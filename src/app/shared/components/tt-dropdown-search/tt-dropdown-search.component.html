@@ -1,0 +1,152 @@
+<div id="tt-dropdown-search-container">
+    <div *ngIf="objectType === 'object'; else stringArrayTemplate">
+        <mat-form-field [floatLabel]="floatLabel">
+            <div *ngIf="isRequired; else notRequired">
+                <input
+                    type="text"
+                    name="value"
+                    [placeholder]="placeholder | translate"
+                    [(ngModel)]="value"
+                    matInput
+                    [matAutocomplete]="stylesAutoObject"
+                    [formControl]="searchTextboxControl"
+                    required
+                    class="input-element"
+                    (blur)="checkSelectedOption($event)"
+                    [readonly]="isReadonly"
+                    (ngModelChange)="showErrorMessage = false"
+                    [attr.data-cy]="'tt-dropdown-' + data_cy"
+                />
+            </div>
+            <ng-template #notRequired>
+                <input
+                    type="text"
+                    name="value"
+                    [placeholder]="placeholder | translate"
+                    [(ngModel)]="value"
+                    matInput
+                    [matAutocomplete]="stylesAutoObject"
+                    [formControl]="searchTextboxControl"
+                    (blur)="checkSelectedOption($event)"
+                    [readonly]="isReadonly"
+                    (ngModelChange)="showErrorMessage = false"
+                    [attr.data-cy]="'tt-dropdown-' + data_cy"
+                />
+            </ng-template>
+            <mat-autocomplete
+                (optionSelected)="selectedItemClick($event)"
+                #stylesAutoObject="matAutocomplete"
+                [displayWith]="getDisplayName.bind(this)"
+            >
+                <mat-option
+                    (onSelectionChange)="onChangeOption(item, $event)"
+                    *ngFor="let item of filteredOptions | async | sortByFilter: optionalParams.value"
+                    [value]="item[optionalParams.key]"
+                    [ngStyle]="{ display: checkIfSelectedItem(item) ? 'none' : 'block' }"
+                    [disabled]="checkIfSelectedItem(item)"
+                    [attr.data-cy]="'tt-dropdown-' + item[optionalParams.key]"
+                    [matTooltip]="showTooltip ? item[optionalParams.key] : ''"
+                    matTooltipClass="tt-dropdown-search-tooltip"
+                    [ngClass]="{ 'tt-dropdown-search-option-wrap': canTextBeWrapped }"
+                >
+                    {{ item[optionalParams.value] }}
+                </mat-option>
+                <mat-option
+                    *ngIf="!(filteredOptions | async) || (filteredOptions | async)?.length === 0"
+                    selected
+                    disabled
+                    [attr.data-cy]="'tt-dropdown-no-options-found'"
+                    >{{ 'No options found!' | translate }}
+                </mat-option>
+            </mat-autocomplete>
+
+            <mat-error class="error-msg" *ngIf="isRequired && searchTextboxControl.hasError('required')">
+                {{ getErrorMessagePlaceholder() | translate }}&nbsp;{{ 'is missing' | translate }}
+            </mat-error>
+            <mat-error
+                class="error-msg"
+                *ngIf="
+                    (!isRequired || (isRequired && !searchTextboxControl.hasError('required'))) &&
+                    searchTextboxControl.invalid
+                "
+            >
+                {{ getErrorMessagePlaceholder() | translate }}&nbsp;{{ 'is invalid' | translate }}
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <ng-template #stringArrayTemplate>
+        <mat-form-field [floatLabel]="floatLabel">
+            <div *ngIf="isRequired; else notRequired">
+                <input
+                    type="text"
+                    name="value"
+                    [placeholder]="placeholder | translate"
+                    [(ngModel)]="value"
+                    matInput
+                    [matAutocomplete]="stylesAuto"
+                    [formControl]="searchTextboxControl"
+                    required
+                    (blur)="checkSelectedOption($event)"
+                    [readonly]="isReadonly"
+                    (ngModelChange)="showErrorMessage = false"
+                    [attr.data-cy]="'tt-dropdown-' + data_cy"
+                />
+            </div>
+            <ng-template #notRequired>
+                <input
+                    type="text"
+                    name="value"
+                    [placeholder]="placeholder | translate"
+                    [(ngModel)]="value"
+                    matInput
+                    [matAutocomplete]="stylesAuto"
+                    [formControl]="searchTextboxControl"
+                    (blur)="checkSelectedOption($event)"
+                    [readonly]="isReadonly"
+                    (ngModelChange)="showErrorMessage = false"
+                    [attr.data-cy]="'tt-dropdown-' + data_cy"
+                />
+            </ng-template>
+
+            <mat-autocomplete
+                (optionSelected)="selectedItemClick($event)"
+                #stylesAuto="matAutocomplete"
+                [displayWith]="getDisplayName.bind(this)"
+            >
+                <mat-option
+                    (onSelectionChange)="onChangeOption(item, $event)"
+                    *ngFor="let item of filteredOptions | async | sortByFilter: 'value'"
+                    [value]="item.id"
+                    [ngStyle]="{ display: checkIfSelectedItem(item.id) ? 'none' : 'block' }"
+                    [disabled]="checkIfSelectedItem(item.id)"
+                    [attr.data-cy]="'tt-dropdown-' + item.id"
+                    [matTooltip]="showTooltip ? item[optionalParams.key] : ''"
+                    matTooltipClass="tt-dropdown-search-tooltip"
+                    [ngClass]="{ 'tt-dropdown-search-option-wrap': canTextBeWrapped }"
+                >
+                    {{ item.value }}
+                </mat-option>
+                <mat-option
+                    *ngIf="!(filteredOptions | async) || (filteredOptions | async)?.length === 0"
+                    selected
+                    disabled
+                    [attr.data-cy]="'tt-dropdown-no-options-found'"
+                    >{{ 'No options found!' | translate }}
+                </mat-option>
+            </mat-autocomplete>
+
+            <mat-error class="error-msg" *ngIf="isRequired && searchTextboxControl.hasError('required')">
+                {{ getErrorMessagePlaceholder() | translate }}&nbsp;{{ 'is missing' | translate }}
+            </mat-error>
+            <mat-error
+                class="error-msg"
+                *ngIf="
+                    (!isRequired || (isRequired && !searchTextboxControl.hasError('required'))) &&
+                    searchTextboxControl.invalid
+                "
+            >
+                {{ getErrorMessagePlaceholder() | translate }}&nbsp;{{ 'is invalid' | translate }}
+            </mat-error>
+        </mat-form-field>
+    </ng-template>
+</div>

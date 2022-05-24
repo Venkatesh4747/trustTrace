@@ -1,0 +1,61 @@
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="heading-title">{{ 'T-EMS Requests' | translate }}:</div>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" *ngIf="pageLoading"></div>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" *ngIf="!pageLoading">
+        <div class="row orders-association-table m-0">
+            <div class="row material-composition m-0" *ngIf="evidences">
+                <mat-table [dataSource]="evidenceDataSource" *ngIf="evidences.length > 0">
+                    <!-- Date Column -->
+                    <ng-container matColumnDef="last_modified">
+                        <mat-header-cell *matHeaderCellDef>{{ 'Last Modified' | translate }}</mat-header-cell>
+                        <mat-cell
+                            class="cursor-pointer"
+                            data-placement="top"
+                            *matCellDef="let element"
+                            (click)="showRelevantEvidences(element)"
+                        >
+                            <span *ngIf="element.last_modified">
+                                {{ element.last_modified | date: 'MMM d y' }}
+                            </span>
+                        </mat-cell>
+                    </ng-container>
+                    <!-- PO_No Column -->
+                    <ng-container matColumnDef="po">
+                        <mat-header-cell *matHeaderCellDef>{{ 'Purchase Order No' | translate }}.</mat-header-cell>
+                        <mat-cell
+                            class="cursor-pointer"
+                            data-placement="top"
+                            *matCellDef="let element"
+                            (click)="showRelevantEvidences(element)"
+                            >{{ element.po || ('Not Available' | translate) }}</mat-cell
+                        >
+                    </ng-container>
+                    <ng-container matColumnDef="provided_by">
+                        <mat-header-cell *matHeaderCellDef>{{ 'Provided By' | translate }}</mat-header-cell>
+                        <mat-cell *matCellDef="let element" (click)="showRelevantEvidences(element)">
+                            <ng-template [ngIf]="element.provided_by" [ngIfElse]="providedByNA">{{
+                                element.provided_by
+                            }}</ng-template>
+                            <ng-template #providedByNA
+                                ><span class="text-muted">{{ 'Not Available' | translate }}</span></ng-template
+                            >
+                        </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="displayedEvidenceDetails"></mat-header-row>
+                    <mat-row
+                        *matRowDef="let row; columns: displayedEvidenceDetails"
+                        [ngClass]="{ 'row-selected': row === selectedRow }"
+                        (click)="selectRow(row)"
+                    ></mat-row>
+                </mat-table>
+                <div class="no-data-available material-composition" *ngIf="evidences.length <= 0">
+                    {{ 'No Data Available' | translate }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

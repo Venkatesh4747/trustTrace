@@ -1,0 +1,316 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="orders-container" class="orders-container">
+            <div id="orders-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Transactions' | translate }}</div>
+                        <div class="page-description">
+                            {{
+                                'Manage your transactions associated with your styles and raw materials'
+                                    | industry
+                                    | translate
+                            }}
+                        </div>
+                    </div>
+                    <div class="header-search" *ngIf="isTransactionsAvailable">
+                        <div class="title-right-search">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Type and press enter to search' | translate }}"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchStyle($event)"
+                                data-cy="order-transaction-search"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <a routerLink="record">
+                            <button class="btn btn-lg btn-blue pull-right btn-gradient cs-btn">
+                                <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" />
+                                {{ 'Record Transactions' | translate }}
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row -->
+
+            <div
+                id="filter-bar-wrapper"
+                class="row filter-bar-wrapper"
+                *ngIf="isTransactionsAvailable && ordersFilters"
+            >
+                <div class="col-md-12">
+                    <ul class="filter-bar-container">
+                        <li *ngFor="let filter of ordersFilters | keys; let filterInd = index">
+                            <app-tt-multi-select-search
+                                (selectionChange)="handleFilterSelection()"
+                                (refreshFilter)="refreshFilter()"
+                                [label]="filter.key"
+                                [options]="filter.value"
+                                [filter_session]="filter_session"
+                                [optionsParam]="optionsParam"
+                                *ngIf="!isAGroup(filter.value)"
+                                [data_cy]="removeSpace(filter.key)"
+                            >
+                            </app-tt-multi-select-search>
+                            <!-- <app-multi-select-and-search
+                                (selectionChange)="handleFilterSelection()"
+                                [label]="filter.key"
+                                [options]="filter.value"
+                                [filter_session]="filter_session"
+                            >
+                            </app-multi-select-and-search> -->
+                        </li>
+                        <li class="reset-filters">
+                            <button
+                                class="button-badge mat-button btn btn-gray"
+                                (click)="resetAllFilters()"
+                                data-cy="transaction-orders-reset-all-filters"
+                            >
+                                {{ 'Reset all filters' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                    <div class="row">
+                        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 total-count">
+                            <div class="float-l" *ngIf="transactions.length > 0 || totalCountFlag">
+                                <app-card-pagination
+                                    [paginationStart]="pagination.from + 1"
+                                    [fetchSize]="pagination.size"
+                                    [totalItemsCount]="totalCount"
+                                    moduleName="Materials"
+                                    (previous)="onScroll('back')"
+                                    (next)="onScroll('next')"
+                                ></app-card-pagination>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                            <div dropdown class="dropdown sort-dropdown">
+                                <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                    <span class="sort-name"
+                                        >{{ 'Sort By' | translate }}
+                                        <i class="fa fa-angle-down"></i>
+                                    </span>
+                                </a>
+                                <ul *dropdownMenu class="dropdown-menu">
+                                    <li>
+                                        <mat-radio-group [(ngModel)]="sortByFilter.sortBy" (change)="handleSortBy()">
+                                            <mat-radio-button value="artifact_name">{{
+                                                'Alphabetical Order' | translate
+                                            }}</mat-radio-button>
+                                            <mat-radio-button value="create_ts">{{
+                                                'Newly Added' | translate
+                                            }}</mat-radio-button
+                                            ><br />
+                                            <mat-radio-button value="status">{{
+                                                'Status' | translate
+                                            }}</mat-radio-button>
+                                        </mat-radio-group>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Sort Dropdown -->
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+
+            <div id="card">
+                <div
+                    class="pt-3 row transactions-table"
+                    [ngStyle]="{ 'top.px': height }"
+                    *ngIf="transactions && transactions.length >= 0"
+                >
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="no-assessments" *ngIf="transactions.length === 0">
+                            {{ 'No Transactions' | translate }}
+                        </div>
+                        <div class="table-responsive" *ngIf="transactions.length > 0">
+                            <div
+                                class="table-card transaction"
+                                *ngFor="let transact of transactions"
+                                [ngClass]="{ bot: transact.mode === 'email' }"
+                            >
+                                <div *ngIf="transact.mode === 'email'" class="imported-from-mail">
+                                    <img src="{{ env.IMG_URL }}images/t-bot.svg" />
+                                </div>
+                                <!-- <div class="table-card-left flex-column" [routerLink]="[product.id]"> -->
+                                <div
+                                    class="table-card-left flex-column ml-1 cursor-pointer"
+                                    [routerLink]="transact.transaction_tree"
+                                >
+                                    <div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Name' | translate }} & {{ 'Number' | translate }}:
+                                            <span>{{ transact.artifact_name }} - {{ transact.artifact_number }}</span>
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Type' | translate }}: <span>{{ transact.product_type.value }}</span>
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Reference ID' | translate }}:
+                                            <span>{{ transact.external_id || 'NA' }}</span>
+                                        </div>
+
+                                        <!-- If needed to enable display of lot ID / Global ID in the future -->
+                                        <!--                                        <div class="desc blue-desc">-->
+                                        <!--                                            {{ 'Lot ID' | translate }}: <span>{{ transact.display_name }}</span>-->
+                                        <!--                                        </div>-->
+                                        <!--                                        <div class="desc blue-desc">-->
+                                        <!--                                            {{ 'QR Code' | translate }}:-->
+                                        <!--                                            <span *ngIf="transact.unique_code; else QRCodeNA">{{-->
+                                        <!--                                                transact.unique_code-->
+                                        <!--                                            }}</span>-->
+                                        <!--                                            <ng-template #QRCodeNA>-->
+                                        <!--                                                <span class="text-muted">NA</span>-->
+                                        <!--                                            </ng-template>-->
+                                        <!--                                        </div>-->
+                                        <div class="desc blue-desc">
+                                            {{ 'Qty' | translate }}:
+                                            <span>{{ transact.quantity }}{{ transact.units_value }}</span>
+                                        </div>
+                                        <div class="desc blue-desc" *ngIf="transact.supplier">
+                                            {{ 'Supplier' | translate }}:
+                                            <span>{{ transact.supplier.value }}</span>
+                                        </div>
+                                        <div class="desc blue-desc" *ngIf="transact.customer">
+                                            {{ 'Customer' | translate }}:
+                                            <span>{{ transact.customer.value }}</span>
+                                        </div>
+                                        <div class="desc blue-desc" *ngIf="transact.po_number">
+                                            {{ 'PO Number' | translate }}:
+                                            <span>{{ transact.po_number }}</span>
+                                        </div>
+                                        <div class="desc blue-desc" *ngIf="transact.tx_date">
+                                            {{ 'Date' | translate }}:
+                                            <span>{{ commonServices.convertToDate(transact.tx_date) }}</span>
+                                        </div>
+                                        <div
+                                            class="desc blue-desc"
+                                            *ngIf="transact.twin_id && authService.haveAccess('ADIDAS_DEMO_READ')"
+                                        >
+                                            {{ 'Digital Twin Id' | translate }}:
+                                            <span>{{ transact.twin_id }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-card-right flex-column mr-1">
+                                    <div class="blue-title align-self-flex-end">
+                                        <div
+                                            class="flex-direction-column display-flex-only align-items-flex-end cursor-default"
+                                        >
+                                            <div class="justify-content-flex-end">
+                                                <div class="card-status cursor-default">
+                                                    <i
+                                                        class="fa fa-circle"
+                                                        [ngClass]="{
+                                                            UN_USED: transact.status === 'UN_USED',
+                                                            USED: transact.status === 'USED'
+                                                        }"
+                                                    >
+                                                    </i>
+                                                    {{ 'Status' | translate }}:&nbsp;<span>{{ transact.status }}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="justify-content-flex-end card-status cursor-default">
+                                                {{ 'Last Modified' | translate }}:
+                                                <span>{{ commonServices.convertToDate(transact.update_ts) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="desc blue-desc align-self-flex-end display-flex-only supply-chain-icon-list-container"
+                                    >
+                                        <div class="supply-chain-icon-container" title="Upload documents">
+                                            <a (click)="uploadDocuments(transact)">
+                                                <img
+                                                    class="image"
+                                                    src="{{ env.IMG_URL }}images/upload.png"
+                                                    alt="Upload documents"
+                                                />
+                                            </a>
+                                        </div>
+                                        <ng-template [ngIf]="transact.unique_code" [ngIfElse]="noQRCode">
+                                            <div class="supply-chain-icon-container" title="Print QR">
+                                                <a (click)="printQR(transact)">
+                                                    <img
+                                                        class="image"
+                                                        src="{{ env.IMG_URL }}images/QRCode.png"
+                                                        alt="Print QR Icon"
+                                                    />
+                                                </a>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #noQRCode>
+                                            <div
+                                                disabled
+                                                class="supply-chain-icon-container disabled"
+                                                title="No QR Code to print"
+                                            >
+                                                <a disabled>
+                                                    <img
+                                                        class="image"
+                                                        src="{{ env.IMG_URL }}images/print-qr.png"
+                                                        alt="Print QR Icon"
+                                                    />
+                                                </a>
+                                            </div>
+                                        </ng-template>
+                                        <!--                                        Has been removed from UI screen. Reserved until confirmed to be removed. -->
+                                        <!--                                        <div class="supply-chain-icon-container" title="view supply chain">-->
+                                        <!--                                            <a (click)="viewSupplyChainFlow(transact.id)">-->
+                                        <!--                                                <img-->
+                                        <!--                                                    class="image"-->
+                                        <!--                                                    src="{{ env.IMG_URL }}images/flow.png"-->
+                                        <!--                                                    alt="View Supply Chain Flow"-->
+                                        <!--                                                />-->
+                                        <!--                                            </a>-->
+                                        <!--                                        </div>-->
+                                        <!--                                        <div class="supply-chain-icon-container" title="view supply chain">-->
+                                        <!--                                            <a (click)="viewSupplyChainFlow(transact.id)">-->
+                                        <!--                                                <i class="action-icons-small fa fa-pencil"></i>-->
+                                        <!--                                            </a>-->
+                                        <!--                                        </div>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row no-transactions-available" *ngIf="!isTransactionsAvailable">
+                <img class="no-transaction-image" src="{{ env.IMG_URL }}images/empty-transaction.png" alt="Add" />
+                <div class="page-title talign-center pt-1">{{ 'Transactions' | translate }}</div>
+                <div class="page-description talign-center pt-1">
+                    {{ 'No Records found. Click below to add' | translate }}
+                </div>
+                <a routerLink="record">
+                    <button class="btn btn-lg btn-blue btn-gradient cs-btn margin-0-auto mt-2">
+                        <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" />
+                        {{ 'Record Transactions' | translate }}
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>
+
+<div style="visibility:hidden" *ngIf="isPrintReady">
+    <app-generate-qr-code #printQRCodeComponent [qrId]="qrCodeToPrint" [qrCodeId]="'qrCodeSectionToPrint'">
+    </app-generate-qr-code>
+</div>

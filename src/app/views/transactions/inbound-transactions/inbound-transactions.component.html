@@ -1,0 +1,299 @@
+<div id="record-transactions-categories" class="material-input-style-box-type">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div id="inbound-transactions" class="material-input-style-box-type-inner">
+        <div class="row pb-2 pr-2">
+            <div class="hr">
+                <span class="hr-title">{{ 'Inbound' | translate }} </span>
+            </div>
+        </div>
+        <div class="row pt-2" *ngIf="!pageLoading">
+            <form #createInboundForm="ngForm">
+                <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 form-align" *ngIf="tierConfig">
+                    <div class="create-inbound-form-block">
+                        <div class="flex-container-block">
+                            <div class="flex-container">
+                                <div *ngFor="let productIdentifier of PRODUCT_IDENTIFIERS">
+                                    <div class="flex-container-inner" *ngIf="checkToShowField(productIdentifier)">
+                                        <mat-form-field>
+                                            <input
+                                                class="input"
+                                                type="text"
+                                                placeholder="{{ getFieldLabel(productIdentifier) | translate }}:"
+                                                name="Article/Style"
+                                                [(ngModel)]="soaUniqueName"
+                                                (blur)="validateSelectedProduct(productIdentifier)"
+                                                matInput
+                                                [matAutocomplete]="soaSearch"
+                                                (keyup)="searchStyleOrArticle($event, productIdentifier)"
+                                                required
+                                                data-cy="inbound-transaction-style-name-number"
+                                            />
+                                            <mat-error class="error-msg" *ngIf="showArticleError"
+                                                >{{ articleError | translate }}
+                                            </mat-error>
+                                            <mat-error class="error-msg" *ngIf="!soaUniqueName && !showArticleError"
+                                                >{{ getFieldLabel(productIdentifier) | translate }}&nbsp;{{
+                                                    'is missing' | translate
+                                                }}</mat-error
+                                            >
+                                            <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                                soaSearchHintText | translate
+                                            }}</mat-hint>
+                                            <mat-autocomplete
+                                                #soaSearch="matAutocomplete"
+                                                [displayWith]="getProductName"
+                                                (optionSelected)="onSOASelection($event.option.value)"
+                                            >
+                                                <mat-option *ngFor="let item of searchData" [value]="item">
+                                                    {{ getProductName(item) }}
+                                                </mat-option>
+                                            </mat-autocomplete>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex-container-inner"
+                                    *ngIf="checkToShowField(inboundLabels.MATERIAL_COMPOSITION)"
+                                >
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            name="styleComposition"
+                                            placeholder="{{
+                                                getFieldLabel(inboundLabels.MATERIAL_COMPOSITION) | translate
+                                            }}:"
+                                            [value]="getProductComposition()"
+                                            data-cy="production-transaction-style-composition"
+                                            readonly
+                                        />
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(inboundLabels.LOT_ID)">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ getFieldLabel(inboundLabels.LOT_ID) | translate }}:"
+                                    name="NewReferenceId"
+                                    [(ngModel)]="payload.inboundData.sellerLotId"
+                                    matInput
+                                    required
+                                    data-cy="inbound-transaction-new-reference-id"
+                                />
+                                <mat-error class="error-msg" *ngIf="!payload.inboundData.sellerLotId"
+                                    >{{ getFieldLabel(inboundLabels.LOT_ID) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(inboundLabels.QUANTITY)">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="number"
+                                    placeholder="{{ getFieldLabel(inboundLabels.QUANTITY) | translate }}:"
+                                    name="Qty"
+                                    [(ngModel)]="payload.inboundData.quantity.quantity"
+                                    required
+                                    data-cy="inbound-transaction-quantity"
+                                    (keydown)="commonServices.filterInput($event)"
+                                />
+                                <mat-error class="error-msg" *ngIf="!payload.inboundData.quantity.quantity"
+                                    >{{ getFieldLabel(inboundLabels.QUANTITY) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(inboundLabels.PO_NUMBER)">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ getFieldLabel(inboundLabels.PO_NUMBER) | translate }}:"
+                                    name="PurchaseOrerNumber"
+                                    [(ngModel)]="payload.inboundData.poNumber"
+                                    required
+                                    data-cy="inbound-transaction-purchase-order-no"
+                                />
+                                <mat-error class="error-msg" *ngIf="!payload.inboundData.poNumber"
+                                    >{{ getFieldLabel(inboundLabels.PO_NUMBER) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(inboundLabels.TRANSACTION_DATE)">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    [matDatepicker]="poDatePicker"
+                                    [max]="today"
+                                    placeholder="{{ getFieldLabel(inboundLabels.TRANSACTION_DATE) | translate }}:"
+                                    name="poDate"
+                                    [(ngModel)]="payload.date"
+                                    required
+                                    (click)="poDatePicker.open()"
+                                    data-cy="inbound-po-date"
+                                />
+                                <mat-error class="error-msg" *ngIf="!payload.date"
+                                    >{{ getFieldLabel(inboundLabels.TRANSACTION_DATE) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                                <mat-datepicker-toggle matSuffix [for]="poDatePicker"></mat-datepicker-toggle>
+                                <mat-datepicker #poDatePicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(inboundLabels.QUANTITY_SUPPLIER_UOM)">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="number"
+                                    name="quantityInSupplierUOM"
+                                    placeholder="{{ getFieldLabel(inboundLabels.QUANTITY_SUPPLIER_UOM) | translate }}:"
+                                    [(ngModel)]="payload.inboundData.sellerUOM.quantity"
+                                    data-cy="inbound-transaction-quantity-supplier"
+                                    (keydown)="commonServices.filterInput($event)"
+                                />
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(inboundLabels.SUPPLIER_UOM)">
+                            <app-tt-dropdown-search
+                                [searchOptions]="config.unit"
+                                [(ngModel)]="payload.inboundData.sellerUOM.unit"
+                                placeholder="{{ getFieldLabel(inboundLabels.SUPPLIER_UOM) | translate }}:"
+                                [isRequired]="payload.inboundData.sellerUOM.quantity !== null"
+                                [required]="payload.inboundData.sellerUOM.quantity !== null"
+                                name="outputQuantityUnit"
+                                [data_cy]="'inbound-transaction-units'"
+                                [showToastr]="false"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(inboundLabels.SUPPLIER_FACILITY)">
+                            <!-- <app-tt-dropdown-search
+                                [searchOptions]="suppliers"
+                                [(ngModel)]="payload.inboundData.supplierId"
+                                placeholder="{{ getFieldLabel(inboundLabels.SUPPLIER) | translate }}:"
+                                required
+                                [isRequired]="true"
+                                name="supplier"
+                                [data_cy]="'inbound-transaction-suppliers'"
+                                [showToastr]="false"
+                                [optionalParams]="optional"                                
+                            >
+                            </app-tt-dropdown-search> -->
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ getFieldLabel(inboundLabels.SUPPLIER_FACILITY) | translate }}:"
+                                    name="supplier"
+                                    data_cy="'inbound-transaction-suppliers'"
+                                    [(ngModel)]="searchTermSupplier"
+                                    (blur)="validateSelectedSupplier()"
+                                    matInput
+                                    [matAutocomplete]="supplierSearch"
+                                    (keyup)="searchSupplier($event)"
+                                    required
+                                />
+                                <mat-error class="error-msg" *ngIf="!searchTermSupplier">
+                                    {{ getFieldLabel(inboundLabels.SUPPLIER_FACILITY) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                                <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                    supplierSearchHintText | translate
+                                }}</mat-hint>
+                                <mat-autocomplete
+                                    #supplierSearch="matAutocomplete"
+                                    [displayWith]="getSupplierName"
+                                    (optionSelected)="onSupplierFacilitySelection($event.option.value)"
+                                >
+                                    <mat-option *ngFor="let item of suppliers" [value]="item">
+                                        {{ item.reference_id }}-{{ item.name }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-container-inner" *ngIf="checkToShowField(inboundLabels.FACILITY)">
+                            <!-- <app-tt-dropdown-search
+                                [(ngModel)]="payload.facilityId"
+                                name="facilities"
+                                placeholder="{{ getFieldLabel(inboundLabels.FACILITY) | translate }}:"
+                                [searchOptions]="associatedFacility"
+                                [data_cy]="'inbound-transaction-associated-facility'"
+                                required
+                                [isRequired]="true"
+                                [showToastr]="false"
+                            >
+                            </app-tt-dropdown-search> -->
+
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ getFieldLabel(inboundLabels.FACILITY) | translate }}:"
+                                    name="facilities"
+                                    [(ngModel)]="searchTermFacility"
+                                    (blur)="validateSelectedFacility()"
+                                    matInput
+                                    [matAutocomplete]="facilitySearch"
+                                    (keyup)="searchFacility($event)"
+                                    required
+                                    data-cy="inbound-transaction-associated-facility"
+                                />
+                                <mat-error class="error-msg" *ngIf="!searchTermFacility">
+                                    {{ getFieldLabel(inboundLabels.FACILITY) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                                <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                    facilitySearchHintText | translate
+                                }}</mat-hint>
+                                <mat-autocomplete
+                                    #facilitySearch="matAutocomplete"
+                                    [displayWith]="getFacilityName"
+                                    (optionSelected)="onFacilitySelection($event.option.value)"
+                                >
+                                    <mat-option *ngFor="let item of facilities" [value]="item">
+                                        {{ item.reference_id }}-{{ item.name }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3 mb-3 pt-3 pb-3">
+                        <div class="col-md-11 talign-right">
+                            <button
+                                id="order-create-btn"
+                                type="button"
+                                class="btn btn-gray create-btn btn-align"
+                                (click)="save()"
+                                [disabled]="!createInboundForm.valid"
+                            >
+                                {{ 'Save' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+<div class="row page-title pt-0">{{ 'Certificates' | translate }}:</div>
+<div class="row mt-1 mb-1 certificate-container" *ngIf="certTypeValueList.length > 0">
+    <div *ngFor="let certInfo of certTypeValueList; let isLast = last; let certIndex = index">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 certificate-file-names">
+            <div class="certificate-file-name" *ngFor="let fName of certInfo.fileName; let isLast = last">
+                <span
+                    >{{ getDisplayText(certInfo.certType) + ' : ' }}
+                    <span class="name">{{ fName | slice: 14 }}</span></span
+                >
+                <span class="file-name-actions">
+                    <!-- <i class="fa fa-download fa-lg" aria-hidden="true" (click)="downloadCertificate(certInfo.evidenceId, fName)"></i> -->
+                    <i class="fa fa-times fa-lg" (click)="deleteAttachment(certIndex, certInfo.evidenceId, fName)"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row no-certificate-available" *ngIf="certTypeValueList.length === 0">
+    <img class="no-certificate-image" src="{{ env.IMG_URL }}images/no-certificate.png" alt="Certificates" />
+    <div class="page-heading talign-center pt-1">{{ 'Uploaded Certificates' | translate }}</div>
+    <div class="page-description talign-center pt-1">{{ 'No Records found. Choose a file to upload' | translate }}</div>
+</div>

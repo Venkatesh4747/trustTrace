@@ -1,0 +1,74 @@
+@import '~styles/variables';
+
+.entity-article-row {
+    padding: 18px 0;
+    margin: 0;
+    color: $text-color-primary;
+    font-family: $font-family-Semibold;
+    font-size: 14px;
+    cursor: default;
+    /* &.odd-row {
+        background: $background-color-primary-tr;
+    }
+    &.even-row {
+        background: $background-color-secondary-tr;
+    } */
+    &.odd-row.row-selected {
+        background: $background-color-primary-selected-tr;
+    }
+    &.even-row.row-selected {
+        background: $background-color-primary-selected-tr;
+    }
+}
+.collapse-section-bg {
+    background: $background-color-secondary-tr;
+}
+.entity-articles-title {
+    font-size: 16px;
+    padding-left: 25px;
+    margin-top: 0;
+    font-family: $font-family-Bold;
+}
+.entity-traced-article-row {
+    color: $text-color-primary;
+    font-family: $font-family-Semibold;
+    font-size: 14px;
+    cursor: default;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    margin: 0;
+}
+/* .odd-row {
+    background: $background-color-primary-tr;
+    
+} */
+.reusable-entity-row {
+    &:nth-of-type(odd) {
+        background: $background-color-table-striped;
+    }
+}
+/* .even-row {
+    background: $background-color-secondary-tr;
+} */
+.odd-row.row-selected {
+    background: $background-color-primary-selected-tr;
+}
+// .even-row.row-selected {
+//     background: $background-color-secondary-selected-tr;
+// }
+.last-traced {
+    display: flex;
+    justify-content: space-between;
+    padding-right: 30px;
+}
+.action-icons-small {
+    font-size: 24px;
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.supply-chain-tree {
+    width: 20px;
+    height: 20px;
+}

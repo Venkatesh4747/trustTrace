@@ -1,0 +1,15 @@
+.city-comp {
+    max-height: initial;
+    overflow: initial;
+    form {
+        p {
+            color: red;
+            margin: -0.9em 0 0.5em 0;
+            font-size: 11px;
+        }
+
+        button:first-child {
+            margin-right: 0.5em;
+        }
+    }
+}

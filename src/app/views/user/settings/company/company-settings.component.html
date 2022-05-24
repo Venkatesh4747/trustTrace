@@ -1,0 +1,869 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+<div class="view-container text-center">
+    <div class="view-container-content">
+        <div class="container-fluid dashboard-outer dashboard-chart-outer">
+            <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+            <div class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="page-title pt-3 pl-2">{{ 'Company Settings' | translate }}</div>
+                    <div class="page-description pl-2">
+                        <span *ngIf="settingsType === 'style'">
+                            {{ 'Set the preferences for Styles, Order and Suppliers' | industry | translate }}
+                        </span>
+                        <span *ngIf="settingsType === 'audit'">
+                            {{ 'Set the preferences for Audit' | translate }}
+                        </span>
+                        <span *ngIf="settingsType === 'api'">
+                            {{ 'Set the preferences for third-party api' | translate }}
+                        </span>
+                    </div>
+                </div>
+                <!-- col -->
+            </div>
+
+            <div class="row pt-2">
+                <form class="toby company-settings">
+                    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-2">
+                        <div
+                            class="form-group bottom"
+                            style="cursor: auto !important"
+                            [ngClass]="{ selected: settingsType === 'style' }"
+                        >
+                            <label (click)="pageLoad('style')">{{ 'Style Settings' | industry | translate }}</label>
+                            <div [ngClass]="{ selected: settingsType === 'style' }"></div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-2">
+                        <div
+                            class="form-group bottom"
+                            style="cursor: auto !important"
+                            [ngClass]="{ selected: settingsType === 'audit' }"
+                        >
+                            <label (click)="pageLoad('audit')">{{ 'Audit Settings' | translate }}</label>
+                            <div [ngClass]="{ selected: settingsType === 'audit' }"></div>
+                        </div>
+                    </div>
+                    <div
+                        *ngIf="authServiceHaveAccess('THIRD_PARTY_API_READ')"
+                        class="col-xs-4 col-sm-4 col-md-3 col-lg-2"
+                    >
+                        <div
+                            class="form-group bottom"
+                            style="cursor: auto !important"
+                            [ngClass]="{ selected: settingsType === 'api' }"
+                        >
+                            <label (click)="pageLoad('api')">{{ 'API Settings' | translate }}</label>
+                            <div [ngClass]="{ selected: settingsType === 'api' }"></div>
+                        </div>
+                    </div>
+
+                    <!-- Integration Testing -->
+                    <!-- <div class="col-xs-4 col-sm-4 col-md-3 col-lg-2">
+                        <div
+                            class="form-group bottom"
+                            style="cursor: auto !important"
+                            [ngClass]="{ selected: settingsType === 'integration' }"
+                        >
+                            <label (click)="settingsType = 'integration'">{{
+                                'Integration Settings' | translate
+                            }}</label>
+                            <div [ngClass]="{ selected: settingsType === 'integration' }"></div>
+                        </div>
+                    </div> -->
+                </form>
+            </div>
+
+            <div class="row pt-2">
+                <div
+                    class="col-xs-12 col-sm-12 col-md-12 col-lg-12 settings style-settings"
+                    *ngIf="settingsType === 'style'"
+                >
+                    <mat-accordion>
+                        <mat-expansion-panel
+                            *ngFor="let category of settingCategories; let panelInd = index"
+                            [expanded]="step === panelInd"
+                            (opened)="setStep(panelInd)"
+                        >
+                            <mat-expansion-panel-header [collapsedHeight]="'75px'" [expandedHeight]="'75px'">
+                                <mat-panel-title>{{ category | translate }}</mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <div [ngSwitch]="category">
+                                <div *ngSwitchCase="'Product Category'">
+                                    <app-product-category [productCategories]="productCategories">
+                                    </app-product-category>
+                                </div>
+                                <div *ngSwitchCase="'Color Specifications'">
+                                    <app-color-specifications [colors]="colors"></app-color-specifications>
+                                </div>
+                                <div *ngSwitchCase="'Season'">
+                                    <form #seasonForm>
+                                        <app-card-input-single
+                                            [placeholderText]="
+                                                'Enter the season (Eg., Summer, Winter, Fall, etc)' | translate
+                                            "
+                                            [hrTitle]="'Your list of Seasons for the product'"
+                                            [askEditConfirm]="askEditConfirm"
+                                            [askDeleteConfirm]="askDeleteConfirm"
+                                            [cardData]="seasons"
+                                            [sectionName]="'seasons'"
+                                            [isCardDataStatusExists]="isCardDataStatusExists"
+                                            [sectionKey]="'seasons'"
+                                        >
+                                        </app-card-input-single>
+                                    </form>
+                                </div>
+                                <div *ngSwitchCase="'Recurring Type'">
+                                    <form #recurringForm>
+                                        <app-card-input-single
+                                            [placeholderText]="
+                                                'Enter the Recurring Type (Eg., Seasonal, Yearly etc)' | translate
+                                            "
+                                            [hrTitle]="'Your list of Recurring Types for the product'"
+                                            [askEditConfirm]="askEditConfirm"
+                                            [askDeleteConfirm]="askDeleteConfirm"
+                                            [isCardDataStatusExists]="isCardDataStatusExists"
+                                            [cardData]="recurringTypes"
+                                            [sectionName]="'recurring_types'"
+                                            [sectionKey]="'recurringTypes'"
+                                        >
+                                        </app-card-input-single>
+                                    </form>
+                                </div>
+                                <div *ngSwitchCase="'Sustainability Labels'">
+                                    <form #recurringForm>
+                                        <app-card-input-single
+                                            [placeholderText]="
+                                                'Enter the Sustainability Label (Eg., Biodegradeable, Recyclable etc)'
+                                                    | translate
+                                            "
+                                            [hrTitle]="'Your list of Sustainability Labels'"
+                                            [askEditConfirm]="askEditConfirm"
+                                            [askDeleteConfirm]="askDeleteConfirm"
+                                            [isCardDataStatusExists]="isCardDataStatusExists"
+                                            [cardData]="sustainabilityLabels"
+                                            [sectionName]="'sustainability_labels'"
+                                            [sectionKey]="'sustainabilityLabels'"
+                                            [hideEditDeleteCondition]="sustainabilityLabelCondition"
+                                        >
+                                        </app-card-input-single>
+                                    </form>
+                                </div>
+                            </div>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </div>
+
+                <div
+                    class="col-xs-12 col-sm-12 col-md-12 col-lg-12 settings audit-settings"
+                    *ngIf="settingsType === 'audit'"
+                >
+                    <mat-accordion class="mat-form-block-type-one">
+                        <!-- Higg integration starts -->
+                        <mat-expansion-panel *ngIf="authServiceHaveAccess('HIGG_CREATE')">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{ 'Higg FEM' | translate }}/ {{ 'FSLM Integration' | translate }}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <div class="mat-panel-body">
+                                <div class="row mt-1 mb-2">
+                                    <div class="col-md-12">
+                                        <div class="pr-1">
+                                            <div class="tt-heading-title text-left mb-1 tt-higg-link-title">
+                                                <span
+                                                    >{{ 'Link your higg account to get the FEM' | translate }} /
+                                                    {{
+                                                        'FSLM scores of your suppliers facilities on Trustrace platform'
+                                                            | translate
+                                                    }}
+                                                </span>
+                                            </div>
+                                            <div class="tt-higg-formwrapper text-left">
+                                                <mat-form-field [floatLabel]="'never'">
+                                                    <input
+                                                        type="text"
+                                                        matInput
+                                                        [formControl]="higgApiKey"
+                                                        placeholder="Please enter your FEM / FSLM API Key (One time activity)"
+                                                    />
+                                                    <mat-error *ngIf="higgApiKey.touched && !higgApiKey.valid">
+                                                        {{ 'Please enter a valid Higg key' | translate }}
+                                                    </mat-error>
+                                                </mat-form-field>
+                                                <div class="row mt-1">
+                                                    <div
+                                                        class="col-xs-12 col-sm-7 col-md-9 col-lg-6 blue-title cursor-pointer"
+                                                    >
+                                                        <span
+                                                            class="tt-higg-api-key-add-info"
+                                                            (click)="showHiggStepsModal()"
+                                                            >{{ 'Find your FEM' | translate }}/{{
+                                                                'FSLM API key in 3 steps' | translate
+                                                            }}</span
+                                                        >
+                                                    </div>
+                                                    <div class="col-xs-12 col-sm-5 col-md-3 col-lg-6">
+                                                        <button
+                                                            type="button"
+                                                            class="btn tt-btn tt-btn-primary ml-1 mr-1 pull-right"
+                                                            data-cy="non-conformance-category-create-btn"
+                                                            (click)="higgLinkAccount()"
+                                                        >
+                                                            {{ 'Save' | translate }}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-expansion-panel>
+                        <!-- Higg integration ends -->
+                        <mat-expansion-panel [expanded]="true">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{ 'Non-Conformity' | translate }}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+
+                            <div class="mat-panel-body">
+                                <div class="row mt-3 mb-2">
+                                    <div class="col-md-12">
+                                        <div class="pr-1">
+                                            <div class="mid-line tt-heading-title">
+                                                <span>{{ 'Create New Non Conformance Category' | translate }}:</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <!--suppress AngularInvalidTemplateReferenceVariable -->
+                                        <form
+                                            [formGroup]="nonConformanceCategoryForm"
+                                            (ngSubmit)="createCategory()"
+                                            #nonConformanceCategoryFGD="ngForm"
+                                        >
+                                            <div class="row nonConformanceCategory">
+                                                <div class="form-group col-md-4 text-left">
+                                                    <mat-form-field [floatLabel]="'never'">
+                                                        <input
+                                                            #nonConformanceCategoryNameER
+                                                            type="text"
+                                                            formControlName="nonConformanceCategoryName"
+                                                            matInput
+                                                            required
+                                                            placeholder="{{ 'Non Conformance Category' | translate }}"
+                                                            data-cy="non-conformance-category-name"
+                                                        />
+                                                        <mat-error
+                                                            *ngIf="hasError('nonConformanceCategoryName', 'required')"
+                                                        >
+                                                            {{ 'Please enter a category name' | translate }}
+                                                        </mat-error>
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-sm-8 text-left">
+                                                    <span
+                                                        class="addSubCategoryButton"
+                                                        (click)="addSubCategoryInputField()"
+                                                    >
+                                                        <div
+                                                            class="spinner-wrapper"
+                                                            data-cy="non-conformance-add-subcategory-btn"
+                                                        >
+                                                            <span
+                                                                class="image-icon image-icon-bg"
+                                                                style="padding: 5px 6px;"
+                                                            >
+                                                                <img
+                                                                    src="{{ env.IMG_URL }}images/plus-btn.png"
+                                                                    alt="Delete"
+                                                                />
+                                                            </span>
+                                                            &nbsp;&nbsp;
+                                                            <h6 class="tt-font">
+                                                                {{ 'Add Sub Category' | translate }}
+                                                            </h6>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="row nonConformanceCategory">
+                                                <div
+                                                    class="col-md-4 text-left"
+                                                    formArrayName="nonConformanceSubCategories"
+                                                >
+                                                    <ul class="list-unstyled">
+                                                        <li
+                                                            *ngFor="
+                                                                let subCategory of nonConformanceSubCategories.controls;
+                                                                let i = index
+                                                            "
+                                                        >
+                                                            <div class="spinner-wrapper" [formGroupName]="i">
+                                                                <input
+                                                                    type="hidden"
+                                                                    hidden
+                                                                    formControlName="subCategoryId"
+                                                                />
+                                                                <input type="hidden" hidden formControlName="status" />
+                                                                <mat-form-field [floatLabel]="'never'">
+                                                                    <input
+                                                                        #nonConformanceSubCategoryNameER
+                                                                        type="text"
+                                                                        formControlName="value"
+                                                                        matInput
+                                                                        required
+                                                                        placeholder="{{ 'Sub Category' | translate }}"
+                                                                        [attr.data-cy]="
+                                                                            'non-conformance-subcategory-' + i
+                                                                        "
+                                                                    />
+                                                                    <mat-error
+                                                                        >{{
+                                                                            'Please enter the sub category name'
+                                                                                | translate
+                                                                        }}
+                                                                    </mat-error>
+                                                                </mat-form-field>
+                                                                <div
+                                                                    class="removeSubCategory image-icon image-icon-bg"
+                                                                    tooltip="Delete"
+                                                                    container="body"
+                                                                    (click)="removeSubCategoryInputField(i)"
+                                                                    [attr.data-cy]="
+                                                                        'non-conformance-delete-subcategory-' + i
+                                                                    "
+                                                                >
+                                                                    <img
+                                                                        src="{{
+                                                                            env.IMG_URL
+                                                                        }}images/questionaire-del.png"
+                                                                        alt="Delete"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-md-offset-8 col-md-4 text-right">
+                                                    <ng-template
+                                                        [ngIf]="!isEditing.nonConformanceCategoryForm"
+                                                        [ngIfElse]="nonConformanceFormUpdateButton"
+                                                    >
+                                                        <button
+                                                            [disabled]="isProcessing.nonConformanceCategoryForm"
+                                                            type="submit"
+                                                            class="btn tt-btn tt-btn-primary pull-right ml-1 mr-1"
+                                                            data-cy="non-conformance-category-create-btn"
+                                                        >
+                                                            <span *ngIf="!isProcessing.nonConformanceCategoryForm">{{
+                                                                'Create' | translate
+                                                            }}</span>
+                                                            <span *ngIf="isProcessing.nonConformanceCategoryForm">{{
+                                                                'Creating...' | translate
+                                                            }}</span>
+                                                        </button>
+                                                    </ng-template>
+
+                                                    <ng-template #nonConformanceFormUpdateButton>
+                                                        <button
+                                                            [disabled]="isProcessing.nonConformanceCategoryForm"
+                                                            type="submit"
+                                                            class="btn tt-btn tt-btn-primary pull-right ml-1"
+                                                            data-cy="non-conformance-category-update-btn"
+                                                        >
+                                                            <span *ngIf="!isProcessing.nonConformanceCategoryForm">{{
+                                                                'Update' | translate
+                                                            }}</span>
+                                                            <span *ngIf="isProcessing.nonConformanceCategoryForm">{{
+                                                                'Updating...' | translate
+                                                            }}</span>
+                                                        </button>
+                                                    </ng-template>
+
+                                                    <button
+                                                        type="button"
+                                                        [disabled]="
+                                                            !nonConformanceCategoryForm.dirty &&
+                                                            !(
+                                                                nonConformanceCategoryForm.touched &&
+                                                                nonConformanceCategoryForm.invalid
+                                                            ) &&
+                                                            !isEditing.nonConformanceCategoryForm
+                                                        "
+                                                        class="btn tt-btn tt-btn-secondary pull-right mr-1"
+                                                        (click)="resetNonConformanceCategoryForm()"
+                                                        data-cy="non-conformance-category-clear-btn"
+                                                    >
+                                                        {{ 'Clear' | translate }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="nc-categories-list-container text-left">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="pr-1">
+                                                <div class="mid-line tt-heading-title">
+                                                    <span>{{
+                                                        'Your list of non-conformance categories' | translate
+                                                    }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-md-12">
+                                            <ul class="list-unstyled">
+                                                <li
+                                                    *ngFor="
+                                                        let nonConformanceCategory of nonConformanceCategories;
+                                                        let i = index
+                                                    "
+                                                >
+                                                    <div class="nonConformanceCategoryItem">
+                                                        <div class="spinner-wrapper">
+                                                            <h4
+                                                                style="color: #306BC4"
+                                                                class="tt-font nonConformanceCategoryName"
+                                                            >
+                                                                {{ nonConformanceCategory.value }}
+                                                            </h4>
+                                                            <span
+                                                                class="action-icon icon-bg edit-icon ml-1"
+                                                                tooltip="Edit"
+                                                                container="body"
+                                                                (click)="
+                                                                    enableEditNonConformanceCategoryName(
+                                                                        nonConformanceCategory
+                                                                    )
+                                                                "
+                                                                [attr.data-cy]="
+                                                                    'non-conformance-category-edit-icon-' + i
+                                                                "
+                                                            >
+                                                                <img
+                                                                    src="{{ env.IMG_URL }}images/edit.png"
+                                                                    alt="Edit"
+                                                                />
+                                                            </span>
+                                                            <span
+                                                                class="action-icon icon-bg delete-icon"
+                                                                tooltip="Delete"
+                                                                container="body"
+                                                                (click)="
+                                                                    deleteNonConformanceCategoryName(
+                                                                        nonConformanceCategory
+                                                                    )
+                                                                "
+                                                                [attr.data-cy]="
+                                                                    'non-conformance-category-delete-icon-' + i
+                                                                "
+                                                            >
+                                                                <img
+                                                                    src="{{ env.IMG_URL }}images/questionaire-del.png"
+                                                                    alt="Delete"
+                                                                />
+                                                            </span>
+                                                        </div>
+                                                        <h5
+                                                            style="padding-left: 20px;"
+                                                            class="text-muted"
+                                                            *ngIf="
+                                                                !nonConformanceCategory.subCategories ||
+                                                                nonConformanceCategory?.subCategories?.length === 0
+                                                            "
+                                                        >
+                                                            {{ 'No Sub Categories have been created' | translate }}.
+                                                        </h5>
+                                                        <h5
+                                                            class="tt-font"
+                                                            style="color: #04B6FF; padding-left: 20px;"
+                                                            *ngIf="nonConformanceCategory?.subCategories?.length > 0"
+                                                        >
+                                                            {{ 'Sub Category' | translate }}:
+                                                        </h5>
+                                                        <ul
+                                                            style="padding-left: 20px;"
+                                                            *ngIf="nonConformanceCategory?.subCategories?.length > 0"
+                                                            class="list-unstyled nonFormanceSubCategoriesList"
+                                                        >
+                                                            <li
+                                                                class="item"
+                                                                *ngFor="
+                                                                    let subCategory of nonConformanceCategory.subCategories
+                                                                "
+                                                            >
+                                                                <h5 class="tt-font tt-font-regular">
+                                                                    {{ subCategory.value }}
+                                                                </h5>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{ 'Audit Expiration Period' | translate }}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+
+                            <div class="mat-panel-body audit-expiration">
+                                <h5 class="tt-font text-left">
+                                    {{
+                                        'Please select the date by which an audit should be categorized as "Expiring Soon"'
+                                            | translate
+                                    }}
+                                </h5>
+
+                                <form
+                                    (ngSubmit)="saveAuditExpiration()"
+                                    [formGroup]="auditExpirationForm"
+                                    class="mt-2"
+                                    #auditExpirationFormFGD="ngForm"
+                                >
+                                    <div class="row text-left">
+                                        <div class="col-md-2">
+                                            <mat-form-field [floatLabel]="'never'">
+                                                <input
+                                                    type="number"
+                                                    formControlName="quantity"
+                                                    min="0"
+                                                    step="1"
+                                                    oninput="validity.valid||(value='');"
+                                                    matInput
+                                                    required
+                                                    placeholder="{{ 'Eg' | translate }}., 3"
+                                                />
+                                                <mat-error>{{
+                                                    'Please enter the quantity in number' | translate
+                                                }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <mat-form-field [floatLabel]="'never'" [hideRequiredMarker]="'true'">
+                                                <mat-select
+                                                    formControlName="unit"
+                                                    placeholder="{{ 'Eg' | translate }}, {{
+                                                        'Days / Weeks etc' | translate
+                                                    }}.,"
+                                                    required
+                                                >
+                                                    <mat-option *ngFor="let unit of timeUnits" [value]="unit">{{
+                                                        localizationService.getDisplayText(unit)
+                                                    }}</mat-option>
+                                                </mat-select>
+                                                <mat-error>{{ 'Please select the unit' | translate }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <h5 class="tt-font text-left">{{ 'before expiry date' | translate }}</h5>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2 mt-1">
+                                        <div class="col-md-12">
+                                            <div class="pull-right pr-1">
+                                                <button
+                                                    type="button"
+                                                    (click)="resetAuditExpirationForm()"
+                                                    class="btn tt-btn tt-btn-secondary mr-1"
+                                                >
+                                                    {{ 'Clear' | translate }}
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    [disabled]="auditExpirationForm.invalid"
+                                                    class="btn tt-btn tt-btn-primary"
+                                                >
+                                                    {{ 'Save' | translate }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{ 'Non Conformity Priority' | translate }}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+
+                            <div class="mat-panel-body audit-priority">
+                                <form
+                                    (ngSubmit)="saveAuditPriority()"
+                                    [formGroup]="auditPriorityForm"
+                                    class="mt-2"
+                                    #auditPriorityFormFGD="ngForm"
+                                >
+                                    <h5 class="tt-font text-left">
+                                        {{ 'Add New Priority Category' | translate }}
+                                    </h5>
+                                    <div class="row priorityCategory">
+                                        <div class="form-group col-md-4 text-left">
+                                            <mat-form-field [floatLabel]="'never'">
+                                                <input
+                                                    #priorityCategoryNameER
+                                                    type="text"
+                                                    formControlName="priorityCategoryName"
+                                                    matInput
+                                                    required
+                                                    placeholder="{{ 'Priority Category' | translate }}"
+                                                />
+                                                <mat-error
+                                                    *ngIf="checkPriorityError('priorityCategoryName', 'required')"
+                                                >
+                                                    {{ 'Please enter a category name' | translate }}</mat-error
+                                                >
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <h5 class="tt-font text-left">
+                                        {{ 'What is the deadline to address this type of Non-Conformity' | translate }}?
+                                    </h5>
+                                    <div class="row text-left">
+                                        <div class="col-md-2">
+                                            <mat-form-field [floatLabel]="'never'">
+                                                <input
+                                                    type="number"
+                                                    formControlName="deadlineValue"
+                                                    min="0"
+                                                    step="1"
+                                                    oninput="validity.valid||(value='');"
+                                                    matInput
+                                                    required
+                                                    placeholder="{{ 'Eg' | translate }}., 3"
+                                                />
+                                                <mat-error>{{
+                                                    'Please enter the value in number' | translate
+                                                }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <mat-form-field [floatLabel]="'never'" [hideRequiredMarker]="'true'">
+                                                <mat-select
+                                                    formControlName="deadlineUnit"
+                                                    placeholder="{{ 'Eg' | translate }}, {{
+                                                        'Days / Weeks etc' | translate
+                                                    }}.,"
+                                                    required
+                                                >
+                                                    <mat-option *ngFor="let unit of timeUnits" [value]="unit">{{
+                                                        localizationService.getDisplayText(unit)
+                                                    }}</mat-option>
+                                                </mat-select>
+                                                <mat-error>{{ 'Please select the unit' | translate }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <h5 class="tt-font text-left">
+                                        {{
+                                            'How long before the deadline would you like the mail to be sent'
+                                                | translate
+                                        }}?
+                                    </h5>
+                                    <div class="row text-left">
+                                        <div class="col-md-2">
+                                            <mat-form-field [floatLabel]="'never'">
+                                                <input
+                                                    type="number"
+                                                    formControlName="reminderValue"
+                                                    min="0"
+                                                    step="1"
+                                                    oninput="validity.valid||(value='');"
+                                                    matInput
+                                                    required
+                                                    placeholder="{{ 'Eg' | translate }}., 3"
+                                                />
+                                                <mat-error>{{
+                                                    'Please enter the value in number' | translate
+                                                }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <mat-form-field [floatLabel]="'never'" [hideRequiredMarker]="'true'">
+                                                <mat-select
+                                                    formControlName="reminderUnit"
+                                                    placeholder="{{ 'Eg' | translate }}, {{
+                                                        'Days / Weeks etc' | translate
+                                                    }}.,"
+                                                    required
+                                                >
+                                                    <mat-option *ngFor="let unit of timeUnits" [value]="unit">{{
+                                                        localizationService.getDisplayText(unit)
+                                                    }}</mat-option>
+                                                </mat-select>
+                                                <mat-error>{{ 'Please select the unit' | translate }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2 mt-1">
+                                        <div class="col-md-12">
+                                            <div class="pull-right">
+                                                <button
+                                                    type="button"
+                                                    (click)="resetAuditPriorityForm()"
+                                                    class="btn tt-btn tt-btn-secondary mr-1"
+                                                >
+                                                    {{ 'Clear' | translate }}
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    [disabled]="auditPriorityForm.invalid"
+                                                    class="btn tt-btn tt-btn-primary"
+                                                >
+                                                    <span *ngIf="!isEditing.auditPriorityForm">{{
+                                                        'Create' | translate
+                                                    }}</span>
+                                                    <span *ngIf="isEditing.auditPriorityForm">{{
+                                                        'Update' | translate
+                                                    }}</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="nc-priorities-list-container text-left">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mid-line tt-heading-title">
+                                            <span>{{ 'Your list of Non Conformance Priorities' | translate }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <ul class="list-unstyled">
+                                            <li *ngFor="let ncPriority of ncPriorities; index as i">
+                                                <div class="priorityCategoryItem">
+                                                    <div class="spinner-wrapper">
+                                                        <h5 class="tt-font priorityCategoryName">
+                                                            {{ i + 1 }}. {{ 'Priority Category' | translate }}:
+                                                        </h5>
+                                                        <span
+                                                            class="action-icon icon-bg edit-icon ml-1"
+                                                            tooltip="Edit"
+                                                            container="body"
+                                                            (click)="enableEditNCPriority(ncPriority)"
+                                                        >
+                                                            <img src="{{ env.IMG_URL }}images/edit.png" alt="Edit" />
+                                                        </span>
+                                                        <span
+                                                            class="action-icon icon-bg delete-icon"
+                                                            tooltip="Delete"
+                                                            container="body"
+                                                            (click)="deleteNCPriority(ncPriority)"
+                                                        >
+                                                            <img
+                                                                src="{{ env.IMG_URL }}images/questionaire-del.png"
+                                                                alt="Delete"
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                    <h5
+                                                        class="tt-font tt-font-regular tt-padding"
+                                                        *ngIf="ncPriority?.categoryName"
+                                                    >
+                                                        {{ ncPriority.categoryName }}
+                                                    </h5>
+                                                    <div class="spinner-wrapper">
+                                                        <h5 class="tt-font tt-padding priorityCategoryName">
+                                                            {{
+                                                                'Deadline to address this type of Non-Conformity'
+                                                                    | translate
+                                                            }}:
+                                                        </h5>
+                                                    </div>
+                                                    <h5
+                                                        class="tt-font tt-font-regular tt-padding"
+                                                        *ngIf="ncPriority?.ncDeadlineValue"
+                                                    >
+                                                        {{ ncPriority.ncDeadlineValue }}
+                                                        {{
+                                                            localizationService.getDisplayText(
+                                                                ncPriority.ncDeadLineUnit
+                                                            )
+                                                        }}
+                                                    </h5>
+                                                    <div class="spinner-wrapper">
+                                                        <h5 class="tt-font tt-padding priorityCategoryName">
+                                                            {{
+                                                                'How long before the deadline would you like the mail to be
+                                                            sent?'
+                                                                    | translate
+                                                            }}
+                                                        </h5>
+                                                    </div>
+                                                    <h5
+                                                        class="tt-font tt-font-regular tt-padding"
+                                                        *ngIf="ncPriority?.mailReminderValue"
+                                                    >
+                                                        {{ ncPriority.mailReminderValue }}
+                                                        {{
+                                                            localizationService.getDisplayText(
+                                                                ncPriority.mailReminderUnit
+                                                            )
+                                                        }}
+                                                    </h5>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </div>
+                <div
+                    class="col-xs-12 col-sm-12 col-md-12 col-lg-12 settings api-settings"
+                    *ngIf="settingsType === 'api'"
+                >
+                    <mat-accordion class="mat-form-block-type-one">
+                        <mat-expansion-panel *ngIf="authServiceHaveAccess('THIRD_PARTY_API_CREATE')">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{ 'Generate API Key' | translate }}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <div class="mat-panel-body">
+                                <app-generate-api-key> </app-generate-api-key>
+                            </div>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </div>
+
+                <!-- Integration settings -->
+                <div
+                    class="col-xs-12 col-sm-12 col-md-12 col-lg-12 settings audit-settings"
+                    *ngIf="settingsType === 'integration'"
+                >
+                    <app-filter-criteria-items></app-filter-criteria-items>
+                    <app-data-mapping-items></app-data-mapping-items>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

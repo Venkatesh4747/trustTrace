@@ -1,0 +1,86 @@
+<div class="non-conformities">
+    <ul class="col-md-12 parent-list" *ngIf="nonConformities?.length > 0">
+        <li *ngFor="let category of nonConformities; let mainIndex = index">
+            <h4 class="tt-font mb-2" *ngIf="oncategoryStatus(category)">
+                {{ category.categoryName | translate }}
+                <span *ngIf="ncMode === 'view'"> ({{ getLengthNC(category) }}):</span>
+            </h4>
+            <ul class="sub-list" *ngIf="category?.subCategories?.length > 0">
+                <ng-container *ngFor="let subCategory of category?.subCategories; let subIndex = index">
+                    <li *ngIf="onNcdataStatus(subCategory)">
+                        <div class="sub-category">
+                            {{ subCategory.value }}
+                            <span
+                                class="tt-nc-label {{ isAllSubNCDataAddressed(subCategory) ? 'green-label' : '' }}"
+                                *ngIf="ncMode === 'view'"
+                            >
+                                {{ getSubncLength(subCategory?.subNCData) }}</span
+                            >
+                        </div>
+                        <ul class="subNCData" *ngIf="subCategory?.subNCData?.length > 0">
+                            <ng-container *ngFor="let subNCData of subCategory?.subNCData; let ncIndex = index">
+                                <li *ngIf="subNCData.status !== 'DELETED'">
+                                    <div class="sub-n-data">
+                                        <span
+                                            class="list-icon"
+                                            *ngIf="ncMode !== 'edit' || subNCData?.id === undefined; else Check"
+                                        >
+                                            <img
+                                                *ngIf="subNCData?.status === 'ACTIVE'"
+                                                [src]="env.IMG_URL + 'images/unaddressed.png'"
+                                                alt="list-icon"
+                                            />
+                                            <img
+                                                *ngIf="subNCData?.status === 'IN_ACTIVE'"
+                                                [src]="env.IMG_URL + 'images/addressed.png'"
+                                                alt="list-icon"
+                                            />
+                                        </span>
+                                        <ng-template #Check>
+                                            <span (click)="onAddress(mainIndex, subIndex, ncIndex)" class="check">
+                                                <mat-checkbox
+                                                    [disabled]="true"
+                                                    [checked]="subNCData.status === 'IN_ACTIVE'"
+                                                >
+                                                </mat-checkbox>
+                                            </span>
+                                        </ng-template>
+                                        <span [class]="subNCData.status === 'IN_ACTIVE' ? 'addressed' : ''">
+                                            {{ subNCData.value }}
+                                        </span>
+                                        <span
+                                            class="edit-icon"
+                                            *ngIf="ncMode !== 'view'"
+                                            (click)="onEdit(mainIndex, subIndex, ncIndex)"
+                                        >
+                                            <img [src]="env.IMG_URL + 'images/edit.png'" alt="edit" />
+                                        </span>
+                                        <span
+                                            class="delete-icon"
+                                            *ngIf="ncMode !== 'view'"
+                                            (click)="onDelete(mainIndex, subIndex, ncIndex)"
+                                        >
+                                            <img [src]="env.IMG_URL + 'images/questionaire-del.png'" alt="delete" />
+                                        </span>
+                                        <mat-spinner [diameter]="14" *ngIf="subNCData?.isProgress"></mat-spinner>
+                                    </div>
+                                    <div class="priority">
+                                        <span>Priority: {{ subNCData.priorityValue }}</span>
+                                        <span class="date" *ngIf="subNCData.status !== 'IN_ACTIVE'; else addressed"
+                                            >{{ 'Added on' }} {{ subNCData.addedOn | date }}</span
+                                        >
+                                        <ng-template #addressed>
+                                            <span class="date"
+                                                >{{ 'Addressed on' }} {{ subNCData.updatedOn | date }}</span
+                                            >
+                                        </ng-template>
+                                    </div>
+                                </li>
+                            </ng-container>
+                        </ul>
+                    </li>
+                </ng-container>
+            </ul>
+        </li>
+    </ul>
+</div>

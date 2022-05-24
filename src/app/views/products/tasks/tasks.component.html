@@ -1,0 +1,20 @@
+<div class="row" *ngIf="!isRoot">
+    <div class="col-md-12">
+        <div class="page-header-section">
+            <div class="page-header-section-inner">
+                <div class="page-title">
+                    <h4 class="title">{{ titles.active.title | translate }}</h4>
+                    <h5 class="sub-title">
+                        {{ titles.active.description | translate }}
+                    </h5>
+                </div>
+
+                <button class="go-back-button" [routerLink]="['.']">
+                    {{ 'Back' | translate }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>

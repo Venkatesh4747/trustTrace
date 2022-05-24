@@ -1,0 +1,98 @@
+@import '~styles/variables';
+
+.sub-supplier-profile {
+    width: 20%;
+    float: left;
+}
+.thumbnail {
+    width: 100%;
+    height: auto;
+}
+.sub-supplier-statistics {
+    color: $text-color-primary;
+    width: 80%;
+    float: left;
+    padding-left: 50px;
+}
+.sub-supplier-name {
+    width: 100%;
+    display: flex;
+}
+
+.sub-supplier-heading {
+    font-size: 30px;
+    word-break: break-word;
+}
+.back-button-div {
+    position: absolute;
+    right: 10%;
+}
+.sub-supplier-description {
+    font-size: 18px;
+    font-family: $font-family-Light;
+    color: #474747;
+    float: left;
+}
+.sub-supplier-stats {
+    float: left;
+    width: 100%;
+}
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    margin-left: -20px;
+    width: 100%;
+}
+.flex-container > .flex-div {
+    width: 190px;
+    margin-top: 20px;
+}
+.numbers {
+    text-align: center;
+    font-family: $font-family-Bold;
+    font-size: 25px;
+}
+.title {
+    text-align: center;
+    font-family: $font-family-Regular;
+    font-size: 15px;
+}
+.male-color {
+    color: #39a7ab;
+}
+.female-color {
+    color: #396fab;
+}
+.others-color {
+    color: #21afd3;
+}
+.sub-supplier-since-color {
+    color: #6d46d0;
+}
+
+.horizontal-div-wrapper {
+    display: block;
+}
+.chip-list-div {
+    width: 50%;
+    float: left;
+    padding-right: 50px;
+    @media #{$responsive-max-1023} {
+        width: 100%;
+    }
+}
+.rating {
+    font-size: 25px;
+}
+.checked {
+    color: #49c3fc;
+}
+.not-checked {
+    color: #ddd;
+}
+.facility-view {
+    .chip-list-div {
+        width: 100%;
+    }
+}

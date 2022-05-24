@@ -1,0 +1,22 @@
+@import '../../../../styles/variables';
+
+.copy-hint {
+    font-family: $font-family-Regular;
+    font-size: 10px;
+    font-weight: normal;
+    letter-spacing: normal;
+    text-align: center;
+    color: #a8a8a8;
+    margin-top: 10.7px;
+}
+
+.ref-id-container {
+    width: fit-content;
+    overflow: hidden;
+}
+
+button {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0350aa;
+}

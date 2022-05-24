@@ -1,0 +1,122 @@
+@import '../../../../styles/variables';
+
+.content-container {
+    padding: 20px 20px;
+}
+
+.template-label {
+    font-family: $font-family-Regular;
+    color: $text-font-color;
+    margin: 0;
+    align-self: center;
+    font-weight: normal;
+    font-size: 14px;
+    font-weight: 600;
+}
+.template-label {
+    span {
+        color: red;
+    }
+}
+.tt-file-upload-ui-container {
+    border: 2px dashed $border-color-default;
+    padding: 20px 30px;
+    margin: 15px 15px 15px 0;
+    max-width: 300px;
+    cursor: pointer;
+}
+
+.tt-file-upload-ui-content {
+    text-align: center;
+    .description {
+        color: #cccccc !important;
+        font-family: $font-family-Regular;
+        font-size: 16px;
+        // margin-left: 15px;
+    }
+}
+
+.tt-uploaded-file-list-container {
+    .tt-uploaded-file {
+        cursor: auto;
+        padding: 15px 20px 15px 0;
+        .fileName {
+            font-family: $font-family-Semibold;
+            font-size: 14px;
+            color: $text-color-primary;
+        }
+    }
+
+    .tt-remove-uploaded-file {
+        margin-left: 10px;
+        cursor: pointer;
+    }
+}
+
+.nc-item {
+    padding: 10px;
+    span.action-icon {
+        margin-left: 10px;
+    }
+}
+
+.nc-item:hover {
+    background-color: lighten($light-blue, 10%);
+    border-radius: 5px;
+}
+
+.input-error {
+    color: red !important;
+}
+
+.non-conformity-item:not(:last-child) {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+}
+
+mat-label {
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    color: #989898 !important;
+}
+
+p {
+    font-size: 14px !important;
+}
+
+@media only screen and (min-width: 1469px) {
+    form {
+        margin-top: 40px;
+    }
+}
+
+.audit-standard {
+    background-color: #acf2ff;
+    color: #325992;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.pd-0 {
+    padding: 0px !important;
+}
+
+.form-details {
+    margin-top: 35px;
+}
+
+mat-form-field {
+    input {
+        color: #325992;
+    }
+}
+
+.button-group {
+    button {
+        &:nth-child(1) {
+            margin-right: 10px;
+        }
+    }
+}

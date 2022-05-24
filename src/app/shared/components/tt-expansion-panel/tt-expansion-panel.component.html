@@ -1,0 +1,15 @@
+<span #insideElement class="tt-expansion-panel-wrapper">
+    <span class="title-label blue-title cursor-pointer" (click)="expanded = !expanded">
+        <span id="view_more" *ngIf="!expanded"> {{ 'View More...' | translate }}</span>
+        <span id="view_less" *ngIf="expanded"> {{ 'View less' | translate }}</span>
+    </span>
+    <div class="tt-expansion-panel-container">
+        <mat-accordion [@.disabled]="true">
+            <mat-expansion-panel [(expanded)]="expanded">
+                <div class="primary-blue-title" *ngFor="let value of valueList; let isLast = last">
+                    {{ value.value }}{{ isLast ? '' : ', ' }}
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</span>

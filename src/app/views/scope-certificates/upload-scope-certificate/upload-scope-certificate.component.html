@@ -1,0 +1,868 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="upload-container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="upload-transaction-header">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="page-title">
+                            <div>{{ 'Upload Scope Certificate' | translate }}</div>
+                            <div class="page-description">
+                                {{ 'Upload and fill Scope Certificate information' | translate }}
+                            </div>
+                        </div>
+                        <!-- Page Title -->
+                        <div class="close-icon-block text-right">
+                            <a
+                                (click)="
+                                    uploadedFile !== undefined
+                                        ? closeUploadScopeCertificate(uploadedFile.id, uploadedFile.fullName)
+                                        : closeUploadScopeCertificate(null, null)
+                                "
+                                *ngIf="showClose"
+                            >
+                                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+                            </a>
+                        </div>
+                        <!-- Close Icon Block -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!-- Row -->
+            </div>
+            <!-- Upload Transaction Header -->
+        </div>
+        <!-- Column -->
+    </div>
+    <!-- Row -->
+    <div class="upload-container-block">
+        <div class="row">
+            <div class="col-md-5">
+                <!--  Row -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="upload-transaction-certificate-block">
+                            <div class="upload-extraction-title">
+                                <h4 class="title">
+                                    {{ extractionStatus | translate }}
+                                </h4>
+                            </div>
+                            <!-- Upload Extraction Title -->
+                            <div class="upload-certificate-section">
+                                <div class="uploaded-source-file-loader" *ngIf="uploadedFile && isExtracting">
+                                    <app-spinner [small]="true"></app-spinner>
+                                </div>
+                                <ngx-extended-pdf-viewer
+                                    [src]="fileToUpload"
+                                    [height]="'80vh'"
+                                    [useBrowserLocale]="true"
+                                    [showBookmarkButton]="false"
+                                    [showDownloadButton]="false"
+                                    [showOpenFileButton]="false"
+                                    [showPrintButton]="false"
+                                    [showPropertiesButton]="false"
+                                    *ngIf="uploadedFile && !isExtracting"
+                                >
+                                    <!-- [showSecondaryToolbarButton]='false' -->
+                                </ngx-extended-pdf-viewer>
+                                <div class="drag-file-upload-container" *ngIf="!uploadedFile">
+                                    <div class="drag-file-upload" (click)="fileInput.click()">
+                                        <span *ngIf="!isUploading" class="drag-file-upload-icon">
+                                            <mat-icon>arrow_upward</mat-icon>
+                                        </span>
+                                        <span *ngIf="!isUploading" class="pl-1">{{
+                                            'Click to upload certificate (Please upload only PDF files)' | translate
+                                        }}</span>
+                                        <span *ngIf="isUploading" class="margin-0-auto">
+                                            <app-spinner [small]="true"></app-spinner>
+                                        </span>
+                                        <input
+                                            type="file"
+                                            class="hidden"
+                                            #fileInput
+                                            name="{{ fileInput }}"
+                                            (change)="uploadFile($event.target.files)"
+                                            [hidden]="true"
+                                            [disabled]="isUploading"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Upload Certificate Section -->
+                            <div
+                                class="upload-certificate-document"
+                                *ngIf="uploadedFile && !isExtracting"
+                                [ngClass]="{ 'disabled-opacity-5': isExtracting }"
+                            >
+                                <div class="upload-file-name-block">
+                                    <p>
+                                        <span>{{ 'File Name ' | translate }}:</span>{{ uploadedFile.name }}
+                                    </p>
+                                    <a
+                                        [ngClass]="{ 'disabled-opacity-5': isExtracting }"
+                                        (click)="downloadScopeCertificate(uploadedFile.id, uploadedFile.name)"
+                                    >
+                                        <img
+                                            tooltip="Download"
+                                            container="body"
+                                            src="{{ env.IMG_URL }}images/file-download.png"
+                                            alt="Download"
+                                        />
+                                    </a>
+                                    <a
+                                        (click)="deleteScopeCertificate(uploadedFile.id, uploadedFile.fullName)"
+                                        [ngClass]="{ 'disabled-opacity-5': isExtracting }"
+                                    >
+                                        <img src="{{ env.IMG_URL }}images/delete-icon.png" alt="Delete" />
+                                    </a>
+                                </div>
+                                <!-- Upload Certificate Document -->
+                            </div>
+                            <!-- Upload File Document -->
+                        </div>
+                        <!-- Upload Transaction Certificate Block -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!--  Row -->
+            </div>
+            <!-- Column -->
+            <div class="col-md-7">
+                <div class="upload-transaction-field ">
+                    <div class="row">
+                        <div class="mandatory-title">
+                            <h4 class="title">{{ 'All fields are mandatory' | translate }} <span>*</span></h4>
+                        </div>
+                        <div class="back-button">
+                            <button
+                                class="go-back-button"
+                                (click)="handleEditClick(!isEditMode)"
+                                [disabled]="
+                                    extractionStatus === extractionStatusText.FAILED ||
+                                    isExtracting ||
+                                    !uploadedFile ||
+                                    disableEditButton
+                                "
+                            >
+                                {{ editBtnText | translate }}
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Mandatory Title -->
+                    <div class="material-input-style-box-type">
+                        <form #scopeCertificateForm="ngForm" class="scope-certificate-form-controls">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table class="table custom-table normal-style-table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>{{ 'Certificate Number' | translate }}</th>
+                                                        <th>{{ 'Certification Standard' | translate }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                                <input
+                                                                    type="text"
+                                                                    matInput
+                                                                    placeholder="{{
+                                                                        'Enter Certificate Number' | translate
+                                                                    }}"
+                                                                    required
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .referenceNumber
+                                                                    "
+                                                                    name="scope-certificate-certificate-number"
+                                                                    [disabled]="
+                                                                        (editBtnText === 'Cancel the edit' &&
+                                                                            extractedData.scExtractedData
+                                                                                ?.referenceNumber &&
+                                                                            extractionStatus !== 'Extraction failed') ||
+                                                                        editBtnText === 'Edit'
+                                                                    "
+                                                                />
+                                                            </mat-form-field>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>{{
+                                                                    extractedData.scExtractedData.referenceNumber ||
+                                                                        ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </td>
+                                                        <td>
+                                                            <mat-form-field
+                                                                [floatLabel]="'never'"
+                                                                class="mandatory"
+                                                                *ngIf="extractionStatus !== 'Extraction failed'"
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    matInput
+                                                                    placeholder="Enter Certification Standard"
+                                                                    [(ngModel)]="certStd"
+                                                                    name="scope-certificate-certificate-type"
+                                                                    [disabled]="
+                                                                        (editBtnText === 'Cancel the edit' &&
+                                                                            extractedData.scExtractedData?.certTypeId &&
+                                                                            extractionStatus !== 'Extraction failed') ||
+                                                                        editBtnText === 'Edit'
+                                                                    "
+                                                                />
+                                                            </mat-form-field>
+                                                            <app-tt-dropdown-search
+                                                                *ngIf="extractionStatus === 'Extraction failed'"
+                                                                [searchOptions]="this.config.CertificationStandard"
+                                                                [(ngModel)]="certStd"
+                                                                [optionalParams]="certParams"
+                                                                placeholder="Enter Certification Standard"
+                                                                required
+                                                                class="mandatory"
+                                                                floatLabel="never"
+                                                                [data_cy]="'scope-certificate-fac-name'"
+                                                                name="scope-certificate-certificate-type"
+                                                            >
+                                                            </app-tt-dropdown-search>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>{{
+                                                                    localeService.getDisplayText(
+                                                                        extractedData.scExtractedData.certTypeId
+                                                                    ) || ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Table Responsive -->
+                                    </div>
+                                    <!-- Table Container -->
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!--  Row -->
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table class="table custom-table normal-style-table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>{{ 'Valid from' | translate }}</th>
+                                                        <th>{{ 'Valid until' | translate }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                                <input
+                                                                    matInput
+                                                                    [matDatepicker]="validFromCtrl"
+                                                                    placeholder="Enter Valid From"
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData.validFrom
+                                                                    "
+                                                                    name="scope-certificate-valid-from"
+                                                                    [disabled]="
+                                                                        (editBtnText === 'Cancel the edit' &&
+                                                                            extractedData.scExtractedData?.validFrom &&
+                                                                            extractionStatus !== 'Extraction failed') ||
+                                                                        editBtnText === 'Edit'
+                                                                    "
+                                                                />
+                                                                <mat-datepicker-toggle matSuffix [for]="validFromCtrl">
+                                                                </mat-datepicker-toggle>
+                                                                <mat-datepicker #validFromCtrl></mat-datepicker>
+                                                            </mat-form-field>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>{{
+                                                                    extractedData.scExtractedData.validFrom ||
+                                                                        ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </td>
+                                                        <td>
+                                                            <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                                <input
+                                                                    matInput
+                                                                    required
+                                                                    [matDatepicker]="validUntilCtrl"
+                                                                    placeholder="Enter Valid Until"
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData.validUntil
+                                                                    "
+                                                                    name="scope-certificate-valid-until"
+                                                                    [disabled]="
+                                                                        (editBtnText === 'Cancel the edit' &&
+                                                                            extractedData.scExtractedData?.validUntil &&
+                                                                            extractionStatus !== 'Extraction failed') ||
+                                                                        editBtnText === 'Edit'
+                                                                    "
+                                                                />
+                                                                <mat-datepicker-toggle matSuffix [for]="validUntilCtrl">
+                                                                </mat-datepicker-toggle>
+                                                                <mat-datepicker #validUntilCtrl></mat-datepicker>
+                                                            </mat-form-field>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>{{
+                                                                    extractedData.scExtractedData.validUntil ||
+                                                                        ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Table Responsive -->
+                                    </div>
+                                    <!-- Table Container -->
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!--  Row -->
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table class="table custom-table normal-style-table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>{{ 'Name of Certified Company' | translate }}</th>
+                                                        <th>{{ 'Certification Body' | translate }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                                <input
+                                                                    type="text"
+                                                                    matInput
+                                                                    placeholder="{{
+                                                                        'Enter Name of Certified Company' | translate
+                                                                    }}"
+                                                                    required
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .sellerOfProduct['value']
+                                                                    "
+                                                                    name="scope-certificate-name-of-certified-company"
+                                                                    [disabled]="
+                                                                        (editBtnText === 'Cancel the edit' &&
+                                                                            extractedData.scExtractedData
+                                                                                ?.sellerOfProduct?.value &&
+                                                                            extractionStatus !== 'Extraction failed') ||
+                                                                        editBtnText === 'Edit'
+                                                                    "
+                                                                />
+                                                            </mat-form-field>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>{{
+                                                                    extractedData.scExtractedData.sellerOfProduct
+                                                                        ? extractedData.scExtractedData.sellerOfProduct[
+                                                                              'value'
+                                                                          ]
+                                                                        : ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </td>
+
+                                                        <!-- <td>
+                                                            <mat-form-field
+                                                                [floatLabel]="'never'"
+                                                                class="mandatory"
+                                                                *ngIf="
+                                                                    extractedData.scExtractedData.sellerOfProduct &&
+                                                                    extractedData.scExtractedData.sellerOfProduct[
+                                                                        'value'
+                                                                    ] !== null
+                                                                "
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    matInput
+                                                                    placeholder="Enter Name of Certified Company"
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .sellerOfProduct['value']
+                                                                    "
+                                                                    name="scope-certificate-name-of-certified-company"
+                                                                />
+                                                            </mat-form-field>
+                                                            <app-tt-dropdown-search
+                                                                *ngIf="
+                                                                    extractedData.scExtractedData.sellerOfProduct[
+                                                                        'value'
+                                                                    ] === null &&
+                                                                    extractedData.scExtractedData.sellerOfProduct
+                                                                        .matchedData === null
+                                                                "
+                                                                [searchOptions]="config.suppliers"
+                                                                [placeholder]="'Enter Name of Certified Company'"
+                                                                (selectionChange)="onSelectingSupplier($event)"
+                                                                [(ngModel)]="
+                                                                    scopeCertificateData.scExtractedData
+                                                                        .sellerOfProduct['value']
+                                                                "
+                                                                name="scope-certificate-name-of-certified-company"
+                                                                floatLabel="never"
+                                                                [optionalParams]="params"
+                                                                [isRequired]="true"
+                                                                class="mandatory"
+                                                                [showToastr]="false"
+                                                                [dontCheckString]="true"
+                                                                required
+                                                            >
+                                                            </app-tt-dropdown-search>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                Extracted value 
+                                                                <span>
+                                                                    {{
+                                                                        extractedData.scExtractedData.sellerOfProduct
+                                                                            ? extractedData.scExtractedData
+                                                                                  .sellerOfProduct['value']
+                                                                            : 'NILL'
+                                                                    }}
+                                                                </span>
+                                                            </p>
+                                                        </td> -->
+                                                        <td>
+                                                            <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    matInput
+                                                                    placeholder="{{
+                                                                        'Enter Certification Body' | translate
+                                                                    }}"
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .bodyIssuingCertificate
+                                                                    "
+                                                                    name="scope-certificate-certification-body"
+                                                                    [disabled]="
+                                                                        (editBtnText === 'Cancel the edit' &&
+                                                                            extractedData.scExtractedData
+                                                                                ?.bodyIssuingCertificate &&
+                                                                            extractionStatus !== 'Extraction failed') ||
+                                                                        editBtnText === 'Edit'
+                                                                    "
+                                                                />
+                                                            </mat-form-field>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>
+                                                                    {{
+                                                                        extractedData.scExtractedData
+                                                                            .bodyIssuingCertificate ||
+                                                                            ('NILL' | translate)
+                                                                    }}
+                                                                </span>
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Table Responsive -->
+                                    </div>
+                                    <!-- Table Container -->
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!--  Row -->
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table
+                                                class="table custom-table normal-style-table scope-certificate-upload-table table-striped"
+                                            >
+                                                <thead>
+                                                    <tr>
+                                                        <th>{{ 'Name of Unit/Facility' | translate }}</th>
+                                                        <th>{{ 'Processing steps / Activities' | translate }}</th>
+                                                        <th>{{ 'Facility Code' | translate }}</th>
+                                                        <th>{{ 'Facility Name' | translate }}</th>
+                                                        <th>{{ 'Action' | translate }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr
+                                                        *ngFor="
+                                                            let facilityInfo of scopeCertificateData.scExtractedData
+                                                                .facilityInfo;
+                                                            let ind = index
+                                                        "
+                                                    >
+                                                        <td>
+                                                            <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                                <input
+                                                                    type="text"
+                                                                    matInput
+                                                                    placeholder="{{
+                                                                        'Enter Facility Unit' | translate
+                                                                    }}"
+                                                                    required
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .facilityInfo[ind].nameOfUnit
+                                                                    "
+                                                                    name="scope-certificate-name-of-facility-unit{{
+                                                                        ind
+                                                                    }}-{{ ind }}"
+                                                                    [disabled]="
+                                                                        (editBtnText === 'Cancel the edit' &&
+                                                                            extractedData.scExtractedData
+                                                                                ?.facilityInfo &&
+                                                                            extractedData.scExtractedData.facilityInfo[
+                                                                                ind
+                                                                            ]?.nameOfUnit &&
+                                                                            extractionStatus !== 'Extraction failed') ||
+                                                                        editBtnText === 'Edit'
+                                                                    "
+                                                                />
+                                                            </mat-form-field>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>{{
+                                                                    extractedData.scExtractedData.facilityInfo &&
+                                                                    extractedData.scExtractedData.facilityInfo[ind] &&
+                                                                    extractedData.scExtractedData.facilityInfo[ind]
+                                                                        .nameOfUnit
+                                                                        ? extractedData.scExtractedData.facilityInfo[
+                                                                              ind
+                                                                          ].nameOfUnit
+                                                                        : ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </td>
+
+                                                        <!-- <td>
+                                                            <mat-form-field
+                                                                [floatLabel]="'never'"
+                                                                class="mandatory"
+                                                                *ngIf="
+                                                                    extractedData.scExtractedData.facilityInfo[ind] &&
+                                                                    extractedData.scExtractedData.facilityInfo[ind]
+                                                                        .nameOfUnit !== null
+                                                                "
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    matInput
+                                                                    placeholder="Enter Facility Unit"
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .facilityInfo[ind].nameOfUnit
+                                                                    "
+                                                                    name="scope-certificate-name-of-facility-unit{{
+                                                                        ind
+                                                                    }}-{{ ind }}"
+                                                                />
+                                                            </mat-form-field>
+                                                            <app-tt-dropdown-search
+                                                                *ngIf="
+                                                                    !extractedData.scExtractedData.facilityInfo[ind] ||
+                                                                    (extractedData.scExtractedData.facilityInfo[ind]
+                                                                        .nameOfUnit === null &&
+                                                                        extractedData.scExtractedData.facilityInfo[ind]
+                                                                            .matchedData === null)
+                                                                "
+                                                                [searchOptions]="config.facilities"
+                                                                [placeholder]="'Enter Facility Unit'"
+                                                                (selectionChange)="onSelectingFacility($event, ind)"
+                                                                [(ngModel)]="
+                                                                    scopeCertificateData.scExtractedData.facilityInfo[
+                                                                        ind
+                                                                    ].nameOfUnit
+                                                                "
+                                                                name="scope-certificate-name-of-facility-unit{{
+                                                                    ind
+                                                                }}-{{ ind }}"
+                                                                floatLabel="never"
+                                                                [optionalParams]="params"
+                                                                [isRequired]="true"
+                                                                class="mandatory"
+                                                                [showToastr]="false"
+                                                                [dontCheckString]="true"
+                                                                required
+                                                            >
+                                                            </app-tt-dropdown-search>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{'Extracted value' | translate}} 
+                                                                <span>
+                                                                    {{
+                                                                        extractedData.scExtractedData.facilityInfo[
+                                                                            ind
+                                                                        ] &&
+                                                                        extractedData.scExtractedData.facilityInfo[ind]
+                                                                            .nameOfUnit
+                                                                            ? extractedData.scExtractedData
+                                                                                  .facilityInfo[ind].nameOfUnit
+                                                                            : 'NILL'
+                                                                    }}
+                                                                </span>
+                                                            </p>
+                                                        </td> -->
+                                                        <td>
+                                                            <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    matInput
+                                                                    placeholder="{{ 'Enter Processes' | translate }}"
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .facilityInfo[ind].processes
+                                                                    "
+                                                                    name="scope-certificate-processes{{ ind }}-{{
+                                                                        ind
+                                                                    }}"
+                                                                    [disabled]="
+                                                                        (editBtnText === 'Cancel the edit' &&
+                                                                            extractedData.scExtractedData
+                                                                                ?.facilityInfo &&
+                                                                            extractedData.scExtractedData.facilityInfo[
+                                                                                ind
+                                                                            ]?.processes &&
+                                                                            extractionStatus !== 'Extraction failed') ||
+                                                                        editBtnText === 'Edit'
+                                                                    "
+                                                                />
+                                                            </mat-form-field>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>
+                                                                    {{
+                                                                        extractedData.scExtractedData.facilityInfo &&
+                                                                        extractedData.scExtractedData.facilityInfo[
+                                                                            ind
+                                                                        ] &&
+                                                                        extractedData.scExtractedData.facilityInfo[ind]
+                                                                            .processes
+                                                                            ? extractedData.scExtractedData
+                                                                                  .facilityInfo[ind].processes
+                                                                            : ('NILL' | translate)
+                                                                    }}
+                                                                </span>
+                                                            </p>
+                                                        </td>
+                                                        <td>
+                                                            <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                                <input
+                                                                    type="text"
+                                                                    matInput
+                                                                    placeholder="{{
+                                                                        'Enter Facility code' | translate
+                                                                    }}"
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .facilityInfo[ind].matchedData.code
+                                                                    "
+                                                                    name="scope-certificate-fac-code{{ ind }}-{{ ind }}"
+                                                                    disabled
+                                                                />
+                                                            </mat-form-field>
+                                                        </td>
+                                                        <td
+                                                            [ngClass]="{ 'disabled-opacity-5': editBtnText === 'Edit' }"
+                                                        >
+                                                            <mat-form-field
+                                                                [floatLabel]="'never'"
+                                                                class="mandatory"
+                                                                *ngIf="editBtnText === 'Edit'"
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    matInput
+                                                                    placeholder="{{
+                                                                        'Enter Facility name' | translate
+                                                                    }}"
+                                                                    [(ngModel)]="
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .facilityInfo[ind].matchedData.value
+                                                                    "
+                                                                    name="scope-certificate-fac-name{{ ind }}-{{ ind }}"
+                                                                    disabled
+                                                                />
+                                                            </mat-form-field>
+                                                            <!-- *ngIf="
+                                                                    (editBtnText === 'Cancel the edit' &&
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .facilityInfo[ind].matchedData.code ==
+                                                                            null) ||
+                                                                    scopeCertificateData.scExtractedData.facilityInfo[
+                                                                        ind
+                                                                    ].matchedData.code === 'Not Available'
+                                                                    || extractionStatus==='Extraction failed' && editBtnText!=='Edit'
+                                                                " -->
+                                                            <app-tt-dropdown-search
+                                                                *ngIf="editBtnText === 'Cancel the edit'"
+                                                                [searchOptions]="facilityList"
+                                                                [(ngModel)]="
+                                                                    scopeCertificateData.scExtractedData.facilityInfo[
+                                                                        ind
+                                                                    ].matchedData.value
+                                                                "
+                                                                (ngModelChange)="
+                                                                    selectionChange(
+                                                                        scopeCertificateData.scExtractedData
+                                                                            .facilityInfo[ind],
+                                                                        $event
+                                                                    )
+                                                                "
+                                                                [optionalParams]="params"
+                                                                placeholder="{{ 'Enter Facility name' | translate }}"
+                                                                required
+                                                                class="mandatory"
+                                                                floatLabel="never"
+                                                                [data_cy]="'scope-certificate-fac-name'"
+                                                                [showTooltip]="true"
+                                                                [canTextBeWrapped]="true"
+                                                                name="scope-certificate-fac-name{{ ind }}-{{ ind }}"
+                                                            >
+                                                            </app-tt-dropdown-search>
+                                                        </td>
+                                                        <td>
+                                                            <div
+                                                                class="action-icon-flex delete-icon"
+                                                                (click)="deleteFacilityInfo(ind)"
+                                                                [ngClass]="{
+                                                                    'disabled-opacity-5': editBtnText === 'Edit'
+                                                                }"
+                                                            >
+                                                                <img
+                                                                    src="{{ env.IMG_URL }}images/delete-icon.png"
+                                                                    alt="delete"
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Table Responsive -->
+                                    </div>
+                                    <!-- Table Container -->
+                                    <div class="add-item-button text-right">
+                                        <button
+                                            [disabled]="editBtnText === 'Edit'"
+                                            type="button"
+                                            class="btn btn-add"
+                                            (click)="addFacilityInfo()"
+                                        >
+                                            <i class="action-icons fa fa-plus"></i>{{ 'Add more' | translate }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!--  Row -->
+
+                            <div class="approval-status-block">
+                                <div class="row" *ngIf="isEditMode && extractionStatus === 'Extraction failed'">
+                                    <div class="col-md-12">
+                                        <p class="approval-status-reasons-title">
+                                            {{ "Looks like you've edited something - provide the details" | translate
+                                            }}<span>*</span>
+                                        </p>
+                                        <div
+                                            class="approval-status-reasons"
+                                            *ngFor="let reason of reasons; let reasonInd = index"
+                                        >
+                                            <mat-checkbox
+                                                [checked]="reason.checked"
+                                                [(ngModel)]="reason.checked"
+                                                name="reason-{{ reasonInd }}"
+                                                >{{ reason.name }}</mat-checkbox
+                                            >
+                                        </div>
+                                        <div class="approval-status-reasons">
+                                            <mat-checkbox
+                                                [checked]="scopeCertificateData.notifyTT"
+                                                [(ngModel)]="scopeCertificateData.notifyTT"
+                                                name="approval-notify-tt"
+                                            >
+                                                {{
+                                                    'Submit Scope Certificate to TrusTrace support team for configuration'
+                                                        | translate
+                                                }}
+                                            </mat-checkbox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="upload-footer-block">
+                                        <div class="footer-button-block text-right">
+                                            <button
+                                                type="button"
+                                                class="btn btn-secondary"
+                                                (click)="
+                                                    uploadedFile !== undefined
+                                                        ? closeUploadScopeCertificate(
+                                                              uploadedFile.id,
+                                                              uploadedFile.fullName
+                                                          )
+                                                        : closeUploadScopeCertificate(null, null)
+                                                "
+                                            >
+                                                {{ 'Cancel' | translate }}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn btn-primary"
+                                                [disabled]="
+                                                    isExtracting ||
+                                                    !uploadedFile ||
+                                                    isFacilityInfoEmpty ||
+                                                    (editBtnText === 'Edit' &&
+                                                        extractionStatus === 'Extraction failed') ||
+                                                    (editBtnText === 'Cancel the edit' && scopeCertificateForm.invalid)
+                                                "
+                                                (click)="submitScopeCertificate()"
+                                            >
+                                                {{ 'Submit' | translate }}
+                                            </button>
+                                        </div>
+                                        <!-- Footer Button Block -->
+                                    </div>
+                                    <!-- Upload Footer Block -->
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!-- Row -->
+                        </form>
+                    </div>
+                    <!-- Material Input Style Box Type-->
+                </div>
+                <!-- Upload Transaction Field-->
+            </div>
+            <!-- Column -->
+        </div>
+        <!--  Row -->
+    </div>
+    <!-- Upload Container Block -->
+</div>
+<!-- Upload Container -->

@@ -1,0 +1,75 @@
+<div id="tt-supplier-search-container" provide-parent-form>
+    <div>
+        <mat-form-field [floatLabel]="floatLabel">
+            <mat-label class="tt-input-label" *ngIf="showLabel">{{ 'Supplier' | translate }}:</mat-label>
+            <input
+                #supplierInput
+                class="input"
+                type="text"
+                name="supplierSearch"
+                [placeholder]="placeholder | translate"
+                matInput
+                [matAutocomplete]="suppliersAuto"
+                [required]="required"
+                [(ngModel)]="supplierSearchText"
+                (ngModelChange)="search()"
+                (focus)="populateAutoSuggestList()"
+                (click)="populateAutoSuggestList()"
+                (blur)="checkSelectedOption($event)"
+                data-cy="ttrace-test-supplier"
+            />
+            <i class="fa fa-search input-fa-search"></i>
+            <mat-autocomplete
+                #suppliersAuto="matAutocomplete"
+                [displayWith]="getDisplayName"
+                (optionSelected)="onSelection($event.option.value)"
+            >
+                <mat-option *ngIf="fetchingSuppliers">
+                    <span class="supplier-search-spinner">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                </mat-option>
+                <span *ngIf="!fetchingSuppliers">
+                    <!--list own company as supplier-->
+                    <mat-option
+                        [value]="currentUserCompany"
+                        *ngIf="showCurrentUserCompany && showCurrentCompanyInTheList"
+                    >
+                        {{ getDisplayName(currentUserCompany) }}
+                    </mat-option>
+                    <mat-divider>{{ 'Suppliers' | translate }}</mat-divider>
+
+                    <!--suppliers list -->
+                    <mat-option *ngFor="let item of searchOptions" [value]="item">
+                        <span class="align-option-text">
+                            {{ getDisplayName(item) }}
+                        </span>
+                        <span class="pull-right">
+                            <app-supplier-status
+                                [status]="item?.supplier_association_status?.id"
+                                [unInvitedTooltip]="unInvitedTooltip"
+                                [unAcceptedTooltip]="unAcceptedTooltip"
+                            >
+                            </app-supplier-status>
+                        </span>
+                    </mat-option>
+                    <mat-divider></mat-divider>
+
+                    <!--Add new supplier-->
+                    <mat-option value="add-new-supplier" *ngIf="options.ADD_NEW">
+                        {{ 'Add New Supplier' | translate }}
+                    </mat-option>
+
+                    <!--cannot disclose supplier -->
+                    <mat-option
+                        class="supplier-not-available"
+                        [value]="cannotDiscloseSupplier"
+                        *ngIf="options.CANNOT_DISCLOSE"
+                    >
+                        {{ getDisplayName(cannotDiscloseSupplier) }}
+                    </mat-option>
+                </span>
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
+</div>

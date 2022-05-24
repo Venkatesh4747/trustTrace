@@ -1,0 +1,17 @@
+@import '~styles/variables';
+
+$prefix: '--';
+
+//Merges a variable name with $prefix
+@function custom-property-name($name) {
+    @return $prefix + $name;
+}
+
+// Defines a custom property
+@mixin define-custom-property($name, $value) {
+    #{custom-property-name($name)}: $value;
+}
+
+body {
+    @include define-custom-property('chart-thumbnail-height', $chart-thumbnail-height);
+}

@@ -1,0 +1,36 @@
+<div class="row mr-0 ml-0" [class.disabled]="uploadingFile">
+    <div class="pl-0 col-xs-8 col-sm-8 col-md-8 col-lg-8">
+        <app-tt-dropdown-search
+            [searchOptions]="certEvidenceList"
+            [(ngModel)]="selectedCertificateType"
+            [placeholder]="'Add Certificate:'"
+            name="certificate"
+            [optionalParams]="optional"
+        ></app-tt-dropdown-search>
+    </div>
+    <div class="pl-0 col-xs-4 col-sm-4 col-md-4 col-lg-4 talign-right" style="padding-top: 15px;">
+        <button
+            id="order-certificate-btn"
+            type="button"
+            [disabled]="uploadingFile"
+            class="btn btn-gray create-btn"
+            (click)="fileInput.click()"
+        >
+            <ng-template [ngIf]="!uploadingFile" [ngIfElse]="uploadingFileContent">
+                {{ 'Choose File' | translate }}
+            </ng-template>
+
+            <ng-template #uploadingFileContent>
+                &nbsp;&nbsp;&nbsp;<app-spinner [small]="true"></app-spinner>&nbsp;&nbsp;&nbsp;
+            </ng-template>
+        </button>
+        <input
+            type="file"
+            class="hidden"
+            (change)="uploadCertification(selectedCertificateType, $event.target.files)"
+            [(ngModel)]="certificationFile"
+            [hidden]="true"
+            #fileInput
+        />
+    </div>
+</div>

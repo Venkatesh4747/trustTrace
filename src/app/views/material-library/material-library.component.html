@@ -1,0 +1,323 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="material-library-container" class="material-library-container">
+            <div id="material-library-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Raw Materials' | translate }}</div>
+                        <div class="page-description">
+                            {{
+                                'Create and manage your materials associated with your styles / product'
+                                    | industry
+                                    | translate
+                            }}.
+                        </div>
+                    </div>
+                    <div class="header-search">
+                        <div class="title-right-search">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Type and press enter to search' | translate }}"
+                                (keyup)="searchMaterials($event)"
+                                [(ngModel)]="searchText"
+                                data-cy="material-library-search"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <a *ngIf="checkAccess('ML_CREATE')" routerLink="create">
+                            <button class="btn btn-lg btn-blue pull-right btn-gradient cs-btn">
+                                <img src="{{ IMG_URL }}images/plus-btn.png" alt="Add" />
+                                {{ 'Create Material' | industry | translate }}
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                <!-- col -->
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="export-data-btn-container">
+                        <button
+                            *ngIf="checkAccess('ML_CREATE')"
+                            class="btn import-btn-bordered pull-right"
+                            data-cy="styles-import-btn"
+                            (click)="importMaterial()"
+                        >
+                            <img src="{{ IMG_URL }}images/upload-blue-icon.png" alt="Import" />
+                            <span>{{ 'Import Materials' | translate }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- row -->
+
+            <!-- Filter Bar and sort -->
+            <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="materialsFilters">
+                <div class="col-md-12">
+                    <ul class="filter-bar-container">
+                        <li *ngFor="let filter of materialsFilters | keys; let filterInd = index">
+                            <app-tt-multi-select-search
+                                (selectionChange)="handleFilterSelection()"
+                                (refreshFilter)="refreshFilter()"
+                                [label]="filter.key"
+                                [options]="filter.value"
+                                [filter_session]="filter_session"
+                                [optionsParam]="optionsParam"
+                                [data_cy]="removeSpace(filter.key)"
+                            >
+                            </app-tt-multi-select-search>
+                        </li>
+                        <li class="reset-filters">
+                            <button
+                                class="button-badge mat-button btn btn-gray"
+                                (click)="resetAllFilters()"
+                                data-cy="raw-materials-reset-all-filters"
+                            >
+                                {{ 'Reset all filters' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                    <!-- <app-filter-bar
+                        [filters]="materialsFilters"
+                        [filter_session]="filter_session"
+                        [filterOptions]="filterOptions"
+                        (handleFilterSelection)="getAllMaterials()"
+                    >
+                    </app-filter-bar> -->
+                </div>
+                <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                    <div class="row">
+                        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 total-count">
+                            <div class="float-l" *ngIf="materialsList.length > 0 || totalCountFlag">
+                                <app-card-pagination
+                                    [paginationStart]="pagination.from + 1"
+                                    [fetchSize]="pagination.size"
+                                    [totalItemsCount]="totalCount"
+                                    moduleName="Materials"
+                                    (previous)="onScroll('back')"
+                                    (next)="onScroll('next')"
+                                ></app-card-pagination>
+                            </div>
+                            <div class="export-data-btn-container">
+                                <button
+                                    class="cs-btn export-data"
+                                    data-cy="material-test-export-btn"
+                                    (click)="downloadRawMaterialsDataAsExcel()"
+                                    [disabled]="!(totalCount > 0)"
+                                >
+                                    <img src="{{ IMG_URL }}images/share.png" alt="Download" />
+                                    <ng-template [ngIf]="!isProcessing">
+                                        {{ 'Export Raw Materials' | translate }}
+                                    </ng-template>
+                                    <ng-template [ngIf]="isProcessing">
+                                        <div class="spinner-wrapper">
+                                            <span>{{ 'Downloading' | translate }}</span>
+                                            <mat-spinner [diameter]="14"></mat-spinner>
+                                        </div>
+                                    </ng-template>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                            <div dropdown class="dropdown sort-dropdown">
+                                <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                    <span class="sort-name"
+                                        >{{ 'Sort By' | translate }}
+                                        <i class="fa fa-angle-down"></i>
+                                    </span>
+                                </a>
+                                <ul *dropdownMenu class="dropdown-menu">
+                                    <li>
+                                        <mat-radio-group [(ngModel)]="sortByFilter.sortBy" (change)="handleSortBy()">
+                                            <mat-radio-button value="internal_article_name">{{
+                                                'Alphabetical Order' | translate
+                                            }}</mat-radio-button>
+                                            <mat-radio-button value="create_ts">{{
+                                                'Newly Added' | translate
+                                            }}</mat-radio-button>
+                                        </mat-radio-group>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Sort Dropdown -->
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+            <!-- Filter Bar and sort -->
+
+            <!-- List of Materials -->
+            <div id="card">
+                <div
+                    class="row materials-table"
+                    [ngStyle]="{ 'top.px': height }"
+                    *ngIf="materialsList && materialsList.length >= 0"
+                >
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="no-assessments" *ngIf="materialsList.length === 0">
+                            {{ 'No Materials' | industry | translate }}
+                        </div>
+                        <div class="table-responsive" *ngIf="materialsList.length > 0">
+                            <div class="table-card" *ngFor="let material of materialsList">
+                                <!-- <div class="table-card-left flex-column" [routerLink]="[product.id]"> -->
+                                <div
+                                    class="table-card-left flex-column"
+                                    [routerLink]="['/', 'material-library', material.id]"
+                                >
+                                    <div class="cursor-pointer">
+                                        <div class="desc blue-desc">
+                                            {{ 'Name' | translate }} & {{ 'Number' | translate }}:
+                                            <span
+                                                >{{ material?.internal_article_name }} -
+                                                {{ material?.internal_article_number }}</span
+                                            >
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Article UID' | translate }}:
+                                            <span>
+                                                {{ material?.material_unique_code || ('Not Availablle' | translate) }}
+                                            </span>
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Supplier Article Name & Number' | industry | translate }}:
+                                            <span>
+                                                {{ material?.supplier_article_name || ('Not Available' | translate) }} -
+                                                {{ material?.supplier_article_number || ('Not Available' | translate) }}
+                                            </span>
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Season' | translate }} & {{ 'Year' | translate }}:
+                                            <span
+                                                >{{ material?.season?.value || ('Not Available' | translate) }} -
+                                                {{ material?.year }}</span
+                                            >
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Type' | translate }}:<span>{{
+                                                material?.product_type?.value || ('Not Available' | translate)
+                                            }}</span>
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Supplied By' | translate }}:
+                                            <span *ngIf="!material?.supplier || !material?.supplier?.length > 0">{{
+                                                'Not Available' | translate
+                                            }}</span>
+                                            <span *ngFor="let supplier of material.supplier; let isLast = last"
+                                                >{{ supplier?.name || ('Not Available' | translate)
+                                                }}<span *ngIf="!isLast">,</span></span
+                                            >
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Material Composition' | industry | translate }}:
+                                            <span
+                                                *ngIf="
+                                                    !(
+                                                        material?.material_composition ||
+                                                        material?.material_composition?.length > 0
+                                                    )
+                                                "
+                                                >{{ 'Not Available' | translate }}</span
+                                            >
+
+                                            <span *ngFor="let comp of material.material_composition; let isLast = last"
+                                                >{{ comp?.value }} {{ comp.composition }}%<span *ngIf="!isLast"
+                                                    >,</span
+                                                ></span
+                                            >
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Required Certificates' | translate }}:
+                                            <span *ngIf="!material?.certifications?.length > 0">{{
+                                                'Not Available' | translate
+                                            }}</span>
+                                            <span *ngFor="let cert of material.certifications; let isLast = last"
+                                                >{{ cert?.value }}<span *ngIf="!isLast">,</span></span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-card-right flex-column">
+                                    <div
+                                        class="title blue-title align-self-flex-end cursorp"
+                                        [routerLink]="['/', 'material-library', material.id]"
+                                    >
+                                        <div *ngIf="material.traceable === 'yes'" class="material-traced">
+                                            <span class="mr-1">{{ 'Traceable' | translate }}</span>
+                                            <img
+                                                class="table-card-icons cursorp"
+                                                src="{{ IMG_URL }}images/traced.png"
+                                                alt="Traceable"
+                                            />
+                                        </div>
+                                        <div *ngIf="material.traceable === 'no'" class="material-not-traced">
+                                            <span class="mr-1">{{ 'Not Traceable' | translate }}</span>
+                                            <img
+                                                class="table-card-icons cursorp"
+                                                src="{{ IMG_URL }}images/not-traced.png"
+                                                alt="Not Traceable"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="table-card-right flex-column">
+                                        <div></div>
+                                        <div class="desc blue-desc display-flex-only">
+                                            <a
+                                                class="action-icons-small"
+                                                *ngIf="checkAccess('ML_ARCHIVE')"
+                                                [matTooltip]="'Archive Material' | translate"
+                                                matTooltipPosition="above"
+                                                (click)="archiveMaterial(material.id)"
+                                            >
+                                                <i
+                                                    style="margin-right: 0px;"
+                                                    class="action-icons-small fa fa-archive"
+                                                ></i>
+                                            </a>
+                                            <a
+                                                [routerLink]="['/', 'material-library', material.id, 'clone']"
+                                                *ngIf="checkAccess('ML_CREATE')"
+                                                [matTooltip]="'Clone Raw Material' | translate"
+                                                matTooltipPosition="above"
+                                            >
+                                                <i class="action-icons-small fa fa-clone"></i>
+                                            </a>
+                                            <a
+                                                (click)="showEditDialog(material.id)"
+                                                *ngIf="checkAccess('ML_UPDATE')"
+                                                [matTooltip]="'Edit Raw Material' | translate"
+                                                matTooltipPosition="above"
+                                            >
+                                                <i class="action-icons-small fa fa-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--<div class="row no-materials-available" *ngIf="!isMaterialsAvailable">
+                <img class="no-transaction-image" src="{{ IMG_URL }}images/no-raw-materials.png" alt="Add" />
+                <div class="page-title talign-center pt-1">{{ 'Your Raw Materials' | translate }}</div>
+                <div class="page-description talign-center pt-1">
+                    {{ 'No Records found. Click below to add' | translate }}
+                </div>
+                <a routerLink="create">
+                    <button class="btn btn-lg btn-blue btn-gradient cs-btn margin-0-auto mt-2">
+                        <img src="{{ IMG_URL }}images/plus-btn.png" alt="Add" />
+                        {{ 'Create your library' | translate }}
+                    </button>
+                </a>
+            </div>-->
+        </div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>

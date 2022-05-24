@@ -1,0 +1,11 @@
+@import '~styles/variables';
+
+.notification-bar {
+    text-align: center;
+    padding: 10px 0 10px 0;
+    color: #3c3c3c;
+}
+
+.transactions-notification {
+    background-color: $color-notification-default;
+}

@@ -1,0 +1,48 @@
+<mat-form-field [attr.data-cy]="data_cy">
+    <mat-select
+        panelClass="multi-select-container"
+        class="input-element"
+        (openedChange)="openedChange($event)"
+        [placeholder]="placeholder | translate"
+        [(ngModel)]="value"
+        [formControl]="selectFormControl"
+        [required]="isRequired"
+        multiple
+    >
+        <div class="select-container">
+            <mat-form-field class="sticky-search">
+                <input
+                    #search
+                    autocomplete="off"
+                    placeholder="Search"
+                    matInput
+                    [formControl]="searchTextboxControl"
+                    [attr.data-cy]="data_cy"
+                />
+                <!-- <i class="fa fa-search"></i> -->
+                <button
+                    [disableRipple]="true"
+                    *ngIf="search.value"
+                    matSuffix
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="clearSearch()"
+                >
+                    <mat-icon>close</mat-icon>
+                </button>
+            </mat-form-field>
+            <div class="options-list">
+                <mat-option
+                    (onSelectionChange)="onSelectionChange($event)"
+                    *ngFor="let option of filteredOptions | async"
+                    [value]="option.key"
+                >
+                    {{ localeService.getDisplayText(option.value) }}
+                </mat-option>
+                <mat-option *ngIf="(filteredOptions | async)?.length === 0" selected disabled
+                    >{{ 'No options found' | translate }}!
+                </mat-option>
+            </div>
+        </div>
+    </mat-select>
+</mat-form-field>

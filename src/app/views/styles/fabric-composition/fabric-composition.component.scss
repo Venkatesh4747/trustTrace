@@ -1,0 +1,113 @@
+@import '~styles/variables';
+.main-fabric-composition {
+    width: 100%;
+    color: $text-color-primary;
+    .add-product-group-btn {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        color: $text-color-primary;
+        font-family: $font-family-Semibold;
+        font-size: 14px;
+        margin: 10px 0 30px 0;
+    }
+    .main-fabric-material-list {
+        // max-height: 300px;
+        // margin-bottom: 20px;
+        // overflow-y: auto;
+    }
+    /* div {
+        width: 98%;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        fieldset {
+            width: 45%;
+            &.chip-card-input {
+                width: 100%;
+            }
+            label {
+                width: 100%;
+            }
+            input {
+                width: 100%;
+                border: none;
+                box-shadow: none;
+                outline: none;
+            }
+            .mat-form-field {
+                width: 100%;
+            }
+            .mat-form-field-label {
+                display: none;
+            }
+            .mat-form-field-underline {
+                border-bottom: 2px solid #ccc;
+            }
+        }
+    } */
+}
+
+.delete-material-comp-btn,
+.delete-size-btn {
+    i {
+        margin-top: 30px;
+    }
+    .action-icons-big {
+        font-size: 19px;
+        color: #777;
+        height: 35px;
+        width: 35px;
+        margin-right: 5px;
+        background: $button-action-background;
+        border-radius: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+}
+
+.main-fabric-material-list {
+    &-type-one {
+        .form-group {
+            &.add-pt {
+                padding-top: 8px;
+            }
+            label {
+                width: 100%;
+            }
+            input {
+                width: 100%;
+                border: none;
+                box-shadow: none;
+                outline: none;
+            }
+            .mat-form-field {
+                width: 100%;
+            }
+            .mat-form-field-label {
+                display: none;
+            }
+            .mat-form-field-underline {
+                border-bottom: 2px solid #ccc;
+            }
+        }
+        .main-fabric-material-block {
+            display: block;
+            width: 100%;
+            padding-left: 0;
+            li {
+                display: inline-block;
+                align-items: center;
+                &:first-child {
+                    width: 80%;
+                }
+                &:last-child {
+                    width: 20%;
+                    padding-left: 15px;
+                }
+            }
+        }
+    }
+}

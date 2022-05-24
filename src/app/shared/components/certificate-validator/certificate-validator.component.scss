@@ -1,0 +1,78 @@
+@import '~styles/variables';
+
+.modal-size {
+    height: 650px;
+    width: 450px;
+    overflow: auto;
+}
+
+.validation-information-modal-title {
+    font-family: $font-family-Regular;
+    color: #325992;
+    font-size: 22px;
+    text-align: center;
+    font-weight: bold;
+    padding: 15px;
+}
+
+.validation-information-modal-heading {
+    font-family: $font-family-Regular;
+    color: #325992;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.validation-information-modal-sub-heading-1 {
+    font-family: $font-family-Regular;
+    font-size: 16px;
+    font-weight: bold;
+    padding-left: 5px;
+}
+
+.validation-information-modal-sub-heading {
+    font-family: $font-family-Regular;
+    font-size: 14px;
+    font-weight: bold;
+    padding-left: 5px;
+}
+
+.validation-information-modal-content {
+    font-family: $font-family-Regular;
+    font-size: 15px;
+}
+
+.validation-information-modal {
+    width: 400px;
+    height: 600px;
+}
+
+.mat-form-field {
+    width: 100%;
+}
+.modal-footer {
+    border-top: none;
+}
+
+.grs-facility {
+    padding-left: 20px;
+    font-family: $font-family-Regular;
+    font-size: 14px;
+    font-weight: bold;
+    padding-left: 5px;
+}
+
+.cpsia-test-list {
+    padding-top: 15px;
+}
+
+.extracted-content {
+    font-family: 'Source Sans Pro-Bold';
+    color: #325992;
+}
+
+.cpsia-fail {
+    color: #325992;
+    height: 5px;
+    width: 5px;
+}

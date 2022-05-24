@@ -1,0 +1,102 @@
+{
+    "message": "SUCCESS",
+    "data": {
+        "EAN": [
+            {
+                "id": "125",
+                "value": "124154578784"
+            }
+        ],
+        "Brand/Suppliers": [
+            {
+                "id": "qhkl6n6oyf6u",
+                "value": "TT"
+            },
+            {
+                "id": "uvjqw0ewl7hw",
+                "value": "TT1"
+            }
+        ],
+        "Product": [
+            {
+                "id": "qhkl6n6oyf6u",
+                "value": "Coffee"
+            }
+        ],
+        "Ingredients": [
+            {
+                "id": "qhkl6n6oyf6u",
+                "value": "Coffee"
+            }
+        ],
+        "Category": [
+            {
+                "id": "qhkl6n6oyf6u",
+                "value": "Drink"
+            }
+        ],
+        "Sub Category": [
+            {
+                "id": "qhkl6n6oyf6u",
+                "value": "Flavoured Drink"
+            }
+        ],
+        "Country of manufacturing": [
+            {
+                "id": "qhkl6n6oyf6u",
+                "value": "India"
+            }
+        ],
+        "Labels": [
+            {
+                "id": "qhkl6n6oyf6u",
+                "value": "EKO"
+            }
+        ],
+        "Country of origin": [
+            {
+                "id": "qhkl6n6oyf6u",
+                "value": "EKO"
+            }
+        ],
+        "Product Group": {
+            "filter-data": [
+                {
+                    "group-data": [
+                        {
+                            "group_1_value": "Category33091",
+                            "group_1_id": "1hb7pplispyzm"
+                        }
+                    ],
+                    "id": "ubmehswnpvtw",
+                    "value": "Category33091"
+                },
+                {
+                    "group-data": [
+                        {
+                            "group_1_value": "Female",
+                            "group_1_id": "ubompiim9201"
+                        },
+                        {
+                            "group_1_value": "Male",
+                            "group_1_id": "1jenpnbxum5h1"
+                        }
+                    ],
+                    "id": "too0gj6zmoty",
+                    "value": "Gender"
+                },
+                {
+                    "group-data": [
+                        {
+                            "group_1_value": "Group1",
+                            "group_1_id": "ubgdq058lq2g"
+                        }
+                    ],
+                    "id": "rl2u7tqrzebc",
+                    "value": "TestGroup"
+                }
+            ],
+            "type": "group"
+        }
+    }
+}

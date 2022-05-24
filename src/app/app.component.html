@@ -1,0 +1,19 @@
+<ng-template [ngIf]="pageReady">
+    <app-release-update></app-release-update>
+    <app-top-navigation *ngIf="isLoggedIn$ | async"></app-top-navigation>
+    <app-side-navigation *ngIf="isLoggedIn$ | async"></app-side-navigation>
+    <router-outlet></router-outlet>
+    <!-- <app-footer *ngIf="isLoggedIn$ | async"></app-footer> -->
+    <p class="chat-support-content" *ngIf="chatSupport">{{ 'Click here for Chat Support' | translate }}</p>
+
+    <h5 class="faq-help" *ngIf="(isLoggedIn$ | async) && !chatSupport">
+        <a href="{{ getFaqUrl() }}" target="_blank">
+            <img src="{{ env.IMG_URL }}images/help.png" alt="help" />
+            <span>
+                {{ 'Help' | translate }}
+            </span>
+        </a>
+    </h5>
+</ng-template>
+
+<tour-step-template></tour-step-template>

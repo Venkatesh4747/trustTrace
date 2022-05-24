@@ -1,0 +1,95 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header-no-border" *ngIf="!pageLoading">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pb-1">
+                <div class="page-title">
+                    <div>{{ 'Traced Materials' | translate }}</div>
+                    <div class="page-description font-color-primary">
+                        {{ 'List that shows the materials that are traced already' | translate }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row pt-5 reusable-supply-chain" *ngIf="!pageLoading && supplyChainData">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="row pl-2">
+                    <mat-label class="tt-title col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        {{ 'The following list has the materials that are already traced' | translate }}.
+                    </mat-label>
+                    <mat-label class="tt-title col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        {{ 'Choose the materials to reuse the Supply Chain' | translate }}
+                    </mat-label>
+                </div>
+                <div class="row pt-2">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                        <div class="entity-table row">
+                            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 pl-3 talign-left">
+                                <mat-checkbox
+                                    class="tt-table-title-with-background text-blue font-regular"
+                                    [(ngModel)]="selectAllCheckBox"
+                                    (change)="reusableEntity.selectAllClicked(selectAllCheckBox)"
+                                >
+                                    {{ 'Select All' | translate }}
+                                </mat-checkbox>
+                            </div>
+                            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 pl-1 talign-left">
+                                <mat-label class="tt-table-title-with-background">
+                                    {{ 'Article Type' | industry | translate }}
+                                </mat-label>
+                            </div>
+                            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 pl-1">
+                                <mat-label class="tt-table-title-with-background">
+                                    {{ 'Article Name / No' | industry | translate }}
+                                </mat-label>
+                            </div>
+                            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 pl-15px talign-left">
+                                <mat-label class="tt-table-title-with-background">
+                                    {{ 'Supplier Name' | translate }}
+                                </mat-label>
+                            </div>
+                            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 pl-2 talign-left">
+                                <mat-label class="tt-table-title-with-background">
+                                    {{ 'Last Traced' | translate }}
+                                </mat-label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row reusable-chain-list">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                        <app-reusable-entity
+                            [items]="supplyChainData"
+                            [trId]="trId"
+                            (selectAllIndirectEvent)="updateSelectAll($event)"
+                        ></app-reusable-entity>
+                    </div>
+                </div>
+                <div class="row pr-3 pt-2 display-flex-justify-flex-end">
+                    <div>
+                        <button
+                            type="button"
+                            mat-button
+                            class="btn btn-blue save-btn"
+                            (click)="analyticsSkipClicked(); skip()"
+                        >
+                            {{ 'Skip' | translate }}
+                        </button>
+                    </div>
+                    <div class="ml-2">
+                        <button
+                            type="button"
+                            mat-button
+                            class="btn btn-gray"
+                            (click)="analyticsProceedClicked(); proceed()"
+                        >
+                            {{ 'Proceed' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

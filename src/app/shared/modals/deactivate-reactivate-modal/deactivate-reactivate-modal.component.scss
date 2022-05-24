@@ -1,0 +1,81 @@
+@import '~styles/variables';
+
+.title {
+    font-family: $font-family-Bold;
+    color: $text-color-primary;
+    font-size: 17px;
+    margin-left: 10px;
+}
+
+.close-icon {
+    width: 22px;
+    height: 22px;
+    margin: 0 0 30px;
+    float: right;
+}
+
+.secondary-btn {
+    border: solid 1px #8e8e8e;
+    background: #ffffff;
+    height: 40px;
+    min-width: 150px;
+    outline: 0;
+    padding: 0 10px;
+    border-radius: 4px;
+    font-size: 16px;
+    float: left;
+}
+
+.primary-btn {
+    height: 40px;
+    background: #ff5f5f;
+    color: #ffffff;
+    min-width: 150px;
+    border-radius: 4px;
+    font-size: 16px;
+    float: right;
+    border: 0;
+}
+
+.description {
+    font-family: $font-family-Regular;
+    font-size: 15px;
+    color: #325992;
+    font-weight: normal;
+    width: 350px;
+    text-align: center;
+    display: block;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+.m-1 {
+    margin: 10px;
+}
+
+.button-block {
+    display: inline-block;
+    width: 100%;
+    padding: 20px 25px 0px 25px;
+}
+
+.message {
+    font-family: $font-family-Bold;
+    color: $text-color-primary;
+    font-size: 18px;
+    text-align: center;
+    display: block;
+    width: 340px;
+    margin: 0 auto;
+}
+
+.reason-title {
+    font-family: $font-family-Bold;
+    color: $text-color-primary;
+    font-size: 18px;
+    margin-left: 10px;
+}
+
+.container-fluid {
+    padding: 0px !important;
+}

@@ -1,0 +1,49 @@
+.modal-section {
+    .description {
+        margin: 0;
+    }
+    .description:last-of-type {
+        margin-bottom: 20px;
+    }
+}
+
+.button-block {
+    .btn {
+        min-width: 130px;
+        height: 36px;
+        padding: 0 10px;
+        margin: 0;
+    }
+    .btn-cancel {
+        background: #ffffff;
+        color: #4b4b4b;
+        border-radius: 4px;
+        font-family: 'Source Sans Pro-Semibold';
+        outline: none;
+        border: 1px solid #8e8e8e;
+    }
+    .btn-gray {
+        margin-left: 15px;
+    }
+}
+
+.close-btn-section {
+    position: relative;
+
+    .close-btn {
+        position: absolute;
+        top: -10px;
+        right: 5px;
+        width: 25px;
+        height: 25px;
+        background: #325992;
+        border-radius: 50%;
+        text-align: center;
+        cursor: pointer;
+        z-index: 1000;
+
+        .fa-close {
+            color: #fff;
+        }
+    }
+}

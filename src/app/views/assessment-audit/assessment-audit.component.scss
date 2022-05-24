@@ -1,0 +1,207 @@
+@import '~styles/variables';
+@import '~styles/mixins';
+
+.header-search {
+    align-items: inherit;
+}
+
+.pt-35 {
+    padding-top: 35px;
+}
+.ml-1 {
+    margin-left: 10px;
+}
+.audits-table {
+    position: absolute;
+    margin: 0 auto;
+    padding-left: 0;
+    top: 250px;
+    left: 15px;
+    right: 30px;
+    bottom: 21px;
+    overflow-y: auto;
+}
+#export-audit-btn-container,
+.upload-audit-btn-container {
+    padding-top: 12px;
+    &.btn-gradient,
+    .btn-gradient {
+        background-image: linear-gradient(to right, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff) !important;
+        border: 1px solid;
+    }
+}
+#header-audit-btn-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    button {
+        padding: 6px 10px;
+        width: auto;
+        min-width: 210px;
+        display: flex;
+        justify-content: space-evenly;
+    }
+    .upload-audit-btn-text {
+        font-family: $font-family-Semibold;
+        color: $text-font-color-muted;
+        font-size: 10px;
+        padding-top: 5px;
+        font-weight: normal;
+    }
+    img {
+        width: 15px;
+        height: 15px;
+        margin-right: 10px;
+    }
+}
+#submenu {
+    display: flex;
+}
+.toby {
+    .form-group.bottom {
+        width: auto;
+        text-align: center;
+        margin: 0px 20px;
+        &:first-child {
+            margin-left: 5px;
+        }
+    }
+    .form-group.selected div.selected {
+        margin: 0;
+    }
+}
+.export-audit-btn-container {
+    margin-left: 40px;
+    img {
+        width: 15px;
+        height: 15px;
+        margin-right: 10px;
+    }
+    button {
+        background: transparent;
+        border: none;
+        outline: none;
+        margin-left: 20px;
+    }
+}
+
+.extraction-pending {
+    color: $color-status-in-progress;
+}
+
+.verification-pending {
+    color: $color-table-filter-7;
+}
+
+.extraction-failed {
+    color: $color-table-filter-1;
+}
+
+.extraction-completed {
+    color: $color-table-filter-4;
+}
+
+.extraction-deleted {
+    color: $color-table-filter-2;
+}
+
+.export-audit,
+.sort-by-exp {
+    font-family: 'Source Sans Pro-Regular';
+    font-size: 16px;
+}
+
+.toby {
+    .form-group {
+        label {
+            padding: 0 20px;
+        }
+    }
+}
+
+.toby .form-group.selected label {
+    position: relative;
+    &::before {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        width: 100%;
+        border-bottom: 3px solid $color-tt-primary;
+        @include transition(all 350ms);
+        @include radius(20px);
+    }
+}
+
+.toby label {
+    position: relative;
+    padding-left: 0px;
+    cursor: pointer;
+    line-height: 20px;
+    display: inline-block;
+    font-weight: normal;
+    &::before {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        width: 0%;
+        border-bottom: 3px solid $color-tt-primary;
+        @include transition(all 350ms);
+        @include radius(20px);
+    }
+}
+.notification-badge {
+    display: inline-block;
+}
+.dropdown.sort-dropdown {
+    padding-right: 50px;
+}
+.card-pointer {
+    cursor: pointer;
+}
+.audit-sort-wrapper {
+    display: flex;
+    justify-content: flex-end;
+
+    .audit-left-align-container {
+        padding: 13px;
+
+        .higg-sync-img {
+            display: inline-block;
+            width: 12px;
+            height: 16px;
+            margin-right: 5px;
+        }
+
+        .refresh-audit-btn {
+            color: #337ab7;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .higg-sync-info-icon {
+            position: relative;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            top: -2px;
+            margin-left: 5px;
+            width: 14px;
+            height: 14px;
+            font-size: 11px;
+            border: 1px solid #337ab7;
+            border-radius: 50%;
+            color: #337ab7;
+            cursor: pointer;
+        }
+    }
+}

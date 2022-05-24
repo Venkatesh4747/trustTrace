@@ -1,0 +1,20 @@
+<mat-accordion class="mat-form-block-type-one">
+    <mat-expansion-panel *ngFor="let division of divisions" (opened)="fetchDataMappingItems(division)">
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{ division.value }} {{ 'Mapping' | translate }}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="mat-panel-body">
+            <div class="row mt-1 mb-2" *ngIf="isFetchingDataMapping" class="spinner-wrapper">
+                <mat-spinner [diameter]="20"></mat-spinner>
+            </div>
+            <div class="row mt-1 mb-2" *ngIf="!isFetchingDataMapping && dataMappingItems">
+                <app-data-mapping
+                    [dataMappingItems]="dataMappingItems"
+                    [division]="division"
+                    [pendingDataMappingItems]="pendingDataMappingItems"
+                    [companyId]="companyId"
+                ></app-data-mapping>
+            </div>
+        </div>
+    </mat-expansion-panel>
+</mat-accordion>

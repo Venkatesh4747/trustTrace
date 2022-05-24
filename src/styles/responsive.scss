@@ -1,0 +1,158 @@
+@import './variables';
+@import './mixins';
+
+/*************************MAXIMUM WIDTH RESPONSIVE sCSS ********************************/
+
+/****************************************************************************************/
+// Maximum Width 1600px
+/****************************************************************************************/
+@media only screen and (max-width: 1600px) {
+    // SIGNUP PAGE SCSS
+    .page {
+        &-wrap {
+            /* Center Block SCSS */
+            .center {
+                &-block {
+                    &-section {
+                        .title {
+                            font-size: 60px !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/****************************************************************************************/
+// Maximum Width 1200px
+/****************************************************************************************/
+@media only screen and (max-width: 1200px) {
+    // SIGNUP PAGE SCSS
+    .page {
+        &-wrap {
+            /* Center Block SCSS */
+            .center {
+                &-block {
+                    &-section {
+                        .title {
+                            font-size: 50px !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/****************************************************************************************/
+// Maximum Width 991px
+/****************************************************************************************/
+@media only screen and (max-width: 991px) {
+    // SIGNUP PAGE SCSS
+    .page {
+        &-wrap {
+            background: #eafcff;
+            &.mobile-res-page-wrap {
+                height: 100vh !important;
+                background-size: cover;
+                background-repeat: no-repeat;
+                width: 100%;
+                display: block;
+            }
+            .center-block-section-inner {
+                width: 400px;
+                margin-bottom: 50px;
+            }
+        }
+    }
+}
+/****************************************************************************************/
+// Maximum Width 767px
+/****************************************************************************************/
+@media only screen and (max-width: 767px) {
+    // SIGNUP PAGE SCSS
+    .page {
+        &-wrap {
+            height: auto !important;
+            /* Center Block SCSS */
+            .center {
+                &-block {
+                    &-section {
+                        padding: 10px 30px !important;
+                        .title {
+                            font-size: 36px !important;
+                        }
+                        .right-side-title {
+                            font-size: 24px !important;
+                        }
+                        &-inner {
+                            .button {
+                                &-block {
+                                    .btn {
+                                        padding: 7px 30px !important;
+                                        font-size: 14px !important;
+                                    }
+                                    .mat-checkbox {
+                                        font-size: 14px !important;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+/****************************************************************************************/
+// Maximum Width 567px
+/****************************************************************************************/
+@media only screen and (max-width: 567px) {
+    // SIGNUP PAGE SCSS
+    .page {
+        &-wrap {
+            height: auto !important;
+            /* Center Block SCSS */
+            .center-block-section {
+                padding: 10px 0px !important;
+                &-inner {
+                    width: auto;
+                    box-shadow: none !important;
+
+                    &.md-width {
+                        width: auto !important;
+                    }
+                    .button-block {
+                        padding-left: 0;
+                        .btn {
+                            width: auto;
+                        }
+                    }
+                    .form-block {
+                        margin-bottom: 75px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*************************MINIMUM WIDTH RESPONSIVE sCSS ********************************/
+
+/****************************************************************************************/
+// Minmum Width Responsive 992px
+/****************************************************************************************/
+@media only screen and (max-width: 992px) {
+}
+
+/****************************************************************************************/
+// Minmum Width Responsive 768px
+/****************************************************************************************/
+@media only screen and (max-width: 768px) {
+}
+/****************************************************************************************/
+// Minmum Width Responsive 568px
+/****************************************************************************************/
+@media only screen and (max-width: 568px) {
+}

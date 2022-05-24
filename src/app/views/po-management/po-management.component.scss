@@ -1,0 +1,140 @@
+@import '../../../styles/variables';
+
+.btn-bordered {
+    background-image: linear-gradient(to right, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff) !important;
+    border: 1px solid;
+    justify-content: center;
+    span {
+        padding-right: 10px;
+    }
+}
+
+.table-responsive {
+    padding: 5px 0;
+}
+
+.tbody-max-height {
+    max-height: calc(100vh - 31em) !important;
+}
+
+.custom-table {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    thead {
+        display: table;
+        table-layout: fixed;
+        width: auto;
+        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+        background-color: #fff;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+    tbody {
+        display: block;
+        max-height: calc(100vh - 27.2em);
+        overflow: auto;
+        tr {
+            cursor: pointer;
+        }
+    }
+    tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+        position: relative;
+        outline: none;
+    }
+    th,
+    td {
+        line-height: 1.4;
+        padding: 1em 15px 1em 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: auto;
+        font-size: 14px !important;
+        &.checkbox-width {
+            width: 50px;
+            padding-left: 35px !important;
+        }
+        @media screen and (max-width: 1279px) {
+            width: 150px !important;
+        }
+    }
+    th {
+        vertical-align: top;
+        font-size: 16px !important;
+        padding-left: 0;
+        @media screen and (max-width: 1366px) {
+            font-size: 14px !important;
+        }
+        &.checkbox-width {
+            padding-right: 40px;
+        }
+        &:first-child {
+            padding-left: 35px !important;
+        }
+    }
+    td {
+        padding: 1.3em 0px;
+        padding-left: 10px;
+        &.checkbox-width {
+            width: 65px;
+            padding-left: 35px !important;
+        }
+        @media screen and (max-width: 1366px) {
+            font-size: 12px !important;
+        }
+        &:first-child {
+            padding-left: 35px !important;
+        }
+        &:nth-child(2) {
+            padding-left: 17px;
+        }
+    }
+}
+
+.table-footer-block-inner-right {
+    margin-right: 25px;
+    .transaction-button-block {
+        @media screen and (max-width: 1366px) {
+            padding-right: 25px;
+        }
+    }
+}
+
+.po-management-button-block {
+    &-inner {
+        padding: 5px 30px;
+    }
+    .btn {
+        padding: 3px 20px;
+        color: #373737;
+        margin: 5px 0;
+        font-weight: bold;
+        &:hover {
+            color: #373737;
+        }
+    }
+    .cancel-btn {
+        border-radius: 4px;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.04);
+        border: 1px solid #cbcbcb;
+        margin-right: 15px;
+        background: #fff;
+    }
+    .submit-btn {
+        border-radius: 4px;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.04);
+        background-color: #9bffc1;
+        margin-right: 20px;
+    }
+}
+
+.content-center {
+    font-size: 2em;
+    color: #a5a5a5;
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}

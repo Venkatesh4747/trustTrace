@@ -1,0 +1,134 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+
+<div mat-dialog-content class="mod-comp state-comp">
+    <form [formGroup]="stateForm" (ngSubmit)="onAddCity()">
+        <div class="row">
+            <div class="col-md-12">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Country</mat-label>
+                    <input
+                        type="text"
+                        aria-label="Countries"
+                        matInput
+                        [readonly]="editable"
+                        formControlName="country"
+                        [matAutocomplete]="auto"
+                    />
+                </mat-form-field>
+                <mat-autocomplete #auto="matAutocomplete">
+                    <mat-option *ngFor="let option of filteredValues" [value]="option.name">
+                        {{ option.name }}
+                    </mat-option>
+                    <mat-option *ngIf="!filteredValues" [value]="">
+                        no options
+                    </mat-option>
+                </mat-autocomplete>
+                <p class="ml-3" *ngIf="handlingFormErrors('country', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('country', validators.PATTERN)">
+                    Only alphabets
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('country', validators.MINLENGTH)">
+                    Must be 3 characters long
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('country', validators.MAXLENGTH)">
+                    Only 100 characters
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('country', validators.ISEXISTS)">
+                    Please select the country from the list
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>State</mat-label>
+                    <input matInput type="text" aria-label="state" formControlName="state" [readonly]="editable" />
+                </mat-form-field>
+                <p class="ml-3" *ngIf="handlingFormErrors('state', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('state', validators.PATTERN)">
+                    Only alphabets
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('state', validators.MINLENGTH)">
+                    Must be 3 characters long
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('state', validators.MAXLENGTH)">
+                    Only 100 characters
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>State Code</mat-label>
+                    <input
+                        matInput
+                        type="text"
+                        aria-label="statecode"
+                        formControlName="state_code"
+                        [readonly]="editable"
+                    />
+                </mat-form-field>
+                <p class="ml-3" *ngIf="handlingFormErrors('state_code', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('state_code', validators.PATTERN)">
+                    Only alphabets and must contain 3 characters only
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Latitude</mat-label>
+                    <input
+                        matInput
+                        type="text"
+                        aria-label="latitude"
+                        formControlName="latitude"
+                        [readonly]="editable"
+                    />
+                </mat-form-field>
+                <p class="ml-3" *ngIf="handlingFormErrors('latitude', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('latitude', validators.PATTERN)">
+                    Must be in the range -90 to 90
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Longitude</mat-label>
+                    <input
+                        matInput
+                        type="text"
+                        aria-label="Longitude"
+                        matInput
+                        formControlName="longitude"
+                        [readonly]="editable"
+                    />
+                </mat-form-field>
+                <p class="ml-3" *ngIf="handlingFormErrors('longitude', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('longitude', validators.PATTERN)">
+                    Must be in the range -180 to 180
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5 col-md-offset-7">
+                <button mat-button (click)="onCancel()" class="btn btn-gray mr-2" type="button">Cancel</button>
+                <button mat-button class="btn btn-blue mr-2" (click)="onEdit()" *ngIf="editable">Edit</button>
+                <button mat-button class="btn btn-blue mr-2" [disabled]="disableBtn" *ngIf="!editable">
+                    {{ editMode ? 'Update' : 'Save' }}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

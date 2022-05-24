@@ -1,0 +1,69 @@
+<div class="no-assessments" *ngIf="allShipmentDetails.length === 0 && isDisabled">
+    {{ 'Not Available' | translate }}
+</div>
+<div
+    class="add-shipment-details"
+    *ngIf="(allShipmentDetails.length === 0 && !isDisabled) || allShipmentDetails.length > 0"
+>
+    <div *ngFor="let shipmentDetail of allShipmentDetails; let i = index">
+        <div class="row shipment-detail">
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <form [formGroup]="shipmentForm">
+                    <mat-form-field>
+                        <input
+                            matInput
+                            readonly
+                            required
+                            [matDatepicker]="dateCtrl"
+                            placeholder="{{ 'Date' | translate }}"
+                            [(ngModel)]="allShipmentDetails[i]['shipmentDate']"
+                            [ngModelOptions]="{ standalone: true }"
+                        />
+                        <mat-datepicker-toggle matSuffix [for]="dateCtrl"></mat-datepicker-toggle>
+                        <mat-datepicker #dateCtrl></mat-datepicker>
+                        <mat-error>{{ 'This field is required' | translate }}</mat-error>
+                    </mat-form-field>
+                </form>
+            </div>
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <div class="input-group">
+                    <input
+                        class="form-control"
+                        required
+                        name="qty"
+                        type="number"
+                        [(ngModel)]="allShipmentDetails[i]['quantity']['quantity']"
+                        placeholder="{{ 'Quantity' | translate }}"
+                        [disabled]="isDisabled"
+                    />
+                    <span class="input-group-addon text-right quantity-unit">
+                        <select
+                            name="quantityUnit"
+                            required
+                            [(ngModel)]="allShipmentDetails[i]['quantity']['unit']"
+                            [disabled]="isDisabled"
+                        >
+                            <option value="" selected disabled>{{ 'Select' | translate }}</option>
+                            <option [value]="unit" *ngFor="let unit of units">{{
+                                localeService.getDisplayText(unit)
+                            }}</option>
+                        </select>
+                    </span>
+                </div>
+            </div>
+            <div class="remove-shipmentdetails" (click)="removeShipmentDetail(i)" *ngIf="!isDisabled">
+                <span class="fa fa-trash"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 display-flex" *ngIf="!isDisabled">
+            <div class="add-more-shipment btn btn-blue" (click)="addMoreShipmentDetails()">
+                {{ 'Add Shipment' | translate }}
+            </div>
+            <div class="add-more-shipment btn btn-gray shipment-save" (click)="saveShipmentDetails()">
+                Save
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,53 @@
+<ul class="filter-bar-container" *ngIf="!isKeyOptions">
+    <li *ngFor="let filter of filters | keys; let filterInd = index">
+        <app-multi-select-and-search
+            (selectionChange)="handleSelection()"
+            [label]="filter.key"
+            [options]="filter.value"
+            [filter_session]="filter_session"
+        >
+        </app-multi-select-and-search>
+    </li>
+    <li class="reset-filters">
+        <button class="button-badge mat-button btn btn-gray" (click)="resetAllFilters()">
+            {{ 'Reset all filters' | translate }}
+        </button>
+    </li>
+</ul>
+
+<ul class="filter-bar-container" *ngIf="isKeyOptions">
+    <li *ngFor="let filter of filters | keys; let filterInd = index">
+        <app-tt-date-filter
+            (selectionChange)="handleSelection()"
+            [filter_session]="filter_session"
+            [label]="filter.key"
+            className="date-filter-bar"
+            arrowIcon="arrow_drop_down"
+            *ngIf="isADateRange(filter.key)"
+        >
+        </app-tt-date-filter>
+        <app-tt-multi-select-search
+            (selectionChange)="handleSelection()"
+            [label]="filter.key"
+            [options]="filter.value"
+            [filter_session]="filter_session"
+            [optionsParam]="optionsParam"
+            *ngIf="!isADateRange(filter.key) && !isAgroup(filter.value)"
+        >
+        </app-tt-multi-select-search>
+        <app-tt-multi-select-group-search
+            (selectionChange)="handleSelection()"
+            [label]="filter.key"
+            [options]="filter.value"
+            [filter_session]="filter_session"
+            [optionsParam]="optionsParam"
+            *ngIf="!isADateRange(filter.key) && isAgroup(filter.value)"
+        >
+        </app-tt-multi-select-group-search>
+    </li>
+    <li class="reset-filters">
+        <button class="button-badge mat-button btn btn-gray" (click)="resetAllFilters()">
+            {{ 'Reset all filters' | translate }}
+        </button>
+    </li>
+</ul>

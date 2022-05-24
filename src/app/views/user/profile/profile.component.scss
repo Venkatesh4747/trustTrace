@@ -1,0 +1,127 @@
+@import '~styles/variables';
+@import '~styles/mixins';
+.lang-heading {
+    margin-top: 5px;
+    text-align: center;
+}
+.select-lang-col {
+    margin-top: 5px;
+    display: flex;
+    // justify-content: center;
+    select {
+        height: 39px;
+    }
+}
+.language-change-col {
+    margin-left: 4px;
+    color: black;
+}
+.mat-panel-body {
+    padding-left: 12px;
+}
+.user-profile {
+    position: relative;
+    left: 20px;
+    text-align: left;
+    .form-group.bottom {
+        font-size: 17px;
+    }
+}
+.notEditable {
+    cursor: not-allowed;
+}
+.settings {
+    .mat-expansion-panel {
+        margin: 0 20px 15px;
+        border-radius: 10px;
+    }
+    .mat-expansion-panel-header-title {
+        color: $text-color-primary;
+        font-family: $font-family-Bold;
+        font-size: 17px;
+    }
+}
+.mat-form-block-type-one {
+    .mat-expansion-panel {
+        .mat-expansion-panel-header {
+            padding-top: 38px;
+            padding-bottom: 38px;
+        }
+    }
+}
+.toby .form-group.selected div.selected {
+    border-bottom: inherit;
+    margin: inherit;
+}
+.edit {
+    column-gap: 2px;
+    color: #b5b2b2;
+}
+.text-color {
+    color: #333;
+}
+
+.toby .form-group.selected label {
+    position: relative;
+    &::before {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        width: 70%;
+        border-bottom: 3px solid $color-tt-primary;
+        @include transition(all 350ms);
+        @include radius(20px);
+    }
+}
+
+.toby label {
+    position: relative;
+    padding-left: 0px;
+    cursor: pointer;
+    line-height: 20px;
+    display: inline-block;
+    font-weight: normal;
+    &::before {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        width: 0%;
+        border-bottom: 3px solid $color-tt-primary;
+        @include transition(all 350ms);
+        @include radius(20px);
+    }
+}
+
+input[type='password'],
+.txtarea {
+    margin-bottom: 0px;
+    width: 75%;
+    line-height: 1.25;
+}
+.password-rules {
+    position: relative;
+    padding: 10px;
+    text-align: left;
+    font-weight: 300;
+    color: $text-color-primary;
+    min-width: 390px;
+    .password-rules--content {
+        text-align: left;
+        font-weight: 300;
+        margin-top: 50px;
+        font-size: 14px;
+        font-weight: normal;
+    }
+}
+
+.email-tab {
+    min-height: 515px;
+}

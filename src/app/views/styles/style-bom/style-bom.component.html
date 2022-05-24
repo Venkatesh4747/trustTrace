@@ -1,0 +1,175 @@
+<div class="bill-of-materials bill-of-materials-type-one" provide-parent-form>
+    <div class="add-product-group-btn cursor-pointer" (click)="addMoreArticle()">
+        <i class="action-icons fa fa-plus"></i>{{ 'Add more Articles' | industry | translate }}
+    </div>
+    <div class="bill-of-material">
+        <div *ngFor="let article of style.bom; let bomIndex = index">
+            <div class="form-field">
+                <div class="row">
+                    <div class="col-md-3">
+                        <fieldset class="form-group">
+                            <label for="bom-productType-{{ bomIndex }}" class="bmd-label-static"
+                                >{{ 'Article Name' | industry | translate }} & {{ 'Number' | translate }}:
+                            </label>
+                            <mat-form-field class="ptop-10">
+                                <input
+                                    type="text"
+                                    class="form-control styles-text-input"
+                                    name="bom-article-{{ bomIndex }}"
+                                    [(ngModel)]="style.bom[bomIndex].article"
+                                    matInput
+                                    [matAutocomplete]="articlesAuto"
+                                    (keyup)="searchArticle($event, bomIndex)"
+                                    data-cy="article-name-and-number"
+                                />
+                                <mat-hint>{{ 'Type at least 3 characters to search' | translate }} </mat-hint>
+                                <mat-autocomplete
+                                    (optionSelected)="setColorAutoCompleteListForSeletedIndex(bomIndex)"
+                                    #articlesAuto="matAutocomplete"
+                                    [displayWith]="getArticleName"
+                                >
+                                    <mat-option *ngFor="let item of articleSearchList" [value]="item">
+                                        {{ item.unique_search }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </fieldset>
+                    </div>
+                    <!-- Column -->
+                    <div class="col-md-3">
+                        <fieldset class="form-group">
+                            <label for="bom-color-{{ bomIndex }}" class="bmd-label-static"
+                                >{{ 'Color' | translate }}:</label
+                            >
+                            <div class="form-inner-block">
+                                <app-chip-input
+                                    [placeholderText]="''"
+                                    [showPlus]="true"
+                                    [isRemovable]="true"
+                                    [chipItems]="selectedColors[bomIndex]"
+                                    [autoCompleteList]="colorAutoCompleteList[bomIndex]"
+                                    (valueChange)="updateColor(bomIndex)"
+                                    data_cy="color"
+                                ></app-chip-input>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <!--Column-->
+                    <div class="col-md-2">
+                        <fieldset class="form-group areaOfUsage-container">
+                            <label for="bom-areaOfUsage-{{ bomIndex }}" class="bmd-label-static"
+                                >{{ 'Area Of Usage' | translate }}:</label
+                            >
+                            <div class="form-inner-block">
+                                <app-tt-dropdown-search
+                                    [searchOptions]="areaOfUsageValues"
+                                    [(ngModel)]="style.bom[bomIndex].areaOfUsage"
+                                    [floatLabel]="'never'"
+                                    name="bom-areaOfUsage-{{ bomIndex }}"
+                                    data_cy="area-of-usage"
+                                ></app-tt-dropdown-search>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <!-- Column -->
+                    <div class="col-md-2">
+                        <fieldset class="form-group">
+                            <label for="bom-consumptionQty-{{ bomIndex }}" class="bmd-label-static"
+                                >{{ 'Consumption Qty' | translate }}:</label
+                            >
+                            <mat-form-field class="ptop-10">
+                                <input
+                                    matInput
+                                    class="form-control styles-text-input"
+                                    name="bom-consumptionQty-{{ bomIndex }}"
+                                    [(ngModel)]="style.bom[bomIndex].qty.quantity"
+                                />
+                            </mat-form-field>
+                        </fieldset>
+                    </div>
+                    <!-- Column -->
+                    <div class="col-md-2">
+                        <ul class="form-field-inner-block">
+                            <li>
+                                <fieldset class="form-group">
+                                    <label for="bom-quantityUnits-{{ bomIndex }}" class="bmd-label-static"
+                                        >{{ 'In Units' | translate }}:</label
+                                    >
+                                    <mat-form-field>
+                                        <mat-select
+                                            [(ngModel)]="style.bom[bomIndex].qty.unit"
+                                            name="bom-quantityUnits-{{ bomIndex }}"
+                                        >
+                                            <mat-option
+                                                *ngFor="let unit of settings['units'] | sortByFilter"
+                                                [value]="unit"
+                                            >
+                                                {{ localeService.getDisplayText(unit) }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </fieldset>
+                            </li>
+                            <li>
+                                <span class="delete-bom-btn">
+                                    <i class="action-icons-big fa fa-trash" (click)="deleteBOM(bomIndex)"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!-- Row -->
+            </div>
+            <!-- Form Field -->
+
+            <!-- <fieldset class="form-group">
+                <label for="bom-productType-{{ bomIndex }}" class="bmd-label-static">{{ 'Article Name' | translate }} &
+                    {{ 'Number' | translate }}:
+                </label>
+                <mat-form-field class="ptop-10">
+                    <input type="text" class="form-control styles-text-input" name="bom-article-{{ bomIndex }}"
+                        [(ngModel)]="style.bom[bomIndex].article" matInput [matAutocomplete]="articlesAuto"
+                        (keyup)="searchArticle($event, bomIndex)" />
+                    <mat-hint>{{ 'Type at least 3 characters to search' | translate }} </mat-hint>
+                    <mat-autocomplete (optionSelected)="setColorAutoCompleteListForSeletedIndex(bomIndex)"
+                        #articlesAuto="matAutocomplete" [displayWith]="getArticleName">
+                        <mat-option *ngFor="let item of articleSearchList" [value]="item">
+                            {{ item.unique_search }}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="bom-color-{{ bomIndex }}" class="bmd-label-static">{{ 'Color' | translate }}:</label>
+                <div class="pt-1 ptop-10">
+                    <app-chip-input [placeholderText]="''" [showPlus]="true" [isRemovable]="true"
+                        [chipItems]="selectedColors[bomIndex]" [autoCompleteList]="colorAutoCompleteList[bomIndex]"
+                        (valueChange)="updateColor(bomIndex)"></app-chip-input>
+                </div>
+            </fieldset>
+            <fieldset class="form-group ml-2">
+                <label for="bom-consumptionQty-{{ bomIndex }}"
+                    class="bmd-label-static">{{ 'Consumption Qty' | translate }}:</label>
+                <mat-form-field class="ptop-10">
+                    <input matInput class="form-control styles-text-input" name="bom-consumptionQty-{{ bomIndex }}"
+                        [(ngModel)]="style.bom[bomIndex].qty.quantity" />
+                </mat-form-field>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="bom-quantityUnits-{{ bomIndex }}"
+                    class="bmd-label-static">{{ 'In Units' | translate }}:</label>
+                <mat-form-field style="width:90%">
+                    <mat-select [(ngModel)]="style.bom[bomIndex].qty.unit" name="bom-quantityUnits-{{ bomIndex }}">
+                        <mat-option *ngFor="let unit of (settings['units'] | sortByFilter)" [value]="unit">
+                            {{ localeService.getDisplayText(unit) }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </fieldset>
+            <span class="delete-bom-btn">
+                <i class="action-icons-big fa fa-trash" (click)="deleteBOM(bomIndex)"></i>
+            </span> -->
+        </div>
+    </div>
+</div>

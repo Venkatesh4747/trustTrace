@@ -1,0 +1,86 @@
+<div class="side-navigation-outer" #sidenavElement>
+    <div class="side-navigation-inner">
+        <ul class="nav-bar-container">
+            <ng-container *ngTemplateOutlet="recursiveMenuList; context: { menus: menus }"> </ng-container>
+        </ul>
+
+        <ng-template #recursiveMenuList let-menus="menus">
+            <li
+                class="nav-bar-wrapper"
+                *ngFor="let menu of menus"
+                [routerLinkActive]="'active-bg'"
+                [ngClass]="{
+                    active: getActiveMenu(menu.childUrls),
+                    'background-none': menu.children && menu.children.length > 0,
+                    'hide-menu': !checkAuthority(menu.authorities)
+                }"
+            >
+                <a
+                    [routerLink]="menu['route_url']"
+                    (click)="onMenuClick(menu['title'])"
+                    [attr.data-cy]="removeSideNavMenuItemSpace(menu['title'])"
+                >
+                    <img class="nav-bar-icon" src="{{ env.IMG_URL }}images/{{ menu['icon'] }}" />
+                    <div class="menu-heading">
+                        {{ menu['title'] | translate }}
+                        <img
+                            class="nav-bar-icon menu-expanded"
+                            src="{{ env.IMG_URL }}images/dropdown-arrow.png"
+                            *ngIf="menu.children && menu.children.length > 0"
+                        />
+                        <img
+                            class="nav-bar-icon menu-collapsed"
+                            src="{{ env.IMG_URL }}images/side-nav.png"
+                            *ngIf="menu.children && menu.children.length > 0"
+                        />
+                    </div>
+                </a>
+                <ng-container *ngIf="menu.children && menu.children.length > 0">
+                    <ng-container *ngTemplateOutlet="recursiveSubMenuList; context: { subMenu: menu.children }">
+                    </ng-container>
+                </ng-container>
+            </li>
+        </ng-template>
+
+        <ng-template #recursiveSubMenuList let-subMenu="subMenu">
+            <ul class="nav-bar-wrapper-container">
+                <li
+                    class="nav-bar-wrapper-sub-menu"
+                    *ngFor="let item of subMenu"
+                    [routerLinkActive]="'active-bg'"
+                    [ngClass]="{
+                        active: item.childUrls && getActiveMenu(item.childUrls),
+                        'background-none': item.children && item.children.length > 0,
+                        'hide-menu': !checkAuthority(item.authorities)
+                    }"
+                >
+                    <a
+                        [routerLink]="item['route_url']"
+                        (click)="onMenuClick(item['title'])"
+                        [routerLinkActive]="'active'"
+                        [attr.data-cy]="removeSideNavMenuItemSpace(item['title'])"
+                    >
+                        <img class="nav-bar-icon" src="{{ env.IMG_URL }}images/{{ item['icon'] }}" />
+                        <div class="menu-heading">
+                            {{ item['title'] | translate }}
+                            <img
+                                class="nav-bar-icon menu-expanded"
+                                src="{{ env.IMG_URL }}images/dropdown-arrow.png"
+                                *ngIf="item.children && item.children.length > 0"
+                            />
+                            <img
+                                class="nav-bar-icon menu-collapsed"
+                                src="{{ env.IMG_URL }}images/side-nav.png"
+                                *ngIf="item.children && item.children.length > 0"
+                            />
+                        </div>
+                    </a>
+                    <ng-container *ngIf="item.children && item.children.length > 0">
+                        <ng-container *ngTemplateOutlet="recursiveSubMenuList; context: { subMenu: item.children }">
+                        </ng-container>
+                    </ng-container>
+                </li>
+            </ul>
+        </ng-template>
+    </div>
+</div>

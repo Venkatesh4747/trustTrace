@@ -1,0 +1,57 @@
+<!-- Generate New API Key -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-5 col-md-offset-2 apikeyfield">
+            <div class="password-input-type-block">
+                <div class="material-input-style-box-type">
+                    <div class="material-input-style-box-type-inner">
+                        <mat-form-field floatLabel="never">
+                            <input
+                                class="password-key-input"
+                                [(ngModel)]="apiKey"
+                                matInput
+                                [placeholder]="'API Key...' | translate"
+                                readonly
+                                #apiKeyInputElement
+                            />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div
+                class="pull-left copyKey"
+                tooltip="Copy key"
+                *ngIf="apiKey"
+                (click)="copyApiKeyText(apiKeyInputElement)"
+            >
+                <mat-icon aria-hidden="false" aria-label="file copy icon">file_copy</mat-icon>
+            </div>
+            <div class="pull-left center-alignment-spinner" *ngIf="isProcessing">
+                <app-spinner [small]="true"></app-spinner>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5 col-md-offset-2">
+            <div>
+                <button
+                    class="btn tt-btn tt-btn-primary pull-left"
+                    [disabled]="isProcessing || apiKey"
+                    (click)="generateNewApiKey()"
+                >
+                    Generate Key
+                </button>
+                <button
+                    *ngIf="apiKey"
+                    class="btn tt-btn revoke-btn pull-right"
+                    (click)="showConfirmationDialog()"
+                    [disabled]="isProcessing"
+                >
+                    Revoke
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

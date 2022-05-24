@@ -1,0 +1,27 @@
+<mat-form-field class="tt-multi-select-auto-complete" [floatLabel]="floatLabel">
+    <input
+        type="text"
+        [placeholder]="placeholder"
+        matInput
+        [(ngModel)]="value"
+        [matAutocomplete]="auto"
+        [formControl]="inputControl"
+        [attr.data-cy]="'tt-multi-select-auto-complete-' + data_cy"
+        [attr.name]="name"
+        [required]="isRequired"
+    />
+
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (closed)="handleClose()">
+        <mat-option *ngFor="let option of filteredOptions | async" [value]="selectedOptions">
+            <div (click)="optionClicked($event, option)">
+                <mat-checkbox
+                    [checked]="option.selected"
+                    (change)="toggleSelection(option)"
+                    (click)="$event.stopPropagation()"
+                >
+                    {{ option[optionalParams.value] }}
+                </mat-checkbox>
+            </div>
+        </mat-option>
+    </mat-autocomplete>
+</mat-form-field>

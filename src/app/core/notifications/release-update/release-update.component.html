@@ -1,0 +1,8 @@
+<div *ngIf="showNotification" class="release-notification animated delay-4 slideInDown">
+    <div class="release-notification-inner">
+        <p [innerHTML]="this.releaseData.message"></p>
+        <span (click)="onClose()">
+            <i class="fa fa-close close-icon"></i>
+        </span>
+    </div>
+</div>

@@ -1,0 +1,60 @@
+<div class="main-fabric-composition" provide-parent-form>
+    <div class="add-product-group-btn cursor-pointer" (click)="addMaterialComposition()">
+        <i class="action-icons fa fa-plus"></i>{{ 'Add more material composition' | translate }}
+    </div>
+    <div class="main-fabric-material-list main-fabric-material-list-type-one">
+        <div *ngFor="let fabricMat of style['materialComp']; let fabricIndex = index">
+            <div class="row">
+                <div class="col-md-4">
+                    <fieldset class="form-group add-pt">
+                        <label for="material-{{ fabricIndex }}" class="bmd-label-static"
+                            >{{ 'Main Fabric Material' | translate }}:</label
+                        >
+                        <app-tt-dropdown-search
+                            [searchOptions]="settings['materials'] | sortByFilter"
+                            [(ngModel)]="style['materialComp'][fabricIndex].id"
+                            [selectedItem]="style['materialComp']"
+                            [floatLabel]="'never'"
+                            [optionalParams]="optional"
+                            name="material-{{ fabricIndex }}"
+                            data_cy="main-fabric-material"
+                        ></app-tt-dropdown-search>
+                    </fieldset>
+                </div>
+                <!-- Column -->
+                <div class="col-md-4">
+                    <ul class="main-fabric-material-block">
+                        <li>
+                            <fieldset class="form-group">
+                                <label for="composition-{{ fabricIndex }}" class="bmd-label-static"
+                                    >{{ 'Material Composition' | industry | translate }}:</label
+                                >
+                                <mat-form-field hintLabel="{{ 'Max value can be 100' | translate }}">
+                                    <input
+                                        matInput
+                                        type="number"
+                                        [(ngModel)]="composition[fabricIndex]"
+                                        (change)="setComposition(fabricIndex)"
+                                        [disabled]="!valuePresent(fabricIndex)"
+                                        class="styles-text-input"
+                                        name="composition-{{ fabricIndex }}"
+                                        min="0"
+                                        max="100"
+                                    />
+                                    <span matSuffix>%</span>
+                                </mat-form-field>
+                            </fieldset>
+                        </li>
+                        <li>
+                            <span class="delete-material-comp-btn">
+                                <i class="action-icons-big fa fa-trash" (click)="removeComposition(fabricIndex)"></i>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+    </div>
+</div>

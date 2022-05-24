@@ -1,0 +1,914 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="upload-container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="upload-transaction-header">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="page-title">
+                            <div>{{ 'Transaction Certificate' | translate }}</div>
+                        </div>
+                        <!-- Page Title -->
+                        <div class="close-icon-block text-right">
+                            <a (click)="closeDialog()" *ngIf="showClose">
+                                <img class="icon" alt="Close Model" [src]="getImage('close-model.png')" />
+                            </a>
+                        </div>
+                        <!-- Close Icon Block -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!-- Row -->
+            </div>
+            <!-- Upload Transaction Header -->
+        </div>
+        <!-- Column -->
+    </div>
+    <!-- Row -->
+    <div class="upload-container-block">
+        <div class="row">
+            <div class="col-md-5">
+                <!--  Row -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="certificate-view-transaction-certificate-block">
+                            <div class="certificate-view-extraction-title">
+                                <h4 class="title">{{ extractionStatus | translate }}</h4>
+                            </div>
+                            <!-- Certificate Extraction Title -->
+                            <div class="certificate-view-certificate-section">
+                                <div class="certificate-viewed-source-file-loader" *ngIf="isFetchingFile">
+                                    <app-spinner [small]="true"></app-spinner>
+                                </div>
+                                <ngx-extended-pdf-viewer
+                                    [src]="uploadedFile"
+                                    [height]="'80vh'"
+                                    [useBrowserLocale]="true"
+                                    [showBookmarkButton]="false"
+                                    [showDownloadButton]="false"
+                                    [showOpenFileButton]="false"
+                                    [showPrintButton]="false"
+                                    [showPropertiesButton]="false"
+                                    *ngIf="uploadedFile && !isFetchingFile"
+                                >
+                                    <!-- [showSecondaryToolbarButton]='false' -->
+                                </ngx-extended-pdf-viewer>
+                            </div>
+                            <!-- Certificate Section -->
+                            <div
+                                class="certificate-view-certificate-document"
+                                *ngIf="uploadedFile && !isFetchingFile"
+                                [ngClass]="{ 'disabled-opacity-5': isFetchingFile }"
+                            >
+                                <div class="certificate-view-file-name-block">
+                                    <p>
+                                        <span>{{ 'File Name ' | translate }}:</span>{{ fileName | translate }}
+                                    </p>
+                                    <a
+                                        [ngClass]="{ 'disabled-opacity-5': isFetchingFile }"
+                                        (click)="downloadEvidence(certId, fileName)"
+                                    >
+                                        <img
+                                            tooltip="Download"
+                                            container="body"
+                                            src="{{ env.IMG_URL }}images/file-download.png"
+                                            alt="Download"
+                                        />
+                                    </a>
+                                </div>
+                                <!-- Certificate Certificate Document -->
+                            </div>
+                            <!-- Certificate File Document -->
+                        </div>
+                        <!-- Certificate Transaction Certificate Block -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!--  Row -->
+            </div>
+            <!-- Column -->
+            <div class="col-md-7">
+                <div class="upload-transaction-field ">
+                    <div class="mandatory-title">
+                        <h4 class="title">{{ 'Highlighted fields are edited by the supplier' | translate }}</h4>
+                    </div>
+                    <!-- Mandatory Title -->
+                    <div class="material-input-style-box-type">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table custom-table normal-style-table table-striped"
+                                            aria-describedby="certificate-info"
+                                        >
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">{{ 'TC Reference ID' | translate }}</th>
+                                                    <th scope="col">
+                                                        {{ 'Certification Type' | translate }}
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    !extractedData.referenceNumber ||
+                                                                    extractedData.referenceNumber !==
+                                                                        changedData.referenceNumber
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    (changedData && changedData.referenceNumber) ||
+                                                                        'Not Available' | translate
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>{{
+                                                                    extractedData.referenceNumber ||
+                                                                        ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    (extractedData && !extractedData.certTypeId) ||
+                                                                    extractedData.certTypeId !== changedData.certTypeId
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    (changedData &&
+                                                                        localeService.getDisplayText(
+                                                                            changedData.certTypeId
+                                                                        )) ||
+                                                                        'Not Available' | translate
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>{{
+                                                                    extractedData
+                                                                        ? localeService.getDisplayText(
+                                                                              extractedData.certTypeId
+                                                                          )
+                                                                        : ('NILL' || 'NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table custom-table normal-style-table table-striped"
+                                            aria-describedby="seller-info"
+                                        >
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">{{ 'Seller' | translate }}</th>
+                                                    <th scope="col">
+                                                        {{ 'Country of Dispatch' | translate }}
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    (extractedData && !extractedData.sellerOfProduct) ||
+                                                                    (extractedData.sellerOfProduct &&
+                                                                        extractedData.sellerOfProduct['value'] !==
+                                                                            changedData.sellerOfProduct['value'])
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    changedData && changedData.sellerOfProduct
+                                                                        ? changedData.sellerOfProduct['value']
+                                                                        : ('Not Available' || 'Not Available'
+                                                                          | translate)
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>
+                                                                    {{
+                                                                        extractedData && extractedData.sellerOfProduct
+                                                                            ? extractedData.sellerOfProduct['value']
+                                                                            : ('NILL' | translate)
+                                                                    }}
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    !extractedData.countryOfDispatch ||
+                                                                    extractedData.countryOfDispatch !==
+                                                                        changedData.countryOfDispatch
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    (changedData && changedData.countryOfDispatch) ||
+                                                                        'Not Available' | translate
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>
+                                                                    {{
+                                                                        extractedData.countryOfDispatch
+                                                                            ? extractedData.countryOfDispatch
+                                                                            : ('NILL' | translate)
+                                                                    }}
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                            <div class="col-md-4">
+                                <div *ngIf="certNames && certNames.length > 1" class="upload-file-name-block">
+                                    <p>{{ certNames[1] }}</p>
+                                    <a (click)="downloadAdditionalEvidence(certId, certNames[1])">
+                                        <img
+                                            tooltip="Download"
+                                            container="body"
+                                            src="{{ env.IMG_URL }}images/file-download.png"
+                                            alt="Download"
+                                        />
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table custom-table normal-style-table table-striped"
+                                            aria-describedby="buyer-info"
+                                        >
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">
+                                                        {{ 'Buyer' | translate }}
+                                                        <span
+                                                            matTooltip="Buyer does not match with the Scope Certificate"
+                                                            matTooltipPosition="above"
+                                                            *ngIf="
+                                                                changedData &&
+                                                                changedData.buyerOfProduct &&
+                                                                !changedData.buyerOfProduct['isExist']
+                                                            "
+                                                            class="header-icon validation-icon"
+                                                        >
+                                                            <mat-icon>error</mat-icon>
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">
+                                                        {{ 'Consignee' | translate
+                                                        }}<span
+                                                            matTooltip="Consignee does not match with the Scope Certificate"
+                                                            matTooltipPosition="above"
+                                                            *ngIf="
+                                                                changedData &&
+                                                                changedData.consigneeOfProduct &&
+                                                                !changedData.consigneeOfProduct['isExist']
+                                                            "
+                                                            class="header-icon validation-icon"
+                                                        >
+                                                            <mat-icon>error</mat-icon>
+                                                        </span>
+                                                    </th>
+                                                    <th scope="col">{{ 'Net weight' | translate }}</th>
+                                                    <th scope="col">{{ 'Recording Facility' | translate }}</th>
+                                                    <th scope="col">
+                                                        {{ 'Supplier Facility' | translate }}
+                                                        <span
+                                                            [matTooltip]="
+                                                                getT2FacilityErrorTooltip(taskData) | translate
+                                                            "
+                                                            matTooltipPosition="above"
+                                                            *ngIf="showT2FacilityError(taskData)"
+                                                            class="header-icon validation-icon"
+                                                        >
+                                                            <mat-icon>error</mat-icon>
+                                                        </span>
+                                                    </th>
+                                                    <!-- <th scope="col">
+                                                        {{ 'Action' | translate }}
+                                                    </th> -->
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    (extractedData && !extractedData.buyerOfProduct) ||
+                                                                    (extractedData.buyerOfProduct &&
+                                                                        extractedData.buyerOfProduct['value'] !==
+                                                                            changedData.buyerOfProduct['value'])
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    changedData && changedData.buyerOfProduct
+                                                                        ? changedData.buyerOfProduct['value']
+                                                                        : ('Not Available' || 'Not Available'
+                                                                          | translate)
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>
+                                                                    {{
+                                                                        extractedData && extractedData.buyerOfProduct
+                                                                            ? extractedData.buyerOfProduct['value']
+                                                                            : ('NILL' | translate)
+                                                                    }}
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    (extractedData &&
+                                                                        !extractedData.consigneeOfProduct) ||
+                                                                    (extractedData.consigneeOfProduct &&
+                                                                        extractedData.consigneeOfProduct['value'] !==
+                                                                            changedData.consigneeOfProduct['value'])
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    changedData && changedData.consigneeOfProduct
+                                                                        ? changedData.consigneeOfProduct['value']
+                                                                        : ('Not Available' || 'Not Available'
+                                                                          | translate)
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>
+                                                                    {{
+                                                                        extractedData &&
+                                                                        extractedData.consigneeOfProduct
+                                                                            ? extractedData.consigneeOfProduct['value']
+                                                                            : ('NILL' | translate)
+                                                                    }}
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    (extractedData && !extractedData.netWeight) ||
+                                                                    extractedData.netWeight !== changedData.netWeight
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    (changedData && changedData.netWeight) ||
+                                                                        'Not Available' | translate
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>
+                                                                    {{
+                                                                        extractedData && extractedData.netWeight
+                                                                            ? extractedData.netWeight
+                                                                            : ('NILL' | translate)
+                                                                    }}
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box': taskData && taskData.recordingFacility
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    (taskData && taskData.recordingFacility) ||
+                                                                        'Not Available' | translate
+                                                                }}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    changedData &&
+                                                                    changedData.facility &&
+                                                                    changedData.facility.key
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    changedData?.facility?.key ||
+                                                                    changedData?.facility?.value
+                                                                        ? changedData?.facility?.key +
+                                                                          '-' +
+                                                                          changedData?.facility?.value
+                                                                        : ('Not Available' | translate)
+                                                                }}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <!-- <td class="text-left">
+                                                        <span
+                                                            class="font-bold popover-link"
+                                                            (click)="getFacilityListForCompany()"
+                                                            [popover]="facilityListTemplate"
+                                                            placement="right bottom"
+                                                            container="body"
+                                                            [outsideClick]="true"
+                                                        >
+                                                            {{ 'KVM / SC' | translate }}
+                                                        </span>
+                                                        <img
+                                                            class="facility-icon"
+                                                            alt="Facility icon"
+                                                            [src]="getImage('facility.png')"
+                                                        />
+                                                    </td> -->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="row" *ngIf="productInfos && productInfos.length > 0">
+                            <div class="col-md-12">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table custom-table product-table tc-approval-evidence-upload-table table-striped"
+                                            aria-describedby="product-info"
+                                        >
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">
+                                                        {{ 'Product Name & Number' | translate }}
+                                                    </th>
+                                                    <th scope="col">{{ 'Trade name' | translate }}</th>
+                                                    <th scope="col">{{ 'LOT Nos' | translate }}</th>
+                                                    <th scope="col">{{ 'Quantity (kgs)' | translate }}</th>
+                                                    <th scope="col">{{ 'Raw material UID' | translate }}</th>
+                                                    <!-- <th scope="col">
+                                                        {{ 'Real Yarn Supplier for Trader TC' | translate }}
+                                                    </th>
+                                                    <th scope="col">{{ 'Yarn COO' | translate }}</th>
+                                                    <th scope="col">
+                                                        {{ 'Cotton Lint COO' | translate }}
+                                                    </th> -->
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let product of productInfos; let ind = index">
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    !extractedData.productInfo ||
+                                                                    !extractedData.productInfo[ind] ||
+                                                                    !changedData.productInfo ||
+                                                                    !changedData.productInfo[ind] ||
+                                                                    (extractedData.productInfo &&
+                                                                        extractedData.productInfo[ind] &&
+                                                                        extractedData.productInfo[ind].productName !==
+                                                                            changedData.productInfo[ind].productName)
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    changedData &&
+                                                                    changedData.productInfo &&
+                                                                    changedData.productInfo[ind]
+                                                                        ? changedData.productInfo[ind].productName
+                                                                        : ('Not Available' | translate)
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                <span>{{
+                                                                    extractedData &&
+                                                                    extractedData.productInfo &&
+                                                                    extractedData.productInfo[ind]
+                                                                        ? extractedData.productInfo[ind].productName
+                                                                        : ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <!-- <td>
+                                                        <mat-form-field [floatLabel]="'never'">
+                                                            <input type="text" matInput
+                                                                placeholder="Enter Material Composition" />
+                                                        </mat-form-field>
+                                                        <p class="value-gray">
+                                                            {{'Extracted value' | translate}} 
+                                                            <span>100% Post-consumer recycled</span>
+                                                        </p>
+                                                    </td> -->
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    !extractedData.productInfo ||
+                                                                    !extractedData.productInfo[ind] ||
+                                                                    !changedData.productInfo ||
+                                                                    !changedData.productInfo[ind] ||
+                                                                    (extractedData.productInfo &&
+                                                                        extractedData.productInfo[ind] &&
+                                                                        extractedData.productInfo[ind].tradeName !==
+                                                                            changedData.productInfo[ind].tradeName)
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    changedData &&
+                                                                    changedData.productInfo &&
+                                                                    changedData.productInfo[ind] &&
+                                                                    changedData.productInfo[ind].tradeName
+                                                                        ? changedData.productInfo[ind].tradeName
+                                                                        : ('Not Available' | translate)
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                <span>{{
+                                                                    extractedData.productInfo &&
+                                                                    extractedData.productInfo[ind]
+                                                                        ? extractedData.productInfo[ind].tradeName
+                                                                        : ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    !extractedData.productInfo ||
+                                                                    !extractedData.productInfo[ind] ||
+                                                                    !changedData.productInfo ||
+                                                                    !changedData.productInfo[ind] ||
+                                                                    (extractedData.productInfo &&
+                                                                        extractedData.productInfo[ind] &&
+                                                                        extractedData.productInfo[ind].lotNumbers !==
+                                                                            changedData.productInfo[ind].lotNumbers)
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    changedData &&
+                                                                    changedData.productInfo &&
+                                                                    changedData.productInfo[ind]
+                                                                        ? changedData.productInfo[ind].lotNumbers
+                                                                        : ('Not Available' | translate)
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                <span>{{
+                                                                    extractedData.productInfo &&
+                                                                    extractedData.productInfo[ind]
+                                                                        ? extractedData.productInfo[ind].lotNumbers
+                                                                        : ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    !extractedData.productInfo ||
+                                                                    !extractedData.productInfo[ind] ||
+                                                                    !changedData.productInfo ||
+                                                                    !changedData.productInfo[ind] ||
+                                                                    (extractedData.productInfo &&
+                                                                        extractedData.productInfo[ind] &&
+                                                                        extractedData.productInfo[ind].netWeight !==
+                                                                            changedData.productInfo[ind].netWeight)
+                                                            }"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    changedData &&
+                                                                    changedData.productInfo &&
+                                                                    changedData.productInfo[ind]
+                                                                        ? changedData.productInfo[ind].netWeight
+                                                                        : ('Not Available' | translate)
+                                                                }}
+                                                            </p>
+                                                            <p class="value-gray">
+                                                                <span>{{
+                                                                    extractedData.productInfo &&
+                                                                    extractedData.productInfo[ind]
+                                                                        ? extractedData.productInfo[ind].netWeight
+                                                                        : ('NILL' | translate)
+                                                                }}</span>
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div
+                                                            [ngClass]="{
+                                                                'yellow-box':
+                                                                    changedData &&
+                                                                    changedData.productInfo &&
+                                                                    changedData.productInfo[ind] &&
+                                                                    changedData.productInfo[ind].productItem &&
+                                                                    changedData.productInfo[ind].productItem.value
+                                                            }"
+                                                            (mouseover)="
+                                                                getMaterialComposition(
+                                                                    changedData.productInfo[ind].productItem?.key,
+                                                                    ind
+                                                                )
+                                                            "
+                                                            [matTooltip]="
+                                                                changedData.productInfo[ind]
+                                                                    .productItemMaterialComposition
+                                                            "
+                                                            matTooltipPosition="above"
+                                                        >
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    (changedData?.productInfo)[ind]?.productItem?.key ||
+                                                                        ('Not Available' | translate)
+                                                                }}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <!-- <td>
+                                                        <p class="view-form-value">
+                                                            {{
+                                                                changedData &&
+                                                                changedData.productInfo &&
+                                                                changedData.productInfo[ind] &&
+                                                                changedData.productInfo[ind].supplierForTraderTC &&
+                                                                changedData.productInfo[ind].supplierForTraderTC
+                                                                    ? changedData.productInfo[ind].supplierForTraderTC
+                                                                    : ('Not Available' | translate)
+                                                            }}
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{
+                                                                changedData &&
+                                                                changedData.productInfo &&
+                                                                changedData.productInfo[ind] &&
+                                                                changedData.productInfo[ind].yarnCOO &&
+                                                                changedData.productInfo[ind].yarnCOO.country &&
+                                                                changedData.productInfo[ind].yarnCOO.country.length > 0
+                                                                    ? convertArrayToString(
+                                                                          changedData.productInfo[ind].yarnCOO.country
+                                                                      )
+                                                                    : ('Not Available' | translate)
+                                                            }}
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{
+                                                                changedData &&
+                                                                changedData.productInfo &&
+                                                                changedData.productInfo[ind] &&
+                                                                changedData.productInfo[ind].cottonLintCOO &&
+                                                                changedData.productInfo[ind].cottonLintCOO.country &&
+                                                                changedData.productInfo[ind].cottonLintCOO.country
+                                                                    .length > 0
+                                                                    ? convertArrayToString(
+                                                                          changedData.productInfo[ind].cottonLintCOO
+                                                                              .country
+                                                                      )
+                                                                    : ('Not Available' | translate)
+                                                            }}
+                                                        </p>
+                                                    </td> -->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="approval-status-block" *ngIf="taskData && taskData.status">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="approval-status-reasons-title">
+                                        {{ 'Reason provided by supplier' | translate }}
+                                    </p>
+                                    <div
+                                        *ngIf="
+                                            taskData.comments && taskData.comments.selectedComments.length > 0;
+                                            else notAvailable
+                                        "
+                                    >
+                                        <div
+                                            class="approval-status-reasons"
+                                            *ngFor="
+                                                let reason of taskData.comments.selectedComments;
+                                                let reasonInd = index
+                                            "
+                                        >
+                                            <p>{{ reason }}</p>
+                                        </div>
+                                    </div>
+                                    <ng-template #notAvailable>
+                                        <p class="content-grey">
+                                            {{ 'Not Available' | translate }}
+                                        </p>
+                                    </ng-template>
+                                </div>
+                                <div
+                                    class="col-md-6"
+                                    *ngIf="
+                                        (changedData && changedData.scExpired) ||
+                                        (changedData.buyerOfProduct && !changedData.buyerOfProduct['isExist']) ||
+                                        (changedData.consigneeOfProduct &&
+                                            !changedData.consigneeOfProduct['isExist']) ||
+                                        (taskData && taskData.systemMessages && taskData.systemMessages.length > 0)
+                                    "
+                                >
+                                    <p class="approval-status-reasons-title">
+                                        {{ 'Validation failed' | translate }}
+                                    </p>
+                                    <div class="approval-status-reasons">
+                                        <p *ngIf="changedData && changedData.scExpired">
+                                            {{ 'Scope Certificate Expired' | translate }}
+                                        </p>
+                                        <p
+                                            *ngIf="
+                                                taskData &&
+                                                taskData.systemMessages &&
+                                                taskData.systemMessages.length > 0
+                                            "
+                                        >
+                                            <span *ngFor="let message of taskData.systemMessages">
+                                                <p>
+                                                    {{ message }}
+                                                </p>
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="other-reason">
+                                        <label class="other-reason-label">{{ 'Other reason' | translate }}:</label>
+                                        <p
+                                            [ngClass]="{
+                                                'other-reason-value-box':
+                                                    taskData.comments && taskData.comments.otherComments,
+                                                'content-grey': !taskData.comments || !taskData.comments.otherComments
+                                            }"
+                                        >
+                                            {{
+                                                taskData.comments && taskData.comments.otherComments
+                                                    ? taskData.comments.otherComments
+                                                    : ('Not Available' | translate)
+                                            }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" *ngIf="showActionButtons">
+                            <div class="col-md-12">
+                                <div class="upload-footer-block">
+                                    <div class="footer-button-block text-right">
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary"
+                                            (click)="handleRejectClick(taskData)"
+                                        >
+                                            {{ 'Reject' | translate }}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            (click)="handleApproveClick(taskData)"
+                                        >
+                                            {{ 'Approve' | translate }}
+                                        </button>
+                                    </div>
+                                    <!-- Footer Button Block -->
+                                </div>
+                                <!-- Upload Footer Block -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!-- Row -->
+                    </div>
+                    <!-- Material Input Style Box Type-->
+                </div>
+                <!-- Upload Transaction Field-->
+            </div>
+            <!-- Column -->
+        </div>
+        <!--  Row -->
+    </div>
+    <!-- Upload Container Block -->
+</div>
+<!-- Upload Container -->
+
+<!-- Facility List -->
+<ng-template #facilityListTemplate>
+    <div class="table-responsive">
+        <table class="table popover-custom-table table-striped" aria-describedby="facility-list-info">
+            <thead>
+                <tr>
+                    <th scope="col">{{ 'Facility Name' | translate }}</th>
+                    <th scope="col">{{ 'Facility code' | translate }}</th>
+                    <th scope="col">{{ 'Valid Until' | translate }}</th>
+                    <th scope="col">{{ 'KVM/SC' | translate }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <div class="facility-list-loader" *ngIf="isFetchingFacilityList">
+                    <app-spinner [small]="true"></app-spinner>
+                </div>
+                <tr *ngFor="let fac of facilityList">
+                    <td *ngIf="fac.facility?.value; else notAvailable">
+                        {{ fac.facility.value }}
+                    </td>
+                    <td *ngIf="fac.facility?.code !== null; else notAvailable">
+                        {{ fac.facility.code }}
+                    </td>
+                    <td *ngIf="fac.validUntil; else notAvailable">
+                        {{ fac.validUntil }}
+                    </td>
+                    <td *ngIf="fac.source; else notAvailable">
+                        {{ fac.source }}
+                    </td>
+                    <ng-template #notAvailable>
+                        <td class="content-grey">
+                            {{ 'Not Available' | translate }}
+                        </td>
+                    </ng-template>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>

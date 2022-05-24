@@ -1,0 +1,35 @@
+@import '~styles/variables';
+
+.collect-supplier-info-modal-title {
+    font-family: $font-family-Regular;
+    color: $text-color-primary;
+    font-size: 17px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.collect-supplier-info-modal-content {
+    font-family: $font-family-Regular;
+    color: $text-color-primary;
+    font-size: 17px;
+    text-align: center;
+    line-height: 29px;
+}
+
+.collect-supplier-info-modal-content-highlight {
+    font-family: $font-family-Regular;
+    color: $color-tt-primary;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.collect-supplier-info-modal {
+    width: 400px;
+}
+
+.mat-form-field {
+    width: 100%;
+}
+.modal-footer {
+    border-top: none;
+}

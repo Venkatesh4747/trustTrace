@@ -1,0 +1,421 @@
+<div id="record-transactions-categories" class="material-input-style-box-type">
+    <div id="outbound-transactions" class="material-input-style-box-type-inner">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div class="row pb-2">
+            <div class="hr mr-2">
+                <span class="hr-title">{{ 'Outbound' | translate }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <form #createOutboundForm="ngForm">
+                <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8" *ngIf="tierConfig">
+                    <div class="create-outbound-form-block">
+                        <div class="flex-container-inner" *ngIf="checkToShowField(outboundLabels.ARTICLE_NAME_NUMBER)">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ getFieldLabel(outboundLabels.ARTICLE_NAME_NUMBER) | translate }}:"
+                                    name="Style"
+                                    [(ngModel)]="searchTerm"
+                                    (blur)="validateSelectedStyle()"
+                                    matInput
+                                    [matAutocomplete]="soaSearch"
+                                    (keyup)="searchStyle($event)"
+                                    required
+                                    data-cy="outbound-transaction-style-name-number"
+                                />
+                                <mat-error class="error-msg" *ngIf="!searchTerm">
+                                    {{ getFieldLabel(outboundLabels.ARTICLE_NAME_NUMBER) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                                <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                    soaSearchHintText | translate
+                                }}</mat-hint>
+                                <mat-autocomplete
+                                    #soaSearch="matAutocomplete"
+                                    [displayWith]="getStyleName"
+                                    (optionSelected)="onSOASelection($event.option.value)"
+                                >
+                                    <mat-option *ngFor="let item of config.SOA_search" [value]="item">
+                                        {{ item.product_name }}-{{ item.product_number }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+
+                        <div
+                            class="flex-container-inner"
+                            *ngIf="checkToShowField(outboundLabels.CUSTOMER_NAME) && tierPayload.tier !== tiers[0]"
+                        >
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ getFieldLabel(outboundLabels.CUSTOMER_NAME) | translate }}:"
+                                    name="CUSTOMER_NAME"
+                                    [(ngModel)]="searchTermCustomer"
+                                    (blur)="validateSelectedCustomer()"
+                                    matInput
+                                    [matAutocomplete]="customerSearch"
+                                    (keyup)="searchCustomer($event)"
+                                    required
+                                    data-cy="outbound-transaction-customer-name"
+                                />
+                                <mat-error class="error-msg" *ngIf="!searchTermCustomer">
+                                    {{ getFieldLabel(outboundLabels.CUSTOMER_NAME) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                                <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                    customerSearchHintText | translate
+                                }}</mat-hint>
+                                <mat-autocomplete
+                                    #customerSearch="matAutocomplete"
+                                    [displayWith]="getFacilityName"
+                                    (closed)="validation('customer')"
+                                    (optionSelected)="onCustomerSelection($event.option.value)"
+                                >
+                                    <mat-option *ngFor="let item of customers" [value]="item">
+                                        {{ item.reference_id }}-{{ item.name }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(outboundLabels.LOT_ID)">
+                            <app-tt-dropdown-search
+                                [searchOptions]="config.lots"
+                                (selectionChange)="onLotSelection($event)"
+                                [(ngModel)]="payload.outboundData.productionLotId"
+                                placeholder="{{ getFieldLabel(outboundLabels.LOT_ID) | translate }}:"
+                                name="referenceId"
+                                [optionalParams]="optional"
+                                required
+                                [isRequired]="true"
+                                [data_cy]="'outbound-transaction-reference-id'"
+                                [showToastr]="false"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+
+                        <div
+                            class="flex-container-inner"
+                            *ngIf="checkToShowField(outboundLabels.LOT_MANUFACTURED_DATE)"
+                        >
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    [matDatepicker]="lotDatepicker"
+                                    placeholder="{{ getFieldLabel(outboundLabels.LOT_MANUFACTURED_DATE) | translate }}:"
+                                    name="lotManufacturedDate"
+                                    [(ngModel)]="payload.outboundData.lotManufacturedDate"
+                                    readonly
+                                    data-cy="outbound-transaction-date"
+                                    required
+                                />
+                                <mat-error class="error-msg" *ngIf="!payload.outboundData.lotManufacturedDate">
+                                    {{ getFieldLabel(outboundLabels.LOT_MANUFACTURED_DATE) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                                <mat-datepicker-toggle matSuffix [for]="lotDatepicker" disabled></mat-datepicker-toggle>
+                                <mat-datepicker #lotDatepicker disabled></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(outboundLabels.QUANTITY)">
+                            <mat-form-field *ngIf="tierPayload.tier === tiers[1]">
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ getFieldLabel(outboundLabels.QUANTITY) | translate }}:"
+                                    name="quantity"
+                                    [(ngModel)]="payload.outboundData.quantity.quantity"
+                                    (ngModelChange)="updateSellerUom()"
+                                    data-cy="outbound-transaction-quantity"
+                                    required
+                                />
+                                <mat-error class="error-msg" *ngIf="!payload.outboundData.quantity.quantity">
+                                    {{ getFieldLabel(outboundLabels.QUANTITY) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                            </mat-form-field>
+                            <mat-form-field *ngIf="tierPayload.tier !== tiers[1]">
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ getFieldLabel(outboundLabels.QUANTITY) | translate }}:"
+                                    name="quantity"
+                                    [(ngModel)]="payload.outboundData.quantity.quantity"
+                                    data-cy="outbound-transaction-quantity"
+                                />
+                                <mat-error class="error-msg" *ngIf="!payload.outboundData.quantity.quantity">
+                                    {{ getFieldLabel(outboundLabels.QUANTITY) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                            </mat-form-field>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(outboundLabels.FACILITY)">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ getFieldLabel(outboundLabels.FACILITY) | translate }}:"
+                                    name="Facility"
+                                    [(ngModel)]="searchTermFacility"
+                                    (blur)="validateSelectedFacility()"
+                                    matInput
+                                    [matAutocomplete]="facilitySearch"
+                                    (keyup)="searchFacility($event)"
+                                    required
+                                    data-cy="outbound-transaction-facility"
+                                />
+                                <mat-error class="error-msg" *ngIf="!searchTermFacility">
+                                    {{ getFieldLabel(outboundLabels.FACILITY) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                                <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                    facilitySearchHintText | translate
+                                }}</mat-hint>
+                                <mat-autocomplete
+                                    #facilitySearch="matAutocomplete"
+                                    [displayWith]="getFacilityName"
+                                    (closed)="validation('facility')"
+                                    (optionSelected)="onFacilitySelection($event.option.value)"
+                                >
+                                    <mat-option *ngFor="let item of facilities" [value]="item">
+                                        {{ item.reference_id }}-{{ item.name }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                        <div
+                            class="flex-container-inner"
+                            *ngIf="checkToShowField(outboundLabels.INVOICE_NUMBER) && tierPayload.tier === tiers[1]"
+                        >
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="text"
+                                    name="invoiceNumber"
+                                    placeholder="{{ getFieldLabel(outboundLabels.INVOICE_NUMBER) | translate }}:"
+                                    [(ngModel)]="payload.outboundData.invoiceNumber"
+                                    data-cy="outbound-transaction-invoiceNumber-tier2"
+                                    required
+                                />
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-container-inner" *ngIf="checkToShowField(outboundLabels.PO_NUMBER)">
+                            <mat-form-field *ngIf="tierPayload.tier !== tiers[0]">
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ getFieldLabel(outboundLabels.PO_NUMBER) | translate }}:"
+                                    name="purchaseOrderNo"
+                                    [(ngModel)]="payload.outboundData.poNumber"
+                                    data-cy="outbound-transaction-purchase-order-no"
+                                    required
+                                />
+                                <mat-error class="error-msg" *ngIf="!payload.outboundData.poNumber">
+                                    {{ getFieldLabel(outboundLabels.PO_NUMBER) | translate }}&nbsp;{{
+                                        'is missing' | translate
+                                    }}</mat-error
+                                >
+                            </mat-form-field>
+                            <app-tt-dropdown-search
+                                [(ngModel)]="payload.outboundData.poNumber"
+                                name="purchaseOrderNo"
+                                placeholder="{{ getFieldLabel(outboundLabels.PO_NUMBER) | translate }}:"
+                                [searchOptions]="poList"
+                                required
+                                [isRequired]="true"
+                                [optionalParams]="poOptional"
+                                [data_cy]="'outbound-transaction-purchase-order-no'"
+                                [showToastr]="false"
+                                *ngIf="tierPayload.tier === tiers[0]"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+
+                        <div
+                            class="flex-container-inner"
+                            *ngIf="checkToShowField(outboundLabels.PO_MAPPING_STATUS) && tierPayload.tier !== tiers[1]"
+                        >
+                            <app-tt-dropdown-search
+                                [searchOptions]="config.po_mapping_status"
+                                [(ngModel)]="payload.outboundData.poMappingStatus"
+                                placeholder="{{ getFieldLabel(outboundLabels.PO_MAPPING_STATUS) | translate }}:"
+                                name="outboundPoMappingStatus"
+                                [data_cy]="'outbound-transaction-po-status'"
+                                [showToastr]="false"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+
+                        <div class="flex-container-inner" *ngIf="checkToShowField(outboundLabels.TRANSACTION_DATE)">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    [max]="today"
+                                    [matDatepicker]="outboundDatePicker"
+                                    placeholder="{{ getFieldLabel(outboundLabels.TRANSACTION_DATE) | translate }}:"
+                                    name="date"
+                                    [(ngModel)]="payload.date"
+                                    readonly
+                                    (click)="outboundDatePicker.open()"
+                                    data-cy="outbound-transaction-date"
+                                    required
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="outboundDatePicker"></mat-datepicker-toggle>
+                                <mat-datepicker #outboundDatePicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+
+                        <div
+                            class="flex-container-inner"
+                            *ngIf="
+                                checkToShowField(outboundLabels.QUANTITY_SUPPLIER_UOM) && tierPayload.tier !== tiers[1]
+                            "
+                        >
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="number"
+                                    name="quantityInSupplierUOM"
+                                    placeholder="{{ getFieldLabel(outboundLabels.QUANTITY_SUPPLIER_UOM) | translate }}:"
+                                    [(ngModel)]="payload.outboundData.sellerUOM.quantity"
+                                    data-cy="outbound-transaction-quantity-supplier"
+                                    (keydown)="commonServices.filterInput($event)"
+                                    required
+                                />
+                            </mat-form-field>
+                        </div>
+
+                        <div
+                            class="flex-container-inner"
+                            *ngIf="
+                                checkToShowField(outboundLabels.QUANTITY_SUPPLIER_UOM) && tierPayload.tier === tiers[1]
+                            "
+                        >
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="number"
+                                    name="quantityInSupplierUOM"
+                                    placeholder="{{ getFieldLabel(outboundLabels.QUANTITY_SUPPLIER_UOM) | translate }}:"
+                                    [(ngModel)]="payload.outboundData.sellerUOM.quantity"
+                                    (ngModelChange)="updateQuantity()"
+                                    data-cy="outbound-transaction-quantity-supplier"
+                                    (keydown)="commonServices.filterInput($event)"
+                                />
+                            </mat-form-field>
+                        </div>
+
+                        <div
+                            class="flex-container-inner"
+                            *ngIf="checkToShowField(outboundLabels.SUPPLIER_UOM) && tierPayload.tier !== tiers[1]"
+                        >
+                            <app-tt-dropdown-search
+                                [searchOptions]="config.unit"
+                                [(ngModel)]="payload.outboundData.sellerUOM.unit"
+                                placeholder="{{ getFieldLabel(outboundLabels.SUPPLIER_UOM) | translate }}:"
+                                [isRequired]="true"
+                                required
+                                name="outputQuantityUnit"
+                                [data_cy]="'outbound-transaction-supplier-units'"
+                                [showToastr]="false"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+
+                        <div
+                            class="flex-container-inner"
+                            *ngIf="checkToShowField(outboundLabels.SUPPLIER_UOM) && tierPayload.tier === tiers[1]"
+                        >
+                            <app-tt-dropdown-search
+                                [searchOptions]="config.unit"
+                                [(ngModel)]="payload.outboundData.sellerUOM.unit"
+                                placeholder="{{ getFieldLabel(outboundLabels.SUPPLIER_UOM) | translate }}:"
+                                [isRequired]="payload.outboundData.sellerUOM.quantity !== null"
+                                [required]="payload.outboundData.sellerUOM.quantity !== null"
+                                name="outputQuantityUnit"
+                                [data_cy]="'outbound-transaction-supplier-units'"
+                                [showToastr]="false"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+                        <div class="flex-container-inner" *ngIf="checkToShowField(outboundLabels.DELAY_REASON)">
+                            <app-tt-dropdown-search
+                                [searchOptions]="getFieldValues(outboundLabels.DELAY_REASON)"
+                                [(ngModel)]="payload.outboundData.delayReason"
+                                placeholder="{{ getFieldLabel(outboundLabels.DELAY_REASON) | translate }}:"
+                                name="delayReason"
+                                [data_cy]="'outbound-transaction-delay-reason'"
+                                [showToastr]="false"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+                        <div
+                            class="flex-container-inner"
+                            *ngIf="checkToShowField(outboundLabels.OTHER_REASON) && toShowOtherReason()"
+                        >
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="text"
+                                    name="otherReason"
+                                    placeholder="{{ getFieldLabel(outboundLabels.OTHER_REASON) | translate }}:"
+                                    [(ngModel)]="otherReasonForDelay"
+                                    required
+                                    data-cy="outbound-transaction-other-reason"
+                                />
+                            </mat-form-field>
+                        </div>
+
+                        <div
+                            class="flex-container-inner"
+                            *ngIf="checkToShowField(outboundLabels.REMARKS) && tierPayload.tier === tiers[1]"
+                        >
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="text"
+                                    name="remarks"
+                                    placeholder="{{ getFieldLabel(outboundLabels.REMARKS) | translate }}:"
+                                    [(ngModel)]="payload.outboundData.remarks"
+                                    data-cy="outbound-transaction-remarks"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row mt-3 mb-3 pt-3">
+                        <div class="col-md-11 text-right">
+                            <button
+                                id="order-create-btn"
+                                type="button"
+                                class="btn btn-gray create-btn btn-align"
+                                (click)="save()"
+                                [disabled]="!createOutboundForm.valid || pageLoading"
+                            >
+                                {{ 'Save' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

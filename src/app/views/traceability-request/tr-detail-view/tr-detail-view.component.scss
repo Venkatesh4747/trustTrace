@@ -1,0 +1,38 @@
+@import '~styles/variables';
+
+.entity-table {
+    background-color: $border-color-secondary;
+    display: flex;
+    align-items: center;
+    min-height: 59px;
+    margin-right: 20px;
+    .tr-title {
+        color: #fff !important;
+    }
+}
+
+.no-data-available-container {
+    text-align: center;
+    position: relative;
+    padding: 0;
+    width: 95%;
+    .no-data-available {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        top: 50%;
+        font-family: $font-family-Semibold;
+        color: $text-color-primary;
+        font-size: 24px;
+    }
+}
+
+.supply-chain-table {
+    position: absolute;
+    top: 250px;
+    left: auto;
+    right: 20px;
+    bottom: 20px;
+    overflow-y: auto;
+    width: 100%;
+}

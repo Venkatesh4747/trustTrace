@@ -1,0 +1,4 @@
+export const TODO_STATUS = {
+    COMPLETED: 'COMPLETED',
+    NOT_COMPLETED: 'NOT_COMPLETED'
+};

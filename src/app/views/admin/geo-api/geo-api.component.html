@@ -1,0 +1,61 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="row">
+    <div class="col-md-6">
+        <div class="title-right-search">
+            <input
+                type="text"
+                class="search"
+                placeholder="{{ 'Type and press enter to search' }}"
+                [(ngModel)]="searchText"
+                (keyup)="searchCity($event)"
+                data-cy="order-transaction-search"
+            />
+            <span class="fa fa-search"></span>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <mat-form-field appearance="fill">
+            <mat-label>SearchType</mat-label>
+            <mat-select [(ngModel)]="searchType">
+                <mat-option *ngFor="let type of searchTypeArr" [value]="type">
+                    {{ type | titlecase }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="col-md-3 col-md-offset-1">
+        <div class="btn-group" dropdown>
+            <button type="button" class="btn btn-blue" (click)="openForm(1)">Add Country</button>
+            <button
+                id="button-split"
+                type="button"
+                dropdownToggle
+                class="btn btn-blue dropdown-toggle dropdown-toggle-split"
+                aria-controls="dropdown-split"
+            >
+                <span class="caret"></span>
+                <span class="sr-only">Split button!</span>
+            </button>
+            <ul id="dropdown-split" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-split">
+                <li role="menuitem">
+                    <a class="dropdown-item" (click)="openForm(2)">Add State</a>
+                </li>
+                <li role="menuitem">
+                    <a class="dropdown-item" (click)="openForm(3)">Add City</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <ag-grid-angular
+            class="ag-theme-balham agTable"
+            [columnDefs]="columnDefs"
+            [rowData]="rowData"
+            [gridOptions]="gridOptions"
+            [pagination]="true"
+            (gridReady)="onGridReady($event)"
+        ></ag-grid-angular>
+    </div>
+</div>

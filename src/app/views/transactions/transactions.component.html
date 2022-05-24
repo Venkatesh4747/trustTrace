@@ -1,0 +1,543 @@
+<div class="view-container">
+    <div id="transactions-notification-container" *ngIf="!notificationDetail.isValid">
+        <app-notification-bar
+            [notification]="notificationDetail.message"
+            [isHTML]="false"
+            [notificationClass]="'transactions-notification'"
+        >
+        </app-notification-bar>
+    </div>
+
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="transactions-container" class="transactions-container">
+            <div id="transactions-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>
+                            {{ 'Transactions' | translate }}
+                            <span *ngIf="selectedTier.value">- {{ selectedTier.value }}</span>
+                        </div>
+                        <div class="page-description">
+                            {{
+                                'Manage your transactions associated with your styles and raw materials'
+                                    | industry
+                                    | translate
+                            }}
+                        </div>
+                    </div>
+                    <div class="header-search">
+                        <div class="title-right-search">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Type and press enter to search' | translate }}"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchTransactions($event)"
+                                data-cy="order-transaction-search"
+                            />
+                            <span class="fa fa-search"></span>
+                        </div>
+                        <button
+                            class="btn btn-lg btn-blue pull-right btn-gradient cs-btn"
+                            (click)="allowTransactions('record-transaction')"
+                            *ngIf="tiers_associated && tiers_associated.length !== 0 && tiers_associated.length !== 4"
+                        >
+                            <img src="{{ IMG_URL }}images/plus-btn.png" alt="Record" />
+                            {{ 'Record Transactions' | translate }}
+                        </button>
+                    </div>
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row -->
+            <div class="row" *ngIf="tiers_associated && tiers_associated.length !== 0 && tiers_associated.length !== 4">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search">
+                    <div class="header-search pl-0 material-input-style-box-type">
+                        <!-- <div class="select-tier-value-block">
+                            <span class="select-tier-label">
+                                {{ 'Select Tier to record transactions' | translate }}:</span
+                            >
+                            <mat-form-field>
+                                <mat-select
+                                    [(ngModel)]="selectedTier"
+                                    (selectionChange)="handleTierSelection()"
+                                    name="select-tier"
+                                    [compareWith]="compareTierSelection"
+                                >
+                                    <mat-option *ngFor="let tier of tiers_associated" [value]="tier">
+                                        {{ tier.value | translate }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div> -->
+                    </div>
+                    <div>
+                        <button
+                            type="button"
+                            class="btn btn-lg btn-bordered pull-right btn-gradient cs-btn mr-15"
+                            (click)="allowTransactions('import-transaction')"
+                        >
+                            <img src="{{ IMG_URL }}images/upload-blue-icon.png" alt="Import" />
+                            <span>{{ 'Import using Excel' | translate }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- row -->
+
+            <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="ordersFilters">
+                <div class="col-md-12">
+                    <ul class="filter-bar-container">
+                        <li *ngFor="let filter of ordersFilters | keys; let filterInd = index">
+                            <app-tt-multi-select-search
+                                (selectionChange)="handleFilterSelection()"
+                                (refreshFilter)="refreshFilter()"
+                                [label]="filter.key"
+                                [options]="filter.value"
+                                [filter_session]="filter_session"
+                                [optionsParam]="optionsParam"
+                                *ngIf="!isAgroup(filter.value)"
+                                [data_cy]="removeSpace(filter.key)"
+                            >
+                            </app-tt-multi-select-search>
+                        </li>
+                        <li class="reset-filters">
+                            <button
+                                class="button-badge mat-button btn btn-gray"
+                                (click)="resetAllFilters()"
+                                data-cy="transaction-orders-reset-all-filters"
+                            >
+                                {{ 'Reset all filters' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-12 pd-0" *ngIf="authService.user.subscriptionType === 'SUPPLIER'">
+                    <div class="tt-tabs pb-2">
+                        <div class="cursor-default" (click)="navigateTo(tabs[0])">
+                            <label class="cursor-pointer" [ngClass]="{ active: activeTab === tabs[0] }">
+                                {{ 'Submitted Transaction' | translate }}
+                            </label>
+                        </div>
+                        <div class="cursor-default" (click)="navigateTo(tabs[1])">
+                            <label class="cursor-pointer" [ngClass]="{ active: activeTab === tabs[1] }">
+                                <span>{{ 'Draft Transaction' | translate }}</span>
+                            </label>
+                        </div>
+                        <div class="cursor-default" (click)="navigateTo(tabs[2])">
+                            <label class="cursor-pointer" [ngClass]="{ active: activeTab === tabs[2] }">
+                                <span>{{ 'Deleted Transaction' | translate }}</span>
+                            </label>
+                        </div>
+                        <!-- <div class="cursor-default" (click)="navigateTo(tabs[3])">
+                            <label class="cursor-pointer" [ngClass]="{ active: activeTab === tabs[3] }">
+                                <span>{{ 'Approval Status' | translate }}</span>
+                            </label>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                    <div class="row">
+                        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 total-count">
+                            <div class="total-info-value-details">
+                                <div class="float-l" *ngIf="transactions.length > 0 || totalCountFlag">
+                                    <app-card-pagination
+                                        [paginationStart]="pagination.from + 1"
+                                        [fetchSize]="pagination.size"
+                                        [totalItemsCount]="totalCount"
+                                        moduleName="Transactions"
+                                        (previous)="onScroll('back')"
+                                        (next)="onScroll('next')"
+                                    ></app-card-pagination>
+                                </div>
+                                <div class="float-l" *ngIf="activeTab === tabs[1] && transactions.length > 0">
+                                    <mat-checkbox
+                                        [checked]="selectAllTransactions"
+                                        (change)="handleSelectAllTransactions($event)"
+                                    >
+                                        {{ 'Select all' | translate }} {{ totalCount }}
+                                        {{ 'draft transaction' | translate }}
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                            <div dropdown class="dropdown sort-dropdown">
+                                <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                    <span class="sort-name"
+                                        >{{ 'Sort By' | translate }}
+                                        <span class="fa fa-angle-down"></span>
+                                    </span>
+                                </a>
+                                <ul *dropdownMenu class="dropdown-menu">
+                                    <li>
+                                        <mat-radio-group
+                                            [(ngModel)]="sortByFilter.sortBy"
+                                            (change)="handleSortBy($event)"
+                                        >
+                                            <mat-radio-button value="product_name">{{
+                                                'Alphabetical Order' | translate
+                                            }}</mat-radio-button>
+                                            <mat-radio-button value="create_ts">{{
+                                                'Newly Added' | translate
+                                            }}</mat-radio-button>
+                                        </mat-radio-group>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Sort Dropdown -->
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+
+            <div id="card">
+                <div class="row transactions-table">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                        <div class="table-container" [ngClass]="{ 'table-mb-65': userSelectedTransactions.length > 0 }">
+                            <div class="table-responsive">
+                                <table
+                                    class="table custom-table table-striped"
+                                    [ngClass]="{ 'mb-40': activeTab === tabs[1] }"
+                                >
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                class="checkbox-width"
+                                                *ngIf="
+                                                    (activeTab === tabs[0] || activeTab === tabs[1]) &&
+                                                    checkAccess('TRANSACTION_UPDATE')
+                                                "
+                                            >
+                                                <mat-checkbox
+                                                    [checked]="hasUserSelectedAllTransactions()"
+                                                    (change)="userSelectAllTransactions($event)"
+                                                >
+                                                </mat-checkbox>
+                                            </th>
+                                            <th
+                                                *ngIf="checkAccess('TRANSACTION_CREATE')"
+                                                class="action-space"
+                                                [ngClass]="{ 'draft-action-space': activeTab === tabs[1] }"
+                                                scope="col"
+                                            >
+                                                {{ 'Action' | translate }}
+                                            </th>
+                                            <th>{{ 'Customer Facility' | translate }}</th>
+                                            <th>{{ 'Supplier Facility' | translate }}</th>
+                                            <th>{{ 'Product Name And UID' | translate }}</th>
+                                            <!-- <th>{{ 'Supplier Material Name' | translate }}</th> -->
+                                            <th>{{ 'Lot ID' | translate }}</th>
+                                            <th>{{ 'Business Document Number' | translate }}</th>
+                                            <!-- <th>{{ 'Po Mapping Status' | translate }}</th> -->
+                                            <th>{{ 'TC Reference Number' | translate }}</th>
+                                            <th>{{ 'Product Type' | translate }}</th>
+                                            <th>{{ 'Transaction Type' | translate }}</th>
+                                            <th>{{ 'Quantity' | translate }}</th>
+                                            <!-- <th>{{ 'Remaining Quantity' | translate }}</th> -->
+                                            <th>{{ 'Recording Facility' | translate }}</th>
+                                            <th>{{ 'Transaction Date' | translate }}</th>
+                                            <th *ngIf="selectedTier.key === tiers[0] || selectedTier.key === tiers[1]">
+                                                {{ 'Production Date' | translate }}
+                                            </th>
+                                            <!-- <th>{{ 'Remarks' | translate }}</th> -->
+                                            <th>{{ 'Trade Name' | translate }}</th>
+                                            <th *ngIf="activeTab === tabs[3]">{{ 'Comments' | translate }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody [ngClass]="{ 'tbody-max-height': userSelectedTransactions.length > 0 }">
+                                        <tr *ngIf="!fetchingTransactionsData && transactions.length === 0">
+                                            <p class="content-center">
+                                                {{ 'No transactions available!' | translate }}
+                                            </p>
+                                        </tr>
+                                        <tr *ngIf="fetchingTransactionsData">
+                                            <p class="content-center">
+                                                <app-spinner [small]="true"></app-spinner>
+                                            </p>
+                                        </tr>
+                                        <tr
+                                            *ngFor="let transaction of transactions"
+                                            [ngClass]="{ 'cursor-pointer': activeTab === tabs[0] }"
+                                            (click)="navigateToTreeView(transaction.id, $event)"
+                                        >
+                                            <td
+                                                class="checkbox-width"
+                                                *ngIf="
+                                                    (activeTab === tabs[0] || activeTab === tabs[1]) &&
+                                                    checkAccess('TRANSACTION_UPDATE')
+                                                "
+                                            >
+                                                <mat-checkbox
+                                                    [checked]="hasUserSelectedTransaction(transaction.id)"
+                                                    (change)="userSelectTransaction($event, transaction)"
+                                                >
+                                                </mat-checkbox>
+                                            </td>
+                                            <td
+                                                *ngIf="checkAccess('TRANSACTION_CREATE')"
+                                                class="action-space"
+                                                [ngClass]="{ 'draft-action-space': activeTab === tabs[1] }"
+                                            >
+                                                <div class="action-icon">
+                                                    <div class="action-icon-flex">
+                                                        <a
+                                                            (click)="
+                                                                $event.stopPropagation(); uploadDocuments(transaction)
+                                                            "
+                                                        >
+                                                            <img
+                                                                src="{{ IMG_URL }}images/document-upload.png"
+                                                                alt="document-upload"
+                                                            />
+                                                        </a>
+                                                    </div>
+                                                    <div class="documentUpload" [ngSwitch]="transaction.document_count">
+                                                        <span *ngSwitchCase="0">
+                                                            {{ 'No document uploaded' | translate }}
+                                                        </span>
+
+                                                        <span *ngSwitchCase="1">
+                                                            {{ transaction.document_count }}
+                                                            {{ 'Document uploaded' | translate }}
+                                                        </span>
+
+                                                        <span *ngSwitchDefault>
+                                                            {{ transaction.document_count }}
+                                                            {{ 'Documents uploaded' | translate }}
+                                                        </span>
+                                                    </div>
+                                                    <!-- <div
+                                                        *ngIf="activeTab === tabs[1]"
+                                                        class="action-icon-flex delete-icon"
+                                                        (click)="
+                                                            deleteConfirmationTransaction(transaction.id)
+                                                        "
+                                                    >
+                                                        <img
+                                                            src="{{ IMG_URL }}images/delete-icon.png"
+                                                            alt="delete"
+                                                        />
+                                                    </div> -->
+                                                </div>
+
+                                                <div
+                                                    class="bot-icon-import-from-mail"
+                                                    *ngIf="
+                                                        (transaction.mode === 'email' ||
+                                                            transaction.tx_type === 'AUTOMATED_INBOUND') &&
+                                                        activeTab !== tabs[1]
+                                                    "
+                                                >
+                                                    <img src="{{ IMG_URL }}images/bot-icon-bg.svg" />
+                                                </div>
+                                            </td>
+                                            <td *ngIf="transaction.customer_facility?.value; else notAvailable">
+                                                {{ transaction.customer_facility?.value }}
+                                            </td>
+                                            <td *ngIf="transaction?.supplier_facility?.value; else notAvailable">
+                                                {{ transaction.supplier_facility.value }}
+                                            </td>
+                                            <td *ngIf="transaction?.product_name_number; else notAvailable">
+                                                {{ transaction.product_name_number }}
+                                            </td>
+                                            <!-- <td *ngIf="transaction?.supplier_material_name; else notAvailable">
+                                                {{ transaction.supplier_material_name }}
+                                            </td> -->
+                                            <td
+                                                class="pl-5px overflow-wrap-break-word"
+                                                *ngIf="transaction?.lot_id; else notAvailable"
+                                            >
+                                                {{ transaction.lot_id }}
+                                            </td>
+                                            <td>
+                                                <span
+                                                    *ngIf="
+                                                        transaction.po_number && transaction.po_number !== null;
+                                                        else poNotAvailable
+                                                    "
+                                                >
+                                                    {{ transaction.po_number }}
+                                                </span>
+                                                <ng-template #poNotAvailable>
+                                                    <span class="content-grey">
+                                                        {{ 'Not Available' | translate }}
+                                                    </span>
+                                                </ng-template>
+                                            </td>
+                                            <!-- <td *ngIf="transaction?.po_mapping_status; else notAvailable">
+                                                {{ transaction.po_mapping_status }}
+                                            </td> -->
+                                            <td *ngIf="transaction?.tc_reference_number; else notAvailable">
+                                                {{ transaction.tc_reference_number }}
+                                            </td>
+                                            <td *ngIf="transaction.product_type?.value; else notAvailable">
+                                                {{ transaction.product_type.value }}
+                                            </td>
+                                            <td *ngIf="transaction?.tx_type; else notAvailable">
+                                                {{ transaction.tx_type }}
+                                            </td>
+                                            <td
+                                                *ngIf="
+                                                    transaction?.quantity?.value || transaction?.quantity_in_uom?.value;
+                                                    else notAvailable
+                                                "
+                                            >
+                                                <span class="display-block" *ngIf="transaction?.quantity?.value">
+                                                    {{ transaction.quantity.value + ' kgs ' }}</span
+                                                >
+                                                <span class="display-block">{{
+                                                    transaction.quantity_in_uom
+                                                        ? transaction.quantity_in_uom.value +
+                                                          ' ' +
+                                                          transaction.quantity_in_uom.unit_value
+                                                        : ''
+                                                }}</span>
+                                                <span class="display-block">{{
+                                                    transaction.actual_conversion_ratio
+                                                        ? ' ratio ' + transaction.actual_conversion_ratio
+                                                        : ''
+                                                }}</span>
+                                            </td>
+                                            <!-- <td
+                                                *ngIf="
+                                                    (transaction?.remaining_quantity?.value !== null &&
+                                                        transaction?.remaining_quantity?.value !== undefined) ||
+                                                        (transaction?.remaining_quantity_uom?.value != null &&
+                                                            transaction?.remaining_quantity_uom?.value !== undefined);
+                                                    else notAvailable
+                                                "
+                                            >
+                                                <span class="display-block">
+                                                    {{
+                                                        transaction.remaining_quantity != null
+                                                            ? transaction.remaining_quantity.value +
+                                                              ' ' +
+                                                              transaction.remaining_quantity.unit_value
+                                                            : transaction.remaining_quantity_uom.value +
+                                                              ' ' +
+                                                              transaction.remaining_quantity_uom.unit_value
+                                                    }}</span
+                                                >
+                                            </td> -->
+                                            <td *ngIf="transaction.facility?.value; else notAvailable">
+                                                {{ transaction.facility.value }}
+                                            </td>
+                                            <td
+                                                *ngIf="
+                                                    transaction.create_ts && noDataConversion(transaction.create_ts);
+                                                    else notAvailable
+                                                "
+                                            >
+                                                {{
+                                                    commonServices.convertToDate(transaction.create_ts) ||
+                                                        ('Not available' | translate)
+                                                }}
+                                            </td>
+                                            <ng-container
+                                                *ngIf="selectedTier.key === tiers[0] || selectedTier.key === tiers[1]"
+                                            >
+                                                <td
+                                                    *ngIf="
+                                                        transaction.tx_date &&
+                                                            noDataConversion(transaction.create_ts) &&
+                                                            (transaction.tx_type === 'PRODUCTION' ||
+                                                                transaction.tx_type === 'INTERMEDIATE PRODUCTION');
+                                                        else notAvailable
+                                                    "
+                                                >
+                                                    {{
+                                                        commonServices.convertToDate(transaction.tx_date) ||
+                                                            ('Not available' | translate)
+                                                    }}
+                                                </td>
+                                            </ng-container>
+                                            <!-- <td *ngIf="transaction?.remarks; else notAvailable">
+                                                {{ transaction.remarks }}
+                                            </td> -->
+                                            <td *ngIf="transaction.trade_name; else notAvailable">
+                                                {{ transaction.trade_name }}
+                                            </td>
+                                            <ng-container *ngIf="activeTab === tabs[3]">
+                                                <td *ngIf="transaction.comments; else notAvailable">
+                                                    {{ transaction.comments }}
+                                                </td>
+                                            </ng-container>
+                                            <ng-template #notAvailable>
+                                                <td class="content-grey">
+                                                    {{ 'Not Available' | translate }}
+                                                </td>
+                                            </ng-template>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot *ngIf="userSelectedTransactions.length > 0">
+                                        <tr>
+                                            <td>
+                                                <div class="table-footer-block">
+                                                    <ul class="table-footer-block-inner">
+                                                        <li class="table-footer-block-inner-left">
+                                                            <span
+                                                                *ngIf="
+                                                                    userSelectedTransactions.length ===
+                                                                    transactions.length
+                                                                "
+                                                            >
+                                                                {{
+                                                                    'All transactions on this page are selected'
+                                                                        | translate
+                                                                }}
+                                                            </span>
+                                                        </li>
+                                                        <li class="table-footer-block-inner-right">
+                                                            <div class="transaction-button-block">
+                                                                <button
+                                                                    class="btn cancel-btn"
+                                                                    type="button"
+                                                                    (click)="handleCancelClick()"
+                                                                >
+                                                                    {{ 'Cancel' | translate }}
+                                                                </button>
+                                                                <button
+                                                                    class="btn delete-btn"
+                                                                    (click)="
+                                                                        deleteConfirmationTransaction(
+                                                                            userSelectedTransactions
+                                                                        )
+                                                                    "
+                                                                    type="button"
+                                                                >
+                                                                    {{ 'Delete' | translate }}
+                                                                </button>
+                                                                <button
+                                                                    class="btn submit-btn"
+                                                                    (click)="
+                                                                        allowTransactions('submit-draft-transaction')
+                                                                    "
+                                                                    type="button"
+                                                                    *ngIf="activeTab === tabs[1]"
+                                                                >
+                                                                    {{ 'Submit' | translate }}
+                                                                </button>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<router-outlet></router-outlet>

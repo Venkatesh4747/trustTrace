@@ -1,0 +1,205 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="filter-section">
+            <h3 class="sub-title">{{ 'Filter' | translate }}</h3>
+            <!-- filters start -->
+            <div class="filter-list-block">
+                <ul class="filters-list-left">
+                    <li *ngFor="let filter of productFilters | keys">
+                        <app-tt-multi-select-search
+                            (selectionChange)="onFilter()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="FILTER_SESSION"
+                            [optionsParam]="optionsParam"
+                            *ngIf="!isGroup(filter.value)"
+                        >
+                        </app-tt-multi-select-search>
+
+                        <app-tt-multi-select-group-search
+                            (selectionChange)="onFilter()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="FILTER_SESSION"
+                            [optionsParam]="optionsParam"
+                            *ngIf="isGroup(filter.value)"
+                        >
+                        </app-tt-multi-select-group-search>
+                    </li>
+                    <!-- todo -->
+                    <!-- <li>
+                        <app-tt-multi-select-with-slider> </app-tt-multi-select-with-slider>
+                    </li> -->
+                </ul>
+                <ul class="filter-list-right">
+                    <li class="reset-filters">
+                        <button class="button-badge mat-button btn btn-gray" (click)="resetAllFilters()">
+                            {{ 'Reset all filters' | translate }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <!-- filters end -->
+        </div>
+    </div>
+</div>
+<div class="row pt-3">
+    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 total-count">
+        <app-card-pagination
+            [paginationStart]="paginationCount * DEFAULT_PAGINATION_SIZE + 1"
+            [fetchSize]="DEFAULT_PAGINATION_SIZE"
+            [totalItemsCount]="productData?.totalCount"
+            moduleName="Finished products"
+            (previous)="onPaginate('back')"
+            (next)="onPaginate('forward')"
+        ></app-card-pagination>
+        <a routerLink="/products/finished/simulation" (click)="simulateBtnClicked()" class="simulation-btn">
+            {{ 'Simulate Product' | translate }}
+        </a>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+        <form class="pull-right">
+            <div class="form-group title-right-search">
+                <mat-icon class="search-icon">search </mat-icon>
+                <input
+                    type="search"
+                    placeholder="{{ 'Search for products, ingredients etc' | translate }}"
+                    class="form-control"
+                    (keyup.enter)="onSearch()"
+                    [formControl]="searchFormControl"
+                />
+
+                <div dropdown class="dropdown sort-dropdown">
+                    <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                        <span class="sort-name"
+                            >{{ 'Sort By' | translate }}
+                            <i class="fa fa-angle-down"></i>
+                        </span>
+                    </a>
+                    <ul *dropdownMenu class="dropdown-menu">
+                        <li>
+                            <mat-radio-group [formControl]="sortControl" (change)="onSort()">
+                                <mat-radio-button value="name">{{ 'Alphabetical Order' | translate }}</mat-radio-button>
+                                <mat-radio-button value="code">{{
+                                    'EAN Ascending order' | translate
+                                }}</mat-radio-button>
+                                <mat-radio-button value="active">{{ 'Active' | translate }}</mat-radio-button>
+                                <mat-radio-button value="inactive">{{ 'Inactive' | translate }}</mat-radio-button>
+                            </mat-radio-group>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row table-container">
+    <div class="table-responsive">
+        <table class="table custom-table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col" *ngFor="let item of productData?.header">{{ item | translate }}</th>
+                    <th scope="col" *ngFor="let field of customFieldDisplayList">{{ field.name | translate }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    *ngFor="let item of productData?.data"
+                    (click)="navigateToProductDetailPage(item, item.searchAfterSort)"
+                >
+                    <td *ngIf="item?.status; else notAvailable">
+                        <app-tt-icon-image [status]="item.status"></app-tt-icon-image>
+                    </td>
+
+                    <td class="ean-block">
+                        <span *ngIf="item?.productNumber">
+                            {{ 'EAN' | translate }}:
+                            <span> {{ item.productNumber }} </span>
+                        </span>
+                        <span *ngIf="item?.itemNumber">
+                            {{ 'Item No.' | translate }} :
+                            <span>
+                                {{ item.itemNumber }}
+                            </span>
+                        </span>
+                        <span *ngIf="item?.pluNumber">
+                            {{ 'PLU' | translate }}:
+                            <span>
+                                {{ item.pluNumber }}
+                            </span>
+                        </span>
+                    </td>
+                    <td *ngIf="item?.product?.value; else notAvailable">{{ item.product.value }}</td>
+                    <td *ngIf="item?.productCategory?.value; else notAvailable">
+                        {{ item.productCategory.value }}
+                    </td>
+
+                    <td *ngIf="item?.subCategory; else notAvailable">
+                        <span [matTooltip]="item.subCategory.value" class="overflow-with-dots">
+                            {{ item.subCategory.value }}
+                        </span>
+                    </td>
+
+                    <td *ngIf="item?.supplier?.value; else notAvailable">{{ item.supplier.value }}</td>
+
+                    <td *ngIf="item?.brand?.value; else notAvailable">{{ item.brand.value }}</td>
+
+                    <td *ngIf="item?.aktuCode?.value; else notAvailable">
+                        {{ item.aktuCode.value }}
+                    </td>
+
+                    <td *ngIf="item?.productLabels && item?.productLabels.length > 0; else notAvailable">
+                        <span [matTooltip]="getValues(item.productLabels)" class="overflow-with-dots">
+                            {{ getValues(item.productLabels) }}
+                        </span>
+                    </td>
+                    <td *ngFor="let customField of customFieldDisplayList">
+                        <span
+                            class="pl-1 overflow-with-dots"
+                            *ngIf="isCustomFieldValueExists(item, customField.id); else notAvailable"
+                            [matTooltip]="item['customFields'][customField.id][0]"
+                        >
+                            {{ item['customFields'][customField.id][0] | translate }}
+                        </span>
+                    </td>
+                    <ng-template #notAvailable>
+                        <td class="not-available">
+                            {{ 'Not available' | translate }}
+                        </td>
+                    </ng-template>
+                </tr>
+                <tr class="pagination-progress" *ngIf="paginationProgress">
+                    <app-spinner [small]="true"></app-spinner>
+                </tr>
+                <tr class="content-center" *ngIf="productData?.data?.length === 0">
+                    <p>
+                        {{ 'No products available!' | translate }}
+                    </p>
+                </tr>
+            </tbody>
+            <!--<tfoot>
+                <tr>
+                    <td colspan="9">
+                        <div class="table-footer-block">
+                            <span>
+                                {{ 'Showing' | translate }}
+                                <strong>{{ productData?.data?.length ? productData?.data?.length : 0 }}</strong>
+                                {{ ' ' + ('out of' | translate) }}
+                                <strong> {{ ' ' + productData?.totalCount }} </strong
+                                >{{ ' ' + ('products' | translate) }}
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+            -->
+            <tfoot></tfoot>
+        </table>
+    </div>
+</div>

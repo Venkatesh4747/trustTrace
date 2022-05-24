@@ -1,0 +1,55 @@
+<div class="view-container style-detail-view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div class="mb-3">
+            <div class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pb-2">
+                    <div class="page-title">
+                        <div>{{ 'Material Library Management' | translate }}</div>
+                        <div class="page-description font-color-primary">
+                            {{ 'Detailed view of the materials associated' | translate }}
+                        </div>
+                    </div>
+
+                    <div class="pr-0">
+                        <button class="go-back-button" (click)="goBack()">
+                            {{ 'Back' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pl-1 tab-group-wrapper  mat-tab-view-page">
+                <mat-tab-group mat-stretch-tabs class="toby">
+                    <mat-tab class="col-xs-3 col-sm-3 col-md-3 col-lg-2" *ngFor="let tab of tabs">
+                        <ng-template mat-tab-label>
+                            <div
+                                class="form-group bottom cursor-default"
+                                [ngClass]="{ selected: selectedTab === tab }"
+                                (click)="handleTabClick(tab)"
+                            >
+                                <label class="cursor-pointer">{{ tab | translate }}</label>
+                                <div [ngClass]="{ selected: selectedTab === tab }"></div>
+                            </div>
+                        </ng-template>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+
+            <div *ngIf="!pageLoading" class="pt-2">
+                <div class="row text-color-primary">
+                    <div *ngIf="!isFetchingAdditionalInfo">
+                        <app-additional-information
+                            [entityId]="id"
+                            [entity]="entity"
+                            [entityData]="additionalInfo"
+                            [fieldResponse]="fieldResponse"
+                        >
+                        </app-additional-information>
+                    </div>
+                    <i class="fa fa-spinner fa-spin ec-loader" *ngIf="isFetchingAdditionalInfo"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

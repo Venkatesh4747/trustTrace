@@ -1,0 +1,142 @@
+<div dragScroll="true" class="tree-container">
+    <div class="tree">
+        <ul>
+            <li class="main-root">
+                <a class="root">
+                    <div class="material">
+                        <!-- <img
+                            class="materials-icon icon-at-start"
+                            src="{{ env.IMG_URL }}images/icons/products/{{
+                                items.supplyChainArticle.articleTypeId
+                            }}.png"
+                        /> -->
+                        <div class="tree-view-traceable-icon" *ngIf="items?.traceable === 'yes'">
+                            <img class="traceable-icons" src="{{ env.IMG_URL }}images/traced.png" alt="Traceable" />
+                        </div>
+                        <app-img
+                            [src]="src"
+                            [alt]="items.supplyChainArticle.articleTypeId"
+                            [default]="default"
+                            class="materials-icon icon-at-start tree-view-image-icon"
+                        >
+                        </app-img>
+                        <ng-template [ngIf]="items.supplyChainArticle.supplierLink">
+                            <a (click)="navigateToSupplierProfile(items.supplyChainArticle.supplierLink)">
+                                <p class="materials-heading">
+                                    <span class="materials-heading" *ngIf="canShowSupplierName()">
+                                        {{ items.supplyChainArticle.supplierName }}
+                                    </span>
+                                    <span
+                                        class="materials-heading display-block"
+                                        *ngIf="
+                                            items.supplyChainArticle.supplierOtherInfo &&
+                                            items.supplyChainArticle.supplierOtherInfo.address &&
+                                            (items.supplyChainArticle.supplierOtherInfo.address.city ||
+                                                items.supplyChainArticle.supplierOtherInfo.address.country)
+                                        "
+                                    >
+                                        {{
+                                            items.supplyChainArticle.supplierOtherInfo.address.city
+                                                ? items.supplyChainArticle.supplierOtherInfo.address.city
+                                                : ''
+                                        }}
+                                        {{
+                                            items.supplyChainArticle.supplierOtherInfo.address.city &&
+                                            items.supplyChainArticle.supplierOtherInfo.address.country
+                                                ? ','
+                                                : ''
+                                        }}
+                                        {{
+                                            items.supplyChainArticle.supplierOtherInfo.address.country
+                                                ? items.supplyChainArticle.supplierOtherInfo.address.country
+                                                : ''
+                                        }}
+                                    </span>
+                                    <span *ngIf="items.metaData && items.metaData.isAgentNode"
+                                        >({{ 'Agent' | translate }})</span
+                                    >
+                                    <span *ngIf="items.supplyChainArticle.facilityName">
+                                        - {{ items.supplyChainArticle.facilityName }}</span
+                                    >
+                                </p>
+                            </a>
+                        </ng-template>
+
+                        <ng-template [ngIf]="!items.supplyChainArticle.supplierLink">
+                            <p class="materials-heading">
+                                <span *ngIf="canShowSupplierName()">
+                                    {{ items.supplyChainArticle.supplierName }}
+                                </span>
+                                <span
+                                    class="display-block"
+                                    *ngIf="
+                                        items.supplyChainArticle.supplierOtherInfo &&
+                                        items.supplyChainArticle.supplierOtherInfo.address &&
+                                        (items.supplyChainArticle.supplierOtherInfo.address.city ||
+                                            items.supplyChainArticle.supplierOtherInfo.address.country)
+                                    "
+                                >
+                                    {{
+                                        items.supplyChainArticle.supplierOtherInfo.address.city
+                                            ? items.supplyChainArticle.supplierOtherInfo.address.city
+                                            : ''
+                                    }}
+                                    {{
+                                        items.supplyChainArticle.supplierOtherInfo.address.city &&
+                                        items.supplyChainArticle.supplierOtherInfo.address.country
+                                            ? ','
+                                            : ''
+                                    }}
+                                    {{
+                                        items.supplyChainArticle.supplierOtherInfo.address.country
+                                            ? items.supplyChainArticle.supplierOtherInfo.address.country
+                                            : ''
+                                    }}
+                                </span>
+                                <span *ngIf="items.metaData && items.metaData.isAgentNode"
+                                    >({{ 'Agent' | translate }})</span
+                                >
+                                <span *ngIf="items.supplyChainArticle.facilityName">
+                                    - {{ items.supplyChainArticle.facilityName }}</span
+                                >
+                            </p>
+                        </ng-template>
+                        <p class="materials-subheading" *ngIf="!showDetails">
+                            {{ localeService.getDisplayText(items.supplyChainArticle.articleTypeId) }}
+                        </p>
+                        <div class="materials-subheading" *ngIf="showDetails">
+                            <p>{{ localeService.getDisplayText(items.supplyChainArticle.articleTypeId) }}</p>
+                            <p>{{ items.poNumber ? 'PO # ' + items.poNumber : ('PO # Not Available' | translate) }}</p>
+                            <p>{{ items.supplyChainArticle.internalArticleName || ('Not Available' | translate) }}</p>
+                            <p class="material-comp" *ngIf="items.supplyChainArticle.materialComposition">
+                                <ng-container
+                                    *ngFor="
+                                        let materialComp of items.supplyChainArticle.materialComposition;
+                                        let isLast = last
+                                    "
+                                >
+                                    {{ localeService.getDisplayText(materialComp.id) }}-{{
+                                        materialComp.value ? materialComp.value : ('NA' | translate)
+                                    }}
+                                    <ng-container *ngIf="!isLast">,&nbsp;</ng-container>
+                                </ng-container>
+                            </p>
+                        </div>
+                    </div>
+                </a>
+                <div *ngIf="items.productSupplyChainList && items.productSupplyChainList.length > 0">
+                    <div class="dash-double-pointer-horizontal"></div>
+                    <div class="dash-no-pointer-vertical"></div>
+                </div>
+                <app-child-tree
+                    [items]="items.productSupplyChainList"
+                    [entityArticleName]="items.supplyChainArticle.internalArticleName"
+                    [navigateWithParams]="navigateWithParams"
+                    [queryParams]="queryParams"
+                    [showDetails]="showDetails"
+                >
+                </app-child-tree>
+            </li>
+        </ul>
+    </div>
+</div>

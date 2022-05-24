@@ -1,0 +1,105 @@
+<div class="parent-container">
+    <div id="title-container">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 p-0">
+            <p class="title">{{ 'Supply Chain' | translate }}</p>
+            <a (click)="closeDialog()">
+                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+            </a>
+        </div>
+    </div>
+    <!-- END OF TITLE BAR -->
+
+    <!-- MAIN CONTAINER -->
+    <div id="main-dialog-container">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <!-- <p class="del-message">{{ msg | translate }}</p> -->
+
+            <div class="row col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-2">
+                <div class="supply-chain-heading" *ngIf="supplyChain">
+                    <div *ngIf="supplyChain.name || supplyChain.number">
+                        {{ 'Name' | translate }} & {{ 'Number' | translate }}.:
+                        <span class="blue-title"> {{ supplyChain.name }} - {{ supplyChain.number }} </span>
+                    </div>
+                    <div class="mt-1" *ngIf="supplyChain.displayId">
+                        {{ 'Lot ID' | translate }}:
+                        <span class="blue-title">
+                            {{ supplyChain.displayId }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row col-xs-12 col-sm-12 col-md-12 col-lg-12 pr-0">
+                <div class="supply-chain-container">
+                    <div class="supply-chain-flow-container" *ngIf="supplyChain.data && supplyChain.data.length > 0">
+                        <div
+                            class="row mt-4 max-width-400px min-height-100px"
+                            *ngFor="let item of supplyChain.data; let isLast = last; let isFirst = first"
+                        >
+                            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                                <div class="product-type-image-container">
+                                    <div class="vertical-line-top" *ngIf="!isFirst"></div>
+                                    <img
+                                        class="product-type-image"
+                                        src="{{ env.IMG_URL }}images/products/{{ item._id }}.png"
+                                    />
+                                    <div class="vertical-line-bottom" *ngIf="!isLast"></div>
+                                </div>
+                            </div>
+                            <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 ml-2">
+                                <div class="product-type-heading">
+                                    {{ localizationService.getDisplayText(item._id) }}
+                                </div>
+                                <div class="supply-chain-detail-container" *ngIf="item.chain && item.chain.length > 0">
+                                    <div
+                                        class="supply-chain-details cursor-default"
+                                        *ngFor="let supplier of item.chain"
+                                    >
+                                        <div>
+                                            <ng-template [ngIf]="supplier.display_name">
+                                                {{ supplier.display_name }},
+                                            </ng-template>
+                                            <ng-template [ngIf]="supplier.date && supplier.date !== ''">
+                                                {{ utilService.getDatebyFormat1(getDate(supplier.date)) }},
+                                            </ng-template>
+                                            <ng-template [ngIf]="supplier.supplier_name">
+                                                {{ supplier.supplier_name }}
+                                            </ng-template>
+                                            <ng-template [ngIf]="supplier?.supplier_address?.country">
+                                                , {{ supplier?.supplier_address?.country }}
+                                            </ng-template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="row">
+                                <div
+                                    class="no-supply-chain"
+                                    *ngIf="supplyChain && supplyChain.data && supplyChain.data.length <= 0"
+                                >
+                                    <img
+                                        class="no-transaction-image"
+                                        src="{{ env.IMG_URL }}images/no-tree-view-available.png"
+                                        alt="Add"
+                                    />
+                                    <div class="page-title talign-center pt-1">
+                                        {{ 'No Data Available' | translate }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END OF MAIN CONTAINER -->
+        <div class="btn-container">
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                <button mat-button class="cancel-btn" (click)="closeDialog()">{{ 'Cancel' | translate }}</button>
+            </div>
+        </div>
+    </div>
+</div>

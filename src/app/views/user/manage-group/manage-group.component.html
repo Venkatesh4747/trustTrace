@@ -1,0 +1,351 @@
+<div class="view-container">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header-section fix-header-block">
+                    <div class="page-header-section-inner">
+                        <div class="page-title">
+                            <h4 class="title">{{ 'Manage User Group' | translate }}</h4>
+                            <h5 class="sub-title">{{ 'Edit/Manage the Groups settings' | translate }}.</h5>
+                        </div>
+                        <!-- Page Title -->
+                    </div>
+                    <!-- Page Header Section Inner -->
+                    <div class="page-header-section-inner alignment-right">
+                        <button class="go-back-button" (click)="goBack()">{{ 'Back' | translate }}</button>
+                        <!-- Title Right Search -->
+                    </div>
+                    <!-- Page Header Section Inner Alignment Right -->
+                </div>
+                <!-- Page Header Section -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+
+        <div class="page-body-section body-section-top-space">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-page-section">
+                        <div class="form-page-inner">
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <mat-form-field [floatLabel]="'never'">
+                                            <input
+                                                maxlength="100"
+                                                matInput
+                                                placeholder="Name of the Group"
+                                                name="fn-ln Name"
+                                                [(ngModel)]="currentGroup.groupName"
+                                                required
+                                            />
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <mat-form-field [floatLabel]="'never'">
+                                            <input
+                                                maxlength="400"
+                                                matInput
+                                                placeholder="Group Description"
+                                                name="fn-ln desc"
+                                                [(ngModel)]="currentGroup.groupDesc"
+                                                required
+                                            />
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-20">
+                                        <div class="form-page-inner-select">
+                                            <h5 class="mat-title">
+                                                {{ 'Group Privileges' | translate }}: <span class="color-red">*</span>
+                                            </h5>
+                                            <div class="table-fix-header-type-one">
+                                                <div class="table-cont ml-0" id="table-cont">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>{{ 'Feature' | translate }}</th>
+                                                                <th
+                                                                    *ngFor="let privilegeName of groupConfig.privileges"
+                                                                >
+                                                                    {{ privilegeName }}
+                                                                </th>
+                                                                <!-- <th>
+                                                                    <ul class="table-header-list">
+                                                                        <li
+                                                                            
+                                                                        >
+                                                                            <p></p>
+                                                                        </li>
+                                                                    </ul>
+                                                                </th> -->
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr
+                                                                *ngFor="
+                                                                    let module of currentGroup.moduleData;
+                                                                    let i = index
+                                                                "
+                                                            >
+                                                                <div class="table-radio-btn">
+                                                                    <mat-radio-group
+                                                                        aria-label="Select an option"
+                                                                        (change)="onChange(i, $event)"
+                                                                        [ngClass]="{
+                                                                            'disable-privileges': currentGroup.default
+                                                                        }"
+                                                                        [disabled]="currentGroup.default"
+                                                                    >
+                                                                        <td>{{ module.module }}</td>
+                                                                        <td>
+                                                                            <mat-radio-button
+                                                                                value="1"
+                                                                                [checked]="
+                                                                                    module.allowedActions.fullAccess
+                                                                                "
+                                                                            >
+                                                                            </mat-radio-button>
+                                                                        </td>
+                                                                        <td>
+                                                                            <mat-radio-button
+                                                                                value="2"
+                                                                                [checked]="
+                                                                                    module.allowedActions.readOnly
+                                                                                "
+                                                                            >
+                                                                            </mat-radio-button>
+                                                                        </td>
+                                                                        <td>
+                                                                            <mat-radio-button
+                                                                                value="3"
+                                                                                [checked]="
+                                                                                    module.allowedActions.noAccess
+                                                                                "
+                                                                            >
+                                                                            </mat-radio-button>
+                                                                        </td>
+                                                                    </mat-radio-group>
+                                                                </div>
+                                                                <!-- Table Radio Button -->
+                                                                <!-- <td class="select-materials">
+                                                                </td> -->
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!-- Table Count -->
+                                            </div>
+                                            <!-- Table Fix Header Type One -->
+                                        </div>
+                                        <!-- Form Page Inner Select -->
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-20">
+                                        <div class="form-page-inner-select">
+                                            <h5 class="mat-title">
+                                                {{ 'Add Users' | translate }}:<span class="color-red">*</span>
+                                            </h5>
+                                            <div class="search-section">
+                                                <div class="title-left-search">
+                                                    <input
+                                                        type="text"
+                                                        class="search"
+                                                        placeholder="Search Users"
+                                                        (keyup)="filterCurrentUsers($event.target.value)"
+                                                    />
+                                                    <i class="fa fa-search"></i>
+                                                </div>
+                                                <!-- Ritle Left Search -->
+                                            </div>
+                                            <!-- Search Section -->
+
+                                            <div class="detail-section">
+                                                <ul class="detail-header">
+                                                    <li>{{ 'Users' | translate }}</li>
+                                                    <li>{{ 'Selected Users' | translate }}</li>
+                                                </ul>
+                                                <ul class="detail-body">
+                                                    <li
+                                                        *ngIf="
+                                                            currentUsers.length > 0 ||
+                                                                (addedUsers && addedUsers.length > 0);
+                                                            else elseBlock
+                                                        "
+                                                    >
+                                                        <ul class="detail-body-inner-left">
+                                                            <li *ngIf="currentUsers.length > 0; else noUserBlock">
+                                                                <ul class="detail-body-inner-left-list">
+                                                                    <li
+                                                                        *ngFor="let user of currentUsers; let i = index"
+                                                                    >
+                                                                        <p (click)="onAddUser(user.id)">
+                                                                            <span>
+                                                                                {{
+                                                                                    user.firstName + ' ' + user.lastName
+                                                                                }}
+                                                                                ({{ user.email }})
+                                                                            </span>
+                                                                            <a
+                                                                                ><img
+                                                                                    class="sni"
+                                                                                    src="{{
+                                                                                        env.IMG_URL
+                                                                                    }}images/right-arrow.png"
+                                                                            /></a>
+                                                                        </p>
+                                                                    </li>
+                                                                </ul>
+                                                            </li>
+                                                            <ng-template #noUserBlock>
+                                                                <li class="detail-body-inner-left-add">
+                                                                    <div class="text-center">
+                                                                        <p>
+                                                                            <b>{{
+                                                                                'No more users to add' | translate
+                                                                            }}</b>
+                                                                        </p>
+                                                                        <p>
+                                                                            {{
+                                                                                'Clear all filters or Add new user in the user management section'
+                                                                                    | translate
+                                                                            }}
+                                                                        </p>
+                                                                    </div>
+                                                                    <!-- Text Center -->
+                                                                </li>
+                                                            </ng-template>
+                                                        </ul>
+
+                                                        <ul class="detail-body-inner-right">
+                                                            <li
+                                                                *ngIf="
+                                                                    addedUsers && addedUsers.length > 0;
+                                                                    else noSelectedUsers
+                                                                "
+                                                            >
+                                                                <ul class="detail-body-inner-right-list">
+                                                                    <li
+                                                                        *ngFor="
+                                                                            let user of addedUsers;
+                                                                            let index = index
+                                                                        "
+                                                                    >
+                                                                        <p>
+                                                                            <span>
+                                                                                {{
+                                                                                    user.firstName + ' ' + user.lastName
+                                                                                }}
+                                                                                ({{ user.email }})
+                                                                            </span>
+                                                                            <span
+                                                                                id="tooltip-delete-group"
+                                                                                [tooltip]="getToolTipContent()"
+                                                                            >
+                                                                                <button
+                                                                                    [disabled]="addedUsers.length === 1"
+                                                                                    (click)="onRemoveUser(user.id)"
+                                                                                >
+                                                                                    <img
+                                                                                        class="sni"
+                                                                                        src="{{
+                                                                                            env.IMG_URL
+                                                                                        }}images/trash-can.png"
+                                                                                    />
+                                                                                </button>
+                                                                            </span>
+                                                                        </p>
+                                                                    </li>
+                                                                </ul>
+                                                            </li>
+                                                            <ng-template #noSelectedUsers>
+                                                                <li class="detail-body-inner-right-add">
+                                                                    <div class="text-center">
+                                                                        <p>
+                                                                            <b>{{ 'No users selected' | translate }}</b>
+                                                                        </p>
+                                                                        <p>
+                                                                            {{
+                                                                                'Click on any of the user to add it here'
+                                                                                    | translate
+                                                                            }}
+                                                                        </p>
+                                                                    </div>
+                                                                    <!-- Text Center -->
+                                                                </li>
+                                                            </ng-template>
+                                                        </ul>
+                                                    </li>
+                                                    <ng-template #elseBlock>
+                                                        <li class="detail-body-add">
+                                                            <div class="text-center">
+                                                                <p>
+                                                                    <b>{{
+                                                                        'No users found for the company' | translate
+                                                                    }}</b>
+                                                                </p>
+                                                                <p>
+                                                                    {{
+                                                                        'Please create a user in the user section'
+                                                                            | translate
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                            <!-- Text Center -->
+                                                        </li>
+                                                    </ng-template>
+                                                </ul>
+                                            </div>
+                                            <!-- Detail Section -->
+                                        </div>
+                                        <!-- Form Page Inner Section -->
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="button-block">
+                                            <div class="pull-right">
+                                                <button class="btn btn-blue btn-md" type="button" (click)="goBack()">
+                                                    {{ 'Cancel' | translate }}
+                                                </button>
+                                                <button class="btn btn-gray btn-md" type="button" (click)="onSave()">
+                                                    {{ 'Update Group' | translate }}
+                                                </button>
+                                            </div>
+                                            <!-- Pull Left -->
+                                        </div>
+                                        <!-- Butto Block -->
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                            </form>
+                        </div>
+                        <!-- Column -->
+                        <!-- Form Page Inner -->
+                    </div>
+                    <!-- Form Page Section -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+        <!-- Page Body Section -->
+    </div>
+    <!--  Container Fluid -->
+</div>
+<!--  View Container -->

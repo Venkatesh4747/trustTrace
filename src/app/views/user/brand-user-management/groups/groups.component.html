@@ -1,0 +1,119 @@
+<div class="container-fluid">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div class="page-create-section">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header-section">
+                    <div class="page-header-section-inner">
+                        <button class="btn btn-lg btn-gradient" (click)="onCreateGroup()">
+                            <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" />
+                            {{ 'Create Group' | translate }}
+                        </button>
+                    </div>
+                    <!-- Header Section Inner -->
+                    <div class="page-header-section-inner alignment-right">
+                        <div class="title-right-search">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="Search Group"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchGroups($event)"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <!-- Title Right Search -->
+                    </div>
+                    <!-- Header Section Inner Alignment Right -->
+                </div>
+                <!-- Header Section -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+
+        <div class="page-body-section">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="inner-page-loader" *ngIf="pageLoading || isDataLoading">
+                        <app-spinner [small]="true"></app-spinner>
+                    </div>
+                    <div class="table-cont table-responsive ml-0" id="table-cont">
+                        <table class="table custom-table" *ngIf="!pageLoading">
+                            <thead>
+                                <tr class="nth-count-three">
+                                    <th>{{ 'Group Name' | translate }}</th>
+                                    <th>{{ 'Users of the Group' | translate }}</th>
+                                    <th class="action">{{ 'Actions' | translate }}</th>
+                                </tr>
+                            </thead>
+                            <tbody
+                                *ngIf="groups && groups.length >= 0"
+                                infiniteScroll
+                                [infiniteScrollDistance]="0.5"
+                                (scrolled)="onScroll()"
+                                [scrollWindow]="false"
+                                [infiniteScrollDisabled]="disableInfiniteScroll"
+                            >
+                                <tr *ngFor="let group of groups; let i = index">
+                                    <td>
+                                        <div class="user-details">
+                                            <span class="user-value">{{ group.name }}</span>
+                                            <span class="user-label">{{ group.description }}</span>
+                                        </div>
+                                        <!-- User Details -->
+                                    </td>
+                                    <td>
+                                        <b (click)="openTooltipModal($event, group.users)">
+                                            {{ getAllDisplayText(group.users) | truncateText: acceptedStringLength }}
+                                        </b>
+                                    </td>
+                                    <td class="action">
+                                        <div class="action-modules">
+                                            <span
+                                                class="tooltip-group"
+                                                [tooltip]="getToolTipContent(group.is_default_group, 'Manage')"
+                                            >
+                                                <button
+                                                    class="btn-link"
+                                                    (click)="navigateToManageGroup(group.id, group.name)"
+                                                >
+                                                    <img src="{{ env.IMG_URL }}images/edit.png" alt="Edit" />
+                                                    {{ 'Manage Group' | translate }}
+                                                </button>
+                                            </span>
+                                            <span
+                                                class="tooltip-group"
+                                                [tooltip]="getToolTipContent(group.is_default_group, 'Status')"
+                                            >
+                                                <button
+                                                    class="text-red btn-link"
+                                                    (click)="openConfirmationDialog(group.id, group.name)"
+                                                    [disabled]="group.is_default_group"
+                                                >
+                                                    <img src="{{ env.IMG_URL }}images/questionaire-del.png" />
+                                                    {{ 'Delete Group' | translate }}
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="no-groups" *ngIf="!groups || groups.length === 0">
+                                    {{
+                                        'No groups found' | translate
+                                    }}!
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table Count -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+        <!-- Page Body Section -->
+    </div>
+    <!-- User Create Section -->
+</div>
+<!-- Container Fluid -->

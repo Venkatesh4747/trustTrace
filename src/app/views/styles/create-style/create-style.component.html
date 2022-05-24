@@ -1,0 +1,131 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header-no-border">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pt-1">
+                <div *ngIf="editMode; else createMode">
+                    <div class="page-title pt-10">{{ 'Edit Styles' | industry | translate }}</div>
+                    <div class="page-description">
+                        {{ 'Edit Style Specifications, Certifications and Supply Chain' | industry | translate }}.
+                    </div>
+                </div>
+                <ng-template #createMode>
+                    <div>
+                        <div class="page-title pt-10">{{ 'Create Style' | industry | translate }}</div>
+                        <div class="page-description">
+                            {{ 'Create Style Specifications, Certifications and Supply Chain' | industry | translate }}.
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+
+        <div class="row pl-2" *ngIf="!pageLoading">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <form #createStylesForm="ngForm" class="create-styles-form">
+                    <div class="row pt-3">
+                        <mat-accordion>
+                            <mat-expansion-panel
+                                *ngFor="let category of styleCategories; let panelInd = index"
+                                [expanded]="step === panelInd"
+                                (opened)="setStep(panelInd)"
+                            >
+                                <mat-expansion-panel-header [collapsedHeight]="'75px'" [expandedHeight]="'75px'">
+                                    <mat-panel-title>{{ category | translate }}</mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <div [ngSwitch]="category">
+                                    <!-- Style Specifications -->
+                                    <div *ngSwitchCase="styleCategories[0]">
+                                        <app-style-specifications
+                                            (productGroupChanged)="productColor?.productGroupSelected($event)"
+                                            (productTypeChanged)="bomComponent?.productTypeSelected($event)"
+                                            [settings]="settings"
+                                            [style]="style"
+                                            [mode]="mode"
+                                            name="spec"
+                                        >
+                                        </app-style-specifications>
+                                    </div>
+                                    <!-- Main Fabric Composition -->
+                                    <div *ngSwitchCase="styleCategories[1]">
+                                        <app-fabric-composition
+                                            [settings]="settings"
+                                            [style]="style"
+                                            name="materialComp"
+                                        >
+                                        </app-fabric-composition>
+                                    </div>
+                                    <!-- Product Color, Size, Fit and Length -->
+                                    <div *ngSwitchCase="styleCategories[2]" class="product-color-size">
+                                        <app-product-color
+                                            [settings]="settings"
+                                            [style]="style"
+                                            name="color"
+                                            (productGroupSelected)="onSelect($event)"
+                                        ></app-product-color>
+                                    </div>
+                                    <!-- Required Certifications -->
+                                    <div *ngSwitchCase="styleCategories[3]">
+                                        <app-style-certifications
+                                            [settings]="settings"
+                                            [style]="style"
+                                            name="certifications"
+                                        >
+                                        </app-style-certifications>
+                                    </div>
+                                    <!-- Sustainability Labels -->
+                                    <div *ngSwitchCase="styleCategories[4]">
+                                        <app-style-sustainability-labels
+                                            [settings]="settings"
+                                            [style]="style"
+                                            name="sustainabilityLabels"
+                                        >
+                                        </app-style-sustainability-labels>
+                                    </div>
+                                    <!-- Upload Product Images -->
+                                    <div *ngIf="false">
+                                        <div class="product-image-upload">
+                                            <!-- input the images from here  -->
+                                            <app-image-upload [style]="style"></app-image-upload>
+                                        </div>
+                                    </div>
+                                    <!-- Supply Chain Information -->
+                                    <div *ngSwitchCase="styleCategories[5]">
+                                        <app-style-supply-chain [style]="style" name="supplyChain">
+                                        </app-style-supply-chain>
+                                    </div>
+                                    <!-- Bill Of Materials -->
+                                    <div *ngSwitchCase="styleCategories[6]" class="bill-of-materials">
+                                        <app-style-bom
+                                            (requireCreateML)="openMLDialog()"
+                                            [settings]="settings"
+                                            [style]="style"
+                                            name="bom"
+                                        ></app-style-bom>
+                                    </div>
+                                    <div *ngSwitchDefault>{{ 'No Dom' | translate }}</div>
+                                </div>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
+                    <div class="row pt-2 pb-2 pr-3 talign-right">
+                        <button class="btn btn-blue cancel-btn" type="button" (click)="goBack()">
+                            {{ 'Cancel' | translate }}
+                        </button>
+                        <button
+                            class="btn btn-gray save-btn"
+                            type="button"
+                            (click)="onSave(createStylesForm)"
+                            [disabled]="!createStylesForm.valid"
+                        >
+                            {{ 'Save' | translate }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>

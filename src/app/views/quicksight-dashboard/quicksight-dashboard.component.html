@@ -1,0 +1,22 @@
+<div class="view-container text-center">
+    <div class="view-container-content">
+        <div class="container-fluid dashboard-outer dashboard-chart-outer">
+            <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+            <div class="row header">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pl-3 pt-3">
+                    <div class="page-title">{{ 'Analytics' | translate }}</div>
+                    <div class="page-description">
+                        {{ 'Provides in-depth visualizations and insights on the data' | translate }}.
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <div id="dashboardContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

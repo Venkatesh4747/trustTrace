@@ -1,0 +1,128 @@
+@import '~styles/variables';
+
+.filter-app-filter-criteria-form-item-detail-header {
+    line-height: 1.4;
+}
+.filter-criteria-form-item-detail {
+    display: block;
+    width: 100%;
+    float: left;
+}
+
+.filter-criteria-form-item-detail-list {
+    font-family: $font-family-Semibold;
+    font-size: 16px;
+    color: $text-color-primary;
+}
+
+.filter-criteria-form-item-detail-block {
+    text-align: left;
+    padding: 0px 20px 10px;
+    line-height: 60px;
+    width: 50%;
+    display: inline-grid;
+    float: left;
+}
+
+.cancel-btn {
+    background: #92eeff;
+    font-family: 'Source Sans Pro-Semibold';
+    color: #212121;
+    padding: 0 35px;
+    box-shadow: 0 0 3px 2px #f5f5f5;
+    height: 36px;
+    border-radius: 5px;
+    border: 0;
+    margin-right: 5px;
+    &:focus,
+    &:hover,
+    &:active {
+        outline: none;
+        border: 0;
+        background: #92eeff;
+        color: #212121;
+    }
+}
+
+.save-btn {
+    background-color: #7affad;
+    color: #333333;
+    padding: 0 35px;
+    height: 36px;
+    box-shadow: 0 0 3px 2px #f5f5f5;
+    font-family: 'Source Sans Pro-Semibold', sans-serif;
+    border-radius: 5px;
+    margin-left: 5px;
+    border: 0;
+    &:focus,
+    &:hover,
+    &:active {
+        outline: none;
+        border: 0;
+        background-color: #7affad;
+        color: #333333;
+    }
+}
+
+.information-details-block-inner-left {
+    display: inline-block;
+    width: 48%;
+}
+.information-details-block-inner-right {
+    display: inline-block;
+    width: 70%;
+    color: $text-color-primary;
+}
+.information {
+    &-details {
+        &-block {
+            display: flex;
+            text-align: left;
+            width: 100%;
+            padding-left: 15px;
+            margin: 12px 0;
+            align-items: flex-start;
+        }
+        &-list {
+            display: block;
+            float: left;
+            align-items: center;
+            height: 100%;
+            font-family: 'Source Sans Pro-Bold';
+            color: $text-color-primary;
+            // word-break: break-all;
+            font-size: 16px;
+            &:first-child {
+                width: 70%;
+            }
+            &:nth-child(2) {
+                width: 5%;
+                padding: 0 5px;
+                text-align: center;
+            }
+            &:last-child {
+                width: 25%;
+                font-family: 'Source Sans Pro-Regular';
+            }
+        }
+        &-value {
+            width: 100%;
+            display: inline-flex;
+            padding-bottom: 10px;
+        }
+    }
+}
+
+.spinner-wrapper {
+    margin: 0 auto;
+    display: inline-flex;
+}
+
+.button-block {
+    float: right;
+    margin-right: 5px;
+}
+
+.mat-expansion-panel:not([class*='mat-elevation-z']) {
+    margin-bottom: 15px;
+}

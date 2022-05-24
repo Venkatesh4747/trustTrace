@@ -1,0 +1,248 @@
+<div class="transaction-tree-view">
+    <ul
+        class="list-unstyled list-inline"
+        [ngClass]="{
+            'root-node': rootNode,
+            'root-node-immediate-child': rootNodeImmediateChild,
+            'more-than-one-child-node': moreThanOneChildNode
+        }"
+    >
+        <li class="node-container" *ngFor="let lotDatum of lotData">
+            <div class="node-container-outer">
+                <div
+                    class="node-container-inner"
+                    [ngClass]="{ 'root-node-has-children': lotDatum.fromLotView?.length > 0 }"
+                >
+                    <div class="tt-font text-center node-container-content">
+                        <div class="content">
+                            <div class="lot-details">
+                                <!--                        <div class="transaction-type-indicator" [tooltip]="lotDatum.txType | titlecase">-->
+                                <!--                            <img-->
+                                <!--                                default="{{ env.IMG_URL }}images/empty.png"-->
+                                <!--                                src="{{ env.IMG_URL }}images/temp/{{ lotDatum.txType.toLowerCase() }}_v1.png"-->
+                                <!--                                alt="{{ lotDatum.txType }}"-->
+                                <!--                            />-->
+                                <!--                        </div>-->
+                                <div class="product-name font-bold" *ngIf="rootNode">
+                                    {{ lotDatum.companyName }}
+                                </div>
+                                <div class="prduct-type font-bold" *ngIf="!rootNode">
+                                    {{ lotDatum.productType }}
+                                </div>
+                                <div class="facilities">
+                                    <span class="font-bold">{{ lotDatum.companyName }},&nbsp;</span>
+                                    <span class="font-bold">{{ lotDatum.facilities | truncateText: 50 }}</span>
+                                </div>
+                                <div class="name-number">
+                                    {{ 'Name' | translate }} &amp; {{ 'No' | translate }}:
+                                    <span class="font-bold">{{ lotDatum.soaNameAndNumber }}</span>
+                                </div>
+                                <div class="po-number" *ngIf="lotDatum.poNumber">
+                                    {{ 'PO No' | translate }}:
+                                    <span class="font-bold">{{ lotDatum.poNumber || ('NA' | translate) }}</span>
+                                </div>
+                                <ng-template #tableData>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped tableData-popover" *ngIf="lotDatum.tableData">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">{{ 'Batch ID' | translate }}</th>
+                                                    <th scope="col">{{ 'Quantity' | translate }}</th>
+                                                    <th scope="col">{{ 'Evidence' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let row of lotDatum.tableData">
+                                                    <td>{{ row.batchId }}</td>
+                                                    <td>{{ row.quantity }}</td>
+                                                    <td>
+                                                        <div
+                                                            *ngIf="
+                                                                row.qualityReport &&
+                                                                row.qualityReport[0].fileName.length
+                                                            "
+                                                        >
+                                                            <div class="fileRow">
+                                                                <span class="filename tt-font">{{
+                                                                    'Quality Report' | translate
+                                                                }}</span>
+                                                                <span
+                                                                    class="download-icon cursor-pointer"
+                                                                    tooltip="Download"
+                                                                    (click)="downloadEvidenceFile(row.qualityReport[0])"
+                                                                >
+                                                                    <img
+                                                                        src="https://static.trustrace.net/static/images/icon-download-black.png"
+                                                                        alt="Download Certificate"
+                                                                    />
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            *ngIf="
+                                                                row.otherDocuments &&
+                                                                row.otherDocuments[0].fileName.length
+                                                            "
+                                                        >
+                                                            <div class="fileRow">
+                                                                <span class="filename tt-font">{{
+                                                                    'Other Documents' | translate
+                                                                }}</span>
+                                                                <span
+                                                                    class="download-icon cursor-pointer"
+                                                                    tooltip="Download"
+                                                                    (click)="
+                                                                        downloadEvidenceFile(row.otherDocuments[0])
+                                                                    "
+                                                                >
+                                                                    <img
+                                                                        src="https://static.trustrace.net/static/images/icon-download-black.png"
+                                                                        alt="Download Certificate"
+                                                                    />
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            *ngIf="
+                                                                !(
+                                                                    row.qualityReport &&
+                                                                    row.qualityReport[0].fileName.length
+                                                                ) &&
+                                                                !(
+                                                                    row.otherDocuments &&
+                                                                    row.otherDocuments[0].fileName.length
+                                                                )
+                                                            "
+                                                        >
+                                                            <span class="tt-font">{{
+                                                                'Not Available' | translate
+                                                            }}</span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </ng-template>
+                                <div class="batch-id" *ngIf="lotDatum.tableData">
+                                    {{ 'Batch ID' | translate }}:
+                                    <span
+                                        class="font-bold popover-link"
+                                        (click)="openBatchDetailPopup(lotDatum.tableData)"
+                                        [popover]="tableData"
+                                        [placement]="'left bottom'"
+                                        container="body"
+                                        [outsideClick]="true"
+                                    >
+                                        {{ getBatchIds(lotDatum.tableData) | truncateText: 20 }}
+                                    </span>
+                                </div>
+                                <div class="quantity">
+                                    {{ 'Quantity' | translate }}:
+                                    <span class="font-bold">{{ lotDatum.quantity || ('NA' | translate) }}</span>
+                                </div>
+                            </div>
+                            <div class="lot-certificates mt-1" *ngIf="lotDatum.certificates.length > 0">
+                                <!--                        <div *ngIf="!lotDatum.certificates || lotDatum.certificates?.length === 0">-->
+                                <!--                            <span class="font-bold">No certificates provided</span>-->
+                                <!--                        </div>-->
+                                <div *ngFor="let certificate of lotDatum.certificates">
+                                    <div class="fileRow">
+                                        <span class="filename font-bold">{{
+                                            localization.getDisplayText(certificate.typeId)
+                                        }}</span>
+                                        <span
+                                            class="download-icon cursor-pointer"
+                                            tooltip="Download"
+                                            (click)="downloadCertificate(certificate)"
+                                        >
+                                            <img
+                                                src="https://static.trustrace.net/static/images/icon-download-black.png"
+                                                alt="Download Certificate"
+                                            />
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div *ngFor="let certificate of lotDatum.qualityReport">
+                                    <div class="fileRow" *ngIf="certificate.fileName.length > 0">
+                                        <span class="filename font-bold">{{ 'Quality Report' | translate }}</span>
+                                        <span
+                                            class="download-icon cursor-pointer"
+                                            tooltip="Download"
+                                            (click)="downloadEvidenceFile(certificate)"
+                                        >
+                                            <img
+                                                src="https://static.trustrace.net/static/images/icon-download-black.png"
+                                                alt="Download Certificate"
+                                            />
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div *ngFor="let certificate of lotDatum.otherDocuments">
+                                    <div class="fileRow" *ngIf="certificate.fileName.length > 0">
+                                        <span class="filename font-bold">{{ 'Other Documents' | translate }}</span>
+                                        <span
+                                            class="download-icon cursor-pointer"
+                                            tooltip="Download"
+                                            (click)="downloadEvidenceFile(certificate)"
+                                        >
+                                            <img
+                                                src="https://static.trustrace.net/static/images/icon-download-black.png"
+                                                alt="Download Certificate"
+                                            />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-type-image">
+                                <img
+                                    default="{{ env.IMG_URL }}images/products/simple/pdt_default.png"
+                                    src="{{ env.IMG_URL }}images/products/simple/pdt_{{
+                                        lotDatum.productType.toLowerCase().replace(' ', '_')
+                                    }}.png"
+                                    [tooltip]="lotDatum.productType"
+                                    alt="{{ lotDatum.productType }}"
+                                />
+                                <span
+                                    class="risk_factor {{ lotDatum.riskFactor }}"
+                                    (click)="
+                                        (checkAccess('ADIDAS_DEMO_READ') ||
+                                            checkAccess('DOCUMENT_EXTRACTION_READ') ||
+                                            checkAccess('DEEPER_DOCUMENT_VALIDATION_READ')) &&
+                                            showDetailedValidationData(lotDatum.certificates)
+                                    "
+                                >
+                                    <span
+                                        [ngClass]="{
+                                            'popover-link':
+                                                checkAccess('ADIDAS_DEMO_READ') ||
+                                                checkAccess('DOCUMENT_EXTRACTION_READ') ||
+                                                checkAccess('DEEPER_DOCUMENT_VALIDATION_READ')
+                                        }"
+                                    >
+                                        {{ RISK_FACTOR[lotDatum.riskFactor] }}
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="dash-double-pointer-horizontal"
+                        *ngIf="rootNode && lotDatum.fromLotView?.length > 0"
+                    ></div>
+                </div>
+            </div>
+            <ng-template [ngIf]="lotDatum.fromLotView?.length > 0">
+                <app-transaction-tree-node
+                    [lotData]="lotDatum.fromLotView"
+                    [rootNodeImmediateChild]="rootNode"
+                    [moreThanOneChildNode]="lotDatum.fromLotView?.length > 1"
+                    class="transaction-tree-view-inner"
+                >
+                </app-transaction-tree-node>
+            </ng-template>
+        </li>
+    </ul>
+</div>

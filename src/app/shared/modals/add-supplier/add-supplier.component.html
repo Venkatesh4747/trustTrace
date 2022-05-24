@@ -1,0 +1,60 @@
+<div
+    bsModal
+    #addSupplierModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="addSupplierModal"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-sm" style="width: 400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title pull-left">{{ 'Send Sign Up Link' | translate }}</h4>
+                <button type="button" class="close pull-right" (click)="hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <!-- modal-header -->
+            <div class="modal-body" style="padding: 15px 30px;">
+                <form #addSupplierForm>
+                    <div class="form-group">
+                        <label class="control-label" for="supplierName">{{ 'Supplier Name' | translate }}</label>
+                        <input
+                            class="form-control"
+                            type="text"
+                            id="supplierName"
+                            name="supplierName"
+                            [(ngModel)]="newSupplier.name"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="supplierEmail">{{ 'Supplier Email' | translate }}</label>
+                        <input
+                            class="form-control"
+                            type="email"
+                            id="supplierEmail"
+                            name="supplierEmail"
+                            [(ngModel)]="newSupplier.email"
+                        />
+                    </div>
+                </form>
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer" style="text-align: center !important;">
+                <button class="btn btn-reset reset-password-button" (click)="hide()">{{ 'Cancel' | translate }}</button>
+                <button class="btn btn-blue" *ngIf="!associatingSupplierProcessing" (click)="associateSupplier()">
+                    {{ 'Send' | translate }}
+                </button>
+                <span style="display: inline-block; width: 76px !important;" *ngIf="associatingSupplierProcessing">
+                    <app-spinner [small]="true"></app-spinner>
+                </span>
+            </div>
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->

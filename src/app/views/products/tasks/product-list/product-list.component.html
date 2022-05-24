@@ -1,0 +1,50 @@
+<ng-container [formGroup]="productsForm" *ngIf="productState$ | async as product">
+    <ng-container *ngIf="!product.errorState.haveError; else haveError">
+        <ng-container *ngIf="!product.productListIsLoading; else Loading">
+            <tr
+                class="application-product-list"
+                *ngFor="let productItem of products; trackBy: customTrackBy; let i = index"
+            >
+                <app-product
+                    [formControlName]="productItem.id"
+                    class="application-product"
+                    [product]="productItem"
+                    [customFieldDisplayList]="customFieldDisplayList"
+                    [index]="i"
+                    [productSubmittedStateSubject]="productSubmittedStateSubject"
+                    [selectAll]="selectAll"
+                ></app-product>
+            </tr>
+        </ng-container>
+    </ng-container>
+
+    <ng-container
+        *ngIf="
+            !product?.productListIsLoading &&
+            (!product?.productsConfig ||
+                !product?.productsConfig?.tasks ||
+                product?.productsConfig?.tasks?.length === 0)
+        "
+    >
+        <p class="content-center">
+            {{ 'No products available!' | translate }}
+        </p>
+    </ng-container>
+
+    <ng-template #haveError>
+        <p class="content-center">
+            {{ 'Unable to' | translate }}
+            <span *ngFor="let item of product.errorState.errorMessage | keys; let last = last">
+                <ng-container *ngIf="item.value">
+                    {{ item.key + (last ? '' : ',') }}
+                </ng-container>
+            </span>
+        </p>
+        <p class="content-center">{{ 'Please reload the page and try again' | translate }}</p>
+    </ng-template>
+</ng-container>
+<ng-template #Loading>
+    <tr class="pagination-progress">
+        <app-spinner [small]="true"></app-spinner>
+    </tr>
+</ng-template>

@@ -1,0 +1,76 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="sc-approval-container material-input-style-box-type">
+    <div class="sc-supplier-details">
+        <div>
+            {{ 'Supplier Name' | translate }}:
+            <span class="supplier-value">{{
+                taskDetail &&
+                taskDetail.changedData &&
+                taskDetail.changedData.sellerOfProduct &&
+                taskDetail.changedData.sellerOfProduct.value &&
+                taskDetail.changedData.sellerOfProduct.value
+                    ? taskDetail.changedData.sellerOfProduct.value
+                    : ('Not Available' | translate)
+            }}</span>
+        </div>
+        <div>
+            {{ 'Supplier Code' | translate }}:
+            <span class="supplier-value">{{
+                taskDetail &&
+                taskDetail.changedData &&
+                taskDetail.changedData.sellerOfProduct &&
+                taskDetail.changedData.sellerOfProduct.matchedData &&
+                taskDetail.changedData.sellerOfProduct.matchedData.code &&
+                taskDetail.changedData.sellerOfProduct.matchedData.code
+                    ? taskDetail.changedData.sellerOfProduct.matchedData.code
+                    : ('Not Available' | translate)
+            }}</span>
+        </div>
+        <div>
+            {{ 'Certification Standard' | translate }}:
+            <span class="supplier-value">{{
+                (taskDetail && taskDetail.certStandard) || ('Not Available' | translate)
+            }}</span>
+        </div>
+        <div>
+            {{ 'Certification Body' | translate }}:
+            <span class="supplier-value">{{
+                (taskDetail && taskDetail.changedData && taskDetail.changedData.bodyIssuingCertificate) ||
+                    ('Not Available' | translate)
+            }}</span>
+        </div>
+        <div>
+            {{ 'Expiry Date' | translate }}:
+            <span class="supplier-value">{{
+                (taskDetail && taskDetail.changedData && taskDetail.changedData.validUntil) ||
+                    ('Not Available' | translate)
+            }}</span>
+        </div>
+    </div>
+
+    <div class="sc-delay-reasons" *ngIf="taskDetail && taskDetail.comments">
+        <h3 class="sc-delay-reasons-title">{{ 'Delay Reason' | translate }}:</h3>
+        <p class="sc-delay-reasons-description" *ngFor="let comment of taskDetail.comments.selectedComments">
+            {{ comment || ('Not Available' | translate) }}
+        </p>
+        <p class="sc-delay-reasons-description" *ngIf="taskDetail && taskDetail.comments.otherComments">
+            {{ (taskDetail.comments && taskDetail.comments.otherComments) || ('Not Available' | translate) }}
+        </p>
+    </div>
+
+    <div class="sc-form-controls">
+        <mat-label class="mat-input-label">{{ 'Remarks' | translate }}:</mat-label>
+        <mat-form-field>
+            <input matInput [(ngModel)]="remarks" name="remarks" />
+        </mat-form-field>
+
+        <div class="sc-form-controls-buttons">
+            <button type="button" class="reject-button" (click)="handleSubmit('Reject')">
+                {{ 'Reject' | translate }}
+            </button>
+            <button type="button" class="secondary-btn" (click)="handleSubmit('Approve')">
+                {{ 'Approve' | translate }}
+            </button>
+        </div>
+    </div>
+</div>

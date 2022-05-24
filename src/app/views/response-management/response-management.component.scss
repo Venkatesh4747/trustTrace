@@ -1,0 +1,163 @@
+.response-management-container {
+  position: fixed;
+  top: 55px;
+  bottom: 0px;
+  right: 0;
+  width: 350px;
+  background-color: #ffffff;
+  z-index: 110;
+  box-shadow: -2px -1px 3px #a0a0a0;
+}
+
+.response-management-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.response-management-content > .row {
+  padding: 10px;
+}
+
+.response-management-thin-border {
+  border-bottom: 1px solid #C0C0C0;
+}
+
+.response-management-thick-border {
+  border-bottom: 2px solid #525368;
+}
+
+.response-management-header {
+  background: #354052;
+  color: #ffffff;
+  padding: 6px 10px 6px 10px !important;
+  line-height: 30px;
+}
+
+.response-management-header > img.comments-box-icon {
+  margin-right: 5px;
+}
+
+.response-management-qs {
+}
+
+.response-management-qp {
+  position: relative;
+  height: 80px;
+  overflow: auto;
+}
+
+.response-management-cs {
+  position: absolute;
+  top: 233px;
+  bottom: 55px;
+  /*height: 340px;*/
+  width: 100%;
+  overflow: scroll !important;
+  padding-top: 0 !important;
+}
+
+.comment-li {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.response-management-comment {
+
+}
+
+.response-management-reply-box {
+  margin-right: 15px;
+}
+
+.response-management-text-box {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid #525368;
+}
+
+.resolve {
+  border: none;
+  color: #fff;
+  background: #a7ca85;
+  padding: 5px 10px;
+}
+
+.textarea {
+  width: 275px;
+  resize: none;
+}
+
+.text-box {
+  position: relative
+}
+
+.navigate-icon {
+  margin: 0 4px;
+  font-size: 1.35em;
+  vertical-align: middle;
+}
+
+.navigate-icon:hover {
+  cursor: pointer;
+}
+
+.thread-reply {
+  background-color: #354052;
+  color: #ffffff;
+}
+
+.thread-reply:hover {
+  cursor: pointer;
+}
+
+.question-preview-text {
+  text-align: center;
+  background-color: #F6F6F6;
+  color: #CDCDCD;
+  font-weight: 500;
+  font-size: 16px;
+  margin: 3px 0;
+  padding: 5px;
+}
+
+.pr-15 {
+  padding-right: 15px !important;
+  margin-left: 60px !important;
+}
+
+.pl-15 {
+  padding-left: 15px !important;
+  margin-right: 60px !important;
+}
+
+.comment-date {
+  color: #C5C5C5;
+  font-weight: 500;
+  padding: 7px 0;
+}
+
+.comment-item {
+  padding-top: 10px;
+  margin: 0 -10px;
+  overflow-wrap: break-word;
+}
+
+.reply-button > .thread-reply {
+  padding: 3px 3px 2px;
+}
+
+.reply-button > .thread-reply i {
+  font-size: 1em;
+}
+
+.thread-start {
+  background-color: #F0F0F0 !important;
+  font-weight: 500;
+}
+
+.comment-reply {
+  height: 85px;
+}

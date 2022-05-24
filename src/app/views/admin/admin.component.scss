@@ -1,0 +1,277 @@
+@import '~styles/variables';
+@import '~styles/mixins';
+
+.admin-outer {
+    margin-top: 20px;
+    &.mt-0 {
+        margin-top: 0;
+    }
+}
+.admin-profile {
+    position: relative;
+    left: 20px;
+    text-align: left;
+    .form-group.bottom {
+        font-size: 17px;
+    }
+}
+.validate-data {
+    text-align: right;
+}
+.validate-data label {
+    margin-right: 20px;
+}
+.import-file-input {
+    float: right;
+    text-align: right;
+}
+.validate-btn {
+    text-align: left;
+}
+.import-button {
+    margin-top: 30px;
+}
+.import-button button {
+    background-color: #00aac6;
+}
+.import-file {
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.response-management-text-box {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #525368;
+}
+
+.error-text-box {
+    padding: 10px;
+}
+
+.import-data-container {
+    padding-top: 20px;
+}
+
+.demo-user-disable-form {
+    min-width: 150px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.demo-user-disable-width {
+    width: 100%;
+}
+
+.generate-qr-code {
+    padding-top: 40px;
+    .generate-qr-code-input {
+        width: 35%;
+        margin: auto auto 30px;
+    }
+    .generate-qr-code-company-select {
+        min-width: 150px;
+        max-width: 500px;
+        width: 100%;
+    }
+    .json-container {
+        width: 80%;
+        height: 500px;
+        overflow-y: auto;
+        overflow-wrap: break-word;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        margin: 20px auto;
+        text-align: left;
+        div {
+            margin-bottom: 20px;
+        }
+    }
+}
+/* Reset Form SCSS */
+.reset {
+    &-form {
+        &-block {
+            form {
+                .mat-card-actions {
+                    .email-link-setup {
+                        &-list {
+                            display: block;
+                            width: 100%;
+                            li {
+                                display: inline-block;
+                                padding: 0 10px;
+                                align-items: center;
+                                vertical-align: middle;
+                                input {
+                                    opacity: 0;
+                                    height: 0;
+                                }
+                                p {
+                                    width: 100%;
+                                    display: inline-block;
+                                    word-break: break-all;
+                                    color: #325992;
+                                    padding-top: 10px;
+                                }
+                                button {
+                                    line-height: 1.3;
+                                    padding: 5px 20px;
+                                    font-size: 14px;
+                                }
+                                &:first-child {
+                                    width: 70%;
+                                }
+                                &:last-child {
+                                    width: 30%;
+                                    position: relative;
+                                    top: 10px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+/* Page Body Section SCSS */
+.page-body-section.body-section-top-space {
+    top: 30px;
+}
+/*Example Form SCSS */
+.reset-password {
+    .example-form {
+        table {
+            > tbody {
+                > tr {
+                    > td {
+                        padding: 18px 18px 0;
+                    }
+                }
+            }
+        }
+    }
+}
+.mat-form-field-appearance-legacy .mat-form-field-wrapper {
+    padding-bottom: 10px;
+}
+.mat-card > .mat-card-actions:last-child {
+    padding-bottom: 15px;
+    margin: 0;
+    padding-top: 0;
+}
+.mat-card {
+    padding: 25px 0 16px;
+}
+
+::ng-deep.timepicker-backdrop-overlay {
+    background-color: transparent !important;
+}
+.release-list {
+    h3 {
+        text-align: left;
+    }
+    ul {
+        list-style-type: none;
+        text-align: left;
+        height: 414px;
+        overflow: hidden;
+        overflow-y: auto;
+        li {
+            color: #325992;
+            margin-bottom: 10px;
+            border: solid #00aac6 1px;
+            border-radius: 5px;
+            padding: 10px;
+            width: 97%;
+        }
+    }
+    .action {
+        float: right;
+        button {
+            margin: -8px;
+            border: none;
+            outline: none;
+            background-color: transparent;
+        }
+    }
+}
+
+.notification-panel {
+    label {
+        font-size: 16px !important;
+    }
+}
+.upload-group {
+    label {
+        float: left;
+    }
+    input {
+        clear: both;
+    }
+
+    width: 75%;
+    margin: 0 auto;
+    margin-bottom: 1em;
+}
+
+.reload {
+    position: relative;
+    top: 0.4em;
+    cursor: pointer;
+    user-select: none;
+}
+
+.reload.loading {
+    mat-icon {
+        animation: rotate 1s linear infinite;
+    }
+}
+
+/*
+tab css
+
+*/
+
+.cursor-pointer {
+    cursor: auto !important;
+}
+
+.toby {
+    .form-group.selected {
+        div.selected {
+            border-bottom: inherit;
+            margin: inherit;
+        }
+        label {
+            position: relative;
+            padding-left: 0px;
+            cursor: pointer;
+            line-height: 20px;
+            display: inline-block;
+            font-weight: normal;
+            &::before {
+                content: '';
+                display: inline-block;
+                position: absolute;
+                bottom: -10px;
+                left: 0;
+                right: 0;
+                margin: 0 auto;
+                width: 70%;
+                border-bottom: 3px solid $color-tt-primary;
+                @include transition(all 350ms);
+                @include radius(20px);
+            }
+        }
+    }
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}

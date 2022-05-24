@@ -1,0 +1,18 @@
+<div class="finished-products-container">
+    <div class="row header no-border" *ngIf="!isRoot">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+            <div class="page-title">
+                <div>{{ titles.active.title | translate }}</div>
+                <div class="page-description font-color-primary">
+                    {{ titles.active.description | translate }}
+                </div>
+            </div>
+
+            <button class="go-back-button" *ngIf="!isRoot" [routerLink]="['.']">
+                {{ 'Back' | translate }}
+            </button>
+        </div>
+    </div>
+
+    <router-outlet></router-outlet>
+</div>

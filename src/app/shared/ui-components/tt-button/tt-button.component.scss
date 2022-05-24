@@ -1,0 +1,36 @@
+@import '~styles/variables';
+
+.primary {
+    color: $tt-button-text-color;
+    font-family: $font-family-Semibold;
+    font-size: 14px;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+    background: $tt-button-color-primary;
+}
+.secondary {
+    color: $tt-button-text-color;
+    font-family: $font-family-Semibold;
+    font-size: 14px;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+    background: $tt-button-color-secondary;
+}
+.back {
+    color: $tt-back-button-text-color;
+    font-family: $font-family-Semibold;
+    font-size: 14px;
+    border-radius: 3px;
+    border: solid 2px $tt-button-border-color;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+    background-color: transparent;
+
+    &:hover {
+        color: $tt-back-button-hover-color;
+    }
+}
+
+img.action-icon {
+    width: 20px;
+    height: 20px;
+}

@@ -1,0 +1,103 @@
+<div class="view-container bom-detail-view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div class="mb-3">
+            <div class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pb-2">
+                    <div class="page-title">
+                        <div>{{ 'Product Library management' | translate }}</div>
+                        <div class="page-description font-color-primary">
+                            {{ 'Detailed view of the product associated.' | translate }}
+                        </div>
+                    </div>
+
+                    <div class="pr-0">
+                        <button class="go-back-button" (click)="goBack()">
+                            {{ 'Back' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pl-2 tab-group-wrapper  mat-tab-view-page">
+                <div class="col-md-12">
+                    <mat-tab-group mat-stretch-tabs class="toby">
+                        <mat-tab class="col-xs-3 col-sm-3 col-md-3 col-lg-2" *ngFor="let tab of tabs">
+                            <ng-template mat-tab-label>
+                                <div
+                                    class="form-group bottom cursor-default"
+                                    [ngClass]="{ selected: selectedTab === tab }"
+                                    (click)="handleTabClick(tab)"
+                                >
+                                    <label class="cursor-pointer tab-with-icon">{{ tab | translate }}</label>
+                                    <div [ngClass]="{ selected: selectedTab === tab }"></div>
+                                </div>
+                            </ng-template>
+                        </mat-tab>
+                    </mat-tab-group>
+                </div>
+            </div>
+
+            <div *ngIf="!pageLoading" class="row">
+                <div class="col-md-12">
+                    <div class="additional-info-detail">
+                        <div *ngIf="selectedTab === tabs[0]">
+                            <div class="information-details" *ngFor="let item of bomDetail | keys">
+                                <div class="information-details-block">
+                                    <div class="information-details-block-inner-left">
+                                        <span class="information-details-list">
+                                            {{ item.key | translate }}
+                                        </span>
+                                        <span class="information-details-list">:&nbsp;&nbsp;&nbsp;</span>
+                                    </div>
+                                    <div
+                                        class="information-details-block-inner-right"
+                                        [ngSwitch]="getFieldType(item.value)"
+                                    >
+                                        <span class="information-details-value">
+                                            <span *ngSwitchCase="'Array'">
+                                                <span *ngFor="let data of item.value; let isLast = last">
+                                                    {{ data.value }}% {{ localizationService.getDisplayText(data.id)
+                                                    }}{{ isLast ? '' : ', ' }}
+                                                </span>
+                                            </span>
+                                            <span *ngSwitchCase="'Object'"></span>
+                                            <span *ngSwitchDefault>
+                                                {{
+                                                    item.value && item.value !== 'null' && item.value !== null
+                                                        ? localizationService.getDisplayText(item.value)
+                                                        : ('Not available' | translate)
+                                                }}
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Information Details -->
+                        </div>
+                    </div>
+                    <!-- Additional info detail -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+
+            <div *ngIf="!pageLoading" class="pt-2">
+                <div class="row text-color-primary" *ngIf="selectedTab !== tabs[0]">
+                    <div class="col-md-12 pd-0">
+                        <div *ngIf="!isFetchingAdditionalInfo">
+                            <app-additional-information
+                                [entityId]="id"
+                                [entity]="entity"
+                                [entityData]="additionalInfo"
+                                [fieldResponse]="fieldResponse"
+                            >
+                            </app-additional-information>
+                        </div>
+                        <i class="fa fa-spinner fa-spin ec-loader" *ngIf="isFetchingAdditionalInfo"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

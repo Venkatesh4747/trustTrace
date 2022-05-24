@@ -1,0 +1,74 @@
+.add-more-certification {
+    margin-top: 15px;
+    width: 175px;
+}
+.upload-po-text {
+    width: 120px;
+}
+.remove-certifications {
+    padding-left: 10px;
+    cursor: pointer;
+}
+#upload .fileName {
+    display: inline-block;
+    margin-left: 10px;
+    max-width: 190px !important;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+#upload .fileInputList {
+    padding: 0;
+    li {
+        list-style: none;
+        padding-bottom: 5px;
+        div {
+            display: inline;
+        }
+    }
+}
+
+#upload a {
+    color: #000000;
+    cursor: pointer;
+}
+
+#upload input {
+    display: none;
+}
+
+#upload .files {
+    width: 270px;
+    padding: 5px 12px;
+    margin: 2px 0;
+    background-color: #000;
+    color: #fff;
+    font-size: 12px;
+}
+
+#upload .files .download {
+    cursor: pointer;
+}
+
+#upload .files .delete {
+    cursor: pointer;
+    color: #ff0000;
+}
+
+#upload .files .delete i {
+    vertical-align: middle;
+    font-size: 17px;
+}
+
+.upload-file-button b {
+    display: inline-block;
+    margin-top: 5px;
+    margin-right: 20px;
+}
+
+.upload-file-button {
+    display: inline-block;
+    height: 30px !important;
+}

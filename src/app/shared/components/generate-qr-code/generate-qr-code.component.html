@@ -1,0 +1,15 @@
+<div id="{{ qrCodeId }}">
+    <!-- <ngx-qrcode [qrc-element-type]="qrCode.elementType" [qrc-value]="qrCode.value" qrc-class="aclass" qrc-errorCorrectionLevel="L">
+                                                                </ngx-qrcode> -->
+    <ngx-qrcode
+        [value]="getFormattedText(qrId)"
+        errorCorrectionLevel="L"
+        cssClass="qr-code-container"
+        class="qr-code-style"
+    >
+    </ngx-qrcode>
+    <div class="generated-id">{{ getFormattedText(qrId) }}</div>
+</div>
+<button type="button" class="btn tt-btn tt-btn-slim tt-btn-outline-secondary mt-1" (click)="printQRCode()">
+    {{ 'Print' | translate }}
+</button>

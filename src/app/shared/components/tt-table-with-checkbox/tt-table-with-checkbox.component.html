@@ -1,0 +1,25 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="mateiral-checkbox-section">
+            <ul class="material-checkbox-header">
+                <li>
+                    <mat-checkbox [(ngModel)]="masterSelected" (change)="checkUncheckAll()" value="m1">
+                        <b>{{ 'Select all' | translate }}</b>
+                    </mat-checkbox>
+                </li>
+            </ul>
+            <ul class="material-checkbox-body">
+                <li class="material-checkbox-body-list" *ngFor="let item of checklist">
+                    <mat-checkbox [(ngModel)]="item.isSelected" (change)="onSelection()" value="{{ item.id }}">
+                        <div class="user-details">
+                            <p>
+                                <b>{{ item.name }}</b>
+                            </p>
+                            <!-- <p>Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do</p> -->
+                        </div>
+                    </mat-checkbox>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+<div class="bread-crumb">
+    <div class="bread-crumb-inner">
+        <!-- Patch for breadcrumb not loading on login -->
+        <!-- Error on logout/login: ExpressionChangedAfterItHasBeenCheckedError -->
+        <ng-template #static_breadcrumb>
+            <ul class="list-unstyled list-inline">
+                <li *ngFor="let breadcrumb of breadcrumbs; let last = last; let first = first" class="breadcrumb-item">
+                    <a [routerLink]="[breadcrumb.url]" *ngIf="!first">
+                        {{ breadcrumb.label }}
+                    </a>
+
+                    <a [routerLink]="[breadcrumb.url]" *ngIf="first">
+                        <i class="fa fa-home"></i>
+                    </a>
+
+                    <i style="margin-left: 5px;" *ngIf="!last" class="fa fa-angle-right"></i>
+                </li>
+            </ul>
+        </ng-template>
+
+        <ul class="list-unstyled list-inline" *ngIf="(breadcrumbs$ | async) as breadcrumbs; else static_breadcrumb">
+            <li *ngFor="let breadcrumb of breadcrumbs; let last = last; let first = first" class="breadcrumb-item">
+                <a [routerLink]="[breadcrumb.url]" *ngIf="!first">
+                    {{ breadcrumb.label }}
+                </a>
+
+                <a [routerLink]="[breadcrumb.url]" *ngIf="first">
+                    <i class="fa fa-home"></i>
+                </a>
+
+                <i style="margin-left: 5px;" *ngIf="!last" class="fa fa-angle-right"></i>
+            </li>
+        </ul>
+    </div>
+</div>

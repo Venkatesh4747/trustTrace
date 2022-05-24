@@ -1,0 +1,12 @@
+<div class="template">
+    <ng-container [ngSwitch]="inputType">
+        <ng-container *ngSwitchCase="'SINGLE_SELECT'">
+            <ng-template #multiSelectContainer> </ng-template>
+        </ng-container>
+        <ng-container *ngSwitchCase="'MULTI_SELECT'">
+            <ng-template #multiSelectContainer> </ng-template>
+        </ng-container>
+        <ng-container *ngSwitchCase="'TEXT'"> </ng-container>
+        <div *ngSwitchDefault>{{ 'Invalid input type' | translate }}</div>
+    </ng-container>
+</div>

@@ -1,0 +1,226 @@
+<div class="view-container text-center" [ngStyle]="{ 'top.px': dashboardContainerTop }">
+    <div class="view-container-content">
+        <div class="container-fluid dashboard-outer dashboard-chart-outer">
+            <div class="row header">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pl-3 pt-3">
+                    <div class="view-container-header-block">
+                        <div
+                            class="view-container-header-block-inner"
+                            [ngClass]="{ success: status, 'icon--active': !status }"
+                        >
+                            <div class="page-title">{{ chartName | translate }}</div>
+                            <div class="page-description">
+                                {{ desc | translate }}
+                            </div>
+                        </div>
+                        <div class="active-right-side-navbar">
+                            <div class="navbar-right-side-header-block">
+                                <span
+                                    class="chart-list-title"
+                                    [ngClass]="{ success: status, 'icon--active': !status }"
+                                    >{{ 'All Charts' | translate }}</span
+                                >
+                                <button
+                                    class="icon icon--transparent"
+                                    (click)="clickEvent()"
+                                    [ngClass]="{ success: status, 'icon--active': !status }"
+                                >
+                                    <span class="navbar-icon"></span>
+                                    <span class="navbar-icon"></span>
+                                    <span class="navbar-icon"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard">
+                <div class="dashboard-section" [ngClass]="{ success: status, 'icon--active': !status }">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div
+                                class="dashboard-section-block"
+                                id=""
+                                [ngStyle]="{ 'top.px': thumbnailWrapperTop }"
+                                (scroll)="sendThumbnailViewChangedEvent()"
+                            >
+                                <div class="dashboard-section-block" *ngIf="showChartDetail">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <app-charts
+                                                [chartDetailData]="chartData"
+                                                (favorites)="updateFavCharts($event)"
+                                                (chartName)="getDisplayName($event)"
+                                            ></app-charts>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="no-data-chart" *ngIf="showNoDataChart">
+                    <img src="{{ env.IMG_URL }}images/no-data-chart.png" />
+                    <p>{{ 'No Data Available' | translate }}</p>
+                </div>
+
+                <div class="navbar-right-side-menu-chart" [ngClass]="{ success: status, 'icon--active': !status }">
+                    <div class="navbar-right-block" [ngClass]="{ success: status, 'icon--active': !status }">
+                        <div class="nav navbar navbar-right">
+                            <div class="navbar-right-inner">
+                                <div class="navbar-right-search">
+                                    <h5 class="chart-menu-title">
+                                        {{ 'All Charts' | translate }}
+                                    </h5>
+                                    <div class="right-menu-search-block" *ngIf="isNotFoodIndustry">
+                                        <div class="search-input">
+                                            <span class="fa fa-search"></span>
+                                            <input
+                                                placeholder="{{ 'Search' | translate }} "
+                                                [(ngModel)]="searchText"
+                                                (ngModelChange)="changeStep()"
+                                            />
+                                            <button
+                                                class="clear-btn"
+                                                [disableRipple]="true"
+                                                *ngIf="searchText"
+                                                matSuffix
+                                                mat-icon-button
+                                                aria-label="Clear"
+                                                (click)="clearSearch()"
+                                            >
+                                                <mat-icon class="mat-icon-clear">close</mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="navbar-material-collapse">
+                                    <div class="right-side-expansion-panel-block">
+                                        <mat-expansion-panel
+                                            (opened)="favOpenClose()"
+                                            (closed)="panelOpenState = false"
+                                            [expanded]="panelOpenState"
+                                        >
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-description>
+                                                    {{ 'Favorites' | translate }}
+                                                </mat-panel-description>
+                                            </mat-expansion-panel-header>
+                                            <ul class="chart-list-items">
+                                                <ng-container *ngIf="favoriteConfig.length > 0">
+                                                    <li
+                                                        class="chart-list"
+                                                        *ngFor="let chart of favoriteConfig; let chartInd = index"
+                                                        [ngClass]="{
+                                                            'panel-active':
+                                                                active &&
+                                                                chartInd === index &&
+                                                                'Favorites' === categoryName
+                                                        }"
+                                                    >
+                                                        <span
+                                                            class="fav-list-items"
+                                                            (click)="
+                                                                onChartClick(
+                                                                    chart.itemId,
+                                                                    chart.customFieldId,
+                                                                    chart.chartType
+                                                                );
+                                                                activeChartName(chartInd, 'Favorites')
+                                                            "
+                                                        >
+                                                            {{ chart.displayName | translate }}
+                                                        </span>
+                                                    </li>
+                                                </ng-container>
+                                                <li *ngIf="favoriteConfig.length === 0">
+                                                    <span
+                                                        [ngClass]="{ chartListDisabled: favoriteConfig.length === 0 }"
+                                                        >{{
+                                                            'You have no charts in favorites. Start adding!' | translate
+                                                        }}</span
+                                                    >
+                                                </li>
+                                            </ul>
+                                        </mat-expansion-panel>
+                                        <mat-expansion-panel
+                                            (opened)="setStep(catInd)"
+                                            [expanded]="step === catInd"
+                                            (closed)="
+                                                step === catInd && step != -1 && collapseFlag === true
+                                                    ? setStep(catInd)
+                                                    : ''
+                                            "
+                                            *ngFor="
+                                                let category of chartConfig
+                                                    | expandCollapse: { displayName: searchText };
+                                                let catInd = index
+                                            "
+                                        >
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-description (click)="changeType(catInd)">
+                                                    <div class="selected-menu-items">
+                                                        <label class="category-label">{{
+                                                            category.displayName | translate
+                                                        }}</label>
+                                                    </div>
+                                                </mat-panel-description>
+                                            </mat-expansion-panel-header>
+                                            <ng-container>
+                                                <ul class="chart-list-items">
+                                                    <li
+                                                        class="chart-list"
+                                                        *ngFor="
+                                                            let chart of category.items
+                                                                | searchFilter: { displayName: searchText };
+                                                            let chartInd = index
+                                                        "
+                                                        [ngClass]="{
+                                                            'panel-active':
+                                                                active &&
+                                                                chartInd === index &&
+                                                                category.displayName === categoryName
+                                                        }"
+                                                    >
+                                                        <div
+                                                            class="chart-list-items-inner"
+                                                            (click)="
+                                                                onChartClick(
+                                                                    chart.itemId,
+                                                                    chart.customFieldId,
+                                                                    chart.chartType,
+                                                                    chartInd
+                                                                );
+                                                                activeChartName(chartInd, category.displayName)
+                                                            "
+                                                        >
+                                                            <span>
+                                                                {{ chart.displayName | translate }}
+                                                            </span>
+                                                            <div
+                                                                class="faviorites-icon"
+                                                                [ngClass]="{
+                                                                    'fav-icon-active': isfavIconActive(
+                                                                        chart.displayName
+                                                                    )
+                                                                }"
+                                                            >
+                                                                <span class="fa fa-star"></span>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </ng-container>
+                                        </mat-expansion-panel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

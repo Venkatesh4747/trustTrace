@@ -1,0 +1,145 @@
+<ul>
+    <ng-template #recursiveList let-items>
+        <li *ngFor="let item of items" class="main-child">
+            <div class="dash-pointer-vertical"></div>
+            <a
+                class="child"
+                [ngClass]="{
+                    'item-selected':
+                        selectedArticleName &&
+                        selectedArticleName.articleName === item.supplyChainArticle.internalArticleName
+                }"
+                (click)="handleSelect(item.supplyChainArticle.internalArticleName)"
+            >
+                <div class="material" [ngClass]="">
+                    <ng-template [ngIf]="item.supplyChainArticle.supplierLink">
+                        <a (click)="navigateToSupplierProfile(item.supplyChainArticle.supplierLink)">
+                            <p class="materials-heading">
+                                <span class="materials-heading" *ngIf="canShowSupplierName(item)">
+                                    {{ item.supplyChainArticle.supplierName }}
+                                </span>
+                                <span
+                                    class="materials-heading display-block"
+                                    *ngIf="
+                                        item.supplyChainArticle.supplierOtherInfo &&
+                                        item.supplyChainArticle.supplierOtherInfo.address &&
+                                        (item.supplyChainArticle.supplierOtherInfo.address.city ||
+                                            item.supplyChainArticle.supplierOtherInfo.address.country)
+                                    "
+                                >
+                                    {{
+                                        item.supplyChainArticle.supplierOtherInfo.address.city
+                                            ? item.supplyChainArticle.supplierOtherInfo.address.city
+                                            : ''
+                                    }}
+                                    {{
+                                        item.supplyChainArticle.supplierOtherInfo.address.city &&
+                                        item.supplyChainArticle.supplierOtherInfo.address.country
+                                            ? ','
+                                            : ''
+                                    }}
+                                    {{
+                                        item.supplyChainArticle.supplierOtherInfo.address.country
+                                            ? item.supplyChainArticle.supplierOtherInfo.address.country
+                                            : ''
+                                    }}
+                                </span>
+                                <span *ngIf="item.metaData && item.metaData.isAgentNode"
+                                    >({{ 'Agent' | translate }})</span
+                                >
+                                <span *ngIf="item.supplyChainArticle.facilityName">
+                                    - {{ item.supplyChainArticle.facilityName }}</span
+                                >
+                            </p>
+                        </a>
+                    </ng-template>
+
+                    <ng-template [ngIf]="!item.supplyChainArticle.supplierLink">
+                        <p class="materials-heading">
+                            <span *ngIf="canShowSupplierName(item)">
+                                {{ item.supplyChainArticle.supplierName }}
+                            </span>
+                            <span
+                                class="display-block"
+                                *ngIf="
+                                    item.supplyChainArticle.supplierOtherInfo &&
+                                    item.supplyChainArticle.supplierOtherInfo.address &&
+                                    (item.supplyChainArticle.supplierOtherInfo.address.city ||
+                                        item.supplyChainArticle.supplierOtherInfo.address.country)
+                                "
+                            >
+                                {{
+                                    item.supplyChainArticle.supplierOtherInfo.address.city
+                                        ? item.supplyChainArticle.supplierOtherInfo.address.city
+                                        : ''
+                                }}
+                                {{
+                                    item.supplyChainArticle.supplierOtherInfo.address.city &&
+                                    item.supplyChainArticle.supplierOtherInfo.address.country
+                                        ? ','
+                                        : ''
+                                }}
+                                {{
+                                    item.supplyChainArticle.supplierOtherInfo.address.country
+                                        ? item.supplyChainArticle.supplierOtherInfo.address.country
+                                        : ''
+                                }}
+                            </span>
+                            <span *ngIf="item.metaData && item.metaData.isAgentNode">({{ 'Agent' | translate }})</span>
+                            <span *ngIf="item.supplyChainArticle.facilityName">
+                                - {{ item.supplyChainArticle.facilityName }}</span
+                            >
+                        </p>
+                    </ng-template>
+                    <p class="materials-subheading" *ngIf="!showDetails">
+                        {{ localeService.getDisplayText(item.supplyChainArticle.articleTypeId) }}
+                    </p>
+                    <div class="materials-subheading" *ngIf="showDetails">
+                        <p>{{ localeService.getDisplayText(item.supplyChainArticle.articleTypeId) }}</p>
+                        <p>{{ item.poNumber ? 'PO # ' + item.poNumber : ('PO # Not Available' | translate) }}</p>
+                        <p>{{ item.supplyChainArticle.internalArticleName || ('Not Available' | translate) }}</p>
+                        <p class="material-comp" *ngIf="item.supplyChainArticle.materialComposition">
+                            <ng-container
+                                *ngFor="
+                                    let materialComp of item.supplyChainArticle.materialComposition;
+                                    let isLast = last
+                                "
+                            >
+                                {{ localeService.getDisplayText(materialComp.id) }}-{{
+                                    materialComp.value ? materialComp.value : ('NA' | translate)
+                                }}
+                                <ng-container *ngIf="!isLast">,&nbsp;</ng-container>
+                            </ng-container>
+                        </p>
+                    </div>
+                    <!-- <img
+                        class="materials-icon icon-at-end pb-1"
+                        src="{{ env.IMG_URL }}images/icons/products/{{ item.supplyChainArticle.articleTypeId }}.png"
+                    /> -->
+                    <div class="tree-view-traceable-icon" *ngIf="item?.traceable === 'yes'">
+                        <img class="traceable-icons" src="{{ env.IMG_URL }}images/traced.png" alt="Traceable" />
+                    </div>
+                    <app-img
+                        [src]="getSrc(item)"
+                        [alt]="item.supplyChainArticle.articleTypeId"
+                        [default]="default"
+                        class="materials-icon icon-at-start tree-view-image-icon"
+                    >
+                    </app-img>
+                </div>
+            </a>
+            <ul *ngIf="item.productSupplyChainList && item.productSupplyChainList.length > 0">
+                <li>
+                    <div class="dash-no-pointer-vertical" *ngIf="item.productSupplyChainList.length > 1"></div>
+                    <ul>
+                        <ng-container
+                            *ngTemplateOutlet="recursiveList; context: { $implicit: item.productSupplyChainList }"
+                        >
+                        </ng-container>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ng-template>
+    <ng-container *ngTemplateOutlet="recursiveList; context: { $implicit: items }"></ng-container>
+</ul>

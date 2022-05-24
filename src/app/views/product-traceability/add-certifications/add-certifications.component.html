@@ -1,0 +1,99 @@
+<div class="no-assessments" *ngIf="certifications.length === 0 && isDisabled">
+  {{'No Certifications' | translate}}
+</div>
+<div *ngIf="(certifications.length === 0 && !isDisabled) || (certifications.length > 0)">
+  <div *ngFor="let certification of certifications">
+    <div class="row" *ngIf="certification.type !== ''; else else_block">
+      <div class="col-md-3">
+        <select name="certifcations"
+                class="form-control"
+                id="certifcations"
+                [(ngModel)]="certification.type"
+                [disabled]="isDisabled">
+          <option [value]="certification.type">
+            {{localeService.getDisplayText(certification.type)}}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <div class="form-control file_upload_button" id="file_upload_button-certification"
+              (click)="InvokeCertificationFileUpload(certification.type)">
+          <span class="disabled-text upload-po-text">{{'Upload Certification' | translate}}</span>
+          <span class="pull-right">
+            <i class="fa fa-upload"></i>
+          </span>
+        </div>
+        <input type="file"
+                class="hidden"
+                id="file_upload_{{certification.type}}"
+                name="file_upload_{{certification.type}}"
+                (change)="uploadCertification(certification.type, $event.target.files)"
+                [(ngModel)]="certificationFile" [hidden]="true" [disabled]="isDisabled" />
+      </div>
+      <div class="col-md-4 uploaded-files-container" id="upload">
+        <ul class="fileInputList">
+          <li *ngFor="let file of certification.files"
+              [tooltip]="file" data-placement="right">
+            <div class="files download"
+                  (click)="getUploadedFile(certification.attachmentId, file)">
+              <i class="fa fa-download"></i>
+              <span class="fileName">{{file}}</span>
+            </div>
+            <div class="remove-certifications" (click)="removeCertification(certification.attachmentId, file)" *ngIf="!isDisabled"><i class="fa fa-trash"></i></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <ng-template #else_block>
+      <div class="row">
+        <div class="col-md-3">
+          <select name="certifcations"
+                  class="form-control"
+                  id="certifcations"
+                  [(ngModel)]="selectedCertificateType"
+                  [disabled]="isDisabled">
+            <option value="Select Certifications" selected disabled>{{'Select Certifications' | translate}}</option>
+            <option [value]="cert_type" *ngFor="let cert_type of certifications_types | sortByFilter">
+              {{localeService.getDisplayText(cert_type)}}
+            </option>
+          </select>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="form-control file_upload_button" id="file_upload_button-certification"
+                (click)="InvokeCertificationFileUpload(selectedCertificateType)">
+            <span class="disabled-text upload-po-text">{{'Upload Certification' | translate}}</span>
+            <span class="pull-right">
+              <i class="fa fa-upload"></i>
+            </span>
+          </div>
+          <input type="file"
+                  class="hidden"
+                  id="file_upload_{{selectedCertificateType}}"
+                  name="file_upload_{{selectedCertificateType}}"
+                  (change)="uploadCertification(selectedCertificateType, $event.target.files)"
+                  [(ngModel)]="certificationFile" [hidden]="true" [disabled]="isDisabled" />
+        </div>
+        <div class="col-md-4 uploaded-files-container" id="upload">
+            <ul class="fileInputList">
+              <li *ngFor="let file of certification.files"
+                  [tooltip]="file" data-placement="right">
+                <span class="files download"
+                      (click)="getUploadedFile(certification.attachmentId, file)">
+                  <i class="fa fa-download"></i>
+                  <span class="fileName">{{file}}</span>
+                </span>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+  <div class="row" *ngIf="!isDisabled">
+    <div class="col-md-3">
+      <div class="add-more-certification btn btn-gradient" (click)="addMoreCertifications()">
+          <img src="{{env.IMG_URL}}images/plus-btn.png" alt="Add">{{'Add Certification' | translate}}
+      </div>
+    </div>
+  </div>
+</div>

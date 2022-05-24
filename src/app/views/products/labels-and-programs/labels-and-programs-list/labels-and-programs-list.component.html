@@ -1,0 +1,154 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="filter-section">
+            <h3 class="sub-title">{{ 'Filter' | translate }}</h3>
+            <!-- filters start -->
+            <div class="filter-list-block">
+                <ul class="filters-list-left">
+                    <li *ngFor="let filter of filters | keys">
+                        <app-tt-multi-select-search
+                            (selectionChange)="onFilter()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="FILTER_SESSION"
+                            [optionsParam]="optionsParam"
+                            *ngIf="!isGroup(filter.value)"
+                        >
+                        </app-tt-multi-select-search>
+
+                        <app-tt-multi-select-group-search
+                            (selectionChange)="onFilter()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="FILTER_SESSION"
+                            [optionsParam]="optionsParam"
+                            *ngIf="isGroup(filter.value)"
+                        >
+                        </app-tt-multi-select-group-search>
+                    </li>
+                </ul>
+                <ul class="filter-list-right">
+                    <li class="reset-filters">
+                        <button class="button-badge mat-button btn btn-gray" (click)="resetAllFilters()">
+                            {{ 'Reset all filters' | translate }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <!-- filters end -->
+        </div>
+    </div>
+</div>
+
+<div class="row pt-1 pl-15">
+    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 total-count">
+        <app-card-pagination
+            [paginationStart]="paginationCount * DEFAULT_PAGINATION_SIZE + 1"
+            [fetchSize]="DEFAULT_PAGINATION_SIZE"
+            [totalItemsCount]="labelData?.totalCount"
+            moduleName="Labels and Programs"
+            (previous)="onPaginate('back')"
+            (next)="onPaginate('forward')"
+        ></app-card-pagination>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+        <form class="pull-right">
+            <div class="form-group title-right-search">
+                <mat-icon class="search-icon">search </mat-icon>
+                <input
+                    type="search"
+                    placeholder="{{ 'Search for labels' | translate }}"
+                    class="form-control"
+                    (keyup.enter)="onSearch()"
+                    [formControl]="searchFormControl"
+                />
+
+                <div dropdown class="dropdown sort-dropdown">
+                    <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                        <span class="sort-name"
+                            >{{ 'Sort By' | translate }}
+                            <span class="fa fa-angle-down"></span>
+                        </span>
+                    </a>
+                    <ul *dropdownMenu class="dropdown-menu">
+                        <li>
+                            <mat-radio-group [formControl]="sortControl" (change)="onSort()">
+                                <mat-radio-button value="name">{{ 'Alphabetical Order' | translate }}</mat-radio-button>
+                                <mat-radio-button value="create_ts">{{ 'Newly Added' | translate }}</mat-radio-button>
+                            </mat-radio-group>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row table-container">
+    <div class="table-responsive">
+        <table class="table custom-table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">{{ 'Label Name' | translate }}</th>
+                    <th scope="col">{{ 'Supplier' | translate }}</th>
+                    <th scope="col">{{ 'Label Level' | translate }}</th>
+                    <th scope="col">{{ 'Label Type' | translate }}</th>
+                    <th scope="col">{{ 'Status' | translate }}</th>
+                    <th scope="col">{{ 'Actions' | translate }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of labelData?.searchResponse" (click)="navigateToLabelUpdatePage(item.id)">
+                    <td>
+                        {{ item.name }}
+                    </td>
+                    <td *ngIf="item?.supplier_divisions?.length > 0; else notAvailable">
+                        <span
+                            matTooltip="{{ getValues(item.supplier_divisions, item?.label_type) }}"
+                            class="overflow-with-dots"
+                        >
+                            {{ getValues(item.supplier_divisions, item?.label_type) }}
+                        </span>
+                    </td>
+                    <td *ngIf="item?.label_level; else notAvailable">{{ item.label_level | translate }}</td>
+                    <td *ngIf="item?.label_type; else notAvailable">
+                        {{ item.label_type | translate }}
+                    </td>
+
+                    <td *ngIf="item?.status; else notAvailable">
+                        {{ item.status | translate }}
+                    </td>
+                    <td *ngIf="hasLabelEditAccess">
+                        <button class="action-button" [disabled]="item.status === 'Inactive'">
+                            <img
+                                class="edit-label"
+                                [ngClass]="{ 'not-allowed': item.status === 'Inactive' }"
+                                src="{{ env.IMG_URL }}images/edit.png"
+                                alt="{{ 'Edit Label' | translate }}"
+                                matTooltip="{{ (item.status === 'Inactive' ? 'Inactive' : 'Edit Label') | translate }}"
+                            />
+                        </button>
+                    </td>
+
+                    <ng-template #notAvailable>
+                        <td class="not-available">
+                            {{ 'Not available' | translate }}
+                        </td>
+                    </ng-template>
+                </tr>
+                <tr class="pagination-progress" *ngIf="paginationProgress">
+                    <app-spinner [small]="true"></app-spinner>
+                </tr>
+                <tr class="content-center" *ngIf="labelData?.searchResponse?.length === 0">
+                    <p>
+                        {{ 'No labels and programs available!' | translate }}
+                    </p>
+                </tr>
+            </tbody>
+            <tfoot></tfoot>
+        </table>
+    </div>
+</div>

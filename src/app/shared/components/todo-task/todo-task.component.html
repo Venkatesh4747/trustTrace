@@ -1,0 +1,52 @@
+<div class="todoContainer">
+    <div class="todoTitle">
+        <div class="todo-list-div">
+            <div class="hr">
+                <span class="hr-title">{{ 'TODO LIST' | translate }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="newTodoContainer">
+        <div class="inner-addon left-addon">
+            <span class="glyphicon glyphicon-plus" style="color:#474747"></span>
+            <input
+                type="text"
+                name="newTaskTitle"
+                [disabled]="!canEditSupplierProfile"
+                [(ngModel)]="newTask.title"
+                (keydown.enter)="createTodo()"
+                placeholder="{{ 'Add a task' | translate }}"
+            />
+        </div>
+    </div>
+    <ol class="list-unstyled todoList" *ngIf="todoTask">
+        <li class="todoList-item check_box_group" *ngFor="let task of todoTask.item; let i = index">
+            <input
+                type="checkbox"
+                [disabled]="!canEditSupplierProfile"
+                id="{{ task.title }}"
+                (change)="saveTodoStatus($event, task)"
+                [name]="task.title"
+                [checked]="task.itemStatus === todoStatus.COMPLETED"
+            />
+            <label for="{{ task.title }}">
+                <span></span>
+            </label>
+
+            <input
+                [disabled]="!canEditSupplierProfile"
+                (keydown.enter)="updateTodo(task, i)"
+                #todoItem
+                class="todoEditableItem"
+                *ngIf="todoEditable[i]"
+                [(ngModel)]="task.title"
+            />
+            <span class="{{ task.itemStatus }}" *ngIf="!todoEditable[i]">{{ task.title }}</span>
+            <span
+                (click)="canEditSupplierProfile && removeTodo(task.itemId, i)"
+                class="todoDelete fa fa-trash pull-right"
+            ></span>
+            <span (click)="canEditSupplierProfile && editTodo(i)" class="todoDelete fa fa-pencil pull-right"></span>
+        </li>
+    </ol>
+</div>

@@ -1,0 +1,16 @@
+<!-- Type of button are primary, secondary -->
+<button
+    mat-button
+    class="tt-btn"
+    [ngClass]="[btnClass, btnType]"
+    (click)="onBtnClick()"
+    [disabled]="toBeDisabled"
+    [type]="type"
+>
+    <span *ngIf="btnType === 'action'">
+        <ng-container [ngSwitch]="iconType">
+            <i *ngSwitchCase="ICON_TYPE.FONT_AWESOME" class="fa" [ngClass]="btnIcon"></i>
+            <img *ngSwitchCase="ICON_TYPE.IMAGE" class="action-icon" [src]="btnIcon" />
+        </ng-container> </span
+    >{{ btnText | translate }}
+</button>

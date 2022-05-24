@@ -1,0 +1,279 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header no-border">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pb-1">
+                <div class="page-title">
+                    <div>{{ 'Supply Chain Information' | translate }}</div>
+                    <div class="page-description font-color-primary">
+                        {{ 'Add the details to complete and launch the Traceability Request' | translate }}
+                    </div>
+                </div>
+                <div class="pr-0">
+                    <button class="go-back-button" (click)="commonServices.goBack(['/', 't-trace'])">
+                        {{ 'Back' | translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row create-supply-chain" *ngIf="!pageLoading && supplyChainData">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <form #editSupplyChainForm="ngForm" class="material-input-style-box-type">
+                    <!-- <div class="row" *ngIf="!showTraderInfo">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6">
+                                    <div class="edit-manufacture-details">
+                                        <p class="manufacturer-description">
+                                            Is
+                                            <span class="manufacturer-name">{{
+                                                supplyChainData.supplyChainArticle.supplierName
+                                            }}</span>
+                                            the manufacturer of this product?
+                                        </p>
+                                        <div class="manufacturer-label">
+                                            {{ 'If not select your Manufacturer' | translate }}:
+                                        </div>
+                                        <app-tt-supplier-search
+                                            origin="T-trace"
+                                            placeholder="Supplier"
+                                            [existingValue]="getExisitingDataForSupplierSearch(supplyChainData)"
+                                            (selectionChange)="handleManufacturerChange($event)"
+                                            [required]="true"
+                                            [showCurrentCompanyInTheList]="false"
+                                            unInvitedTooltip="Uninvited Supplier - T-Trace will not be launched since this supplier was not invited to the platform"
+                                            unAcceptedTooltip="Unaccepted Supplier - Requests can be sent but will only be viewed by the Supplier after he accepts your invitation"
+                                        >
+                                        </app-tt-supplier-search>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10">
+                                    <div class="edit-manufacture-radio-block">
+                                        <tt-radio-group
+                                            [ngModel]="modelData.entity"
+                                            name="Entities"
+                                            [title]="'How do you wish to add the information?'"
+                                            [items]="entities"
+                                            [toShowInRow]="true"
+                                            [toBeDisabled]="shouldDisableManufacturerToggle()"
+                                            [additionalInfoInput]="additionalInfoInput"
+                                            (handleTypeChange)="handleOptionChange($event)"
+                                        >
+                                        </tt-radio-group>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" *ngIf="toCollectFromSupplier">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
+                                            <button
+                                                type="button"
+                                                mat-button
+                                                class="btn btn-gray edit-manufacture-btn"
+                                                (click)="launchToSupplier()"
+                                            >
+                                                {{ 'Launch Traceability Request' | translate }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div
+                                            class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-2 pr-3 vertical-dotted-line-container"
+                                        >
+                                            <div class="vertical-dotted-line"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <div class="row" *ngIf="showTraderInfo">
+                        <div class="col-md-12">
+                            <div class="check-trader-block">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <mat-checkbox
+                                            class="text-blue-primary font-regular"
+                                            [(ngModel)]="checkTrader"
+                                            (change)="analyticsCheckTraderChanged()"
+                                            data-cy="ttrace-trader-checkbox"
+                                            name="ttrace-trader"
+                                        >
+                                            {{ 'Check if you are a trader' | translate }}
+                                        </mat-checkbox>
+                                        <div class="manufacturer-name" *ngIf="checkTrader">
+                                            <span>{{ "Enter the manufacturer's name for" | translate }}</span>
+                                            {{ supplyChainData.supplyChainArticle.internalArticleName }} :
+                                        </div>
+                                        <app-tt-supplier-search
+                                            *ngIf="checkTrader"
+                                            origin="T-trace"
+                                            [existingValue]="getExisitingDataForSupplierSearch(supplyChainData)"
+                                            placeholder="{{ 'Supplier' | translate }}"
+                                            (selectionChange)="handleManufacturerChange($event)"
+                                            [required]="checkTrader"
+                                            [showCurrentCompanyInTheList]="false"
+                                            unInvitedTooltip="Uninvited Supplier - T-Trace will not be launched since this supplier was not invited to the platform"
+                                            unAcceptedTooltip="Unaccepted Supplier - Requests can be sent but will only be viewed by the Supplier after he accepts your invitation"
+                                        >
+                                        </app-tt-supplier-search>
+                                    </div>
+                                </div>
+                                <div class="row" *ngIf="checkTrader">
+                                    <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10">
+                                        <tt-radio-group
+                                            [ngModel]="modelData.entity"
+                                            name="Entities"
+                                            [title]="'How do you wish to add the information?'"
+                                            [items]="entities"
+                                            [toShowInRow]="true"
+                                            (handleTypeChange)="handleOptionChange($event)"
+                                        >
+                                        </tt-radio-group>
+                                    </div>
+                                </div>
+                                <div class="row" *ngIf="checkTrader && toCollectFromSupplier">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <mat-checkbox
+                                            class="text-blue-primary font-regular collect-maufacture-checkbox"
+                                            [(ngModel)]="checkNewProductName"
+                                            data-cy="ttrace-new-product-name-checkbox"
+                                            name="ttrace-new-product-name"
+                                        >
+                                            {{ 'Check if you want to add a new name for' | translate }}
+                                            <div class="manufacturer-name">{{ productName.label }} :</div>
+                                        </mat-checkbox>
+                                        <input
+                                            type="text"
+                                            matInput
+                                            id="info"
+                                            name="new-product-name"
+                                            class="form-control"
+                                            placeholder="{{ 'Enter New Name and Number' | translate }}"
+                                            [(ngModel)]="productName.tradeName"
+                                            [readonly]="!checkNewProductName"
+                                            [required]="checkNewProductName"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="row" *ngIf="checkTrader && toCollectFromSupplier">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-xs-6 col-sm-4 col-md-2 col-lg-2 mt-2">
+                                                <button
+                                                    type="button"
+                                                    mat-button
+                                                    class="btn btn-gray"
+                                                    (click)="launchToSupplier()"
+                                                >
+                                                    {{ 'Launch Traceability Request' | translate }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row position-relative" *ngIf="!isConstructingPayload && supplyChainData">
+                        <div
+                            class="col-xs-12 col-sm-12 col-md-12 col-lg-12"
+                            id="toCollectFromSupplier-overlay"
+                            *ngIf="toCollectFromSupplier"
+                        ></div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <!-- <div class="row pt-2 pl-1">
+                                <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 pl-25">
+                                    <mat-label class="tt-title">
+                                        {{ 'Enter the data by yourself below' | translate }}:
+                                    </mat-label>
+                                </div>
+                            </div> -->
+                            <div class="row pt-2">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                                    <div class="table-cont table-t-trace table-responsive mt-0 ml-0 pl-0 pr-0">
+                                        <table class="table custom-table table-striped last-child-width-auto">
+                                            <thead class="product-category-thead">
+                                                <tr>
+                                                    <th>
+                                                        {{ 'Article Type' | industry | translate
+                                                        }}<span class="color-red">*</span>
+                                                    </th>
+                                                    <th>
+                                                        {{ 'Article Name / No' | industry | translate
+                                                        }}<span class="color-red">*</span>
+                                                    </th>
+                                                    <th>
+                                                        {{ 'Supplier Article Name' | industry | translate }}
+                                                    </th>
+                                                    <th>
+                                                        {{ 'Supplier Name' | translate
+                                                        }}<span class="color-red">*</span>
+                                                    </th>
+                                                    <th *ngIf="showFacilityColumn">
+                                                        {{ 'Facility Name' | translate }}
+                                                    </th>
+                                                    <th>
+                                                        {{ 'Purchase Order No.' | translate }}
+                                                    </th>
+                                                    <th>
+                                                        {{ "Provide Supplier's Data" | translate }}
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="product-category-tbody">
+                                                <div
+                                                    class="loading construct-supply-chain-data"
+                                                    *ngIf="isConstructingPayload"
+                                                >
+                                                    {{ 'Loading' | translate }}&#8230;
+                                                </div>
+                                                <app-edit-entity
+                                                    [entity]="supplyChainData"
+                                                    *ngIf="!isConstructingPayload"
+                                                    name="edit-entity"
+                                                    [scrollTo]="selectedArticleName"
+                                                    [trId]="trId"
+                                                    [toShowFacilityColumn]="showFacilityColumn"
+                                                >
+                                                </app-edit-entity>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Count -->
+                                </div>
+                            </div>
+                            <div class="row mb-2 pr-2">
+                                <div class="talign-right">
+                                    <button
+                                        type="button"
+                                        mat-button
+                                        [disabled]="isSaveDisabled"
+                                        class="btn btn-blue save-btn"
+                                        (click)="analyticsSaveClicked(); saveTr()"
+                                    >
+                                        {{ 'Save' | translate }}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        mat-button
+                                        class="btn btn-gray"
+                                        (click)="analyticsLaunchAndProceedClicked(); launchAndProceed()"
+                                    >
+                                        {{ 'Submit' | translate }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

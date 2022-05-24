@@ -1,0 +1,19 @@
+@import '~styles/variables';
+
+.footer {
+  background: #ececec;
+  padding: 8px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 69px;
+}
+.footer.collapsed {
+  left: $side-nav-bar-width;
+}
+.footer p {
+  color: #9c9b9b;
+  font-size: 13px;
+  text-align: center;
+  margin: 0;
+}

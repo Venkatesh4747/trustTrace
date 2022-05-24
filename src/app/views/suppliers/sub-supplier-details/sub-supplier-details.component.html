@@ -1,0 +1,110 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <div class="main-container pl-2 pr-3 pt-5">
+            <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+            <div class="sub-supplier-profile">
+                <div class="csub-supplier-pic-container">
+                    <img
+                        class="thumbnail img-responsive"
+                        src="{{ profileDetails.logoUrl || getcdnImage('no-company-logo-found.png') }}"
+                        alt="Sub Supplier Logo"
+                    />
+                    <app-address [address]="profileDetails.address" [editVisible]="false"></app-address>
+
+                    <app-contact-info [contact]="profileDetails.contactInfo" [showEditIcon]="false"></app-contact-info>
+                </div>
+            </div>
+            <div class="sub-supplier-statistics">
+                <div class="sub-supplier-location-details">
+                    <div class="sub-supplier-name mr-1">
+                        <p class="sub-supplier-heading" *ngIf="profileDetails.name">
+                            {{ profileDetails.name }}
+                        </p>
+                        <div class="back-button-div">
+                            <div class="pr-0">
+                                <a>
+                                    <button (click)="goBack()" class="go-back-button">
+                                        {{ 'Back' | translate }}
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="sub-supplier-description" *ngIf="profileDetails.description">
+                        {{ profileDetails.description }}
+                    </p>
+                    <p *ngIf="!profileDetails.name && !profileDetails.description">
+                        {{ 'No Sub Supplier details available.' | translate }}
+                    </p>
+                    <div class="back-button-div">
+                        <p class="ml-2 mt-3">{{ 'Sustainability Rating' | translate }}</p>
+                        <span class="rating" *ngFor="let star of ratings">
+                            <ng-container [ngSwitch]="star">
+                                <span *ngSwitchCase="0" class="fa fa-star not-checked ml-1"></span>
+                                <span
+                                    *ngSwitchDefault
+                                    [attr.title]="env.star_rating[star]"
+                                    class="fa fa-star checked ml-1"
+                                ></span>
+                            </ng-container>
+                        </span>
+                    </div>
+                </div>
+                <div class="sub-supplier-stats mt-4">
+                    <div class="flex-container">
+                        <div class="flex-div">
+                            <p class="male-color numbers">{{ profileDetails.employeeCount.men || 0 }}</p>
+                            <p class="male-color title">{{ 'Male Employees' | translate }}</p>
+                        </div>
+                        <div class="flex-div">
+                            <p class="female-color numbers">{{ profileDetails.employeeCount.women || 0 }}</p>
+                            <p class="female-color title">{{ 'Female Employees' | translate }}</p>
+                        </div>
+                        <div class="flex-div">
+                            <p class="others-color numbers">{{ profileDetails.employeeCount.others || 0 }}</p>
+                            <p class="others-color title">{{ 'Others Employees' | translate }}</p>
+                        </div>
+                        <div class="flex-div">
+                            <p
+                                class="sub-supplier-since-color numbers"
+                                *ngIf="profileDetails.associatedSince; else noData"
+                            >
+                                {{ profileDetails.associatedSince | date: 'yyyy' }}
+                            </p>
+                            <ng-template #noData>
+                                <p class="sub-supplier-since-color numbers">{{ 'No Data' | translate }}</p>
+                            </ng-template>
+                            <p class="sub-supplier-since-color title">{{ 'Supplier since' | translate }}</p>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-div-wrapper">
+                        <div [ngClass]="{ 'facility-view': isFacilityProfile }">
+                            <div class="chip-list-div">
+                                <app-chip-list
+                                    [chipList]="profileDetails.valueProcess"
+                                    [title]="SUB_SUPPLIER_CONSTANTS.VALUEPROCESS"
+                                ></app-chip-list>
+                                <app-chip-list
+                                    [chipList]="profileDetails.materials"
+                                    [title]="SUB_SUPPLIER_CONSTANTS.MATERIALS"
+                                ></app-chip-list>
+                                <app-certificates
+                                    [standards]="profileDetails.certifications"
+                                    [masterStandards]="masterStandards"
+                                ></app-certificates>
+                            </div>
+                        </div>
+                        <app-facilities-list
+                            *ngIf="!isFacilityProfile"
+                            [facilities]="profileDetails.facilities"
+                            [facilityCount]="facilitiesCount"
+                            [companyId]="supplierCompanyId"
+                        >
+                        </app-facilities-list>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

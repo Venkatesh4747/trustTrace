@@ -1,0 +1,50 @@
+<div class="modal-page">
+    <div class="modal-header">
+        <h5 class="modal-title">{{ title | translate }}</h5>
+    </div>
+    <form [formGroup]="updateForm" (submit)="onSubmit(updateForm.value)">
+        <div class="modal-body">
+            <p class="modal-description">
+                <strong>{{ ingredientName | translate }}</strong> {{ 'and' | translate }}
+                <span [ngSwitch]="granularityId">
+                    <span *ngSwitchCase="'country_of_origin'">{{
+                        'its country of origin has been added to multiple products. How do you wish to proceed?'
+                            | translate
+                    }}</span>
+                    <span *ngSwitchDefault>
+                        {{ 'is available in multiple products. How do you wish to proceed?' | translate }}</span
+                    >
+                </span>
+            </p>
+            <div class="radio-button-block">
+                <mat-radio-group aria-label="Select an option" formControlName="mode">
+                    <span [ngSwitch]="granularityId">
+                        <mat-radio-button value="all" *ngSwitchCase="'country_of_origin'">
+                            {{
+                                'Apply the same country of origin for all cases where the ingredient is included'
+                                    | translate
+                            }}
+                        </mat-radio-button>
+                        <mat-radio-button value="all" *ngSwitchCase="'production_method'">
+                            {{
+                                'Apply the same production method for all cases where the ingredient is included'
+                                    | translate
+                            }}
+                        </mat-radio-button>
+                        <mat-radio-button value="all" *ngSwitchCase="'ingredient_label'">
+                            {{
+                                'Apply the same ingredient label for all cases where the ingredient is included'
+                                    | translate
+                            }}
+                        </mat-radio-button>
+                    </span>
+                    <mat-radio-button value="current">{{ 'Apply for this alone.' | translate }}</mat-radio-button>
+                </mat-radio-group>
+            </div>
+        </div>
+        <div class="button-block">
+            <button class="btn btn-bordered" (click)="onCancel()" type="button">{{ secondaryBtn | translate }}</button>
+            <button class="btn btn-secondary" type="submit">{{ primaryBtn | translate }}</button>
+        </div>
+    </form>
+</div>

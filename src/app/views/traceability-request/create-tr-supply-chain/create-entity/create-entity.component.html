@@ -1,0 +1,72 @@
+<div class="row" id="{{ entity.supplyChainArticle.internalArticleName }}" provide-parent-form>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="row pl-15 pr-15" *ngIf="addMoreInputs">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                <div class="label-block">
+                    <mat-label class="tt-input-label">
+                        {{ localizationService.getDisplayText(entity.supplyChainArticle.articleTypeId) }}:
+                        <span class="font-regular">{{ getProductName() }}</span>
+                    </mat-label>
+                    <div class="add-more-input" *ngIf="addMoreInputs.length > 0">
+                        <button type="button" mat-button [matMenuTriggerFor]="addMoreInputsMenu">
+                            <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" />
+                            {{ 'Add More Input' | translate }} <i class="fa fa-caret-down pl-1" aria-hidden="true"></i>
+                        </button>
+                        <mat-menu #addMoreInputsMenu="matMenu">
+                            <button
+                                type="button"
+                                mat-menu-item
+                                *ngFor="let item of addMoreInputs"
+                                (click)="addToProductSupplyChainList(item)"
+                            >
+                                {{ localizationService.getDisplayText(item.value) }}
+                            </button>
+                        </mat-menu>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                <div
+                    class="bg-secondary-inner"
+                    *ngFor="let productSupplyChainList of entity.productSupplyChainList; let ind = index"
+                >
+                    <div class="bg-secondary">
+                        <div class="product-category">
+                            <app-create-article
+                                [article]="productSupplyChainList"
+                                [listIndex]="ind"
+                                (handleDelete)="deleteInProductSupplyChainList($event)"
+                                (scrollToElementWithId)="scrollToElementWithId($event)"
+                                [isReadonly]="productSupplyChainList.supplyChainArticle.creationType === 'USER'"
+                                [disableDelete]="entity.productSupplyChainList.length === 1"
+                                [addMoreInputs]="addMoreInputs"
+                                [showFacilityColumn]="toShowFacilityColumn"
+                            >
+                            </app-create-article>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" *ngIf="addMoreInputs">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="row" *ngFor="let productSupplyChain of entity.productSupplyChainList">
+            <div
+                class="col-xs-12 col-sm-12 col-md-12 col-lg-12 position-relative"
+                *ngIf="checkEntityRequired(productSupplyChain)"
+            >
+                <div class="loading construct-supply-chain-data" *ngIf="isConstructingPayload">
+                    {{ 'Loading' | translate }}&#8230;
+                </div>
+                <app-create-entity
+                    [entity]="productSupplyChain"
+                    *ngIf="!isConstructingPayload"
+                    [trId]="trId"
+                    [toShowFacilityColumn]="toShowFacilityColumn"
+                ></app-create-entity>
+            </div>
+        </div>
+    </div>
+</div>

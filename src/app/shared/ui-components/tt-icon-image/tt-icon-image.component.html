@@ -1,0 +1,21 @@
+<ng-container [ngSwitch]="status">
+    <div class="mat-icon mat-done" *ngSwitchCase="'SUBMITTED'">
+        <mat-icon matTooltip="{{ 'Submitted' | translate }}">done</mat-icon>
+    </div>
+    <div class="mat-icon mat-edit" *ngSwitchCase="'DRAFT'">
+        <mat-icon matTooltip="{{ 'Pending Submission' | translate }}">create</mat-icon>
+    </div>
+    <div class="mat-icon spinner" *ngSwitchCase="'ONPROGRESS'">
+        <mat-spinner diameter="16"></mat-spinner>
+    </div>
+    <div class="mat-icon initiated" *ngSwitchCase="'INITIATED'">
+        <mat-icon matTooltip="{{ 'Initiated' | translate }}">sync</mat-icon>
+    </div>
+    <div class="mat-icon mat-done" *ngSwitchCase="'COMPLETED'">
+        <mat-icon matTooltip="{{ 'Completed' | translate }}">done</mat-icon>
+    </div>
+    <div class="mat-icon mat-error-icon" *ngSwitchCase="'ERROR'">
+        <mat-icon matTooltip="{{ 'Error' | translate }}">error</mat-icon>
+    </div>
+    <div *ngSwitchDefault></div>
+</ng-container>

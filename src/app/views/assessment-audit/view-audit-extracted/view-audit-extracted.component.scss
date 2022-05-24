@@ -1,0 +1,109 @@
+@import '~styles/variables';
+.parent-container {
+    padding: 0px 20px 20px 10px;
+    color: $text-font-color;
+    overflow: auto;
+    height: 90vh;
+}
+.title,
+.section-title,
+.section-container {
+    font-family: $font-family-Bold;
+    font-size: 17px;
+}
+.title {
+    float: left;
+}
+.icon {
+    width: 30px;
+    height: 30px;
+    margin-left: 30px;
+    float: right;
+}
+.section-container {
+    padding-top: 50px;
+    .hr {
+        border-bottom: 2px solid #ececec;
+        font-family: $font-family-Semibold;
+        color: #ccc;
+    }
+    .hr-title {
+        font-family: $font-family-Bold;
+        font-size: 14px;
+    }
+    .form-section {
+        padding-top: 45px;
+        padding-left: 20px;
+    }
+}
+
+.audit-standard {
+    background-color: #acf2ff;
+    color: #325992;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.tt-input-label {
+    span {
+        color: red;
+    }
+}
+
+.hint {
+    color: #ed7ba1;
+    font-family: 'Source Sans Pro-Bold';
+    font-size: 13px;
+}
+
+.form-container {
+    height: 93vh;
+    overflow: hidden;
+    overflow-y: auto;
+    overflow: moz-scrollbars-none;
+    padding-right: 20px;
+    &::-webkit-scrollbar {
+        width: 5px !important;
+    }
+}
+
+.btnGroups {
+    float: right;
+    button {
+        margin-right: 10px;
+        margin-bottom: 10px;
+        &.btn {
+            line-height: 40px;
+            &.mr-0 {
+                margin-right: 0;
+            }
+            &:last-child {
+                margin-right: 0px;
+            }
+        }
+    }
+}
+
+.tt-save-btn {
+    width: 120px;
+}
+
+.exp-hint {
+    margin-top: 14px;
+    text-align: left;
+    user-select: text;
+    font-size: 17px;
+    width: 75%;
+    font-family: 'Source Sans Pro-Regular' !important;
+}
+mat-hint {
+    i {
+        background: white;
+        padding: 3px;
+        line-height: 1.2;
+        color: #385e96;
+        cursor: pointer;
+    }
+}

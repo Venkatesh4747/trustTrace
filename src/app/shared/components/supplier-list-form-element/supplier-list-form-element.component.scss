@@ -1,0 +1,94 @@
+@import '../../../../styles/variables';
+
+.loading {
+    text-align: center;
+    user-select: none;
+}
+
+.with-divider {
+    display: block;
+    margin: 0;
+    &-bottom {
+        border-bottom-width: 1px;
+        border-bottom-style: solid;
+        border-bottom-color: rgba(0, 0, 0, 0.12);
+    }
+    &-top {
+        border-top-width: 1px;
+        border-top-style: solid;
+        border-top-color: rgba(0, 0, 0, 0.12);
+    }
+}
+
+.cursor-pointer {
+    mat-option {
+        cursor: pointer !important;
+    }
+}
+
+.mat-chip {
+    background: rgb(156, 253, 205);
+    color: rgb(3, 63, 141);
+}
+.glyphicon-plus {
+    position: absolute;
+    right: 0;
+    color: #474747;
+    margin-left: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+input.mat-chip-input {
+    margin: 8px !important;
+}
+
+.error {
+    position: absolute;
+    top: 52px;
+    font-size: 12px;
+    color: #f44336;
+}
+
+input {
+    color: #325992;
+}
+
+mat-spinner {
+    position: absolute;
+    right: 2px;
+    top: 37%;
+}
+
+.push-right {
+    right: 20px;
+}
+
+.full-width {
+    width: 100% !important;
+}
+
+.audit-custom-style {
+    mat-label {
+        font-family: $font-family-Regular;
+        font-weight: 400 !important;
+        font-size: 14px !important;
+        color: #989898 !important;
+    }
+}
+
+.transaction-custom-style {
+    input {
+        font-size: 14px;
+        color: #325992 !important;
+    }
+}
+
+.search-icon {
+    position: absolute;
+    right: 0px;
+    color: #d4d4d4;
+}
+
+.error-msg {
+    font-size: 10px;
+}

@@ -1,0 +1,27 @@
+@import '~styles/variables';
+
+.additional-info {
+    label {
+        margin-bottom: 20px;
+    }
+}
+
+.tt-radio-button-group .showInRow .mat-radio-button {
+    margin: 0 0;
+}
+
+mat-radio-button {
+    width: fit-content;
+}
+.mat-form-field .mat-form-field-infix {
+    padding-top: 0.5em;
+}
+
+.radio-button-row {
+    &:last-child {
+        display: block;
+    }
+}
+mat-form-field {
+    width: auto;
+}

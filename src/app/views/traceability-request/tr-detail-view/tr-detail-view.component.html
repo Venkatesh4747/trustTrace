@@ -1,0 +1,88 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="supply-chain-view-header" class="row header no-border">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pb-2 align-items-flex-start">
+                <div class="page-title">
+                    <div>{{ 'View Supply Chain Information' | translate }}</div>
+                    <div class="page-description font-color-primary">
+                        {{ 'Know the complete supply chain information' | translate }}
+                    </div>
+                </div>
+                <div class="pr-0">
+                    <div class="header-search flex-direction-column">
+                        <button class="go-back-button" (click)="commonService.goBack(['/', 't-trace'])">
+                            {{ 'Back' | translate }}
+                        </button>
+                        <button class="go-back-button edit-styled-btn width-100-px" (click)="navigateToEdit()">
+                            <i class="fa fa-pencil"></i>{{ 'Edit' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="supply-chain-view-table-title" class="row details-view-container pt-2">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search" *ngIf="supplyChainData">
+                <mat-label class="tt-input-label font-regular">
+                    {{ localeService.getDisplayText(supplyChainData.supplyChainArticle.articleTypeId) }}:
+                    <span class="font-bold">{{ supplyChainData.supplyChainArticle.internalArticleName }}</span>
+                    <span *ngIf="supplyChainData.metaData && supplyChainData.metaData.isAgentNode"
+                        >({{ 'Agent' | translate }})</span
+                    >
+                </mat-label>
+            </div>
+        </div>
+
+        <div id="supply-chain-view-table-header" class="row pt-2 pl-2 pb-5">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="entity-table row m-0">
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 talign-left">
+                        <mat-label class="tt-table-title-with-background">
+                            {{ 'Article Type' | industry | translate }}
+                        </mat-label>
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                        <mat-label class="tt-table-title-with-background">
+                            {{ 'Article Name / No' | industry | translate }}
+                        </mat-label>
+                    </div>
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 p-0 talign-center">
+                        <mat-label class="tt-table-title-with-background">
+                            {{ 'Supplier Name' | translate }}
+                        </mat-label>
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 talign-center">
+                        <mat-label class="tt-table-title-with-background">
+                            {{ 'Purchase Order No.' | translate }}
+                        </mat-label>
+                    </div>
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 p-0 talign-center">
+                        <mat-label class="tt-table-title-with-background">
+                            {{ 'Data Provider' | translate }}
+                        </mat-label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row supply-chain-table pl-25" [ngStyle]="{ 'top.px': height }" *ngIf="supplyChainData">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <app-entity-table-view
+                    [entity]="supplyChainData"
+                    *ngIf="!isConstructingPayload"
+                    [showEntityTitle]="false"
+                >
+                </app-entity-table-view>
+            </div>
+            <div
+                class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-data-available-container"
+                *ngIf="!supplyChainData.productSupplyChainList"
+            >
+                <img src="{{ env.IMG_URL }}images/no-data-chart.png" />
+                <p class="no-data-available">{{ 'No Data Available' | translate }}</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+<div class="tt-radio-button-group">
+    <div class="tt-radio-button-title">
+        {{ title | industry | translate }} <span class="color-red" *ngIf="isRequired">*</span>
+    </div>
+    <div>
+        <mat-radio-group
+            [(ngModel)]="value"
+            [ngClass]="{ showInRow: toShowInRow }"
+            [disabled]="toBeDisabled"
+            data-cy="ttrace-test-radio"
+        >
+            <ng-container *ngFor="let item of items">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="t-trace-mat-buttion-block">
+                            <mat-radio-button
+                                [value]="item"
+                                (click)="!toBeDisabled && handleChange(item)"
+                                attr.data-cy="tt-trace-test-{{
+                                    testAutomationService.normalizeAttributeValue(item[optionalParams.value])
+                                }}"
+                            >
+                                {{ item[optionalParams.value] | translate }}
+                            </mat-radio-button>
+                        </div>
+                    </div>
+                </div>
+
+                <ng-container *ngIf="additinalInfoAvailable(item)">
+                    <div class="additional-info-field-block">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="additional-info-block">
+                                    <mat-form-field
+                                        [floatLabel]="'never'"
+                                        *ngIf="additionalInfoInput.filed.type === 'text'"
+                                    >
+                                        <label for="info">{{ additionalInfoInput.filed.label }}</label>
+                                        <input type="text" matInput id="info" [(ngModel)]="additionalInfo" />
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </mat-radio-group>
+    </div>
+</div>

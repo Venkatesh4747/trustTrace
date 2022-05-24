@@ -1,0 +1,55 @@
+@import '~styles/variables';
+
+.content-center {
+    font-size: 1.6em;
+    color: #a5a5a5;
+    text-align: center;
+    padding: 25px;
+    background: none !important;
+    display: block !important;
+}
+
+.password-key-input {
+    line-height: 1.6 !important;
+}
+
+.revoke-btn {
+    color: #fff;
+    background: #d9534f;
+    border-color: #d43f3a;
+    &:hover {
+        color: #000;
+    }
+}
+
+.center-alignment-spinner {
+    position: relative;
+    display: inline-block;
+    top: 5px;
+    left: 20px;
+}
+
+.btn-gray {
+    height: 40px;
+    align-items: center;
+    vertical-align: middle;
+    line-height: 1.2;
+    &:hover,
+    &:active,
+    &:focus {
+        color: #212121;
+    }
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+.tt-btn:hover {
+    color: #333;
+}
+
+.copyKey {
+    margin-top: 5px;
+    cursor: pointer;
+}

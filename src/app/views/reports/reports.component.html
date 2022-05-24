@@ -1,0 +1,237 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="reports-container" class="reports-container">
+            <div id="reports-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Reports' | translate }}</div>
+                        <div class="page-description">
+                            {{ 'Generate on demand and scheduled reports' | translate }}
+                        </div>
+                    </div>
+                    <div *ngIf="checkAccess('REPORTS_CREATE')" class="header-search">
+                        <button class="btn btn-lg btn-blue pull-right btn-gradient cs-btn" routerLink="record">
+                            <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" />
+                            {{ 'Generate on demand report' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pl-2 tab-group-wrapper mat-tab-view-page">
+                <div class="col-md-12">
+                    <mat-tab-group mat-stretch-tabs class="toby">
+                        <mat-tab class="col-xs-3 col-sm-3 col-md-3 col-lg-2" *ngFor="let module of modules">
+                            <ng-template mat-tab-label>
+                                <div
+                                    class="form-group bottom cursor-default"
+                                    [ngClass]="{ selected: selectedModule === module }"
+                                    (click)="handleModuleSelection(module)"
+                                >
+                                    <label class="cursor-pointer">
+                                        {{ module.name | translate }}
+                                    </label>
+                                </div>
+                            </ng-template>
+                        </mat-tab>
+                    </mat-tab-group>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="card">
+                        <!-- <div class="row">
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 total-count">
+                                <card-pagination
+                                    [paginationStart]="pagination.from + 1"
+                                    [fetchSize]="pagination.size"
+                                    [totalItemsCount]="totalCount"
+                                    [moduleName]="'Transactions'"
+                                    (previous)="onScroll('back')"
+                                    (next)="onScroll('next')"
+                                ></card-pagination>
+                            </div>
+                        </div> -->
+                        <div class="row transactions-table">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="table custom-table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">{{ 'Name of the report' | translate }}</th>
+                                                    <th scope="col">{{ 'Scheduled report' | translate }}</th>
+                                                    <th scope="col">{{ 'On demand report' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngIf="!isFetchingReports && (!reports || reports.length == 0)">
+                                                    <p class="content-center">
+                                                        {{ 'No reports available!' | translate }}
+                                                    </p>
+                                                </tr>
+                                                <tr *ngIf="isFetchingReports">
+                                                    <p class="content-center">
+                                                        <app-spinner [small]="true"></app-spinner>
+                                                    </p>
+                                                </tr>
+                                                <tr *ngFor="let report of reports; let ind = index">
+                                                    <td>{{ report.name | translate }}</td>
+                                                    <td *ngIf="report.latestScheduledReport; else notAvailable">
+                                                        <div class="file-formates">
+                                                            <ul class="file-formates-list">
+                                                                <li
+                                                                    [ngClass]="{
+                                                                        'not-supported': !doesScheduledReportTypeSupported(
+                                                                            supportedFormatTypes[supportedFormatInd],
+                                                                            ind
+                                                                        )
+                                                                    }"
+                                                                    *ngFor="
+                                                                        let supportedFormat of supportedFormatTypes;
+                                                                        let supportedFormatInd = index
+                                                                    "
+                                                                    matTooltip="{{
+                                                                        supportedFormatTypes[supportedFormatInd]
+                                                                            | translate
+                                                                    }}"
+                                                                    (click)="
+                                                                        downloadReportFile(
+                                                                            report.name,
+                                                                            report.latestScheduledReport,
+                                                                            supportedFormatTypes[supportedFormatInd],
+                                                                            report.supportZIPReports
+                                                                        )
+                                                                    "
+                                                                >
+                                                                    {{ supportedFormatTypes[supportedFormatInd] }}
+                                                                </li>
+                                                            </ul>
+                                                            <div class="last-generated-block">
+                                                                <span class="color-gray">
+                                                                    {{ 'Last Generated on' | translate }}
+                                                                    {{
+                                                                        report.latestScheduledReport.createTs
+                                                                            | date: 'MMM dd, yyyy'
+                                                                    }}
+                                                                </span>
+                                                                <span
+                                                                    class="last-generated-block-spinner"
+                                                                    *ngIf="
+                                                                        report.latestScheduledReport.status ===
+                                                                            'INITIATED' ||
+                                                                        report.latestScheduledReport.status ===
+                                                                            'IN_PROGRESS'
+                                                                    "
+                                                                >
+                                                                    <app-spinner [small]="true"></app-spinner>
+                                                                </span>
+                                                            </div>
+                                                            <!-- Last Generated Block -->
+                                                        </div>
+                                                    </td>
+                                                    <td *ngIf="report.latestOnDemandReport; else notAvailable">
+                                                        <div class="file-formates">
+                                                            <ul class="file-formates-list">
+                                                                <li
+                                                                    [ngClass]="{
+                                                                        'not-supported': !doesOnDemandReportTypeSupported(
+                                                                            supportedFormatTypes[index],
+                                                                            ind
+                                                                        )
+                                                                    }"
+                                                                    *ngFor="
+                                                                        let supportedFormat of supportedFormatTypes;
+                                                                        let index = index
+                                                                    "
+                                                                    matTooltip="{{
+                                                                        supportedFormatTypes[index] | translate
+                                                                    }}"
+                                                                    (click)="
+                                                                        downloadReportFile(
+                                                                            report.name,
+                                                                            report.latestOnDemandReport,
+                                                                            supportedFormatTypes[index],
+                                                                            report.supportZIPReports
+                                                                        )
+                                                                    "
+                                                                >
+                                                                    {{ supportedFormatTypes[index] }}
+                                                                </li>
+                                                            </ul>
+                                                            <div class="last-generated-block">
+                                                                <span class="color-gray">
+                                                                    {{ 'Last Generated on' | translate }}
+                                                                    {{
+                                                                        report.latestOnDemandReport.createTs
+                                                                            | date: 'MMM dd, yyyy, hh:mm:ss a'
+                                                                    }}
+                                                                </span>
+                                                                <span
+                                                                    class="last-generated-block-spinner"
+                                                                    *ngIf="
+                                                                        report.latestOnDemandReport.status ===
+                                                                            'INITIATED' ||
+                                                                        report.latestOnDemandReport.status ===
+                                                                            'IN_PROGRESS'
+                                                                    "
+                                                                >
+                                                                    <app-spinner [small]="true"></app-spinner>
+                                                                </span>
+                                                            </div>
+                                                            <!-- Last Generated Block -->
+                                                        </div>
+                                                    </td>
+                                                    <!-- <td>
+                                                        <button class="btn btn-bordered">
+                                                            History
+                                                        </button>
+                                                    </td> -->
+                                                    <ng-template #notAvailable>
+                                                        <td class="content-grey">
+                                                            {{ 'Not Available' | translate }}
+                                                        </td>
+                                                    </ng-template>
+                                                </tr>
+                                            </tbody>
+                                            <!-- <tfoot>
+                                                <tr>
+                                                    <td>
+                                                        <div class="table-footer-block">
+                                                            <ul class="table-footer-block-inner">
+                                                                <li class="table-footer-block-inner-left"></li>
+                                                                <li class="table-footer-block-inner-right">
+                                                                    <div class="transaction-button-block">
+                                                                        <button
+                                                                            class="btn cancel-btn"
+                                                                            type="button"
+                                                                        >
+                                                                            {{ 'Cancel' | translate }}
+                                                                        </button>
+                                                                        <button
+                                                                            class="btn submit-btn"
+                                                                            type="button"
+                                                                        >
+                                                                            {{ 'Submit' | translate }}
+                                                                        </button>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tfoot> -->
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<router-outlet></router-outlet>

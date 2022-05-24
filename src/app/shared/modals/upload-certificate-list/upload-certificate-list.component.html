@@ -1,0 +1,57 @@
+<div class="ec-upload-certificate-modal">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div *ngIf="!pageLoading">
+        <div class="ec-upload-certificate-modal-title">
+            <span>{{ 'Edit / Upload New Files' | translate }}</span>
+            <a (click)="closeDialog()">
+                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+            </a>
+        </div>
+        <div
+            class="ec-upload-certificate-details-container"
+            *ngIf="item.ttCertificate.uploadedFiles && item.ttCertificate.uploadedFiles.length > 0"
+        >
+            <div
+                class="ec-upload-certificate-details"
+                *ngFor="let fileName of item.ttCertificate.uploadedFiles; let cardIndex = index"
+            >
+                <div class="filename">{{ getFileNameFromUrl(fileName) }}</div>
+                <div class="cursor-pointer" *ngIf="!isDeleting[cardIndex]">
+                    <i class="fa fa-trash" (click)="removeFile(item.evidenceId, fileName, cardIndex)"></i>
+                </div>
+                <div *ngIf="isDeleting[cardIndex]">
+                    <app-spinner [small]="true"></app-spinner>
+                </div>
+            </div>
+        </div>
+        <div
+            class="ec-upload-certificate-details-container no-certificates-found"
+            *ngIf="!item.ttCertificate.uploadedFiles || item.ttCertificate.uploadedFiles.length === 0"
+        >
+            <div><img src="{{ utilService.getcdnImage('no-certificate.png') }}" /></div>
+            <div>{{ 'No Certificates Found' | translate }}</div>
+        </div>
+        <div class="drag-file-upload-container">
+            <div class="drag-file-upload" (click)="fileInput.click()">
+                <span *ngIf="!isUploading[unique_id]" class="drag-file-upload-icon">
+                    <mat-icon>arrow_upward</mat-icon>
+                </span>
+                <span *ngIf="!isUploading[unique_id]" class="pl-1">{{
+                    'Click to upload certificate' | translate
+                }}</span>
+                <span *ngIf="isUploading[unique_id]" class="margin-0-auto">
+                    <app-spinner [small]="true"></app-spinner>
+                </span>
+                <input
+                    type="file"
+                    class="hidden"
+                    #fileInput
+                    name="{{ fileInput }}"
+                    (change)="uploadFile($event.target.files, unique_id)"
+                    [hidden]="true"
+                    [disabled]="isUploading[unique_id]"
+                />
+            </div>
+        </div>
+    </div>
+</div>

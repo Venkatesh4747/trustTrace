@@ -1,0 +1,22 @@
+@import '~styles/variables';
+
+#tt-dropdown-search-container {
+    .mat-form-field {
+        width: 100%;
+    }
+}
+.input-element {
+    font-size: 14px;
+    color: $text-color-primary !important;
+}
+input.mat-input-element {
+    font-size: 14px;
+    color: $text-color-primary;
+}
+.error-msg {
+    font-size: 10px;
+}
+
+.tt-dropdown-search-tooltip {
+    font-size: 13px;
+}

@@ -1,0 +1,68 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="record-transaction-container" class="record-transaction-container" *ngIf="!pageLoading">
+            <div class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Record Transaction' | translate }}</div>
+                        <div class="page-description">
+                            {{ 'Record Inbound / Outbound transactions' | translate }}
+                        </div>
+                    </div>
+                    <div>
+                        <a [routerLink]="['/', 'orders-lite']">
+                            <button class="go-back-button">{{ 'Back' | translate }}</button>
+                        </a>
+                    </div>
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row -->
+
+            <div class="row pt-3" id="processes-type">
+                <div class="col-md-offset-4 col-md-4">
+                    <mat-form-field>
+                        <mat-select [(value)]="selectedOption">
+                            <mat-option value="Select Transaction Type" disabled>{{
+                                'Select Transaction Type' | translate
+                            }}</mat-option>
+                            <mat-option *ngFor="let option of options" [value]="option">
+                                {{ option | translate }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+
+            <div class="row pt-3" id="transactions-categories">
+                <div [ngSwitch]="selectedOption">
+                    <div *ngSwitchCase="options[0]">
+                        <!-- Inbound component -->
+                        <app-inbound-transactions></app-inbound-transactions>
+                    </div>
+                    <div *ngSwitchCase="options[1]">
+                        <!-- Outbound component -->
+                        <app-outbound-transactions></app-outbound-transactions>
+                    </div>
+                    <div *ngSwitchDefault>
+                        <div class="row no-transactions-available" *ngIf="selectedOption === 'Select Transaction Type'">
+                            <img
+                                class="no-transaction-image"
+                                src="{{ env.IMG_URL }}images/empty-transaction.png"
+                                alt="Add"
+                            />
+                            <div class="page-title talign-center pt-1">{{ 'Orders / Transactions' | translate }}</div>
+                            <div class="page-description talign-center pt-1">
+                                {{ 'Choose any of the options to add / manage your orders' | translate }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

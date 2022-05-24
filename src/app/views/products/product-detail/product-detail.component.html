@@ -1,0 +1,278 @@
+<app-full-page-loader *ngIf="pageLoading || fullPageSpinner"></app-full-page-loader>
+<div class="product-detail-container" *ngIf="!pageLoading">
+    <section class="product-info pt-3 mt-2">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 pl-2">
+                <ul class="product-detail-list">
+                    <li>
+                        <strong>{{ 'EAN' | translate }}: </strong>
+                        <span>{{ productDetail?.code || ('Not available' | translate) }}</span>
+                    </li>
+                    <li>
+                        <strong>{{ 'Item No.' | translate }} : </strong>
+                        <span>{{ productDetail?.item_number || ('Not available' | translate) }}</span>
+                    </li>
+                    <li>
+                        <strong>{{ 'PLU' | translate }}: </strong>
+                        <span>{{ productDetail?.plu_number || ('Not available' | translate) }}</span>
+                    </li>
+                    <li>
+                        <strong>{{ 'Product' | translate }}: </strong>
+                        <span>{{ productDetail?.name || ('Not available' | translate) }}</span>
+                    </li>
+                    <li *ngIf="isRetailer">
+                        <strong>{{ 'Brand / Supplier' | translate }}: </strong>
+                        <span *ngIf="productDetail?.supplier?.name; else notAvailable">
+                            {{ productDetail.supplier.name }}
+                        </span>
+                    </li>
+                    <li>
+                        <strong>{{ 'Labels' | translate }}: </strong>
+                        <span *ngIf="productDetail && productDetail.product_labels">
+                            <span *ngFor="let label of productDetail?.product_labels; let isLast = last">
+                                {{ label?.value }} {{ isLast ? '' : ',' }}
+                            </span>
+                        </span>
+                        <span
+                            *ngIf="
+                                !productDetail ||
+                                !productDetail?.product_labels ||
+                                productDetail?.product_labels?.length === 0
+                            "
+                            >{{ 'Not available' | translate }}</span
+                        >
+                    </li>
+                    <li *ngIf="isRetailer">
+                        <strong>{{ 'AKTU Code' | translate }}: </strong>
+                        <span *ngIf="productDetail.status?.value; else notAvailable">
+                            {{ productDetail.status.value }}
+                        </span>
+                    </li>
+                    <li>
+                        <strong>{{ 'Country of Manufacturing' | translate }}: </strong>
+                        <span *ngIf="productDetail.country_of_packaging?.value; else notAvailable">{{
+                            productDetail.country_of_packaging.value
+                        }}</span>
+                    </li>
+                    <li>
+                        <strong>{{ 'Last updated by' | translate }}: </strong>
+                        <ng-container
+                            *ngIf="productDetails?.lastModifiedBy || productDetails?.updateTs; else notAvailable"
+                        >
+                            <span>{{ productDetails?.lastModifiedBy || ('Not available' | translate) }}</span>
+                            {{ 'on' | translate }}
+                            <span>{{
+                                (productDetails?.updateTs | date: 'medium') || ('Not available' | translate)
+                            }}</span>
+                        </ng-container>
+                        <ng-template #notAvailable>
+                            {{ 'Not available' | translate }}
+                        </ng-template>
+                    </li>
+                    <li>
+                        <strong>{{ 'Score updated on' | translate }}: </strong>
+                        <ng-container *ngIf="productDetails?.scoreUpdateTs; else notAvailable">
+                            <span>{{
+                                (productDetails?.scoreUpdateTs | date: 'medium') || ('Not available' | translate)
+                            }}</span>
+                        </ng-container>
+                    </li>
+                    <li *ngIf="syncStatus">
+                        <strong (click)="syncProductScore()"
+                            ><a [ngClass]="{ loading: syncStatus === 'Synchronizing' }"
+                                >{{ syncStatus | translate }} <mat-icon class="align-icon">cached</mat-icon></a
+                            ></strong
+                        >
+                    </li>
+                </ul>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" *ngIf="isRetailer">
+                <div class="paginate-btn-group">
+                    <button
+                        mat-button
+                        [disabled]="!previousProductId || previousProductId === null ? true : false"
+                        (click)="onPaginate('previous')"
+                    >
+                        <mat-icon aria-hidden="false" aria-label="Previous">arrow_back_ios</mat-icon>
+                        {{ 'Previous' | translate }}
+                    </button>
+                    <button
+                        mat-button
+                        [disabled]="!nextProductId || nextProductId === null ? true : false"
+                        (click)="onPaginate('next')"
+                    >
+                        {{ 'Next' | translate }}
+                        <mat-icon aria-hidden="false" aria-label="Next">arrow_forward_ios</mat-icon>
+                    </button>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 mt-7">
+                <div class="score-checkbox">
+                    <ng-container *ngIf="isRetailer && hasRetailerEditAccess">
+                        <mat-checkbox
+                            (click)="$event.preventDefault(); openConfirmModal()"
+                            [checked]="showApiScore"
+                        ></mat-checkbox>
+                        <span class="score-enabled">{{ 'Scoring enabled for API' | translate }}</span>
+                        <button
+                            class="info-button"
+                            [popover]="scoreEnablingInstruction"
+                            placement="bottom"
+                            triggers="focus"
+                        >
+                            <mat-icon class="info-icon">info</mat-icon>
+                        </button>
+                    </ng-container>
+                </div>
+            </div>
+            <div
+                class="col-xs-12 col-sm-12 col-md-12 col-lg-6"
+                [ngClass]="{
+                    'mt-3': isRetailer && !hasRetailerEditAccess,
+                    'mt-2': !isRetailer && !hasRetailerEditAccess
+                }"
+            >
+                <div>
+                    <button
+                        *ngIf="isRetailer && hasRetailerEditAccess"
+                        class="score-btn"
+                        [matMenuTriggerFor]="editProductMenuList"
+                    >
+                        <img
+                            class="edit-score"
+                            src="{{ env.IMG_URL }}images/edit.png"
+                            alt="{{ 'Edit Score' | translate }}"
+                        />
+                        {{ 'Edit Product' | translate }}
+                    </button>
+                    <mat-menu class="edit-menu-list" #editProductMenuList="matMenu">
+                        <button (click)="editScore()" mat-menu-item [disabled]="!isScoreAvailable()">
+                            {{ 'Edit Scores' | translate }}
+                        </button>
+                        <button mat-menu-item (click)="onCreateSupplierDeclarationFrom()">
+                            {{ 'Edit Sustainability Declaration' | translate }}
+                        </button>
+                    </mat-menu>
+                    <button
+                        [disabled]="!isScoreAvailable() || isScoreHistoryLoadInProgress"
+                        class="score-btn"
+                        (click)="changeHistory()"
+                    >
+                        <mat-icon class="align-icon">restore</mat-icon>
+                        {{ 'Score History' | translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row declaration-container" *ngIf="productDeclarationFormToggle">
+            <div class="col-md-12 pl-0 pr-0">
+                <div class="table-cont table-responsive mt-0 ml-0 pl-0 pr-0">
+                    <table class="table custom-table table-striped">
+                        <thead class="product-category-thead">
+                            <tr>
+                                <ng-container
+                                    *ngFor="let header of productDeclarationTableHeaders | keys; let first = first"
+                                >
+                                    <th>
+                                        <div class="table-header-filter sort-by-filter">
+                                            <span>{{ header.key | translate }}</span>
+                                            <span *ngIf="header.value.isMandatory" class="color-red"> *</span>
+                                        </div>
+                                    </th>
+                                    <th *ngIf="first"></th>
+                                </ng-container>
+                            </tr>
+                        </thead>
+                        <tbody class="product-category-tbody">
+                            <ng-container *ngIf="productDeclarationConfig !== null; else noProducts">
+                                <tr class="application-product-list">
+                                    <ng-container [formGroup]="productsDeclarationFrom">
+                                        <app-product
+                                            [formControlName]="productDeclarationConfig.id"
+                                            class="application-product"
+                                            [product]="productDeclarationConfig"
+                                            [index]="0"
+                                            [isSimulation]="true"
+                                            #productComponent
+                                        ></app-product>
+                                    </ng-container>
+                                </tr>
+                            </ng-container>
+
+                            <ng-template #noProducts>
+                                <div
+                                    class="no-products-available"
+                                    *ngIf="!fetchingProductDeclarationDetails; else fetching"
+                                >
+                                    <p class="title">
+                                        {{ 'No products found' | translate }}
+                                    </p>
+                                </div>
+                                <ng-template #fetching>
+                                    <div class="fetching">
+                                        <app-spinner [small]="true"></app-spinner>
+                                    </div>
+                                </ng-template>
+                            </ng-template>
+                        </tbody>
+                        <tfoot>
+                            <div *ngIf="productDeclarationConfig !== null">
+                                <div class="button-group">
+                                    <button
+                                        mat-button
+                                        color="primary"
+                                        type="button"
+                                        (click)="onDestroyDeclarationForm()"
+                                        [disabled]="this.isFetchingAdditionalInfo"
+                                    >
+                                        {{ 'Cancel' | translate }}
+                                    </button>
+                                    <button
+                                        mat-button
+                                        color="primary"
+                                        type="button"
+                                        (click)="submitProductDeclaration()"
+                                        [disabled]="this.isFetchingAdditionalInfo"
+                                    >
+                                        {{ 'Submit' | translate }}
+                                    </button>
+                                </div>
+                            </div>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row product-ec">
+            <div *ngIf="!isFetchingAdditionalInfo">
+                <app-additional-information
+                    [entityId]="activeProductId"
+                    [entity]="entity"
+                    [entityData]="additionalInfo"
+                    [fieldResponse]="fieldData"
+                >
+                </app-additional-information>
+            </div>
+            <span class="fa fa-spinner fa-spin ec-loader" *ngIf="isFetchingAdditionalInfo"></span>
+        </div>
+    </section>
+</div>
+<ng-template #scoreEnablingInstruction>
+    <div class="score-info-unordered">
+        <ul class="score-active-info-list">
+            <li>
+                <span>{{ 'Unchecking this checkbox will turn off scores for API.' | translate }}</span>
+            </li>
+            <li class="line-gap">
+                <span>
+                    {{
+                        'Score will still be shown in this page but will sent as Not Available to the Application Program Interface'
+                            | translate
+                    }}
+                </span>
+            </li>
+        </ul>
+    </div>
+</ng-template>

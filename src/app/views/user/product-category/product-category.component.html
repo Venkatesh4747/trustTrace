@@ -1,0 +1,259 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+<div class="row product-category-container" id="product-category-container">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="hr">
+            <span class="hr-title">{{ 'Create New Product Category' | translate }}: </span>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <form [formGroup]="productCategoryForm" class="form-material-block">
+            <div class="row">
+                <div class="col col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    <div class="product-category-name-input text-left">
+                        <mat-form-field [floatLabel]="'never'">
+                            <input
+                                matInput
+                                placeholder="{{ 'Name of the Product Category' | translate }}"
+                                name="pg-pgName"
+                                formControlName="categoryName"
+                                required
+                                data-cy="product-category-name"
+                            />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="col col-xs-3 col-sm-3 col-md-3 col-lg-3"></div>
+                <div class="col col-xs-3 col-sm-3 col-md-3 col-lg-3"></div>
+                <div class="col col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    <div
+                        class="add-product-group-btn cursor-pointer"
+                        (click)="addProductGroup()"
+                        data-cy="product-category-add-btn"
+                    >
+                        <span class="action-icons-big fa fa-plus"></span>
+                        <span>{{ 'Add Product Group' | translate }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row" formArrayName="productGroups">
+                <div
+                    class="col-xs-12 col-sm-12 col-md-12 col-lg-12"
+                    *ngFor="let productGroup of productGroups.controls; let isLast = last; let i = index"
+                    [formGroupName]="i"
+                >
+                    <!-- <div class="row product-group"
+            *ngFor="let productGroup of editableProductCategory.productGroups; let isLast = last; let i = index">  -->
+                    <div class="row">
+                        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 product-group-type">
+                            <mat-form-field [floatLabel]="'never'">
+                                <input
+                                    formControlName="groupName"
+                                    matInput
+                                    placeholder="{{ 'Product Group' | translate }}"
+                                    name="pg-{{ i }}"
+                                    required
+                                    [attr.data-cy]="'product-category-group-' + i"
+                                />
+                            </mat-form-field>
+                        </div>
+                        <div class="col col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <!-- <mat-form-field>
+                        <input *ngIf="!isEditing" matInput placeholder="Sizes"
+                          [(ngModel)]="productGroup.sizes"
+                          (click)="openSettingsModal($event, i, 'size')"
+                          required readonly>
+                      </mat-form-field> -->
+                            <div
+                                class="div-input"
+                                (click)="openSettingsModal($event, i, 'size')"
+                                [attr.data-cy]="'product-category-size-' + i"
+                            >
+                                <span
+                                    class="text-primary-color"
+                                    *ngIf="
+                                        getAllDisplayText(productCategoryForm.value.productGroups[i]['size']).length > 0
+                                    "
+                                    >{{
+                                        getAllDisplayText(productCategoryForm.value.productGroups[i]['size'])
+                                            | truncateText: acceptedStringLength
+                                    }}</span
+                                >
+                                <span
+                                    *ngIf="
+                                        getAllDisplayText(productCategoryForm.value.productGroups[i]['size']).length ===
+                                        0
+                                    "
+                                    >{{ 'Sizes' | translate }}</span
+                                >
+                            </div>
+                        </div>
+                        <div class="col col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <div
+                                class="div-input"
+                                (click)="openSettingsModal($event, i, 'fit')"
+                                [attr.data-cy]="'product-category-fit-' + i"
+                            >
+                                <span
+                                    class="text-primary-color"
+                                    *ngIf="
+                                        getAllDisplayText(productCategoryForm.value.productGroups[i]['fit']).length > 0
+                                    "
+                                    >{{
+                                        getAllDisplayText(productCategoryForm.value.productGroups[i]['fit'])
+                                            | truncateText: acceptedStringLength
+                                    }}</span
+                                >
+                                <span
+                                    *ngIf="
+                                        getAllDisplayText(productCategoryForm.value.productGroups[i]['fit']).length ===
+                                        0
+                                    "
+                                    >{{ 'Fit' | translate }}</span
+                                >
+                            </div>
+                        </div>
+                        <div class="col col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <div
+                                class="div-input"
+                                (click)="openSettingsModal($event, i, 'length')"
+                                [attr.data-cy]="'product-category-length-' + i"
+                            >
+                                <span
+                                    class="text-primary-color"
+                                    *ngIf="
+                                        getAllDisplayText(productCategoryForm.value.productGroups[i]['length']).length >
+                                        0
+                                    "
+                                    >{{
+                                        getAllDisplayText(productCategoryForm.value.productGroups[i]['length'])
+                                            | truncateText: acceptedStringLength
+                                    }}</span
+                                >
+                                <span
+                                    *ngIf="
+                                        getAllDisplayText(productCategoryForm.value.productGroups[i]['length'])
+                                            .length === 0
+                                    "
+                                    >{{ 'Length' | translate }}</span
+                                >
+                            </div>
+                        </div>
+                        <div class="col col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                            <div class="delete-product-group-btn" [attr.data-cy]="'product-category-delete-btn-' + i">
+                                <span class="action-icons-big fa fa-trash" (click)="removeProductGroup(i)"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- </div> -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="pt-3 pb-3 col-xs-12 col-sm-12 col-md-12 col-lg-12 display-flex-justify-flex-end">
+                    <button
+                        type="button"
+                        class="btn btn-blue save-product-category custom-margin mr-1"
+                        data-dismiss="modal"
+                        (click)="resetForm()"
+                        data-cy="product-category-clear-btn"
+                    >
+                        {{ 'Clear' | translate }}
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-gray save-product-category"
+                        data-dismiss="modal"
+                        (click)="saveProductGroup(productCategoryForm.value)"
+                        [disabled]="!productCategoryForm.valid"
+                        *ngIf="!isEditing"
+                        data-cy="product-category-save-btn"
+                    >
+                        {{ 'Save' | translate }}
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-gray save-product-category"
+                        data-dismiss="modal"
+                        (click)="saveProductGroup(productCategoryForm.value)"
+                        [disabled]="!productCategoryForm.valid"
+                        *ngIf="isEditing"
+                        data-cy="product-category-update-btn"
+                    >
+                        {{ 'Update' | translate }}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- List of product groups -->
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 product-group-wrapper">
+        <div class="hr">
+            <span class="hr-title">{{ 'Your list of Product Category' | translate }}: </span>
+        </div>
+
+        <div *ngIf="!productCategories || productCategories.length === 0" class="row pt-2">
+            {{ 'No Product category found' | translate }}
+        </div>
+        <div *ngIf="productCategories" class="pt-2 row product-groups-container">
+            <div
+                class="col-xs-12 col-sm-12 col-md-12 col-lg-12 product-list-container"
+                *ngFor="let category of productCategories; let isLast = last; let i = index"
+            >
+                <div *ngIf="category.status === 'ACTIVE'">
+                    <div class="product-group-name">
+                        <span class="pg-name">{{ category.categoryName }}</span>
+                        <span [attr.data-cy]="'product-category-edit-icon-' + i"
+                            ><span class="action-icons-small fa fa-pencil" (click)="editProductCategory(i)"></span
+                        ></span>
+                        <span [attr.data-cy]="'product-category-delete-icon-' + i"
+                            ><span
+                                class="action-icons-small fa fa-trash"
+                                (click)="removeProductCategory(category)"
+                            ></span
+                        ></span>
+                    </div>
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 product-group-title">
+                        {{ 'Group' | translate }}
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 product-group-title">
+                        {{ 'Size' | translate }}
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 product-group-title">
+                        {{ 'Fit' | translate }}
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 product-group-title">
+                        {{ 'Length' | translate }}
+                    </div>
+                    <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"></div>
+
+                    <div
+                        class="product-group-list"
+                        *ngFor="let productGroupList of category.productGroups; let ind = index"
+                    >
+                        <div class="row margin-r">
+                            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">{{ productGroupList.groupName }}</div>
+                            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                                <span *ngFor="let size of productGroupList.size; let isLastSize = last">
+                                    {{ size.value }}{{ isLastSize ? '' : ',' }}
+                                </span>
+                            </div>
+                            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                                <span *ngFor="let fit of productGroupList.fit; let isLastFit = last">
+                                    {{ fit.value }}{{ isLastFit ? '' : ',' }}
+                                </span>
+                            </div>
+                            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                                <span *ngFor="let length of productGroupList.length; let isLastLength = last">
+                                    {{ length.value }}{{ isLastLength ? '' : ',' }}
+                                </span>
+                            </div>
+                            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"></div>
+                        </div>
+                    </div>
+                    <div class="hr" *ngIf="!isLast"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,157 @@
+<div [class]="options?.customClass ? options?.customClass : 'supplier-list-container'">
+    <ng-container [ngSwitch]="options?.controlType">
+        <div *ngSwitchCase="'single-select'">
+            <mat-form-field
+                [ngClass]="{ 'full-width': options?.fullWidth }"
+                [hideRequiredMarker]="options?.requiredSymbolRemove ? true : false"
+                [floatLabel]="options?.floatLabel ? options?.floatLabel : 'auto'"
+            >
+                <mat-label class="tt-input-label" *ngIf="options?.label"> {{ options?.label | translate }}</mat-label>
+                <input
+                    #inputElement
+                    (focus)="onFocus()"
+                    (keyup)="update('from-input')"
+                    [required]="options?.isRequired"
+                    [placeholder]="options?.placeholder ? (options?.placeholder | translate) : ''"
+                    type="text"
+                    matInput
+                    [matAutocomplete]="auto"
+                    [formControl]="control"
+                    formSubmittedSync
+                    [matTooltip]="options?.isDisabled ? 'Edit not allowed' : ''"
+                    [readonly]="
+                        options?.isDisabled || false || (options?.selectedItem && !state?.selectedValuesPatched)
+                    "
+                    [matTooltipPosition]="options?.tooltipPosition ? options?.tooltipPosition : 'right'"
+                    [attr.data-cy]="data_cy"
+                />
+                <mat-icon
+                    class="search-icon"
+                    aria-hidden="false"
+                    aria-label="Search"
+                    *ngIf="!(options?.selectedItem && !state?.selectedValuesPatched)"
+                    >search</mat-icon
+                >
+                <mat-spinner *ngIf="options?.selectedItem && !state?.selectedValuesPatched" diameter="14"></mat-spinner>
+                <mat-error class="error-msg" *ngIf="options?.isRequired && control.hasError('required')">
+                    {{ getErrorMessagePlaceholder() | translate }}&nbsp;{{ 'is missing' | translate }}</mat-error
+                >
+                <mat-error
+                    class="error-msg"
+                    *ngIf="
+                        options?.errorMessage &&
+                        control.invalid &&
+                        (!options?.isRequired || (options?.isRequired && !control.hasError('required')))
+                    "
+                >
+                    {{ options?.errorMessage | translate }}</mat-error
+                >
+            </mat-form-field>
+        </div>
+        <div *ngSwitchCase="'chip-select'">
+            <mat-form-field
+                [ngClass]="{ 'full-width': options?.fullWidth }"
+                [hideRequiredMarker]="options?.requiredSymbolRemove ? true : false"
+                [floatLabel]="options?.floatLabel ? options?.floatLabel : 'auto'"
+            >
+                <mat-label class="tt-input-label" *ngIf="options?.label"> {{ options?.label }}</mat-label>
+                <mat-chip-list #chipList aria-label="supplier selection">
+                    <mat-chip
+                        *ngFor="let item of multiSelectedValues"
+                        [removable]="options?.isDisabled ? false : true"
+                        (removed)="remove(item)"
+                    >
+                        {{ item.supplier_name }}
+                        <mat-icon matChipRemove *ngIf="options?.isDisabled ? false : true">cancel</mat-icon>
+                    </mat-chip>
+                    <input
+                        (focus)="onFocus()"
+                        #inputElement
+                        (keyup)="update('from-input')"
+                        [required]="options?.isRequired"
+                        [placeholder]="options?.placeholder ? (options?.placeholder | translate) : ''"
+                        type="text"
+                        matInput
+                        [formControl]="multiSelectCtrl"
+                        [matAutocomplete]="auto"
+                        formSubmittedSync
+                        [readonly]="
+                            options?.isDisabled || false || (options?.selectedItem && !state?.selectedValuesPatched)
+                        "
+                        [matChipInputFor]="chipList"
+                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                        [matTooltip]="options?.isDisabled ? 'Edit not allowed' : ''"
+                        [matTooltipPosition]="options?.tooltipPosition ? options?.tooltipPosition : 'right'"
+                        [attr.data-cy]="data_cy"
+                    />
+                    <mat-spinner
+                        class="push-right"
+                        *ngIf="options?.selectedItem && !state?.selectedValuesPatched"
+                        diameter="14"
+                    ></mat-spinner>
+                    <span class="glyphicon glyphicon-plus" (click)="onFocusChipInput()"></span>
+                </mat-chip-list>
+                <p class="error" *ngIf="options?.errorMessage && control.invalid && control.touched">
+                    {{ options?.errorMessage }}
+                </p>
+            </mat-form-field>
+        </div>
+
+        <div *ngSwitchDefault>{{ 'Not valid control type' | translate }}</div>
+    </ng-container>
+</div>
+
+<mat-autocomplete #auto="matAutocomplete" [displayWith]="displayValue.bind(this)" (optionSelected)="selected($event)">
+    <mat-option *ngIf="state?.rawSupplierListLoading" class="loading" disabled readonly [value]="null">
+        <app-spinner [small]="true"></app-spinner>
+    </mat-option>
+    <ng-container *ngIf="filteredList && !state?.rawSupplierListLoading">
+        <ng-container *ngIf="options?.showCurrentCompany">
+            <mat-option
+                *ngIf="!state.currentCompanyAddedToList"
+                class="with-divider-bottom"
+                [value]="currentCompany"
+                [attr.data-cy]="'tt-dropdown-' + displayValue(this.currentCompany)"
+            >
+                {{ displayValue(this.currentCompany) }}
+            </mat-option>
+        </ng-container>
+        <mat-option
+            *ngFor="let item of filteredList | sortByFilter: 'supplier_name'"
+            [value]="item"
+            [attr.data-cy]="'tt-dropdown-' + item?.supplier_name"
+        >
+            <div>
+                <span class="option">
+                    {{ item?.supplier_name }}
+                </span>
+                <span class="pull-right">
+                    <app-supplier-status
+                        [status]="item?.supplier_association_status?.id"
+                        [unInvitedTooltip]="unInvitedTooltip"
+                        [unAcceptedTooltip]="unAcceptedTooltip"
+                    >
+                    </app-supplier-status>
+                </span>
+            </div>
+        </mat-option>
+        <ng-container *ngIf="options?.addSupplierOption">
+            <div class="cursor-pointer" (click)="onCreateAddSupplierModel()">
+                <mat-option class="with-divider-top" disabled [attr.data-cy]="'tt-dropdown-add-new-supplier'">
+                    {{ 'Add new supplier' | translate }}
+                </mat-option>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="!options?.addSupplierOption && !options?.showCurrentCompany">
+            <mat-option
+                disabled
+                [value]="null"
+                *ngIf="filteredList.length === 0"
+                [attr.data-cy]="'tt-dropdown-no-options-found'"
+            >
+                {{ 'No options found!' | translate }}
+            </mat-option>
+        </ng-container>
+    </ng-container>
+</mat-autocomplete>

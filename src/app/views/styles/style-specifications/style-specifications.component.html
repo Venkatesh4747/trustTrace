@@ -1,0 +1,143 @@
+<div class="style-specifications" provide-parent-form>
+    <fieldset class="form-group">
+        <label for="styleName" class="bmd-label-static"
+            >{{ 'Style Name' | industry | translate }}:<span class="color-red">*</span></label
+        >
+        <input type="text" class="form-control styles-text-input" name="styleName" [(ngModel)]="style.name" required />
+    </fieldset>
+    <fieldset class="form-group">
+        <label for="productUniqueCode" class="bmd-label-static">
+            {{ 'Style UID' | industry | translate }}:<span class="color-red">*</span>
+            <span
+                *ngIf="mode === 'create'"
+                [popover]="supplierInfoTemplate"
+                placement="right top"
+                containerClass="tooltipInfo"
+                triggers="mouseenter:mouseleave"
+                class="style-uid-info uniqueid-create-info-title"
+                >{{ 'How to create?' | translate }}</span
+            >
+        </label>
+        <input
+            type="text"
+            class="form-control styles-text-input"
+            name="productUniqueCode"
+            [(ngModel)]="style.productUniqueCode"
+            [readonly]="mode === 'edit'"
+            required
+        />
+    </fieldset>
+    <fieldset class="form-group">
+        <label for="styleCode" class="bmd-label-static">{{ 'Style Number' | industry | translate }}:</label>
+        <input type="text" class="form-control styles-text-input" name="styleCode" [(ngModel)]="style.code" />
+    </fieldset>
+    <fieldset class="form-group">
+        <label for="year" class="bmd-label-static">{{ 'Year' | translate }}:<span class="color-red">*</span></label>
+        <input type="text" class="form-control styles-text-input" name="year" [(ngModel)]="style.year" required />
+        <!-- <span class="color-red" *ngIf="showYearError">Should be min and max (1000 and 3000)</span> -->
+    </fieldset>
+    <fieldset class="form-group style-season-field">
+        <label for="season" class="bmd-label-static">{{ 'Season' | translate }}:<span class="color-red">*</span></label>
+        <app-tt-dropdown-search
+            [searchOptions]="settings['style']['styleSettings']['seasons']"
+            [(ngModel)]="style.season"
+            [floatLabel]="'never'"
+            [optionalParams]="parameters"
+            name="style-season"
+            required
+            [isRequired]="isRequired"
+            data_cy="season"
+        ></app-tt-dropdown-search>
+    </fieldset>
+    <fieldset class="form-group style-season-field">
+        <label for="productType" class="bmd-label-static"
+            >{{ 'Product Type' | translate }}:<span class="color-red">*</span></label
+        >
+        <app-tt-dropdown-search
+            [searchOptions]="settings['productTypes']"
+            [(ngModel)]="style.productType"
+            (selectionChange)="productTypeChange()"
+            [floatLabel]="'never'"
+            [optionalParams]="parameters"
+            name="style-product-type"
+            required
+            [isRequired]="isRequired"
+            data_cy="product-type"
+        >
+        </app-tt-dropdown-search>
+    </fieldset>
+    <fieldset *ngIf="false" class="form-group">
+        <label for="recurringType" class="bmd-label-static">{{ 'Recurring Type' | translate }}:</label>
+        <app-tt-dropdown-search
+            [searchOptions]="settings.style.styleSettings.recurringTypes"
+            [(ngModel)]="style.recurringType"
+            [floatLabel]="'never'"
+            [optionalParams]="parameters"
+            name="style-recurring-type"
+            data_cy="recurring-type"
+        ></app-tt-dropdown-search>
+    </fieldset>
+    <fieldset class="form-group chip-card-input">
+        <label for="productGroup" class="bmd-label-static">{{ 'Product Group' | translate }}:</label>
+        <div class="product-group-items" *ngIf="settings.style?.styleSettings?.productCategories">
+            <div *ngFor="let category of settings.style.styleSettings.productCategories; let pgIndex = index">
+                <label class="bmd-label-static pdt-group-name" *ngIf="category.categoryName"
+                    >{{ category.categoryName }}:</label
+                >
+                <app-tt-dropdown-search
+                    [searchOptions]="category.productGroups"
+                    [(ngModel)]="productGroups[category.id]"
+                    (selectionChange)="confirmProductGroupChange(category.id, $event)"
+                    [ngModelOptions]="{ standalone: true }"
+                    [floatLabel]="'never'"
+                    [optionalParams]="optionalParams"
+                    [isRequired]="isRequired"
+                    required
+                    data_cy="product-group"
+                >
+                </app-tt-dropdown-search>
+            </div>
+        </div>
+    </fieldset>
+
+<!-- sample work starts-->
+    <fieldset class="form-group">
+        <label for="Quantity" class="bmd-label-static">{{ 'Quantity' | translate }}:<span class="color-red">*</span></label>
+        <input type="text" class="form-control styles-text-input" name="Quantity" [(ngModel)]="style.quanity" required />
+        <!-- <span class="color-red" *ngIf="showYearError">Should be min and max (1000 and 3000)</span> -->
+    </fieldset>
+
+    <!-- sample work ends -->
+
+
+</div>
+<!--Style UID info templete start-->
+<ng-template #supplierInfoTemplate>
+    <div class="showTooltipInfo">
+        <p class="tooltip-title">
+            {{ 'What is a Style UID?' | translate }}
+        </p>
+        <p>
+            {{ 'A UID that is to be created for the Styles in TrusTrace platform' | translate }}
+        </p>
+        <p class="tooltip-title">
+            {{ 'Rules to create a UID:' | translate }}
+        </p>
+        <ul>
+            <li>{{ 'Maximum of 100 characters without space.' | translate }}</li>
+            <li>{{ 'Only Alphanumeric' | translate }} [0-9 a-z A-Z]</li>
+            <li>{{ 'Allowed special characters' | translate }}: - (hyphen) _(underscore)</li>
+        </ul>
+        <p>
+            <span class="tooltip-title">{{ 'Sample Style UID:' | translate }}</span> {{ 'Style001' | translate }}
+        </p>
+        <p class="tooltip-title">{{ "Don't have a Style UID?" | translate }}</p>
+        <p>
+            {{ 'Check the' | translate }}
+            <span class="tooltip-title"> {{ 'User Manual' | translate }}</span> >>
+            <span class="tooltip-title"> {{ 'Add styles section' | translate }}</span>
+            {{ 'for the style UID nomenclature.' | translate }}
+        </p>
+    </div>
+</ng-template>
+<!--Style UID info template end-->

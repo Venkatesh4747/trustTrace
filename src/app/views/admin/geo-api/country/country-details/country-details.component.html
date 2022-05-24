@@ -1,0 +1,223 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+
+<div mat-dialog-content class="mod-comp country-comp">
+    <form [formGroup]="countryForm" (ngSubmit)="onAddCountry()">
+        <div class="row">
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Name</mat-label>
+                    <input type="text" aria-label="countryname" matInput [readonly]="editable" formControlName="name" />
+                </mat-form-field>
+                <p *ngIf="handlingFormErrors('name', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p *ngIf="handlingFormErrors('name', validators.PATTERN)">
+                    Only alphabets
+                </p>
+                <p *ngIf="handlingFormErrors('name', validators.MINLENGTH)">
+                    Must be 3 characters long
+                </p>
+                <p *ngIf="handlingFormErrors('name', validators.MAXLENGTH)">
+                    Only 100 characters
+                </p>
+            </div>
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Native</mat-label>
+                    <input type="text" aria-label="Native" matInput [readonly]="editable" formControlName="native" />
+                </mat-form-field>
+                <p *ngIf="handlingFormErrors('native', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p *ngIf="handlingFormErrors('native', validators.MINLENGTH)">
+                    Must be 3 characters long
+                </p>
+                <p *ngIf="handlingFormErrors('native', validators.MAXLENGTH)">
+                    Only 100 characters allowed
+                </p>
+                <p *ngIf="handlingFormErrors('native', validators.PATTERN)">
+                    Only letters allowed
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Region</mat-label>
+                    <input
+                        type="text"
+                        aria-label="Region"
+                        matInput
+                        [readonly]="editable"
+                        formControlName="region"
+                        [matAutocomplete]="regionauto"
+                    />
+                </mat-form-field>
+                <mat-autocomplete #regionauto="matAutocomplete">
+                    <mat-option *ngFor="let option of filteredOptions['regions']" [value]="option.name">
+                        {{ option.name }}
+                    </mat-option>
+                    <mat-option *ngIf="!filteredOptions['regions']" [value]="">
+                        no options
+                    </mat-option>
+                </mat-autocomplete>
+                <p class="ml-3" *ngIf="handlingFormErrors('region', validators.ISEXISTS)">
+                    Please select region from the list
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('region', validators.NOTEXISTS)">
+                    Regions not available
+                </p>
+            </div>
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Subregion</mat-label>
+                    <input
+                        type="text"
+                        aria-label="Subregion"
+                        matInput
+                        [readonly]="editable"
+                        formControlName="subregion"
+                        [matAutocomplete]="subRegionauto"
+                    />
+                </mat-form-field>
+                <mat-autocomplete #subRegionauto="matAutocomplete">
+                    <mat-option *ngFor="let option of filteredOptions['subRegions']" [value]="option.name">
+                        {{ option.name }}
+                    </mat-option>
+                    <mat-option *ngIf="!filteredOptions['subRegions']" [value]="">
+                        no options
+                    </mat-option>
+                </mat-autocomplete>
+                <p class="ml-3" *ngIf="handlingFormErrors('subregion', validators.ISEXISTS)">
+                    Please select subregion from the list
+                </p>
+                <p class="ml-3" *ngIf="handlingFormErrors('subregion', validators.NOTEXISTS)">
+                    Subregions not available
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>ISO2</mat-label>
+                    <input matInput type="text" formControlName="iso2" [readonly]="editable" appUpperCaseTextOnly />
+                </mat-form-field>
+                <p *ngIf="handlingFormErrors('iso2', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p *ngIf="handlingFormErrors('iso2', validators.PATTERN)">
+                    Only Alphabets and 2 characters long
+                </p>
+            </div>
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>ISO3</mat-label>
+                    <input matInput type="text" formControlName="iso3" [readonly]="editable" appUpperCaseTextOnly />
+                </mat-form-field>
+                <p *ngIf="handlingFormErrors('iso3', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p *ngIf="handlingFormErrors('iso3', validators.PATTERN)">
+                    Only Alphabets and 3 characters long
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Phone Code</mat-label>
+                    <input matInput type="text" formControlName="phone_code" [readonly]="editable" />
+                </mat-form-field>
+                <p *ngIf="handlingFormErrors('phone_code', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p *ngIf="handlingFormErrors('phone_code', validators.PATTERN)">
+                    Only numeric and must be 3 to 4 characters long
+                </p>
+            </div>
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Capital</mat-label>
+                    <input matInput type="text" formControlName="capital" [readonly]="editable" />
+                </mat-form-field>
+                <p *ngIf="handlingFormErrors('capital', validators.MINLENGTH)">
+                    Must be 3 characters long
+                </p>
+                <p *ngIf="handlingFormErrors('capital', validators.PATTERN)">
+                    Only Alphabets
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Latitude</mat-label>
+                    <input
+                        matInput
+                        type="text"
+                        aria-label="latitude"
+                        matInput
+                        formControlName="latitude"
+                        [readonly]="editable"
+                    />
+                </mat-form-field>
+                <p *ngIf="handlingFormErrors('latitude', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p *ngIf="handlingFormErrors('latitude', validators.PATTERN)">
+                    Must be in the range -90 to 90
+                </p>
+            </div>
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Longitude</mat-label>
+                    <input
+                        matInput
+                        type="text"
+                        aria-label="Longitude"
+                        matInput
+                        formControlName="longitude"
+                        [readonly]="editable"
+                    />
+                </mat-form-field>
+                <p *ngIf="handlingFormErrors('longitude', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p *ngIf="handlingFormErrors('longitude', validators.PATTERN)">
+                    Must be in the range -180 to 180
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Currency</mat-label>
+                    <input
+                        matInput
+                        type="text"
+                        aria-label="Currency"
+                        matInput
+                        formControlName="currency"
+                        [readonly]="editable"
+                        appUpperCaseTextOnly
+                    />
+                </mat-form-field>
+                <p *ngIf="handlingFormErrors('currency', validators.REQUIRED)">
+                    *Required
+                </p>
+                <p *ngIf="handlingFormErrors('currency', validators.PATTERN)">
+                    Only Alphabets and 2 to 5 characters long
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5 col-md-offset-7">
+                <button mat-button (click)="onCancel()" class="btn btn-gray" type="button">Cancel</button>
+                <button mat-button class="btn btn-blue" (click)="onEdit()" *ngIf="editable">Edit</button>
+                <button mat-button class="btn btn-blue" *ngIf="!editable" [disabled]="disabledBtn">
+                    {{ editMode ? 'Update' : 'Save' }}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

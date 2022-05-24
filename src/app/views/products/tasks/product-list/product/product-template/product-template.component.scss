@@ -1,0 +1,28 @@
+@import '~styles/variables';
+
+mat-select {
+    font-size: 14px;
+    font-weight: normal;
+    font-family: $font-family-Regular !important;
+}
+.value-holder {
+    color: #325992 !important;
+    background-color: white;
+    border: 1px solid #bababa;
+    cursor: pointer;
+    width: 167px;
+    display: flex;
+    &:hover {
+        background: #eceaea !important;
+    }
+
+    span {
+        font-size: 14px;
+        font-weight: normal;
+        font-family: $font-family-Regular !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 85px;
+        margin-left: 13px;
+    }
+}

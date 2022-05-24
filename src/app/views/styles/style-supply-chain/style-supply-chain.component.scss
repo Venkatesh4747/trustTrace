@@ -1,0 +1,23 @@
+@import '~styles/variables';
+.supply-chain-information {
+    width: 60%;
+    color: $text-color-primary;
+    fieldset {
+        width: 100%;
+        &.chip-card-input {
+            width: 100%;
+        }
+        label {
+            width: 100%;
+        }
+        .mat-form-field {
+            width: 100%;
+        }
+        .mat-form-field-label {
+            display: none;
+        }
+        .mat-form-field-underline {
+            border-bottom: 2px solid #CCC;
+        }
+    }
+}

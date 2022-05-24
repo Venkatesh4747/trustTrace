@@ -1,0 +1,467 @@
+<div id="record-transactions-categories" class="material-input-style-box-type">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div id="inbound-transactions" class="material-input-style-box-type-inner">
+        <div class="row pb-2 pr-2">
+            <div class="hr">
+                <span class="hr-title">{{ 'Inbound - cotton' | translate }} </span>
+            </div>
+        </div>
+        <div class="row pt-2">
+            <form #createInboundForm="ngForm">
+                <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 form-align" *ngIf="tierConfig">
+                    <div class="inbound-transaction-cotton-form">
+                        <div
+                            class="row"
+                            *ngFor="
+                                let material of payload.inboundData.materialCompositionList;
+                                let isFirst = first;
+                                let isLast = last;
+                                let i = index
+                            "
+                        >
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.MATERIAL_NAME)"
+                            >
+                                <app-tt-dropdown-search
+                                    [(ngModel)]="payload.inboundData.materialCompositionList[i].id"
+                                    name="material-name-{{ i }}"
+                                    placeholder="{{ getFieldLabel(cottonInboundLabels.MATERIAL_NAME) | translate }}:"
+                                    [searchOptions]="config.material"
+                                    [data_cy]="'inbound-cotton-transaction-material-name'"
+                                    required
+                                    [isRequired]="true"
+                                    [showToastr]="false"
+                                >
+                                </app-tt-dropdown-search>
+                            </div>
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.MATERIAL_COMPOSITION)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="number"
+                                        matInput
+                                        [(ngModel)]="payload.inboundData.materialCompositionList[i].value"
+                                        name="material-composition-{{ i }}"
+                                        placeholder="{{
+                                            getFieldLabel(cottonInboundLabels.MATERIAL_COMPOSITION) | translate
+                                        }}:"
+                                        data-cy="inbound-cotton-transaction-material-composition"
+                                        required
+                                    />
+                                </mat-form-field>
+                            </div>
+                            <div *ngIf="isLast" class="col-md-1 col-xs-1 col-lg-1 col-sm-1">
+                                <em class="action-icons-big fa fa-plus cursor-pointer" (click)="addMaterial()"></em>
+                            </div>
+                            <div
+                                *ngIf="payload.inboundData.materialCompositionList.length > 1"
+                                class="col-md-1 col-xs-1 col-lg-1 col-sm-1 delete-row"
+                            >
+                                <em
+                                    class="action-icons-big fa fa-trash cursor-pointer"
+                                    (click)="deleteMaterial(i)"
+                                ></em>
+                            </div>
+                        </div>
+
+                        <div class="row pt-2">
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label mb-3"
+                                *ngIf="checkToShowField(cottonInboundLabels.MLM_ID)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{ getFieldLabel(cottonInboundLabels.MLM_ID) | translate }}:"
+                                        name="Article/Style"
+                                        [(ngModel)]="productSearchText"
+                                        (blur)="validateSelectedProduct(cottonInboundLabels.MLM_ID)"
+                                        matInput
+                                        [matAutocomplete]="soaSearch"
+                                        (keyup)="searchStyleOrArticle($event)"
+                                        required
+                                        data-cy="inbound-transaction-style-name-number"
+                                    />
+                                    <mat-error class="error-msg" *ngIf="showArticleError"
+                                        >{{ articleError | translate }}
+                                    </mat-error>
+                                    <mat-error class="error-msg" *ngIf="!soaUniqueName && !showArticleError"
+                                        >{{ getFieldLabel(cottonInboundLabels.MLM_ID) | translate }}&nbsp;{{
+                                            'is missing' | translate
+                                        }}</mat-error
+                                    >
+                                    <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                        soaSearchHintText | translate
+                                    }}</mat-hint>
+                                    <mat-autocomplete
+                                        #soaSearch="matAutocomplete"
+                                        [displayWith]="getProductName"
+                                        (optionSelected)="onProductSelection($event.option.value)"
+                                    >
+                                        <mat-option *ngFor="let item of config.SOA_search" [value]="item">
+                                            {{ getProductName(item) }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                </mat-form-field>
+                            </div>
+
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label mb-3"
+                                *ngIf="checkToShowField(cottonInboundLabels.T2_Facility_ID)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{
+                                            getFieldLabel(cottonInboundLabels.T2_Facility_ID) | translate
+                                        }}:"
+                                        name="T2_Facility_ID"
+                                        [(ngModel)]="searchTermFacility"
+                                        (blur)="validateSelectedFacility()"
+                                        matInput
+                                        [matAutocomplete]="facilitySearch"
+                                        (keyup)="searchFacility($event)"
+                                        required
+                                        data-cy="cotton-inbound-transaction-t2-facility-id"
+                                    />
+                                    <mat-error class="error-msg" *ngIf="!searchTermFacility">
+                                        {{ getFieldLabel(cottonInboundLabels.T2_Facility_ID) | translate }}&nbsp;{{
+                                            'is missing' | translate
+                                        }}</mat-error
+                                    >
+                                    <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                        facilitySearchHintText | translate
+                                    }}</mat-hint>
+                                    <mat-autocomplete
+                                        #facilitySearch="matAutocomplete"
+                                        [displayWith]="getFacilityName"
+                                        (closed)="validation()"
+                                        (optionSelected)="onFacilitySelection($event.option.value)"
+                                    >
+                                        <mat-option *ngFor="let item of facilities" [value]="item">
+                                            {{ item.reference_id }}-{{ item.name }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                </mat-form-field>
+                            </div>
+
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.SUPPLIER)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{ getFieldLabel(cottonInboundLabels.SUPPLIER) | translate }}:"
+                                        name="seller-name"
+                                        [(ngModel)]="payload.inboundData.sellerName"
+                                        matInput
+                                        required
+                                        data-cy="inbound-cotton-transaction-seller-name"
+                                    />
+                                    <mat-error class="error-msg" *ngIf="!payload.facility">
+                                        {{ getFieldLabel(cottonInboundLabels.SUPPLIER) | translate }}&nbsp;{{
+                                            'is missing' | translate
+                                        }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="row pt-2">
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.YARN_LOT_NUMBER)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{
+                                            getFieldLabel(cottonInboundLabels.YARN_LOT_NUMBER) | translate
+                                        }}:"
+                                        name="yarn-lot-no"
+                                        [(ngModel)]="payload.inboundData.sellerLotId"
+                                        matInput
+                                        required
+                                        data-cy="inbound-cotton-transaction-yarn-lot-no"
+                                    />
+                                    <mat-error class="error-msg" *ngIf="!payload.inboundData.sellerLotId">
+                                        {{ getFieldLabel(cottonInboundLabels.YARN_LOT_NUMBER) | translate }}&nbsp;{{
+                                            'is
+                                        missing' | translate
+                                        }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.COTTON_TYPE)"
+                            >
+                                <app-tt-dropdown-search
+                                    [(ngModel)]="payload.inboundData.materialType"
+                                    name="cotton-type"
+                                    placeholder="{{ getFieldLabel(cottonInboundLabels.COTTON_TYPE) | translate }}:"
+                                    [searchOptions]="config.material_type"
+                                    [data_cy]="'inbound-cotton-transaction-cotton-type'"
+                                    [isRequired]="true"
+                                    required
+                                    [showToastr]="false"
+                                >
+                                </app-tt-dropdown-search>
+                            </div>
+                        </div>
+
+                        <div class="row pt-2">
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.NET_WEIGHT)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{ getFieldLabel(cottonInboundLabels.NET_WEIGHT) | translate }}:"
+                                        name="net-weight"
+                                        [(ngModel)]="payload.inboundData.quantity.quantity"
+                                        matInput
+                                        required
+                                        data-cy="inbound-cotton-transaction-net-weight"
+                                    />
+                                    <mat-error class="error-msg" *ngIf="!payload.inboundData.quantity.quantity">
+                                        {{ getFieldLabel(cottonInboundLabels.NET_WEIGHT) | translate }}&nbsp;{{
+                                            'is missing' | translate
+                                        }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.YARN_INVOICE_NUMBER)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{
+                                            getFieldLabel(cottonInboundLabels.YARN_INVOICE_NUMBER) | translate
+                                        }}:"
+                                        name="yarn-invoice-number"
+                                        [(ngModel)]="payload.inboundData.invoiceNumber"
+                                        matInput
+                                        required
+                                        data-cy="inbound-cotton-transaction-yarn-invoice-number"
+                                    />
+                                    <mat-error class="error-msg" *ngIf="!payload.inboundData.invoiceNumber">
+                                        {{ getFieldLabel(cottonInboundLabels.YARN_INVOICE_NUMBER) | translate }}&nbsp;{{
+                                            'is
+                                        missing' | translate
+                                        }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="row pt-2">
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.YARN_COO)"
+                            >
+                                <app-tt-dropdown-search
+                                    (selectionChange)="getStates($event)"
+                                    name="yarn-coo"
+                                    placeholder="{{ getFieldLabel(cottonInboundLabels.YARN_COO) | translate }}:"
+                                    [searchOptions]="countries.yarn"
+                                    [optionalParams]="parameters"
+                                    [data_cy]="'inbound-cotton-transaction-yarn-coo'"
+                                    required
+                                    [isRequired]="true"
+                                    [showToastr]="false"
+                                >
+                                </app-tt-dropdown-search>
+
+                                <!-- <app-tt-multi-select-auto-complete
+                                    (selectionChange)="getStates($event)"
+                                    [options]="countries.yarn"
+                                    placeholder="{{ getFieldLabel(cottonInboundLabels.YARN_COO) | translate }}:"
+                                    name="yarn-coo"
+                                    [data_cy]="'inbound-cotton-transaction-yarn-coo'"
+                                    [optionalParams]="parameters"
+                                    [selectedOptions]="selectedCountries.yarn"
+                                    required
+                                >
+                                </app-tt-multi-select-auto-complete> -->
+                            </div>
+
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.COTTON_LINT_COO)"
+                            >
+                                <!-- <app-tt-dropdown-search (selectionChange)="getStates($event, 'Cotton_Lint')"
+                                    [(ngModel)]="payload.inboundData.cottonLintCOO.country" name="cotton-lint-coo"
+                                    placeholder="{{ getFieldLabel(cottonInboundLabels.COTTON_LINT_COO) | translate }}:"
+                                    [searchOptions]="countries" [optionalParams]="parameters"
+                                    [data_cy]="'inbound-cotton-transaction-cotton-lint-coo'" required
+                                    [isRequired]="true" [showToastr]="false">
+                                </app-tt-dropdown-search> -->
+
+                                <app-tt-multi-select-auto-complete
+                                    (selectionChange)="getStates($event, 'Cotton_Lint')"
+                                    [options]="countries.cotton_lint"
+                                    placeholder="{{ getFieldLabel(cottonInboundLabels.COTTON_LINT_COO) | translate }}:"
+                                    name="cotton-lint-coo"
+                                    [data_cy]="'inbound-cotton-transaction-cotton-lint-coo'"
+                                    [optionalParams]="parameters"
+                                    [selectedOptions]="selectedCountries.cotton_lint"
+                                    [isRequired]="true"
+                                >
+                                </app-tt-multi-select-auto-complete>
+                            </div>
+                        </div>
+
+                        <div class="row pt-2">
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.YARN_PROVINCE) && toShowProvince('Yarn')"
+                            >
+                                <app-tt-dropdown-search
+                                    (selectionChange)="processProvinces($event)"
+                                    name="yarn-province"
+                                    [optionalParams]="parameters"
+                                    placeholder="{{ getFieldLabel(cottonInboundLabels.YARN_PROVINCE) | translate }}:"
+                                    [searchOptions]="states.yarn"
+                                    [data_cy]="'inbound-cotton-transaction-yarn-province'"
+                                    required
+                                    [isRequired]="true"
+                                    [showToastr]="false"
+                                >
+                                </app-tt-dropdown-search>
+
+                                <!-- <app-tt-multi-select-auto-complete (selectionChange)="processProvinces($event)"
+                                    [options]="states.yarn"
+                                    placeholder="{{ getFieldLabel(cottonInboundLabels.YARN_PROVINCE) | translate }}:"
+                                    name="yarn-province" [data_cy]="'inbound-cotton-transaction-yarn-province'"
+                                    [optionalParams]="parameters" required [selectedOptions]="selectedProvinces.yarn">
+                                </app-tt-multi-select-auto-complete> -->
+                            </div>
+
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="
+                                    checkToShowField(cottonInboundLabels.COTTON_LINT_PROVINCE) &&
+                                    toShowProvince('Cotton_Lint')
+                                "
+                            >
+                                <app-tt-dropdown-search
+                                    (selectionChange)="processProvinces($event, 'Cotton_Lint')"
+                                    name="cotton-lint-province"
+                                    [optionalParams]="parameters"
+                                    placeholder="{{
+                                        getFieldLabel(cottonInboundLabels.COTTON_LINT_PROVINCE) | translate
+                                    }}:"
+                                    [searchOptions]="states.cotton_lint"
+                                    [data_cy]="'inbound-cotton-transaction-cotton-lint-province'"
+                                    required
+                                    [isRequired]="true"
+                                    [showToastr]="false"
+                                >
+                                </app-tt-dropdown-search>
+
+                                <!-- <app-tt-multi-select-auto-complete
+                                    (selectionChange)="processProvinces($event, 'Cotton_Lint')"
+                                    [options]="states.cotton_lint" placeholder="{{
+                                        getFieldLabel(cottonInboundLabels.COTTON_LINT_PROVINCE) | translate
+                                    }}:" name="cotton-lint-province"
+                                    [data_cy]="'inbound-cotton-transaction-cotton-lint-province'"
+                                    [optionalParams]="parameters" required
+                                    [selectedOptions]="selectedProvinces.cotton_lint">
+                                </app-tt-multi-select-auto-complete> -->
+                            </div>
+                        </div>
+
+                        <div class="row pt-2">
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.CERTIFICATE_OF_YARN_ORIGIN)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{
+                                            getFieldLabel(cottonInboundLabels.CERTIFICATE_OF_YARN_ORIGIN) | translate
+                                        }}:"
+                                        name="certificate-of-yarn-origin"
+                                        [(ngModel)]="payload.inboundData.yarnCOO.certificateOfOrigin"
+                                        matInput
+                                        data-cy="inbound-cotton-transaction-certificate-of-yarn-origin"
+                                    />
+                                    <mat-error
+                                        class="error-msg"
+                                        *ngIf="!payload.inboundData.yarnCOO.certificateOfOrigin"
+                                    >
+                                        {{
+                                            getFieldLabel(cottonInboundLabels.CERTIFICATE_OF_YARN_ORIGIN) | translate
+                                        }}&nbsp;{{ 'is missing' | translate }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div
+                                class="col-md-5 col-xs-5 col-lg-5 col-sm-5 label"
+                                *ngIf="checkToShowField(cottonInboundLabels.CERTIFICATE_OF_COTTON_LINT_ORIGIN)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{
+                                            getFieldLabel(cottonInboundLabels.CERTIFICATE_OF_COTTON_LINT_ORIGIN)
+                                                | translate
+                                        }}:"
+                                        name="certificate-of-cotton-lint-origin"
+                                        [(ngModel)]="payload.inboundData.cottonLintCOO.certificateOfOrigin"
+                                        matInput
+                                        data-cy="inbound-cotton-transaction-certificate-of-cotton-lint-origin"
+                                    />
+                                    <mat-error
+                                        class="error-msg"
+                                        *ngIf="!payload.inboundData.cottonLintCOO.certificateOfOrigin"
+                                    >
+                                        {{
+                                            getFieldLabel(cottonInboundLabels.CERTIFICATE_OF_COTTON_LINT_ORIGIN)
+                                                | translate
+                                        }}&nbsp;{{ 'is missing' | translate }}
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 mb-3 pt-3 pb-3">
+                            <div class="col-md-12 talign-right">
+                                <button
+                                    id="order-create-btn"
+                                    type="button"
+                                    class="btn btn-gray create-btn btn-align"
+                                    (click)="save()"
+                                    [disabled]="!createInboundForm.valid"
+                                >
+                                    {{ 'Save' | translate }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

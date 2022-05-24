@@ -1,0 +1,48 @@
+<div
+    class="row entity-article-row"
+    [ngClass]="{
+        'odd-row': index % 2 === 0,
+        'even-row': index % 2 === 1,
+        'row-selected':
+            selectedArticleName && selectedArticleName.articleName === article.supplyChainArticle.internalArticleName
+    }"
+    (click)="handleSelect(article.supplyChainArticle.internalArticleName)"
+>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+        <div class="article-type">
+            {{ localeService.getDisplayText(article.supplyChainArticle.articleTypeId) }}
+        </div>
+    </div>
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <div class="article-name-no">
+            {{ article.supplyChainArticle.internalArticleName }}
+        </div>
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 talign-center">
+        <ng-template [ngIf]="article.supplyChainArticle.supplierLink">
+            <a [routerLink]="article.supplyChainArticle.supplierLink">
+                <div class="article-supplier">
+                    {{ article.supplyChainArticle.supplierName }}
+                </div>
+            </a>
+        </ng-template>
+        <ng-template [ngIf]="!article.supplyChainArticle.supplierLink">
+            <div class="article-supplier">
+                {{ article.supplyChainArticle.supplierName }}
+            </div>
+        </ng-template>
+    </div>
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 talign-center">
+        <div class="ponumber" *ngIf="article.poNumber">
+            {{ article.poNumber }}
+        </div>
+        <div class="no-ponumber" *ngIf="!article.poNumber">
+            {{ 'Not Available' | translate }}
+        </div>
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 p-0 talign-center">
+        <div class="article-data-collection">
+            {{ article.dataProviderName }}
+        </div>
+    </div>
+</div>

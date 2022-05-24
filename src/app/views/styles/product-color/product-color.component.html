@@ -1,0 +1,118 @@
+<div class="product-color-size row" provide-parent-form>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="add-product-group-btn cursor-pointer row" (click)="addMoreColor()">
+            <i class="action-icons fa fa-plus"></i>{{ 'Add more color' | translate }}
+        </div>
+    </div>
+    <!-- Column -->
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="product-color-size-fit-length">
+            <div class="row" *ngFor="let variant of style.variants; let colorIndex = index">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="row">
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <fieldset class="form-group">
+                                <label for="colors-{{ colorIndex }}" class="bmd-label-static"
+                                    >{{ 'Choose the Color' | translate }}:<span class="color-red">*</span></label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        name="colors-{{ colorIndex }}"
+                                        [(ngModel)]="style.variants[colorIndex].color"
+                                    >
+                                        <mat-option
+                                            *ngFor="let color of settings.style.styleSettings.colors"
+                                            [value]="color.id"
+                                        >
+                                            {{ color.name }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </fieldset>
+                        </div>
+                        <!-- Column -->
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <span class="delete-color-btn">
+                                <i class="action-icons-big fa fa-trash" (click)="removeColor(colorIndex)"></i>
+                            </span>
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="row" *ngFor="let size of variant.sizes; let isFirst = first; let sizeIndex = index">
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <fieldset class="form-group">
+                                <label for="sizes-{{ colorIndex }}-{{ sizeIndex }}" class="bmd-label-static"
+                                    >{{ 'Choose the Size' | translate }}:<span class="color-red">*</span></label
+                                >
+                                <mat-form-field>
+                                    <mat-select
+                                        name="sizes-{{ colorIndex }}-{{ sizeIndex }}"
+                                        (click)="checkIfEmptyList()"
+                                        [(ngModel)]="style.variants[colorIndex].sizes[sizeIndex].size"
+                                    >
+                                        <mat-option *ngFor="let size of sizeAutoCompleteList" [value]="size.id">
+                                            {{ size.value }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </fieldset>
+                        </div>
+                        <!-- Column -->
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" *ngIf="size.size">
+                            <fieldset class="form-group">
+                                <label for="fits" class="bmd-label-static">{{ 'Choose the Fit' | translate }}:</label>
+                                <app-chip-input
+                                    [placeholderText]="''"
+                                    [showPlus]="true"
+                                    [isRemovable]="true"
+                                    [chipItems]="selectedFits[colorIndex][sizeIndex]"
+                                    [autoCompleteList]="sizeToFit[size.size]"
+                                    (valueChange)="updateFits(colorIndex, sizeIndex)"
+                                ></app-chip-input>
+                            </fieldset>
+                        </div>
+                        <!-- Column -->
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" *ngIf="size.size">
+                            <fieldset class="form-group">
+                                <label for="lengths" class="bmd-label-static"
+                                    >{{ 'Choose the Length' | translate }}:</label
+                                >
+                                <app-chip-input
+                                    [placeholderText]="''"
+                                    [showPlus]="true"
+                                    [isRemovable]="true"
+                                    [chipItems]="selectedLengths[colorIndex][sizeIndex]"
+                                    [autoCompleteList]="sizeToLength[size.size]"
+                                    (valueChange)="updateLengths(colorIndex, sizeIndex)"
+                                ></app-chip-input>
+                            </fieldset>
+                        </div>
+                        <!-- Column -->
+                        <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                            <span class="delete-size-btn">
+                                <i class="action-icons-big fa fa-trash" (click)="removeSize(colorIndex, sizeIndex)"></i>
+                            </span>
+                        </div>
+                        <!-- Column -->
+                        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" *ngIf="isFirst">
+                            <div
+                                class="add-product-group-btn add-more-size-btn cursor-pointer row"
+                                (click)="addMoreSize(colorIndex)"
+                            >
+                                <i class="action-icons fa fa-plus"></i>{{ 'Add more size' | translate }}
+                            </div>
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+    </div>
+</div>

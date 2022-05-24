@@ -1,0 +1,346 @@
+<div class="view-container">
+    <div id="transactions-notification-container" *ngIf="!notificationDetail.isValid">
+        <app-notification-bar
+            [notification]="notificationDetail.message"
+            [isHTML]="false"
+            [notificationClass]="'transactions-notification'"
+        >
+        </app-notification-bar>
+    </div>
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="evidence-container" class="evidence-container">
+            <div id="evidence-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Transaction Certificate' | translate }}</div>
+                        <div class="page-description">
+                            {{ 'Manage all transactions certificates' | industry | translate }}
+                        </div>
+                    </div>
+                    <div class="header-search" *ngIf="isEvidenceAvailable && evidenceFilters">
+                        <div class="title-right-search">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Type and press enter to search' | translate }}"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchEvidence($event)"
+                                data-cy="evidence-search"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <!-- <a routerLink="record">
+                            <button class="btn btn-lg btn-blue pull-right btn-gradient cs-btn">
+                                <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" />
+                                {{ 'Record Transactions' | translate }}
+                            </button>
+                        </a> -->
+                        <button
+                            *ngIf="checkAccess('TRANSACTION_CERTIFICATE_CREATE')"
+                            type="button"
+                            class="btn btn-lg btn-bordered pull-right btn-gradient cs-btn mr-15"
+                            (click)="allowUpload()"
+                        >
+                            <img src="{{ env.IMG_URL }}images/upload-blue-icon.png" alt="Import" />
+                            <span>{{ 'Upload Transaction Certificate' | translate }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Evidence Header -->
+            <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="isEvidenceAvailable && evidenceFilters">
+                <div class="col-md-12">
+                    <ul class="filter-bar-container">
+                        <li *ngFor="let filter of evidenceFilters | keys; let filterInd = index">
+                            <app-tt-multi-select-search
+                                (selectionChange)="handleFilterSelection()"
+                                (refreshFilter)="refreshFilter()"
+                                [label]="filter.key"
+                                [options]="filter.value"
+                                [filter_session]="filter_session"
+                                [optionsParam]="optionsParam"
+                                *ngIf="!isAgroup(filter.value)"
+                                [data_cy]="removeSpace(filter.key)"
+                            >
+                            </app-tt-multi-select-search>
+                            <!-- <app-multi-select-and-search
+                            (selectionChange)="handleFilterSelection()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="filter_session"
+                        >
+                        </app-multi-select-and-search> -->
+                        </li>
+                        <li class="reset-filters">
+                            <button
+                                class="button-badge mat-button btn btn-gray"
+                                (click)="resetAllFilters()"
+                                data-cy="evidence-reset-all-filters"
+                            >
+                                {{ 'Reset all filters' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-12 pd-0">
+                    <div class="tt-tabs pb-2">
+                        <div class="cursor-default" (click)="navigateTo(tab)" *ngFor="let tab of tabs; let ind = index">
+                            <label class="cursor-pointer" [ngClass]="{ active: activeTab === tab }">
+                                {{ tab | translate }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                    <div class="row">
+                        <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 total-count">
+                            <div class="float-l" *ngIf="evidences.length > 0 || totalCountFlag">
+                                <card-pagination
+                                    [paginationStart]="pagination.from + 1"
+                                    [fetchSize]="pagination.size"
+                                    [totalItemsCount]="totalCount"
+                                    [moduleName]="'Transaction Certificates'"
+                                    (previous)="onScroll('back')"
+                                    (next)="onScroll('next')"
+                                ></card-pagination>
+                            </div>
+                        </div>
+                        <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                            <div dropdown class="dropdown sort-dropdown">
+                                <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                    <span class="sort-name"
+                                        >{{ 'Sort By' | translate }}
+                                        <i class="fa fa-angle-down"></i>
+                                    </span>
+                                </a>
+                                <ul *dropdownMenu class="dropdown-menu">
+                                    <li>
+                                        <mat-radio-group
+                                            [(ngModel)]="sortByFilter.sortBy"
+                                            (change)="handleSortBy($event)"
+                                        >
+                                            <mat-radio-button value="product_name">{{
+                                                'Product Name' | translate
+                                            }}</mat-radio-button>
+                                            <mat-radio-button value="create_ts">{{
+                                                'Newly Added' | translate
+                                            }}</mat-radio-button>
+                                        </mat-radio-group>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Sort Dropdown -->
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Filter Bar -->
+
+            <div id="card">
+                <div class="row evidence-table" [ngStyle]="{ 'top.px': height }">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="table custom-table table-striped" *ngIf="activeTab === tabs[0]">
+                                    <thead>
+                                        <tr>
+                                            <th class="checkbox-width">
+                                                <mat-checkbox
+                                                    [checked]="hasUserSelectedAllEvidences()"
+                                                    (change)="userSelectedAllEvidences($event)"
+                                                >
+                                                </mat-checkbox>
+                                            </th>
+                                            <th>{{ 'Product Name' | translate }}</th>
+                                            <th>{{ 'TC Reference ID' | translate }}</th>
+                                            <th>{{ 'Certification Type' | translate }}</th>
+                                            <th>{{ 'Seller/Buyer/Consignee' | translate }}</th>
+                                            <th>{{ 'LOT Numbers' | translate }}</th>
+                                            <th>{{ 'Net Weight (Kgs)' | translate }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        class="tbody-scrollbar"
+                                        [ngClass]="{
+                                            active: activeTab === tabs[0] && userSelectedEvidences.length > 0
+                                        }"
+                                    >
+                                        <tr *ngIf="!fetchingEvidencesData && evidences.length === 0">
+                                            <p class="content-center">
+                                                {{ 'No evidences available!' | translate }}
+                                            </p>
+                                        </tr>
+                                        <tr *ngIf="fetchingEvidencesData">
+                                            <p class="content-center">
+                                                <app-spinner [small]="true"></app-spinner>
+                                            </p>
+                                        </tr>
+                                        <tr
+                                            *ngFor="let evidence of evidences"
+                                            (click)="openTransactionCertificateDetailView(evidence, $event)"
+                                        >
+                                            <td class="checkbox-width">
+                                                <mat-checkbox
+                                                    [checked]="hasUserSelectedEvidence(evidence.id)"
+                                                    (change)="userSelectedEvidence($event, evidence)"
+                                                >
+                                                </mat-checkbox>
+                                            </td>
+                                            <td>
+                                                <div class="mat-value">
+                                                    <p>{{ evidence.product_name }}</p>
+                                                </div>
+                                                <div class="mat-value-details" *ngIf="evidence.invoice_number">
+                                                    <p>
+                                                        {{ 'Invoice No :' | translate }}
+                                                        <span>&nbsp;{{ evidence.invoice_number }}</span>
+                                                    </p>
+                                                </div>
+                                            </td>
+                                            <td *ngIf="evidence.tc_reference_id; else notAvailable">
+                                                <a
+                                                    ><span
+                                                        (click)="downloadEvidence(evidence.cert_id, evidence.file_name)"
+                                                        >{{ evidence.tc_reference_id }}</span
+                                                    ></a
+                                                >
+                                            </td>
+                                            <td *ngIf="evidence.cert_std?.value; else notAvailable">
+                                                {{ evidence.cert_std?.value | translate }}
+                                            </td>
+                                            <td>
+                                                <div class="evidence-details">
+                                                    <ul class="evidence-details-list">
+                                                        <li>{{ 'Seller' | translate }}</li>
+                                                        <li>:</li>
+                                                        <li>{{ evidence.supplier?.value }}</li>
+                                                    </ul>
+                                                    <ul class="evidence-details-list">
+                                                        <li>{{ 'Buyer' | translate }}</li>
+                                                        <li>:</li>
+                                                        <li>{{ evidence.facility?.value }}</li>
+                                                    </ul>
+                                                    <ul class="evidence-details-list">
+                                                        <li>{{ 'Consignee' | translate }}</li>
+                                                        <li>:</li>
+                                                        <li>{{ evidence.consignee?.value }}</li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td *ngIf="evidence.lot_numbers; else notAvailable">
+                                                {{ evidence.lot_numbers }}
+                                            </td>
+                                            <td *ngIf="evidence.net_weight; else notAvailable">
+                                                {{ evidence.net_weight }}
+                                            </td>
+                                            <ng-template #notAvailable>
+                                                <td class="content-grey">
+                                                    {{ 'Not Available' | translate }}
+                                                </td>
+                                            </ng-template>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot *ngIf="activeTab === tabs[0] && userSelectedEvidences.length > 0">
+                                        <tr>
+                                            <td>
+                                                <div class="table-footer-block">
+                                                    <ul class="table-footer-block-inner">
+                                                        <li class="table-footer-block-inner-left"></li>
+                                                        <li class="table-footer-block-inner-right">
+                                                            <div class="evidence-button-block">
+                                                                <button
+                                                                    class="btn cancel-btn"
+                                                                    type="button"
+                                                                    (click)="handleCancelClick()"
+                                                                >
+                                                                    {{ 'Cancel' | translate }}
+                                                                </button>
+                                                                <button
+                                                                    class="btn delete-btn"
+                                                                    (click)="
+                                                                        deleteConfirmationEvidence(
+                                                                            userSelectedEvidences
+                                                                        )
+                                                                    "
+                                                                    type="button"
+                                                                >
+                                                                    {{ 'Delete' | translate }}
+                                                                </button>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <table class="table custom-table table-striped" *ngIf="activeTab === tabs[1]">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ 'TC Reference ID' | translate }}</th>
+                                            <th>{{ 'Certification Type' | translate }}</th>
+                                            <th>{{ 'LOT Numbers' | translate }}</th>
+                                            <th>{{ 'Requested Date' | translate }}</th>
+                                            <th>{{ 'Comments' | translate }}</th>
+                                            <th>{{ 'Status' | translate }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngIf="!fetchingEvidencesData && evidences.length === 0">
+                                            <p class="content-center">
+                                                {{ 'No evidences available!' | translate }}
+                                            </p>
+                                        </tr>
+                                        <tr *ngIf="fetchingEvidencesData">
+                                            <p class="content-center">
+                                                <app-spinner [small]="true"></app-spinner>
+                                            </p>
+                                        </tr>
+                                        <tr *ngFor="let evidence of evidences">
+                                            <td *ngIf="evidence.tc_reference_id; else notAvailable">
+                                                <a
+                                                    ><span
+                                                        (click)="downloadEvidence(evidence.cert_id, evidence.file_name)"
+                                                        >{{ evidence.tc_reference_id }}</span
+                                                    ></a
+                                                >
+                                            </td>
+                                            <td *ngIf="evidence.cert_std?.value; else notAvailable">
+                                                {{ evidence.cert_std?.value | translate }}
+                                            </td>
+                                            <td *ngIf="evidence.lot_numbers; else notAvailable">
+                                                {{ evidence.lot_numbers }}
+                                            </td>
+                                            <td *ngIf="evidence.creation_date; else notAvailable">
+                                                {{ evidence.creation_date }}
+                                            </td>
+                                            <td *ngIf="evidence.comments; else notAvailable">
+                                                {{ evidence.comments }}
+                                            </td>
+                                            <td *ngIf="evidence.workflow_status; else notAvailable">
+                                                {{ evidence.workflow_status }}
+                                            </td>
+                                            <ng-template #notAvailable>
+                                                <td class="content-grey">
+                                                    {{ 'Not Available' | translate }}
+                                                </td>
+                                            </ng-template>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- evidence-container -->
+    </div>
+    <!-- container-fluid -->
+</div>
+<!-- view-container -->

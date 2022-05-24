@@ -1,0 +1,32 @@
+@import '~styles/variables';
+
+.validation-info-container {
+    color: #325992;
+}
+
+.validation-section {
+    padding: 15px;
+}
+
+.validation-data {
+    display: flex;
+}
+
+.section-heading {
+    font-size: 18px;
+    font-family: 'Source Sans Pro-Bold';
+}
+
+.expected-section {
+    font-family: 'Source Sans Pro-Bold';
+}
+
+.validation-failed-message {
+    color: #ff0000;
+    font-family: 'Source Sans Pro-Bold';
+}
+
+.validation-passed-message {
+    color: #325992;
+    font-family: 'Source Sans Pro-Bold';
+}

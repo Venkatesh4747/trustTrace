@@ -1,0 +1,183 @@
+<span
+    class="details-list"
+    *ngIf="
+        fieldData &&
+        fieldData.fieldId &&
+        responseValues &&
+        responseValues !== null &&
+        responseValues[fieldData.fieldId] &&
+        (responseValues[fieldData.fieldId][0] !== null || responseValues[fieldData.fieldId][0] !== '')
+    "
+>
+    <span [ngSwitch]="fieldData.displayConfig.type">
+        <span *ngSwitchCase="'DATE'">
+            {{ responseValues[fieldData.fieldId][0] | date: 'd-MMM-yyyy' }}
+        </span>
+
+        <span *ngSwitchCase="'FILE'">
+            <div
+                class="files download"
+                *ngFor="let fileInfo of fileInfos"
+                (click)="downloadFile(fileInfo.id, fileInfo.fileName)"
+            >
+                <span class="fileName cursorp">{{ fileInfo.fileName }}</span>
+
+                <span class="files download image-icon cursorp">
+                    <img src="{{ env.IMG_URL }}images/file-download.png" alt="Download" />
+                </span>
+            </div>
+        </span>
+
+        <span *ngSwitchCase="'MULTI_SELECT'">
+            <span *ngFor="let val of responseValues[fieldData.fieldId]; let isLast = last">
+                {{ val | translate }}{{ isLast ? '' : ',' }}
+            </span>
+        </span>
+
+        <span *ngSwitchCase="'TABLE'">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="common-striped-table">
+                        <div class="table-responsive" *ngIf="dataVal">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th
+                                            *ngFor="let header of tableHeaders; let isLast = last"
+                                            [ngClass]="{ 'talign-center': isLast }"
+                                        >
+                                            {{ localeService.getDisplayText(header) | translate }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let rowData of tableRows; let rowInd = index">
+                                        <td
+                                            [ngClass]="{
+                                                'row-with-icon':
+                                                    columnData['fieldStyleConfig'] &&
+                                                    columnData['fieldStyleConfig'].icon,
+                                                'row-with-bold':
+                                                    columnData['fieldStyleConfig'] &&
+                                                    columnData['fieldStyleConfig'].bold
+                                            }"
+                                            *ngFor="let columnData of tableRows[rowInd]['cells']; let colInd = index"
+                                        >
+                                            <span
+                                                *ngIf="
+                                                    columnData['fieldStyleConfig'] &&
+                                                    columnData['fieldStyleConfig'].icon
+                                                "
+                                            >
+                                                <img
+                                                    class="table-card-icons"
+                                                    src="{{
+                                                        utilService.getProductComplianceImageUrl(
+                                                            columnData['fieldStyleConfig'].iconUrl
+                                                        )
+                                                    }}"
+                                                />
+                                            </span>
+                                            <span *ngIf="columnData['label']">
+                                                {{
+                                                    columnData['needLocalization'] === true
+                                                        ? (localeService.getDisplayText(columnData['label'])
+                                                          | translate)
+                                                        : (columnData['label'] | translate)
+                                                }}
+                                            </span>
+                                            <span *ngIf="columnData['values']">
+                                                <span *ngIf="columnData['values'].length === 0">--</span>
+                                                <span *ngFor="let value of columnData['values']; let isLast = last">
+                                                    <span
+                                                        class="content-width-break"
+                                                        *ngIf="
+                                                            !columnData['fieldStyleConfig'] ||
+                                                            !columnData['fieldStyleConfig'].icon
+                                                        "
+                                                    >
+                                                        {{
+                                                            columnData['needLocalization'] === true
+                                                                ? localeService.getDisplayText(value)
+                                                                : (value | translate)
+                                                        }}{{ isLast ? '' : ',' }}
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Table Responsive -->
+                        <div *ngIf="!dataVal" class="no-data-img-container">
+                            <span class="no-data-img-table">
+                                <img src="{{ env.IMG_URL }}images/ec-no-scores.png" />
+                                <p class="pt-15">{{ 'Insufficient data to generate a table' | translate }}</p>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </span>
+
+        <span *ngSwitchCase="'SPIDER_WEB'">
+            <span id="container-{{ fieldData.fieldId }}" class="chart-container" *ngIf="dataVal"></span>
+            <span *ngIf="!dataVal" class="no-data-img-container">
+                <span class="no-data-img">
+                    <img src="{{ env.IMG_URL }}images/ec-spider-no-data.png" />
+                    <p class="pt-15">{{ 'Insufficient data to generate spider web' | translate }}</p>
+                </span>
+            </span>
+        </span>
+
+        <span *ngSwitchCase="'TEXTAREA'">
+            {{ responseValues[fieldData.fieldId][0] | translate }}
+        </span>
+
+        <span *ngSwitchCase="'SINGLE_SELECT'">
+            {{ responseValues[fieldData.fieldId][0] | translate }}
+        </span>
+
+        <span *ngSwitchCase="'TEXT'">
+            {{ responseValues[fieldData.fieldId][0] | translate }}
+        </span>
+
+        <span *ngSwitchCase="'NUMBER'">
+            {{ responseValues[fieldData.fieldId][0] | translate }}
+        </span>
+
+        <span *ngSwitchDefault class="label-highlighted">
+            {{ responseValues[fieldData.fieldId][0] | translate }}
+        </span>
+    </span>
+</span>
+
+<span
+    class="details-list"
+    *ngIf="
+        !responseValues ||
+        responseValues === null ||
+        !responseValues[fieldData.fieldId] ||
+        responseValues[fieldData.fieldId][0] === null ||
+        responseValues[fieldData.fieldId][0] === ''
+    "
+    [ngClass]="{
+        'no-data-img-container':
+            fieldData.displayConfig.type === 'SPIDER_WEB' || fieldData.displayConfig.type === 'TABLE'
+    }"
+>
+    <span [ngSwitch]="fieldData.displayConfig.type">
+        <span *ngSwitchCase="'SPIDER_WEB'" class="no-data-img">
+            <img src="{{ env.IMG_URL }}images/ec-spider-no-data.png" />
+            <p class="pt-15">{{ 'Insufficient data to generate spider web' | translate }}</p>
+        </span>
+        <span *ngSwitchCase="'TABLE'" class="no-data-img-table">
+            <img src="{{ env.IMG_URL }}images/ec-no-scores.png" />
+            <p class="pt-15">{{ 'Insufficient data to generate scores' | translate }}</p>
+        </span>
+        <span class="not-availble" *ngSwitchDefault>{{ 'Not available' | translate }}</span>
+    </span>
+</span>

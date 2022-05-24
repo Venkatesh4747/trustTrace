@@ -1,0 +1,25 @@
+<div class="row pr-0 m-0 pt-4">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 p-0 ec-sub-title">
+        <div class="row m-0 pb-2">
+            {{ localeService.getDisplayText(entity.productType) }}:
+            <span class="font-bold"
+                >{{ entity.productName | translate }}
+                <span class="supplier-article" *ngIf="entity.supplierArticleName || entity.supplierArticleNumber">
+                    / {{ entity.supplierArticleName }}
+                    <span *ngIf="entity.supplierArticleNumber"> - {{ entity.supplierArticleNumber }} </span>
+                </span>
+            </span>
+        </div>
+        <div class="row m-0">
+            <div
+                class="col-xs-12 col-sm-12 col-md-12 col-lg-12 p-0"
+                *ngFor="let article of entity.evidencesView; let ind = index"
+            >
+                <app-evidence-article-table-view
+                    [article]="article"
+                    [listIndex]="ind"
+                ></app-evidence-article-table-view>
+            </div>
+        </div>
+    </div>
+</div>

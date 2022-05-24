@@ -1,0 +1,27 @@
+<div class="ec-proceed-submit-modal">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div *ngIf="!pageLoading">
+        <div class="ec-proceed-submit-modal-title">
+            <span>{{ data.title | translate }}</span>
+            <a (click)="closeDialog('Close')" *ngIf="data.showClose">
+                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+            </a>
+        </div>
+        <div class="ec-proceed-submit-details-container" [innerHTML]="data.description"></div>
+        <div class="row pr-1 evidence-collection-buttons-row">
+            <div class="col-xs-11 col-sm-11 col-md-11 col-lg-11 evidence-collection-buttons">
+                <button
+                    type="button"
+                    mat-button
+                    class="btn btn-blue save-btn"
+                    (click)="closeDialog(data.primaryButton)"
+                >
+                    {{ data.primaryButton | translate }}
+                </button>
+                <button type="button" mat-button class="btn btn-gray" (click)="closeDialog(data.secondaryButton)">
+                    {{ data.secondaryButton | translate }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

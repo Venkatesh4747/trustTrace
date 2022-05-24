@@ -1,0 +1,40 @@
+<!--
+    <tt-dropdown
+        formcontrolName]="formControlName"
+        name="dropdownName"
+        [title]="'titleForTheDropdown'"
+        [items]="listOfItems"
+        [panelClass]="'select-panel-right'"
+        [isRequired]="true/false"
+        [optionalParams]="optionalParams"
+    >
+    </tt-dropdown>
+-->
+<div class="tt-dropdown">
+    <mat-form-field>
+        <mat-label class="tt-input-label">{{ title }}</mat-label>
+        <mat-select
+            disableOptionCentering
+            [panelClass]="panelClass"
+            [(ngModel)]="value"
+            name="tt-dropdown"
+            required
+            *ngIf="isRequired"
+        >
+            <mat-option *ngFor="let item of items" [value]="item">
+                {{ item[optionalParams.value] }}
+            </mat-option>
+        </mat-select>
+        <mat-select
+            disableOptionCentering
+            [panelClass]="panelClass"
+            [(ngModel)]="value"
+            name="tt-dropdown"
+            *ngIf="!isRequired"
+        >
+            <mat-option *ngFor="let item of items" [value]="item">
+                {{ item[optionalParams.value] }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>

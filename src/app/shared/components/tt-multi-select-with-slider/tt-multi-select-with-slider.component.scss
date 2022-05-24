@@ -1,0 +1,195 @@
+@import '~styles/variables';
+
+::ng-deep .mat-select-panel.long-panel {
+    max-height: 442px !important;
+}
+
+::ng-deep .option-list {
+    padding-left: 0.7em !important;
+}
+
+::ng-deep .list {
+    .mat-option-text {
+        font-size: 14px;
+        font-family: $font-family-Semibold;
+        margin-left: 0.5em;
+    }
+    .mat-pseudo-checkbox {
+        width: 15px;
+        height: 15px;
+        margin-left: 5px;
+    }
+}
+.sticky-search {
+    width: 100%;
+    position: sticky;
+    z-index: 1;
+    padding: 1.1em 1em;
+    padding-bottom: 0px;
+    background: #fff;
+    top: 0;
+}
+
+.search-icon {
+    position: absolute;
+    top: 46%;
+    left: 1.17em;
+    font-size: 1.5em;
+    color: #aaa;
+}
+
+.form-control {
+    border-radius: 0.3em;
+    box-sizing: border-box;
+    padding: 0px;
+    padding-left: 2.6em;
+    &:focus {
+        border-color: #ccc;
+        box-shadow: inherit;
+    }
+}
+
+.button-badge {
+    height: 45px;
+    border-radius: 4px;
+    border: none;
+    font-family: $font-family-Semibold;
+    margin-right: 10px;
+    font-size: 16px;
+    background: #b9f0ff;
+}
+
+.button-badge[data-count].showDataCount:before {
+    content: attr(data-count);
+    font-family: $font-family-Bold;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    font-size: 14px;
+    text-align: center;
+    display: block;
+    border-radius: 60%;
+    background: #00ffe2;
+    position: absolute;
+    top: -7px;
+    left: -7px;
+    color: $text-color-primary;
+}
+.option-group {
+    .list {
+        max-height: 142px;
+        overflow-y: auto;
+    }
+}
+.title {
+    padding: 0 1em;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: $font-family-Bold;
+    color: $text-color-primary;
+    margin-bottom: 0.5em;
+}
+
+.actions {
+    padding: 1em;
+    float: right;
+
+    button {
+        border: 1px solid #8e8e8e;
+        border-radius: 4px;
+        padding: 0px 1em;
+        color: #4b4b4b;
+        font-family: $font-family-Semibold;
+        &.green-btn {
+            background-color: #7affad;
+            border: none;
+        }
+        &:nth-child(2) {
+            margin-left: 1em;
+        }
+    }
+}
+.slider-container {
+    clear: both;
+    padding: 0 1em;
+    position: relative;
+    .title {
+        padding: 0px;
+    }
+    .group {
+        display: inline-flex;
+        flex-wrap: nowrap;
+        position: absolute;
+        top: 30px;
+        left: 20px;
+        div {
+            margin-right: 20.2%;
+            position: relative;
+            font-size: 12px;
+            color: #325992;
+
+            @-moz-document url-prefix() {
+                & {
+                    margin-right: 21.8% !important;
+                }
+            }
+            &:nth-last-child(1) {
+                margin-right: 0;
+            }
+            &::after {
+                content: '';
+                width: 1px;
+                height: 6px;
+                border: 1px solid #dededf;
+                position: absolute;
+                top: 100%;
+                left: 50%;
+            }
+        }
+    }
+
+    .slider {
+        outline: 0;
+        border: 0;
+        max-width: 100%;
+        margin: 48px 0px 23px;
+        transition: box-shadow 0.2s ease-in-out;
+        height: 2px;
+        // Chrome
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            &::-webkit-slider-thumb {
+                width: 20px;
+                -webkit-appearance: none;
+                height: 20px;
+                cursor: ew-resize;
+                box-shadow: 0px 0 0px 0px #33dbff, inset 0 0 0 40px #33dbff;
+                border-radius: 50%;
+                transition: box-shadow 0.2s ease-in-out;
+                position: relative;
+                top: 0px;
+            }
+            &:active::-webkit-slider-thumb {
+                background: #fff;
+                box-shadow: 0px 0 0 0px #1597ff, inset 0 0 0 3px #1597ff;
+            }
+        }
+        // Firefox
+        &::-moz-range-progress {
+            background-color: #33dbff;
+        }
+        &::-moz-range-track {
+            background-color: #dededf;
+        }
+        // IE
+        &::-ms-fill-lower {
+            background-color: #33dbff;
+        }
+        &::-ms-fill-upper {
+            background-color: #dededf;
+        }
+    }
+}
+
+::ng-deep .long-panel .mat-option .mat-pseudo-checkbox.mat-pseudo-checkbox-checked {
+    background-color: #325992;
+}

@@ -1,0 +1,40 @@
+@import '~styles/variables';
+
+.parent-container {
+    position: relative;
+    color: #325992;
+}
+
+#title-container {
+    position: relative;
+    padding: 35px 15px 20px;
+    text-align: center;
+}
+
+.close-icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    img {
+        width: 20px;
+    }
+}
+
+.centreButtons {
+    .primary-btn {
+        border-radius: 3px;
+        background-color: #7affad;
+        padding: 10px 40px;
+        outline: none;
+        border: none;
+    }
+}
+
+.value-details {
+    display: block;
+    strong {
+        width: 200px;
+        display: block;
+        margin: 0 auto;
+    }
+}

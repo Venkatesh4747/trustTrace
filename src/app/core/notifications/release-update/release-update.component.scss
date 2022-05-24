@@ -1,0 +1,61 @@
+.release-notification {
+    position: relative;
+    z-index: 1002;
+    &-inner {
+        display: block;
+        position: absolute;
+        left: 25%;
+        z-index: 1001;
+        width: 40%;
+        margin: 6px auto;
+        background: #fdefb2;
+        padding: 10px 51px 1px 17px;
+        border-radius: 6px;
+        @media screen and (max-width: 1024px) {
+            width: 35%;
+        }
+        @media screen and (max-width: 990px) {
+            width: 30%;
+        }
+        @media screen and (max-width: 768px) {
+            width: 25%;
+        }
+    }
+    p {
+        text-align: justify;
+        color: #55514e;
+        font-size: 14px;
+    }
+
+    span {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+}
+
+.animated {
+    animation-duration: 1s;
+    animation-fill-mode: both;
+    &.delay {
+        &-4 {
+            animation-delay: 4s;
+        }
+    }
+    &.slideInDown {
+        animation-name: slideInDown;
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translate3d(0, -100%, 0);
+        visibility: visible;
+    }
+
+    to {
+        transform: translate3d(0, 0, 0);
+    }
+}

@@ -1,0 +1,77 @@
+image: node:14.17.6
+pipelines:
+    pull-requests:
+        release/*:
+            - step:
+                  name: Build from source
+                  size: 2x
+                  caches:
+                      - node
+                  script:
+                      - npm install
+                      - npm run build:prod
+        staging: #this runs as default for any branch not elsewhere defined
+            - step:
+                  name: Build from source
+                  size: 2x
+                  caches:
+                      - node
+                  script:
+                      - npm install
+                      - npm run build:fashion:prod
+        master:
+            - step:
+                  name: Build from source
+                  size: 2x
+                  caches:
+                      - node
+                  script:
+                      - npm install
+                      - npm run build:fashion:prod
+
+    branches:
+        staging:
+            - step:
+                  name: Build from source
+                  size: 2x
+                  caches:
+                      - node
+                  script:
+                      - npm install
+                      - npm run build:fashion:prod
+        feature/*:
+            - step:
+                  name: Build fashion-staging
+                  size: 2x
+                  caches:
+                      - node
+                  script:
+                      - npm install
+                      - npm run build:prod
+        bugfix/*:
+            - step:
+                  name: Build from source
+                  size: 2x
+                  caches:
+                      - node
+                  script:
+                      - npm install
+                      - npm run build:prod
+        hotfix/*:
+            - step:
+                  name: Build from source
+                  size: 2x
+                  caches:
+                      - node
+                  script:
+                      - npm install
+                      - npm run build:prod
+        support/*:
+            - step:
+                  name: Build from source
+                  size: 2x
+                  caches:
+                      - node
+                  script:
+                      - npm install
+                      - npm run build:prod

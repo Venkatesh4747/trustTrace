@@ -1,0 +1,638 @@
+<div class="view-container" *ngIf="facilityProfile">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="main-container facility-profile" *ngIf="!pageLoading">
+            <div class="row">
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 max-width-300-px">
+                    <img
+                        class="thumbnail"
+                        src="{{ facilityProfile.logoUrl || utilService.getcdnImage('no-company-logo-found.png') }}"
+                    />
+                </div>
+                <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                    <div class="row">
+                        <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                            <div class="supplier-name-heading">
+                                <div class="supplier-heading" *ngIf="facilityProfile.name">
+                                    {{ facilityProfile.name }}
+                                </div>
+                                <div class="state-country" *ngIf="facilityProfile.referenceId">
+                                    {{ facilityProfile.referenceId }}
+                                </div>
+                                <div class="state-country">
+                                    <p class="supplier-location" *ngIf="facilityProfile.address">
+                                        {{ facilityProfile.address.state }} ,
+                                        {{ facilityProfile.address.country }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="description" *ngIf="checkAccess('FACILITY_UPDATE')">
+                                <app-inline-edit
+                                    (valueChange)="onValueChange()"
+                                    [(ngModel)]="facilityProfile.description"
+                                    [required]="true"
+                                    type="textarea"
+                                    class="supplier-description"
+                                    [disabled]="
+                                        !checkAccess('FACILITY_UPDATE') || !checkAccess('SUPPLIER_FACILITY_UPDATE')
+                                    "
+                                    [ngClass]="{
+                                        'is-not-accessible':
+                                            !checkAccess('FACILITY_UPDATE') || !checkAccess('SUPPLIER_FACILITY_UPDATE')
+                                    }"
+                                >
+                                </app-inline-edit>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <div>
+                                <div class="back-button-div">
+                                    <a (click)="commonServices.goBack(['/', 'facilities'])">
+                                        <button class="go-back-button">{{ 'Back' | translate }}</button>
+                                    </a>
+                                </div>
+                                <div class="star-rating">
+                                    <!-- STAR RATING -->
+                                    <div>
+                                        <p class="rating-heading">{{ 'Sustainability Rating' | translate }}</p>
+                                        <fieldset
+                                            class="rating"
+                                            [ngClass]="{
+                                                'is-not-accessible pointer-none ':
+                                                    !checkAccess('FACILITY_UPDATE') ||
+                                                    !checkAccess('SUPPLIER_FACILITY_UPDATE')
+                                            }"
+                                        >
+                                            <input
+                                                class="rating-radioBtn"
+                                                type="radio"
+                                                id="star5"
+                                                name="rating"
+                                                value="5"
+                                                (click)="updateQualityParam('5')"
+                                                [checked]="facilityProfile.qualityRating == 5"
+                                            />
+                                            <label class="full" for="star5" [attr.title]="env.star_rating['5']"></label>
+                                            <input
+                                                class="rating-radioBtn"
+                                                type="radio"
+                                                id="star4"
+                                                name="rating"
+                                                value="4"
+                                                (click)="updateQualityParam('4')"
+                                                [checked]="facilityProfile.qualityRating == 4"
+                                            />
+                                            <label class="full" for="star4" [attr.title]="env.star_rating['4']"></label>
+                                            <input
+                                                class="rating-radioBtn"
+                                                type="radio"
+                                                id="star3"
+                                                name="rating"
+                                                value="3"
+                                                (click)="updateQualityParam('3')"
+                                                [checked]="facilityProfile.qualityRating == 3"
+                                            />
+                                            <label class="full" for="star3" [attr.title]="env.star_rating['3']"></label>
+                                            <input
+                                                class="rating-radioBtn"
+                                                type="radio"
+                                                id="star2"
+                                                name="rating"
+                                                value="2"
+                                                (click)="updateQualityParam('2')"
+                                                [checked]="facilityProfile.qualityRating == 2"
+                                            />
+                                            <label class="full" for="star2" [attr.title]="env.star_rating['2']"></label>
+                                            <input
+                                                class="rating-radioBtn"
+                                                type="radio"
+                                                id="star1"
+                                                name="rating"
+                                                value="1"
+                                                (click)="updateQualityParam('1')"
+                                                [checked]="facilityProfile.qualityRating == 1"
+                                            />
+                                            <label class="full" for="star1" [attr.title]="env.star_rating['1']"></label>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="supplier-stats">
+                                <div class="flex-container">
+                                    <div class="male">
+                                        <app-inline-edit
+                                            (valueChange)="onValueChange()"
+                                            [(ngModel)]="facilityProfile.employeeCount.men"
+                                            [required]="true"
+                                            type="text"
+                                            class="male-numbers"
+                                            [disabled]="
+                                                !checkAccess('FACILITY_UPDATE') ||
+                                                !checkAccess('SUPPLIER_FACILITY_UPDATE')
+                                            "
+                                        >
+                                        </app-inline-edit>
+                                        <p class="male-title">{{ 'Male Employees' | translate }}</p>
+                                    </div>
+                                    <div class="female">
+                                        <app-inline-edit
+                                            (valueChange)="onValueChange()"
+                                            [(ngModel)]="facilityProfile.employeeCount.women"
+                                            [required]="true"
+                                            type="text"
+                                            class="female-numbers"
+                                            [disabled]="
+                                                !checkAccess('FACILITY_UPDATE') ||
+                                                !checkAccess('SUPPLIER_FACILITY_UPDATE')
+                                            "
+                                        >
+                                        </app-inline-edit>
+                                        <p class="female-title">{{ 'Female Employees' | translate }}</p>
+                                    </div>
+                                    <div class="styles">
+                                        <app-inline-edit
+                                            (valueChange)="onValueChange($event, 'DATE')"
+                                            [(ngModel)]="facilityProfile.associatedSince"
+                                            [required]="true"
+                                            type="date"
+                                            class="yor-numbers"
+                                            [disabled]="
+                                                !checkAccess('FACILITY_UPDATE') ||
+                                                !checkAccess('SUPPLIER_FACILITY_UPDATE')
+                                            "
+                                        >
+                                        </app-inline-edit>
+                                        <p class="yor-title">{{ 'Supplier since' | translate }}</p>
+                                    </div>
+                                    <div class="years of">
+                                        <p class="style-numbers">{{ facilityProfile.noOfAssessments || 0 }}</p>
+                                        <p class="style-title">{{ 'Assessments' | translate }}</p>
+                                    </div>
+                                    <div class="capacity">
+                                        <p class="capacity-numbers">
+                                            {{ facilityProfile.productionCapacity || ('No data' | translate) }}
+                                        </p>
+                                        <p class="capacity-title">{{ 'Production Capacity' | translate }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pl-2 tab-group-wrapper mat-tab-view-page">
+                <mat-tab-group mat-stretch-tabs class="toby">
+                    <mat-tab class="col-xs-3 col-sm-3 col-md-3 col-lg-2" *ngFor="let tab of facilityProfileTypes">
+                        <ng-template mat-tab-label>
+                            <div
+                                class="form-group bottom cursor-default"
+                                [ngClass]="{ selected: facilityProfileType === tab }"
+                                (click)="changeFacilityProfileType(tab)"
+                            >
+                                <label class="cursor-pointer">{{ tab | translate }}</label>
+                                <div [ngClass]="{ selected: facilityProfileType === tab }"></div>
+                            </div>
+                        </ng-template>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+
+            <div id="card" *ngIf="facilityProfileType === facilityProfileTypes[1]">
+                <div class="row fs-table">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="table custom-table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-md-2">{{ 'Parameters' | translate }}</th>
+                                            <th>{{ 'Score' | translate }}</th>
+                                            <th>{{ 'Risk Status' | translate }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngIf="facilityRating.bsci">
+                                            <td>{{ 'BSCI Worldwide Governance Indicators' | translate }}</td>
+                                            <td>
+                                                <div class="scorebar">
+                                                    <progressbar
+                                                        [max]="100"
+                                                        [value]="facilityRating.bsci.index"
+                                                        [type]="facilityRating.bsci.type"
+                                                    >
+                                                        <span class="text-nowrap white-text">{{
+                                                            facilityRating.bsci.index
+                                                        }}</span>
+                                                    </progressbar>
+                                                    <span class="min-score-label">0</span>
+                                                    <span class="max-score-label">100</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {{ facilityRating.bsci.status }}
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="facilityRating.waterRisk">
+                                            <td>{{ 'Water Risk' | translate }}</td>
+                                            <td>
+                                                <div class="scorebar">
+                                                    <progressbar
+                                                        [max]="5"
+                                                        [value]="facilityRating.waterRisk.index"
+                                                        [type]="facilityRating.waterRisk.type"
+                                                    >
+                                                        <span class="text-nowrap white-text">{{
+                                                            facilityRating.waterRisk.index
+                                                        }}</span>
+                                                    </progressbar>
+                                                    <span class="min-score-label">0</span>
+                                                    <span class="max-score-label">5</span>
+                                                </div>
+                                            </td>
+                                            <td>{{ facilityRating.waterRisk.status }}</td>
+                                        </tr>
+                                        <tr *ngIf="facilityRating.biodiversity">
+                                            <td>{{ 'Biodiversity Habitat' | translate }}</td>
+                                            <td>
+                                                <div class="scorebar">
+                                                    <progressbar
+                                                        [max]="100"
+                                                        [value]="facilityRating.biodiversity.index"
+                                                        [type]="facilityRating.biodiversity.type"
+                                                    >
+                                                        <span class="text-nowrap white-text">{{
+                                                            facilityRating.biodiversity.index
+                                                        }}</span>
+                                                    </progressbar>
+                                                    <span class="min-score-label">0</span>
+                                                    <span class="max-score-label">100</span>
+                                                </div>
+                                            </td>
+                                            <td>{{ facilityRating.biodiversity.status }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row text-color-primary" *ngIf="facilityProfileType === facilityProfileTypes[0]">
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 width-300-px">
+                    <app-address [address]="address" [formMode]="editAddress" [editVisible]="editVisible"></app-address>
+                    <app-contact-info
+                        [contact]="contact"
+                        (contactValueChange)="onValueChange($event, 'CONTACT')"
+                        [formMode]="editContactInfo"
+                        [showEditIcon]="checkAccess('FACILITY_UPDATE') && checkAccess('SUPPLIER_FACILITY_UPDATE')"
+                    >
+                    </app-contact-info>
+                </div>
+                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ml-3">
+                    <div class="vp-mt-cert-container">
+                        <!-- VP DETAILS -->
+                        <div class="hr">
+                            <span class="hr-title">{{ 'VALUE PROCESS' | translate }}</span>
+                        </div>
+                        <!-- VP EDITABLE INPUT -->
+                        <div class="no-vp-mat-data" *ngIf="facilityProfile.valueProcess.length === 0">
+                            <p>{{ 'No value process data available. Type below to add.' | translate }}</p>
+                        </div>
+                        <div class="value-process" id="profile-chip-list">
+                            <mat-form-field class="chip-list">
+                                <mat-chip-list #chipVPList>
+                                    <mat-chip
+                                        style="background: rgb(156, 253, 205);color: rgb(3, 63, 141);"
+                                        *ngFor="let vp of facilityProfile.valueProcess"
+                                        [selectable]="vpSelectable"
+                                        [removable]="vpRemovable"
+                                        (removed)="removeVp(vp)"
+                                    >
+                                        {{ localeService.getDisplayText(vp) }}
+                                        <mat-icon matChipRemove *ngIf="vpRemovable">cancel</mat-icon>
+                                    </mat-chip>
+                                    <span
+                                        *ngIf="
+                                            checkAccess('SUPPLIER_FACILITY_UPDATE') && checkAccess('FACILITY_UPDATE')
+                                        "
+                                        class="glyphicon glyphicon-plus"
+                                        style="color:#474747;margin-left: 10px;margin-top: 10px;"
+                                    ></span>
+                                    <input
+                                        (click)="wantToEditVp()"
+                                        #vpInput
+                                        [formControl]="vpCtrl"
+                                        [matAutocomplete]="vpauto"
+                                        [matChipInputFor]="chipVPList"
+                                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                        (click)="focusOnInput('VP')"
+                                        [tooltip]="'click to add'"
+                                        data-placement="top"
+                                        [disabled]="
+                                            !checkAccess('FACILITY_UPDATE') || !checkAccess('SUPPLIER_FACILITY_UPDATE')
+                                        "
+                                    />
+                                </mat-chip-list>
+                                <mat-autocomplete
+                                    #vpauto="matAutocomplete"
+                                    (optionSelected)="selectedValueProcess($event)"
+                                >
+                                    <mat-option
+                                        *ngFor="let vp of filteredVps | async | sortByFilter: 'value'"
+                                        [value]="vp.id"
+                                    >
+                                        {{ vp.value }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+
+                        <!-- VP EDITABLE INPUT -->
+                        <!-- VP DETAILS ENDS -->
+
+                        <!-- MATERIALS DETAILS -->
+                        <div class="materials-container">
+                            <div class="hr">
+                                <span class="hr-title">{{ 'MATERIALS' | industry | translate }}</span>
+                            </div>
+                            <!-- MT EDITABLE INPUT -->
+                            <div class="materials" id="profile-chip-list">
+                                <div class="no-vp-mat-data" *ngIf="facilityProfile.materials.length === 0">
+                                    <p>
+                                        {{ 'No materials data available. Type below to add.' | industry | translate }}
+                                    </p>
+                                </div>
+                                <!-- <app-chip-input
+                                    [placeholderText]="''"
+                                    [showPlus]="true"
+                                    [isRemovable]="true"
+                                    [isRemovableOnFocus]="true"
+                                    [chipItems]="selectedMaterials"
+                                    [autoCompleteList]="matObjs"
+                                    (valueChange)="updateMaterials($event)"
+                                ></app-chip-input> -->
+                                <mat-form-field class="chip-list">
+                                    <mat-chip-list #chipMatList>
+                                        <mat-chip
+                                            style="background: rgb(156, 242, 253);color: rgb(3, 63, 141);"
+                                            *ngFor="let material of facilityProfile.materials"
+                                            [selectable]="matSelectable"
+                                            [removable]="matRemovable"
+                                            (removed)="removeMat(material)"
+                                        >
+                                            {{ localeService.getDisplayText(material) }}
+                                            <mat-icon matChipRemove *ngIf="matRemovable">cancel</mat-icon>
+                                        </mat-chip>
+                                        <span
+                                            *ngIf="
+                                                checkAccess('SUPPLIER_FACILITY_UPDATE') &&
+                                                checkAccess('FACILITY_UPDATE')
+                                            "
+                                            class="glyphicon glyphicon-plus"
+                                            style="color:#474747; margin-left: 10px;"
+                                        ></span>
+                                        <input
+                                            #matInput
+                                            [formControl]="matCtrl"
+                                            [matAutocomplete]="matAuto"
+                                            (click)="wantToEditMat()"
+                                            [matChipInputFor]="chipMatList"
+                                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                            (click)="focusOnInput('Material')"
+                                            [tooltip]="'click to add'"
+                                            data-placement="top"
+                                            [disabled]="
+                                                !checkAccess('FACILITY_UPDATE') ||
+                                                !checkAccess('SUPPLIER_FACILITY_UPDATE')
+                                            "
+                                        />
+                                    </mat-chip-list>
+                                    <mat-autocomplete
+                                        #matAuto="matAutocomplete"
+                                        (optionSelected)="selectedMaterials($event)"
+                                    >
+                                        <mat-option
+                                            *ngFor="let material of filteredMaterials | async | sortByFilter: 'value'"
+                                            [value]="material.id"
+                                        >
+                                            {{ material.value }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <!-- END OF MT EDITABLE INPUT -->
+                        <!-- MATERIALS DETAILS ENDS -->
+
+                        <!-- CERT DETAILS -->
+                        <div class="certifications-container">
+                            <div class="hr">
+                                <span class="hr-title">{{ 'CERTIFICATIONS' | translate }}</span>
+                            </div>
+                            <div class="standardsContainer" style="border:none;">
+                                <p class="noMaterials pt-1" *ngIf="standards?.length <= 0">
+                                    {{ 'No Standards' | translate }} &amp;
+                                    {{ 'Certifications' | translate }}
+                                </p>
+                                <div class="row" *ngIf="standards?.length > 0">
+                                    <div
+                                        class="col-md-2 standardsImageContainer"
+                                        *ngFor="let standard of standards; let i = index"
+                                    >
+                                        <div
+                                            class="certificate-item"
+                                            [tooltip]="certificateTooltipContent"
+                                            data-placement="top"
+                                            (click)="
+                                                certificateManagerService.downloadFile(
+                                                    standard.id,
+                                                    standard.uploadedFiles[0]
+                                                )
+                                            "
+                                            containerClass="certificateTooltip"
+                                            container="body"
+                                        >
+                                            <img
+                                                src="{{ utilService.getStandardImageUrl(standard.typeId) }}"
+                                                (error)="utilService.getDefaultCertificateImage($event.target)"
+                                                alt="Certificate Image"
+                                            />
+                                            <div class="overlay-download-icon">
+                                                <img
+                                                    src="{{ env.IMG_URL }}images/icon-download-white.png"
+                                                    alt="Download Certificate"
+                                                />
+                                            </div>
+                                            <div class="download-icon placement-bottom-right">
+                                                <img
+                                                    src="{{ env.IMG_URL }}images/icon-download-grey.png"
+                                                    alt="Download Certificate"
+                                                />
+                                            </div>
+                                        </div>
+                                        <ng-template #certificateTooltipContent>
+                                            <div
+                                                class="text-left"
+                                                style="background-color: #fff; border: 1px solid #f5f5f5;"
+                                            >
+                                                <h5 class="tt-font">{{ getCertificateNameById(standard.typeId) }}</h5>
+                                                <h5 class="tt-font tt-font-regular">
+                                                    {{ 'Validity' | translate }}:
+                                                    <span style="font-weight: bold !important;">{{
+                                                        standard.expiryDate | date
+                                                    }}</span>
+                                                </h5>
+                                                <h5 class="tt-font tt-font-regular">
+                                                    {{ 'Certification Body' | translate }}:
+                                                    <span style="font-weight: bold !important;">{{
+                                                        standard.body
+                                                    }}</span>
+                                                </h5>
+                                                <h5 class="tt-font tt-font-regular">
+                                                    {{ 'Facility Name' | translate }}:
+                                                    <span style="font-weight: bold !important;">{{
+                                                        standard.facilityName
+                                                    }}</span>
+                                                </h5>
+                                            </div>
+                                        </ng-template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- CERT DETAILS ENDS -->
+                    </div>
+                </div>
+                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ml-3">
+                    <!-- <div class="todo-facilities-container">
+                        <div class="todo-list-div">
+                            <app-todo-task
+                                [todoTask]="todoTask"
+                                [supplierId]="supplierId"
+                                [analyticsPageOrigin]="analyticsPageOrigin"
+                            ></app-todo-task>
+                        </div>
+
+                        <div class="facilities-list-div">
+                            <div class="hr">
+                                <span class="hr-title">{{ 'FACILITIES' | translate }}</span>
+                            </div>
+                        </div>
+                        <div class="facilities-lists">
+                            <div class="facilities-div" *ngFor="let facility of facilityProfile.facilities">
+                                <div class="table-card">
+                                    <div class="table-card-left">
+                                        <p class="supplier-name">{{ facility.name }}</p>
+                                        <p class="facility-location" *ngIf="facility.address">
+                                            {{ facility.address.city }}, {{ facility.address.state }}
+                                        </p>
+                                    </div>
+                                    <div class="table-card-right flex-column" *ngIf="facility.address">
+                                        <div
+                                            class="flag-icon flag-icon-{{
+                                                getCountryCode(facility.address.country)
+                                            }} action-item align-self-flex-end"
+                                        ></div>
+                                        <p style="float:right;">{{ facility.address.country }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="noFacilitesData"
+                                *ngIf="
+                                    facilityProfile.facilities === undefined || facilityProfile.facilities.length === 0
+                                "
+                            >
+                                <p>
+                                    {{ 'No facilities available' | translate }}
+                                </p>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="styles-association-container">
+                        <div class="hr">
+                            <span class="hr-title">{{ 'Styles Associated' | industry | translate }} (0)</span>
+                        </div>
+                        <div class="stylesAssociationContainer" style="border:none;">
+                            <p class="noCertData pt-1">
+                                {{ 'No Styles Available' | industry | translate }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="materials-association-container">
+                        <div class="hr">
+                            <span class="hr-title">{{ 'RAW-MATERIALS' | industry | translate }} (0)</span>
+                        </div>
+                        <div class="materialsAssociationContainer" style="border:none;">
+                            <p class="noCertData pt-1">
+                                {{ 'No Raw Materials Available' | industry | translate }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="audit-container">
+                        <div class="hr">
+                            <span class="hr-title">{{ 'AUDITS' | translate }} ({{ auditCount }})</span>
+                        </div>
+                        <div class="no-data" *ngIf="audits.length === 0">
+                            {{ 'No Audit Available' | translate }}
+                        </div>
+                    </div>
+                    <div class="audit-table">
+                        <div
+                            class="table-card cursorp"
+                            *ngFor="let audit of audits"
+                            (click)="
+                                commonServices.navigateToUrlWithLocationBack(['/', 'assessment-audit', audit.auditId])
+                            "
+                        >
+                            <div class="table-card-left">
+                                <div class="desc blue-desc">
+                                    <span class="title blue-title">
+                                        {{ audit.auditName }}
+                                    </span>
+                                </div>
+                                <div class="desc blue-desc">
+                                    {{ 'Audit Standard' | translate }}:
+                                    <span class="title blue-title">
+                                        {{ audit.auditStandard }}
+                                    </span>
+                                </div>
+                                <div class="desc blue-desc">
+                                    {{ 'Validity' | translate }}:
+                                    <span class="title blue-title">{{
+                                        moment(audit['validity']).format('DD MMM YYYY')
+                                    }}</span>
+                                </div>
+                            </div>
+                            <div class="table-card-left flex-column"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row text-color-primary" *ngIf="!isAStaticProfileType(facilityProfileType)">
+                <div class="col-md-12" *ngIf="!isFetchingAdditionalInfo">
+                    <div class="facilitie-details-additional-info">
+                        <app-additional-information
+                            [entityId]="facilityId"
+                            [entity]="entity"
+                            [entityData]="additionalInfo"
+                            [fieldResponse]="fieldResponse"
+                            [canShowEditIcon]="checkAccess('SUPPLIER_FACILITY_UPDATE')"
+                            (saveAdditionalInfo)="onSaveAdditionalInfo($event)"
+                        >
+                        </app-additional-information>
+                    </div>
+                </div>
+                <i class="fa fa-spinner fa-spin ec-loader" *ngIf="isFetchingAdditionalInfo"></i>
+            </div>
+        </div>
+    </div>
+</div>

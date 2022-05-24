@@ -1,0 +1,102 @@
+<div class="filter-criteria-container" *ngIf="!isEditable">
+    <div class="edit-btn-container" *ngIf="showEditIcon">
+        <a>
+            <button class="edit-styled-btn width-100-px float-r mr-2" (click)="handleEditClick()">
+                <i class="fa fa-pencil"></i>{{ 'Edit' | translate }}
+            </button>
+        </a>
+    </div>
+
+    <div class="additional-info-detail">
+        <div class="information-details" *ngIf="filterCriteriaItems">
+            <div class="information-details-block" *ngFor="let item of filterCriteriaItems; trackBy: trackById">
+                <div class="information-details-block-inner-left">
+                    <span class="information-details-list">
+                        {{ item.display_config.name }}
+                    </span>
+                    <span class="information-details-list">:&nbsp;&nbsp;&nbsp;</span>
+                </div>
+                <div
+                    class="information-details-block-inner-right"
+                    *ngIf="item.filter_criteria.value && item.filter_criteria.value.length > 0"
+                >
+                    <span
+                        class="information-details-value"
+                        *ngFor="let val of item.filter_criteria.value; let isLast = last"
+                    >
+                        {{ val }} {{ isLast ? '' : ',' }}
+                    </span>
+                </div>
+                <div
+                    class="information-details-block-inner-right"
+                    *ngIf="
+                        !item.filter_criteria.value ||
+                        item.filter_criteria.value.length === 0 ||
+                        item.filter_criteria.value[0] === null
+                    "
+                >
+                    {{ 'Not Available' | translate }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p *ngIf="isFetchingFilterCriteriaItems" class="spinner-wrapper">
+        <mat-spinner [diameter]="20"></mat-spinner>
+    </p>
+    <p *ngIf="!filterCriteriaItems && !isFetchingFilterCriteriaItems">
+        {{ 'No details available. Click the edit button to add.' | translate }}
+    </p>
+</div>
+<div *ngIf="isEditable">
+    <div *ngIf="isSaving" class="spinner-wrapper">
+        <mat-spinner [diameter]="20"></mat-spinner>
+    </div>
+    <div class="filter-criteria-form-container" *ngIf="filterCriteriaForm">
+        <form class="filter-criteria-form" [formGroup]="filterCriteriaForm">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="filter-criteria-form-item-detail">
+                        <div
+                            class="filter-criteria-form-item-detail-block"
+                            *ngFor="let item of filterCriteriaItems; let ind = index"
+                        >
+                            <div class="filter-app-filter-criteria-form-item-detail-header">
+                                <span class="filter-criteria-form-item-detail-list">
+                                    {{ item.display_config.name }}
+                                </span>
+                                <span class="filter-criteria-form-item-detail-list">:&nbsp;&nbsp;&nbsp;</span>
+                            </div>
+                            <app-edit-fields [filterCriteriaItem]="item" [parentForm]="filterCriteriaForm">
+                            </app-edit-fields>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pr-2">
+                <div class="col-md-8">
+                    <div class="button-block">
+                        <div class="alignment-right">
+                            <button mat-button class="cancel-btn" (click)="cancelEditMode()">
+                                {{ 'Cancel' | translate }}
+                            </button>
+
+                            <button
+                                mat-button
+                                class="save-btn"
+                                (click)="saveFilterCriteria()"
+                                [disabled]="!filterCriteriaForm.valid"
+                            >
+                                {{ 'Save' | translate }}
+                            </button>
+                        </div>
+                        <!-- Alignment Right -->
+                    </div>
+                    <!-- Button Block -->
+                </div>
+                <!-- Column -->
+            </div>
+        </form>
+    </div>
+</div>

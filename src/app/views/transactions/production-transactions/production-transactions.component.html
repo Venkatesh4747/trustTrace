@@ -1,0 +1,894 @@
+<div id="record-transactions-categories" class="material-input-style-box-type">
+    <div id="production-transactions" class="material-input-style-box-type-inner">
+        <div class="row pb-2">
+            <div class="hr mr-2">
+                <span class="hr-title">{{ 'Production' | translate }} </span>
+            </div>
+        </div>
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div>
+            <form #createProductionForm="ngForm">
+                <div class="row">
+                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 pr-2" *ngIf="tierConfig">
+                        <div class="create-production-form-block">
+                            <div class="flex-container" *ngFor="let productIdentifier of PRODUCT_IDENTIFIERS">
+                                <div class="flex-container-inner" *ngIf="checkToShowField(productIdentifier)">
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            type="text"
+                                            placeholder="{{ getFieldLabel(productIdentifier) | translate }}:"
+                                            name="Article/Style"
+                                            [(ngModel)]="soaUniqueName"
+                                            (blur)="validateSelectedProduct(productIdentifier)"
+                                            matInput
+                                            [matAutocomplete]="soaSearch"
+                                            (keyup)="searchStyleOrArticle($event, productIdentifier)"
+                                            required
+                                            data-cy="inbound-transaction-style-name-number"
+                                        />
+                                        <mat-error class="error-msg" *ngIf="showArticleError"
+                                            >{{ articleError | translate }}
+                                        </mat-error>
+                                        <mat-error class="error-msg" *ngIf="!soaUniqueName && !showArticleError"
+                                            >{{ getFieldLabel(productIdentifier) | translate }}&nbsp;{{
+                                                'is missing' | translate
+                                            }}</mat-error
+                                        >
+                                        <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                            soaSearchHintText | translate
+                                        }}</mat-hint>
+                                        <mat-autocomplete
+                                            #soaSearch="matAutocomplete"
+                                            [displayWith]="getProductName.bind(this)"
+                                            (optionSelected)="onProductSelection($event.option.value)"
+                                        >
+                                            <mat-option *ngFor="let item of searchData" [value]="item">
+                                                {{ getProductName(item) }}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <div class="flex-container-inner" *ngIf="checkToShowField(productionLabels.FACILITY)">
+                                <!-- <app-tt-dropdown-search
+                                    [(ngModel)]="transaction.facilityId"
+                                    name="facilities"
+                                    placeholder="{{ getFieldLabel(productionLabels.FACILITY) | translate }}:"
+                                    [searchOptions]="config.facilities"
+                                    [data_cy]="'production-transaction-facilities'"
+                                    required
+                                    [isRequired]="true"
+                                    [showToastr]="false"
+                                >
+                                </app-tt-dropdown-search> -->
+
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{ getFieldLabel(productionLabels.FACILITY) | translate }}:"
+                                        name="facilities"
+                                        [(ngModel)]="searchTermFacility"
+                                        (blur)="validateSelectedFacility()"
+                                        matInput
+                                        [matAutocomplete]="facilitySearch"
+                                        (keyup)="searchFacility($event)"
+                                        required
+                                        data-cy="inbound-transaction-associated-facility"
+                                    />
+                                    <mat-error class="error-msg" *ngIf="!searchTermFacility">
+                                        {{ getFieldLabel(productionLabels.FACILITY) | translate }}&nbsp;{{
+                                            'is missing' | translate
+                                        }}</mat-error
+                                    >
+                                    <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                        facilitySearchHintText | translate
+                                    }}</mat-hint>
+                                    <mat-autocomplete
+                                        #facilitySearch="matAutocomplete"
+                                        [displayWith]="getFacilityName"
+                                        (closed)="validation()"
+                                        (optionSelected)="onFacilitySelection($event.option.value)"
+                                    >
+                                        <mat-option *ngFor="let item of facilities" [value]="item">
+                                            {{ item.reference_id }}-{{ item.name }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                </mat-form-field>
+                            </div>
+
+                            <div
+                                class="flex-container-inner"
+                                *ngIf="checkToShowField(productionLabels.MATERIAL_COMPOSITION)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        matInput
+                                        name="styleComposition"
+                                        placeholder="{{
+                                            getFieldLabel(productionLabels.MATERIAL_COMPOSITION) | translate
+                                        }}:"
+                                        [value]="getStyleComposition()"
+                                        data-cy="production-transaction-style-composition"
+                                        readonly
+                                    />
+                                </mat-form-field>
+                            </div>
+
+                            <div
+                                class="flex-container-inner"
+                                *ngIf="checkToShowField(productionLabels.SUPPLIER_MATERIAL_NAME)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        matInput
+                                        name="supplierMaterialName"
+                                        placeholder="{{
+                                            getFieldLabel(productionLabels.SUPPLIER_MATERIAL_NAME) | translate
+                                        }}:"
+                                        [(ngModel)]="transaction.productionData.supplierMaterialName"
+                                        data-cy="production-transaction-supplier-material-name"
+                                        readonly
+                                    />
+                                </mat-form-field>
+                            </div>
+
+                            <div class="flex-container-inner" *ngIf="checkToShowField(productionLabels.LOT_ID)">
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{ getFieldLabel(productionLabels.LOT_ID) | translate }}:"
+                                        name="NewReferenceId"
+                                        #referenceId
+                                        [(ngModel)]="transaction.productionData.outputLotId"
+                                        matInput
+                                        required
+                                        data-cy="production-transaction-new-reference-id"
+                                    />
+                                    <mat-error class="error-msg" *ngIf="!transaction.productionData.outputLotId"
+                                        >{{ getFieldLabel(productionLabels.LOT_ID) | translate }}&nbsp;{{
+                                            'is missing' | translate
+                                        }}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+
+                            <div
+                                class="flex-container-inner"
+                                *ngIf="checkToShowField(productionLabels.TRANSACTION_DATE)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        matInput
+                                        [max]="today"
+                                        [matDatepicker]="picker"
+                                        name="transactionDate"
+                                        [(ngModel)]="transaction.date"
+                                        placeholder="{{
+                                            getFieldLabel(productionLabels.TRANSACTION_DATE) | translate
+                                        }}:"
+                                        readonly
+                                        (click)="picker.open()"
+                                        data-cy="production-transaction-date"
+                                        required
+                                    />
+                                    <mat-error class="error-msg" *ngIf="!transaction.date"
+                                        >{{ getFieldLabel(productionLabels.TRANSACTION_DATE) | translate }}&nbsp;{{
+                                            'is missing' | translate
+                                        }}</mat-error
+                                    >
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="flex-container-inner" *ngIf="checkToShowField(productionLabels.QUANTITY)">
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        matInput
+                                        type="number"
+                                        name="outputQuantity"
+                                        placeholder="{{ getFieldLabel(productionLabels.QUANTITY) | translate }}:"
+                                        [(ngModel)]="transaction.productionData.outputQuantity.quantity"
+                                        (keydown)="commonServices.filterInput($event)"
+                                        required
+                                    />
+                                    <mat-error
+                                        class="error-msg"
+                                        *ngIf="!transaction.productionData.outputQuantity.quantity"
+                                        >{{ getFieldLabel(productionLabels.QUANTITY) | translate }}&nbsp;{{
+                                            'is missing' | translate
+                                        }}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+
+                            <div
+                                class="flex-container-inner"
+                                *ngIf="checkToShowField(productionLabels.QUANTITY_SUPPLIER_UOM)"
+                            >
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        matInput
+                                        type="number"
+                                        name="quantityInSupplierUOM"
+                                        placeholder="{{
+                                            getFieldLabel(productionLabels.QUANTITY_SUPPLIER_UOM) | translate
+                                        }}:"
+                                        [(ngModel)]="transaction.productionData.sellerUOM.quantity"
+                                        data-cy="production-transaction-quantity-supplier"
+                                        (keydown)="commonServices.filterInput($event)"
+                                        [required]="selectedTier === 'Tier1'"
+                                    />
+                                </mat-form-field>
+                            </div>
+
+                            <div class="flex-container-inner" *ngIf="checkToShowField(productionLabels.SUPPLIER_UOM)">
+                                <app-tt-dropdown-search
+                                    [searchOptions]="config.unit"
+                                    [(ngModel)]="transaction.productionData.sellerUOM.unit"
+                                    placeholder="{{ getFieldLabel(productionLabels.SUPPLIER_UOM) | translate }}:"
+                                    [isRequired]="
+                                        selectedTier === 'Tier1' ||
+                                        (selectedTier !== 'Tier1' &&
+                                            transaction.productionData.sellerUOM.quantity !== null)
+                                    "
+                                    [required]="
+                                        selectedTier === 'Tier1' ||
+                                        (selectedTier !== 'Tier1' &&
+                                            transaction.productionData.sellerUOM.quantity !== null)
+                                    "
+                                    name="outputQuantityUnit"
+                                    [data_cy]="'production-transaction-units'"
+                                    [showToastr]="false"
+                                >
+                                </app-tt-dropdown-search>
+                            </div>
+
+                            <div
+                                class="flex-container-inner"
+                                *ngIf="checkToShowField(productionLabels.YEAR) && tierPayload.tier === tiers[0]"
+                            >
+                                <app-tt-dropdown-search
+                                    [searchOptions]="config.year"
+                                    [(ngModel)]="transaction.productionData.year"
+                                    placeholder="{{ getFieldLabel(productionLabels.YEAR) | translate }}:"
+                                    name="year"
+                                    [data_cy]="'production-transaction-year'"
+                                    [showToastr]="false"
+                                >
+                                </app-tt-dropdown-search>
+                            </div>
+                            <div
+                                class="flex-container-inner"
+                                *ngIf="checkToShowField(productionLabels.SEASON) && tierPayload.tier === tiers[0]"
+                            >
+                                <app-tt-dropdown-search
+                                    [searchOptions]="config.season"
+                                    [(ngModel)]="transaction.productionData.season"
+                                    placeholder="{{ getFieldLabel(productionLabels.SEASON) | translate }}:"
+                                    name="season"
+                                    [data_cy]="'production-transaction-season'"
+                                    [showToastr]="false"
+                                >
+                                </app-tt-dropdown-search>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mb-2">
+                    <div class="col-md-8 pl-0">
+                        <div class="hr text-center">
+                            <span class="hr-title text-muted">{{ 'Sustainable Materials' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-xs-12 col-lg-12 col-sm-12">
+                        <div
+                            class="production-transaction-materials-style"
+                            *ngFor="
+                                let inputMaterial of sustainableProductionInputs;
+                                let isFirst = first;
+                                let isLast = last;
+                                let i = index
+                            "
+                        >
+                            <!-- <div class="row pt-2" *ngIf="tierPayload.tier !== tiers[1]">
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.INPUT_ARTICLE_NAME_NUMBER)"
+                                >
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            type="text"
+                                            placeholder="{{
+                                                getFieldLabel(productionLabels.INPUT_ARTICLE_NAME_NUMBER) | translate
+                                            }}:"
+                                            name="articles-{{ sustainableProductionInputs[i].fieldName }}{{ i }}-{{
+                                                i
+                                            }}"
+                                            [(ngModel)]="sustainableProductionInputs[i]['articleId']"
+                                            matInput
+                                            [matAutocomplete]="articlesAuto"
+                                            (keyup)="searchArticle($event, i)"
+                                            required
+                                            data-cy="production-transaction-article"
+                                        />
+                                        <mat-error
+                                            class="error-msg"
+                                            *ngIf="!sustainableProductionInputs[i]['articleId']"
+                                            >{{
+                                                getFieldLabel(productionLabels.INPUT_ARTICLE_NAME_NUMBER) | translate
+                                            }}&nbsp;{{ 'is missing' | translate }}</mat-error
+                                        >
+                                        <mat-hint [ngStyle]="{ color: articleHintColor }">{{
+                                            articleSearchHintText | translate
+                                        }}</mat-hint>
+                                        <mat-autocomplete
+                                            #articlesAuto="matAutocomplete"
+                                            [displayWith]="getLotDisplayName"
+                                            (optionSelected)="onArticleSelection($event.option.value, i)"
+                                        >
+                                            <mat-option *ngFor="let item of config.article_search" [value]="item">
+                                                {{ item.product_name }}-{{ item.product_number }}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </div>
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.INPUT_MATERIAL_COMPOSITION)"
+                                >
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            name="inputStyleComposition-{{ sustainableProductionInputs[i].fieldName }}{{
+                                                i
+                                            }}-{{ i }}"
+                                            placeholder="{{
+                                                getFieldLabel(productionLabels.INPUT_MATERIAL_COMPOSITION) | translate
+                                            }}:"
+                                            [(ngModel)]="inputStyleComposition[i]"
+                                            data-cy="production-input-transaction-style-composition"
+                                            readonly
+                                        />
+                                    </mat-form-field>
+                                </div>
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.INPUT_PO_NUMBER)"
+                                >
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="config.poNumber"
+                                        (selectionChange)="onPoNumberChange($event, i)"
+                                        [(ngModel)]="sustainableProductionInputs[i].poNumber"
+                                        placeholder="{{ getFieldLabel(productionLabels.INPUT_PO_NUMBER) | translate }}:"
+                                        name="poNumber-{{ sustainableProductionInputs[i].fieldName }}"
+                                        [optionalParams]="poOptional"
+                                        [selectedItem]="sustainableProductionInputs"
+                                        required
+                                        [isRequired]="true"
+                                        [data_cy]="'production-transaction-purchase-order-no'"
+                                        [showToastr]="false"
+                                    >
+                                    </app-tt-dropdown-search>
+                                </div>
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.INPUT_LOT_ID)"
+                                >
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="config.lots"
+                                        (selectionChange)="inputLotChanged($event, i)"
+                                        [(ngModel)]="sustainableProductionInputs[i].lotId"
+                                        placeholder="{{ getFieldLabel(productionLabels.INPUT_LOT_ID) | translate }}:"
+                                        name="ReferenceId-{{ sustainableProductionInputs[i].fieldName }}{{ i }}-{{ i }}"
+                                        [optionalParams]="optional"
+                                        [selectedItem]="sustainableProductionInputs"
+                                        required
+                                        [isRequired]="true"
+                                        [data_cy]="'production-transaction-reference-id'"
+                                        [showToastr]="false"
+                                    >
+                                    </app-tt-dropdown-search>
+                                </div>
+                            </div> -->
+                            <div class="row pt-2">
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.INPUT_LOT_ID)"
+                                >
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            type="text"
+                                            placeholder="{{
+                                                getFieldLabel(productionLabels.INPUT_LOT_ID) | translate
+                                            }}:"
+                                            name="articles-{{ sustainableProductionInputs[i].fieldName }}{{ i }}-{{
+                                                i
+                                            }}"
+                                            [(ngModel)]="sustainableProductionInputs[i].lotId"
+                                            matInput
+                                            [matAutocomplete]="lotsAuto"
+                                            (keyup)="searchLot($event, i)"
+                                            required
+                                            data-cy="production-transaction-lot-id"
+                                        />
+                                        <mat-error class="error-msg" *ngIf="!sustainableProductionInputs[i].lotId"
+                                            >{{ getFieldLabel(productionLabels.INPUT_LOT_ID) | translate }}&nbsp;{{
+                                                'is missing' | translate
+                                            }}</mat-error
+                                        >
+                                        <mat-hint [ngStyle]="{ color: lotHintColor }">{{
+                                            lotSearchHintText | translate
+                                        }}</mat-hint>
+                                        <mat-autocomplete
+                                            #lotsAuto="matAutocomplete"
+                                            [displayWith]="getLotName"
+                                            (optionSelected)="onLotSelection($event.option.value, i)"
+                                        >
+                                            <mat-option *ngFor="let item of config.lot_search" [value]="item">
+                                                {{ item.lot_id }}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </div>
+
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.INPUT_PO_NUMBER)"
+                                >
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="config.poNumber"
+                                        (selectionChange)="onPoSelection($event, i)"
+                                        [(ngModel)]="sustainableProductionInputs[i].poNumber"
+                                        placeholder="{{ getFieldLabel(productionLabels.INPUT_PO_NUMBER) | translate }}:"
+                                        name="poNumber-{{ sustainableProductionInputs[i].fieldName }}{{ i }}-{{ i }}"
+                                        [optionalParams]="poOptional"
+                                        [selectedItem]="sustainableProductionInputs"
+                                        [required]="isPoNumberMandatory(sustainableProductionInputs[i])"
+                                        [isRequired]="isPoNumberMandatory(sustainableProductionInputs[i])"
+                                        [data_cy]="'production-transaction-purchase-order-no'"
+                                        [showToastr]="false"
+                                    >
+                                    </app-tt-dropdown-search>
+                                    <!-- <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            name="poNumber-{{ sustainableProductionInputs[i].fieldName }}{{ i }}-{{
+                                                i
+                                            }}"
+                                            placeholder="{{
+                                                getFieldLabel(productionLabels.INPUT_PO_NUMBER) | translate
+                                            }}:"
+                                            [(ngModel)]="sustainableProductionInputs[i].poNumber"
+                                            [required]="isPoNumberMandatory(sustainableProductionInputs[i])"
+                                            data-cy="production-transaction-purchase-order-no"
+                                            readonly
+                                        />
+                                    </mat-form-field> -->
+                                </div>
+
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.INPUT_ARTICLE_NAME_NUMBER)"
+                                >
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="config.mlmIds"
+                                        (selectionChange)="onMLMSelection($event, i)"
+                                        [(ngModel)]="sustainableProductionInputs[i].productItemId"
+                                        placeholder="{{
+                                            getFieldLabel(productionLabels.INPUT_ARTICLE_NAME_NUMBER) | translate
+                                        }}:"
+                                        name="article-name-number-{{ sustainableProductionInputs[i].fieldName }}{{
+                                            i
+                                        }}-{{ i }}"
+                                        [optionalParams]="mlmIdOptional"
+                                        [selectedItem]="sustainableProductionInputs"
+                                        [required]="isPoNumberMandatory(sustainableProductionInputs[i])"
+                                        [isRequired]="isPoNumberMandatory(sustainableProductionInputs[i])"
+                                        [data_cy]="'production-transaction-article-name-number'"
+                                        [showToastr]="false"
+                                    >
+                                    </app-tt-dropdown-search>
+                                    <!-- <mat-form-field>
+                                        <input class="input" matInput
+                                            name="ReferenceId-{{ sustainableProductionInputs[i].fieldName }}{{ i }}-{{i}}"
+                                            placeholder="{{ getFieldLabel(productionLabels.INPUT_ARTICLE_NAME_NUMBER) | translate }}:"
+                                            [(ngModel)]="sustainableProductionInputs[i].articleId"
+                                            data-cy="production-transaction-article-name-number" readonly />
+                                    </mat-form-field> -->
+                                </div>
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.SUPPLIER)"
+                                >
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="config.suppliers"
+                                        (selectionChange)="updateSupplier($event, i)"
+                                        [(ngModel)]="sustainableProductionInputs[i].supplierFacilityId"
+                                        placeholder="{{ getFieldLabel(productionLabels.SUPPLIER) | translate }}:"
+                                        name="supplier-{{ sustainableProductionInputs[i].fieldName }}{{ i }}-{{ i }}"
+                                        [optionalParams]="supplierOptional"
+                                        [selectedItem]="sustainableProductionInputs"
+                                        required
+                                        [isRequired]="true"
+                                        [data_cy]="'inbound-transaction-suppliers'"
+                                        [showToastr]="false"
+                                        [showTooltip]="false"
+                                        [canTextBeWrapped]="true"
+                                        *ngIf="selectedTier !== 'Tier2' && selectedTier !== 'Tier1'"
+                                    >
+                                    </app-tt-dropdown-search>
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="config.suppliers"
+                                        (selectionChange)="updateSupplier($event, i)"
+                                        [(ngModel)]="sustainableProductionInputs[i].supplierFacilityId"
+                                        placeholder="{{ getFieldLabel(productionLabels.SUPPLIER) | translate }}:"
+                                        name="supplier-{{ sustainableProductionInputs[i].fieldName }}{{ i }}-{{ i }}"
+                                        [optionalParams]="supplierOptional"
+                                        [selectedItem]="sustainableProductionInputs"
+                                        [isRequired]="false"
+                                        [data_cy]="'inbound-transaction-suppliers'"
+                                        [showToastr]="false"
+                                        [showTooltip]="false"
+                                        [canTextBeWrapped]="true"
+                                        *ngIf="selectedTier === 'Tier2' || selectedTier === 'Tier1'"
+                                    >
+                                    </app-tt-dropdown-search>
+                                </div>
+                            </div>
+                            <div class="row pt-2">
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.INPUT_MATERIAL_COMPOSITION)"
+                                >
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            name="inputStyleComposition-{{ sustainableProductionInputs[i].fieldName }}{{
+                                                i
+                                            }}-{{ i }}"
+                                            placeholder="{{
+                                                getFieldLabel(productionLabels.INPUT_MATERIAL_COMPOSITION) | translate
+                                            }}:"
+                                            [(ngModel)]="inputStyleComposition[i]"
+                                            data-cy="production-input-transaction-style-composition"
+                                            readonly
+                                        />
+                                    </mat-form-field>
+                                </div>
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.INPUT_LOT_QUANTITY)"
+                                >
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            type="number"
+                                            placeholder="{{
+                                                getFieldLabel(productionLabels.INPUT_LOT_QUANTITY) | translate
+                                            }}:"
+                                            name="inputQty-{{ sustainableProductionInputs[i].fieldName }}{{ i }}-{{
+                                                i
+                                            }}"
+                                            [(ngModel)]="sustainableProductionInputs[i].quantity.quantity"
+                                            (ngModelChange)="checkQuantityEntered($event, i)"
+                                            required
+                                            data-cy="production-transaction-quantity-used"
+                                            (keydown)="commonServices.filterInput($event)"
+                                            (blur)="checkNonZeroQuantity(i)"
+                                        />
+                                        <mat-error
+                                            class="error-msg"
+                                            *ngIf="!sustainableProductionInputs[i].quantity.quantity"
+                                        >
+                                            {{ getFieldLabel(productionLabels.INPUT_LOT_QUANTITY) | translate }}&nbsp;{{
+                                                'is missing' | translate
+                                            }}</mat-error
+                                        >
+                                    </mat-form-field>
+                                </div>
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="
+                                        checkToShowField(productionLabels.INPUT_QUANTITY_USED_IN_UOM) &&
+                                        tierPayload.tier === tiers[0]
+                                    "
+                                >
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            type="number"
+                                            name="inputQuantityUsedInUOM-{{
+                                                sustainableProductionInputs[i].fieldName
+                                            }}{{ i }}-{{ i }}"
+                                            placeholder="{{
+                                                getFieldLabel(productionLabels.INPUT_QUANTITY_USED_IN_UOM) | translate
+                                            }}:"
+                                            [(ngModel)]="sustainableProductionInputs[i].supplierUOM.quantity"
+                                            (ngModelChange)="updateQuantity(i)"
+                                            data-cy="production-transaction-input-quantity-used-in-uom"
+                                            (keydown)="commonServices.filterInput($event)"
+                                        />
+                                        <mat-error
+                                            class="error-msg"
+                                            *ngIf="!sustainableProductionInputs[i].supplierUOM.quantity"
+                                        >
+                                            {{
+                                                getFieldLabel(productionLabels.INPUT_QUANTITY_USED_IN_UOM) | translate
+                                            }}&nbsp;{{ 'is missing' | translate }}</mat-error
+                                        >
+                                    </mat-form-field>
+                                </div>
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="
+                                        checkToShowField(productionLabels.INPUT_UNITS_IN_UOM) &&
+                                        tierPayload.tier === tiers[0]
+                                    "
+                                >
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="config.input_unit"
+                                        [(ngModel)]="sustainableProductionInputs[i].supplierUOM.unit"
+                                        placeholder="{{
+                                            getFieldLabel(productionLabels.INPUT_UNITS_IN_UOM) | translate
+                                        }}:"
+                                        name="inputQuantityUnit-{{ sustainableProductionInputs[i].fieldName }}{{ i }}-{{
+                                            i
+                                        }}"
+                                        [isRequired]="sustainableProductionInputs[i].supplierUOM.quantity !== null"
+                                        [required]="sustainableProductionInputs[i].supplierUOM.quantity !== null"
+                                        [data_cy]="'production-transaction-input-quantity-uom'"
+                                        [showToastr]="false"
+                                    >
+                                    </app-tt-dropdown-search>
+                                </div>
+                                <div
+                                    class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label"
+                                    *ngIf="checkToShowField(productionLabels.INPUT_LOT_CREATION_DATE)"
+                                >
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            [matDatepicker]="inputLotDatePicker"
+                                            placeholder="{{
+                                                getFieldLabel(productionLabels.INPUT_LOT_CREATION_DATE) | translate
+                                            }}:"
+                                            name="lotCreationDate-{{ sustainableProductionInputs[i].fieldName }}{{
+                                                i
+                                            }}-{{ i }}"
+                                            [(ngModel)]="sustainableProductionInputs[i].inputTxDate"
+                                            readonly
+                                            (click)="inputLotDatePicker.open()"
+                                            data-cy="input-lot-creation-date"
+                                        />
+                                        <mat-datepicker-toggle matSuffix [for]="inputLotDatePicker">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #inputLotDatePicker></mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+                                <div *ngIf="isLast" class="col-md-3 col-xs-3 col-lg-3 col-sm-3 mt-1">
+                                    <div class="input-material-btn cursor-pointer" (click)="addInputMaterial()">
+                                        <i class="action-icons-big fa fa-plus"></i>
+                                        {{ 'Add more sustainable materials' | translate }}
+                                    </div>
+                                </div>
+                                <div *ngIf="!isFirst" class="col-md-1 col-xs-1 col-lg-1 col-sm-1 mt-1">
+                                    <i class="action-icons-big fa fa-trash" (click)="deleteInputMaterial(i)"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mb-2" *ngIf="tierPayload.tier === tiers[1]">
+                    <div class="col-md-8 pl-0">
+                        <div class="hr text-center">
+                            <span class="hr-title text-muted">{{ 'Non sustainable Materials' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="card" *ngIf="tierPayload.tier === tiers[1]">
+                    <div class="row transactions-table">
+                        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pd-0">
+                            <div class="table-container">
+                                <div class="table-responsive">
+                                    <table class="table custom-table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    {{ 'Quantity Used (In Kgs)' | translate }}
+                                                </th>
+                                                <th colspan="3">
+                                                    <div class="material-details-form-header">
+                                                        <span class="material-header">
+                                                            {{ 'Input Raw Material Name' | translate }}
+                                                        </span>
+                                                        <span class="material-header">
+                                                            {{ 'Material composition (%)' | translate }}
+                                                        </span>
+                                                        <span class="material-header">
+                                                            {{ 'Action' | translate }}
+                                                        </span>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="
+                                                    let nonSustainableMaterial of nonSustainableProductionInputs;
+                                                    let nonInd = index
+                                                "
+                                            >
+                                                <td>
+                                                    <mat-form-field>
+                                                        <input
+                                                            class="input"
+                                                            matInput
+                                                            type="number"
+                                                            name="non-sustainable-material-{{
+                                                                nonSustainableProductionInputs[nonInd].fieldName
+                                                            }}{{ nonInd }}-{{ nonInd }}"
+                                                            [(ngModel)]="
+                                                                nonSustainableProductionInputs[nonInd].quantity.quantity
+                                                            "
+                                                            data-cy="production-transaction-quantity-used"
+                                                            (keydown)="commonServices.filterInput($event)"
+                                                        />
+                                                    </mat-form-field>
+                                                </td>
+                                                <td colspan="3">
+                                                    <div class="material-details-form">
+                                                        <div
+                                                            class="materials-add-more-button"
+                                                            (click)="addMaterialComposition(nonInd)"
+                                                        >
+                                                            <button type="button" class="btn btn-add-more">
+                                                                <img
+                                                                    src="{{ env.IMG_URL }}images/plus-btn.png"
+                                                                    alt="Record"
+                                                                />
+                                                                {{ 'Add more material compositions' | translate }}
+                                                            </button>
+                                                        </div>
+                                                        <div
+                                                            class="material-input-table-inner"
+                                                            *ngFor="
+                                                                let comp of nonSustainableProductionInputs[nonInd]
+                                                                    .materialCompositionList;
+                                                                let compInd = index;
+                                                                let isNonSustainableFirst = first
+                                                            "
+                                                        >
+                                                            <div class="material-input">
+                                                                <app-tt-dropdown-search
+                                                                    [searchOptions]="config.materials | sortByFilter"
+                                                                    [(ngModel)]="
+                                                                        nonSustainableProductionInputs[nonInd]
+                                                                            .materialCompositionList[compInd]['id']
+                                                                    "
+                                                                    [floatLabel]="'never'"
+                                                                    [optionalParams]="materialsOptional"
+                                                                    name="name-{{
+                                                                        nonSustainableProductionInputs[nonInd].fieldName
+                                                                    }}{{ nonInd }}-{{ nonInd }}{{ compInd }}"
+                                                                    data_cy="production-transaction-material-name"
+                                                                    [selectedItem]="
+                                                                        nonSustainableProductionInputs[nonInd]
+                                                                            .materialCompositionList
+                                                                    "
+                                                                >
+                                                                </app-tt-dropdown-search>
+                                                            </div>
+                                                            <div class="material-input">
+                                                                <mat-form-field>
+                                                                    <input
+                                                                        class="input"
+                                                                        matInput
+                                                                        type="number"
+                                                                        name="comp-{{
+                                                                            nonSustainableProductionInputs[nonInd]
+                                                                                .fieldName
+                                                                        }}{{ nonInd }}-{{ nonInd }}{{ compInd }}"
+                                                                        [(ngModel)]="
+                                                                            nonSustainableProductionInputs[nonInd]
+                                                                                .materialCompositionList[compInd][
+                                                                                'value'
+                                                                            ]
+                                                                        "
+                                                                        data-cy="production-transaction-material-composition"
+                                                                    />
+                                                                </mat-form-field>
+                                                            </div>
+
+                                                            <div class="material-input">
+                                                                <div
+                                                                    class="action-icon"
+                                                                    [ngClass]="{
+                                                                        'disable-action':
+                                                                            isNonSustainableFirst &&
+                                                                            nonSustainableProductionInputs.length ===
+                                                                                1 &&
+                                                                            nonSustainableProductionInputs[nonInd]
+                                                                                .materialCompositionList.length === 1
+                                                                    }"
+                                                                >
+                                                                    <div
+                                                                        class="action-icon-flex delete-icon"
+                                                                        (click)="
+                                                                            deleteMaterialComposition(nonInd, compInd)
+                                                                        "
+                                                                    >
+                                                                        <img
+                                                                            src="{{
+                                                                                env.IMG_URL
+                                                                            }}images/delete-icon.png"
+                                                                            alt="delete"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <ng-template #notAvailable>
+                                                    <td class="content-grey">
+                                                        {{ 'Not Available' | translate }}
+                                                    </td>
+                                                </ng-template>
+                                            </tr>
+                                            <tr>
+                                                <div class="add-row">
+                                                    <div class="add-row-img" (click)="addNonSustainableMaterial()">
+                                                        <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Record" />
+                                                        {{ 'Add more non sustainable materials' | translate }}
+                                                    </div>
+                                                </div>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row pt-2 mb-3">
+                    <div class="col-xs-offset-12 col-smoffset-7 col-md-offset-7 col-lg-offset-7">
+                        <button
+                            id="order-create-btn"
+                            type="button"
+                            class="btn btn-gray create-btn btn-align mr-2"
+                            (click)="save()"
+                            [disabled]="!createProductionForm.valid || sustainableProductionInputs.length < 1"
+                        >
+                            {{ 'Save' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

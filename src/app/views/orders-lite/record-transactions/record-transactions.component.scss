@@ -1,0 +1,21 @@
+@import '~styles/variables';
+
+#processes-type {
+    text-align: center;
+    font-family: $font-family-Semibold;
+    .mat-form-field {
+        width: 100%;
+    }
+    .mat-form-field-underline {
+        display: none;
+    }
+}
+
+.no-transactions-available {
+    width: 100%;
+    text-align: center;
+    margin-top: 5em;
+    img.no-transaction-image {
+        width: 75px;
+    }
+}

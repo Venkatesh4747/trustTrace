@@ -1,0 +1,429 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="create-library-container" class="create-library-container">
+            <div class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div>
+                        <div class="page-title">
+                            {{
+                                editMode
+                                    ? ('Edit Material' | industry | translate)
+                                    : ('Create Material' | industry | translate)
+                            }}
+                        </div>
+                        <div class="page-description pt-1">
+                            {{
+                                editMode
+                                    ? ('Edit the materials associated with your product / styles.'
+                                      | industry
+                                      | translate)
+                                    : ('Add the materials associated with your product / styles.'
+                                      | industry
+                                      | translate)
+                            }}
+                        </div>
+                    </div>
+                    <div>
+                        <a (click)="goBack()">
+                            <button class="go-back-button">{{ 'Back' | translate }}</button>
+                        </a>
+                    </div>
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row -->
+
+            <div class="row pb-5" id="create-library-form" *ngIf="configs && !pageLoading">
+                <form #createLibraryForm="ngForm">
+                    <div class="row">
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Article Type' | industry | translate }}:<span class="color-red">*</span></label>
+                            <app-tt-dropdown-search
+                                [searchOptions]="configs.master_data.PRODUCT | sortByFilter"
+                                [(ngModel)]="createPayload.articleTypeId"
+                                placeholder="{{ 'E.g. Fabric, Fiber' | translate }}"
+                                name="articleType"
+                                [optionalParams]="optional"
+                                required
+                                [isRequired]="isRequired"
+                                floatLabel="never"
+                                data_cy="material-test-article-type"
+                            ></app-tt-dropdown-search>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label class="uniqueid-label">
+                                <span>{{ 'Article UID' | translate }}:</span>
+                                <span class="color-red">*</span>
+                                <span
+                                    *ngIf="!editMode"
+                                    [popover]="materialInfoTemplate"
+                                    placement="right top"
+                                    containerClass="tooltipInfo"
+                                    triggers="mouseenter:mouseleave"
+                                    class="uniqueid-create-info-title float-r"
+                                >
+                                    {{ 'How to create?' | translate }}
+                                </span>
+                            </label>
+                            <mat-form-field floatLabel="never" [ngClass]="{ 'mat-input-readonly': editMode }">
+                                <input
+                                    [(ngModel)]="createPayload.materialUniqueCode"
+                                    class="input"
+                                    matInput
+                                    name="materialUniqueCode"
+                                    required
+                                    data-cy="material-test-internal-material-unique-id"
+                                    [readonly]="editMode"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div
+                            class="col-xs-4 col-sm-4 col-md-3 col-lg-3"
+                            *ngIf="supplierListOptions.selectedItem || !editMode"
+                        >
+                            <label>{{ 'Supplier Name' | translate }}:<span class="color-red">*</span></label>
+
+                            <app-supplier-list-element
+                                origin="Raw-materials"
+                                [options]="supplierListOptions"
+                                (valueChanges)="createPayload.supplierId = $event?.supplier_id"
+                                unInvitedTooltip="Uninvited Supplier - Future Requests like T-Trace and T-EMS cannot not be launched for this Material to this supplier"
+                                data_cy="material-test-supplier-name"
+                            >
+                            </app-supplier-list-element>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label
+                                >{{ 'Internal Article Name' | industry | translate }}:<span class="color-red"
+                                    >*</span
+                                ></label
+                            >
+                            <mat-form-field floatLabel="never">
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ 'E.g. JacketFabric' | translate }}"
+                                    name="internalArticleName"
+                                    [(ngModel)]="createPayload.internalArticleName"
+                                    required
+                                    data-cy="material-test-internal-article-name"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label
+                                >{{ 'Internal Article Number' | industry | translate }}:<span class="color-red"
+                                    >*</span
+                                ></label
+                            >
+                            <mat-form-field floatLabel="never">
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ 'E.g. JCK123789' | translate }}"
+                                    name="internalArticleNumber"
+                                    [(ngModel)]="createPayload.internalArticleNumber"
+                                    required
+                                    data-cy="material-test-internal-article-number"
+                                />
+                            </mat-form-field>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <div class="row pt-0">
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <label>{{ 'Year' | translate }}:<span class="color-red">*</span></label>
+                                    <mat-form-field floatLabel="never">
+                                        <input
+                                            class="input"
+                                            matInput
+                                            type="number"
+                                            placeholder="{{ 'E.g. 2019' | translate }}"
+                                            name="year"
+                                            [(ngModel)]="createPayload.year"
+                                            required
+                                            data-cy="material-test-year"
+                                        />
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <label>{{ 'Season' | translate }}:<span class="color-red">*</span></label>
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="configs.seasons"
+                                        [(ngModel)]="createPayload.season"
+                                        [ngModelOptions]="{ standalone: true }"
+                                        placeholder="{{ 'E.g. Winter' | translate }}"
+                                        name="Season"
+                                        floatLabel="never"
+                                        [optionalParams]="optionalParams"
+                                        [isRequired]="isRequired"
+                                        required
+                                        data_cy="material-test-season"
+                                    ></app-tt-dropdown-search>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Supplier Article Name' | industry | translate }}:</label>
+                            <mat-form-field floatLabel="never">
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ 'E.g. Supplier Fabric' | translate }}"
+                                    name="supplierArticleName"
+                                    [(ngModel)]="createPayload.supplierArticleName"
+                                    data-cy="material-test-supplier-article-name"
+                                />
+                            </mat-form-field>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Supplier Article Number' | industry | translate }}:</label>
+                            <mat-form-field floatLabel="never">
+                                <input
+                                    matInput
+                                    placeholder="{{ 'E.g. SUP87778' | translate }}"
+                                    name="supplierArticleNumber"
+                                    [(ngModel)]="createPayload.supplierArticleNumber"
+                                    data-cy="material-test-supplier-article-number"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div
+                        class="row"
+                        *ngFor="
+                            let materialComp of createPayload['materialsComposition'];
+                            let matInd = index;
+                            let isFirst = first
+                        "
+                    >
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Material' | industry | translate }}:</label>
+                            <app-tt-dropdown-search
+                                [searchOptions]="configs.master_data.MATERIAL"
+                                [(ngModel)]="createPayload['materialsComposition'][matInd].id"
+                                placeholder="{{ 'E.g. Cotton' | translate }} "
+                                [selectedItem]="createPayload['materialsComposition']"
+                                [optionalParams]="optional"
+                                name="material-{{ matInd }}"
+                                floatLabel="never"
+                                data_cy="material-test-article"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Material Composition' | industry | translate }} %:</label>
+                            <mat-form-field floatLabel="never">
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="number"
+                                    name="materialComp-{{ matInd }}"
+                                    placeholder="{{ 'E.g. 50' | translate }}"
+                                    (ngModelChange)="checkMaterialCompEntered($event, matInd)"
+                                    [(ngModel)]="createPayload['materialsComposition'][matInd].value"
+                                    data-cy="material-test-article-composition"
+                                />
+                            </mat-form-field>
+                        </div>
+                        <div class="col-xs-3 col-sm-3 col-md-2 col-lg-2" *ngIf="isFirst">
+                            <div
+                                class="add-material-comp-btn cursor-pointer"
+                                (click)="addMaterialComposition()"
+                                data-cy="material-test-add-more"
+                            >
+                                <i class="action-icons fa fa-plus"></i>{{ 'Add more' | translate }}
+                                <br />
+                                {{ 'materials' | translate }}
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-sm-3 col-md-2 col-lg-2 mt-2" *ngIf="!isFirst">
+                            <span class="delete-material-comp-btn">
+                                <i
+                                    class="action-icons fa fa-trash"
+                                    (click)="removeComposition(matInd)"
+                                    data-cy="material-test-trash"
+                                ></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-8 col-lg-8 certification-required">
+                            <fieldset>
+                                <label>{{ 'Certificates Required' | translate }}:</label>
+                                <app-chip-input
+                                    [showPlus]="true"
+                                    [isRemovable]="true"
+                                    [chipItems]="selectedCertifications"
+                                    [autoCompleteList]="certificationAutoCompleteList"
+                                    (valueChange)="updateCertifications($event)"
+                                    data_cy="material-test-certificates"
+                                >
+                                </app-chip-input>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-8 col-lg-8 certification-required">
+                            <fieldset>
+                                <label>{{ 'Add Colors' | translate }}:</label>
+                                <app-chip-input
+                                    [showPlus]="true"
+                                    [isRemovable]="true"
+                                    [chipItems]="selectedColors"
+                                    [autoCompleteList]="colorsAutoCompleteList"
+                                    (valueChange)="updateColors($event)"
+                                    data_cy="material-test-add-color"
+                                ></app-chip-input>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Width' | translate }}:</label>
+                            <mat-form-field floatLabel="never">
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="250"
+                                    name="materialWidth"
+                                    [(ngModel)]="createPayload.width.value"
+                                    data-cy="material-test-width"
+                                />
+                            </mat-form-field>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Units' | translate }}:</label>
+                            <app-tt-dropdown-search
+                                [searchOptions]="configs.master_data.WIDTH_UNIT"
+                                [(ngModel)]="createPayload.width.unit"
+                                [ngModelOptions]="{ standalone: true }"
+                                placeholder="{{ 'Meters' | translate }}"
+                                floatLabel="never"
+                                [optionalParams]="optionalParamsUnit"
+                                [isRequired]="isRequired"
+                                data_cy="material-test-width-units"
+                            ></app-tt-dropdown-search>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Density' | translate }}:</label>
+                            <mat-form-field floatLabel="never">
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="250"
+                                    name="materialDensity"
+                                    [(ngModel)]="createPayload.density.value"
+                                    data-cy="material-test-density"
+                                />
+                            </mat-form-field>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Units' | translate }}:</label>
+                            <app-tt-dropdown-search
+                                [searchOptions]="configs.master_data.DENSITY_UNIT"
+                                [(ngModel)]="createPayload.density.unit"
+                                [ngModelOptions]="{ standalone: true }"
+                                placeholder="{{ 'Meters' | translate }}"
+                                floatLabel="never"
+                                [optionalParams]="optionalParamsUnit"
+                                [isRequired]="isRequired"
+                                data_cy="material-test-density-units"
+                            ></app-tt-dropdown-search>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Should be traced' | translate }}?<span class="color-red">*</span></label>
+                            <app-tt-dropdown-search
+                                [searchOptions]="configs.traceable"
+                                [(ngModel)]="createPayload.traceable"
+                                [ngModelOptions]="{ standalone: true }"
+                                floatLabel="never"
+                                [optionalParams]="optionalParamsUnit"
+                                [isRequired]="isRequired"
+                                required
+                                data_cy="material-test-traceable"
+                            ></app-tt-dropdown-search>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                            <label>{{ 'Tags' | translate }}:</label>
+                            <mat-form-field floatLabel="never">
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ 'E.g. Recyclable, Synthetic, Woven' | translate }}"
+                                    name="materailTags"
+                                    [(ngModel)]="createPayload.tags"
+                                    data-cy="material-test-tags"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-8 col-sm-8 col-md-6 col-lg-6 display-flex-justify-flex-end">
+                            <button
+                                type="button"
+                                mat-button
+                                class="cancel-btn"
+                                (click)="goBack()"
+                                data-cy="material-test-cancel-btn"
+                            >
+                                {{ 'Cancel' | translate }}
+                            </button>
+                            <button
+                                mat-button
+                                class="save-btn"
+                                type="button"
+                                (click)="onCreate()"
+                                [disabled]="!createLibraryForm.valid"
+                                data-cy="material-test-submit-btn"
+                            >
+                                {{ 'Save' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Material UID info templete start-->
+<ng-template #materialInfoTemplate>
+    <div class="showTooltipInfo">
+        <p class="tooltip-title">
+            {{ 'What is a Article UID?' | translate }}
+        </p>
+        <p>
+            {{ 'A UID that is to be created for the Materials in TrusTrace platform' | translate }}
+        </p>
+        <p class="tooltip-title">
+            {{ 'Rules to create a UID:' | translate }}
+        </p>
+        <ul>
+            <li>{{ 'Maximum of 100 characters without space.' | translate }}</li>
+            <li>{{ 'Only Alphanumeric' | translate }} [0-9 a-z A-Z]</li>
+            <li>{{ 'Allowed special characters' | translate }}: - (hyphen) _(underscore)</li>
+        </ul>
+        <p>
+            <span class="tooltip-title">{{ 'Sample Article UID:' | translate }}</span> RM000001
+        </p>
+        <p class="tooltip-title">{{ "Don't have a Article UID?" | translate }}</p>
+        <p>
+            {{ 'Check the' | translate }}
+            <span class="tooltip-title"> {{ 'User Manual' | translate }}</span> >>
+            <span class="tooltip-title"> {{ 'Add Material section' | translate }}</span>
+            {{ 'for the article UID nomenclature.' | translate }}
+        </p>
+    </div>
+</ng-template>
+<!--Material UID info template end-->

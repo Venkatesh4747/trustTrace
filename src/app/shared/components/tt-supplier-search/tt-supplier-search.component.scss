@@ -1,0 +1,40 @@
+@import '~styles/variables';
+
+#tt-supplier-search-container {
+    .mat-form-field {
+        width: 100%;
+    }
+}
+.input-element {
+    font-size: 14px;
+    color: $text-color-primary !important;
+}
+input.mat-input-element {
+    font-size: 14px;
+    color: $text-color-primary;
+    text-overflow: ellipsis;
+    padding-right: 20px;
+    padding-bottom: 2px;
+}
+
+.supplier-not-available {
+    color: red;
+    font-family: $font-family-Regular;
+}
+
+.supplier-search-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.align-option-text {
+    display: inline-block;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 17px;
+    max-width: 80%;
+}
+.pull-right {
+    margin-top: 16px;
+}

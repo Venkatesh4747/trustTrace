@@ -1,0 +1,190 @@
+@import '~styles/variables';
+.hr {
+    margin-top: 70px;
+    border-bottom: 1px solid #ececec;
+    font-family: $font-family-Bold;
+    color: #cccccc;
+}
+.hr-title {
+    font-family: $font-family-Bold;
+    color: #325992;
+}
+.main-container {
+    padding-left: 20px;
+    padding-right: 30px;
+    padding-top: 50px;
+}
+.back-button-div {
+    width: 100%;
+    text-align: right;
+    padding-right: 45px;
+    padding-bottom: 20px;
+}
+.btn-light {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+.company-profile {
+    width: 20%;
+    float: left;
+    margin-top: 0px;
+}
+
+.edit-company-pic {
+    width: 40px;
+    height: 40px;
+    float: right;
+}
+
+.location-section {
+    width: 100%;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+.show-location-details {
+    margin-top: 33px;
+    font-family: $font-family-Regular;
+    word-wrap: break-word;
+    p {
+        color: $text-color-primary;
+    }
+}
+
+/* NO LOCATION CONTAINER */
+.no-data-text {
+    text-align: center;
+    color: #9b9b9b;
+    font-family: $font-family-Regular;
+    font-size: 17px;
+    margin-top: 17px;
+    padding-left: 28px;
+    padding-right: 28px;
+}
+
+.add-btn {
+    background: #baf5ff;
+    border-radius: 43px;
+    border: none;
+}
+.add-btn:focus {
+    outline: none;
+}
+
+.no-data-container {
+    margin-top: 50px;
+    display: block;
+    text-align: center;
+}
+/* NO LOCATION CONTAINER ENDS */
+
+/* ADD LOCATION FORM */
+.add-location-container {
+    width: 100%;
+    margin-top: 30px;
+}
+.mat-form-field {
+    width: 100%;
+    font-family: $font-family-Regular;
+    font-size: 14px;
+}
+
+.location-input {
+    margin-top: 5px;
+    font-family: $font-family-Regular;
+    font-size: 14px;
+    color: $text-color-primary !important;
+}
+
+.btn-container {
+    width: 100%;
+    margin-right: 30px;
+}
+
+.save-btn {
+    margin-top: 10px;
+    background: #7effbe;
+    color: #474747;
+    border-radius: 5px;
+    font-family: $font-family-Semibold;
+    width: 100px;
+}
+
+.cancel-btn {
+    margin-top: 10px;
+    background: #71eeff;
+    color: #474747;
+    border-radius: 5px;
+    font-family: $font-family-Semibold;
+    width: 100px;
+    margin-right: 10px;
+}
+
+.edit-btn-container {
+    margin-top: -27px;
+    float: right;
+}
+
+.edit-img {
+    width: 40px;
+    height: 40px;
+    margin-top: 11px;
+    opacity: 0.3;
+}
+
+.edit-img:hover {
+    opacity: 1;
+    filter: alpha(opacity=100); /* For IE8 and earlier */
+}
+
+.add-contact-container {
+    width: 100%;
+    margin-top: 15px;
+    padding-bottom: 70px;
+}
+/* END OF ADD LOCATION FORM */
+
+.location-subtext {
+    line-height: 2;
+    font-family: $font-family-Regular;
+    color: #474747;
+    word-wrap: break-word;
+}
+
+.contact-subtext {
+    font-family: $font-family-Regular;
+    color: #474747;
+    margin-top: 0px;
+    word-wrap: break-word;
+}
+.company-statistics {
+    width: 80%;
+    float: left;
+    padding-left: 50px;
+    margin-top: 0px;
+}
+.stat-flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -30px;
+}
+.stat-flex-container > div {
+    width: 160px;
+}
+/* FLEX BOXES */
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    margin-left: -21px;
+}
+.flex-container > div {
+    width: 150px;
+    margin: 0px;
+}

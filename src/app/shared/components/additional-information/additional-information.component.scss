@@ -1,0 +1,18 @@
+@import '~styles/variables';
+.hr {
+    margin-top: 40px !important;
+    border-bottom: 1px solid #ececec;
+    font-family: $font-family-Bold;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+.hr-title {
+    font-family: $font-family-Bold;
+    color: #325992;
+}
+.material-loader {
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}

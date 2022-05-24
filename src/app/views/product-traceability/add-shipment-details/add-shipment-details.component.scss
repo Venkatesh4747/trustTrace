@@ -1,0 +1,20 @@
+.add-more-shipment {
+    margin-top: 15px;
+    width: 175px;
+}
+
+.add-shipment-details {
+    .shipment-detail {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+}
+
+.shipment-save{
+    margin-left: 10px;
+}
+
+.remove-shipmentdetails{
+    cursor: pointer;
+}

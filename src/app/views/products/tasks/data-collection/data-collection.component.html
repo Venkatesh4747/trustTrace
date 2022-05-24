@@ -1,0 +1,176 @@
+<ng-container *ngIf="productConfig$ | async as product">
+    <app-full-page-loader *ngIf="product.filterList === null || product.submitOnProgress"></app-full-page-loader>
+    <div class="row pt-1">
+        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 pl-3">
+            <div class="filter-list-block">
+                <ul class="filters-list-left">
+                    <li *ngFor="let filter of product?.filterList | keys">
+                        <app-tt-multi-select-search
+                            (selectionChange)="valueChanged(filter.key, $event)"
+                            (refreshFilter)="fetchFilters($event)"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [optionsParam]="optionsParam"
+                            [filter_session]="FILTER_SESSION"
+                        >
+                        </app-tt-multi-select-search>
+                    </li>
+                </ul>
+                <ul class="filter-list-right">
+                    <li class="reset-filters">
+                        <button class="button-badge mat-button btn btn-gray" (click)="resetAllFilters()">
+                            {{ 'Reset' | translate }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 pr-3">
+            <div class="import-btn-container">
+                <button
+                    type="button"
+                    class="btn btn-lg btn-blue pull-right btn-gradient cs-btn"
+                    (click)="openImportExcelModal()"
+                >
+                    <img src="{{ env.IMG_URL }}images/upload-blue-icon.png" alt="Import" />
+                    <span>{{ 'Import using Excel' | translate }}</span>
+                </button>
+                <span class="import-product-sub-title">{{
+                    'Import product data by uploading excel sheet' | translate
+                }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-category-table">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 total-count">
+                <app-card-pagination
+                    [paginationStart]="product.paginationCount * DEFAULT_PAGINATION_SIZE + 1"
+                    [fetchSize]="DEFAULT_PAGINATION_SIZE"
+                    [totalItemsCount]="product?.productsConfig?.totalCount || 0"
+                    moduleName="Products"
+                    (previous)="paginate('back')"
+                    (next)="paginate('forward')"
+                ></app-card-pagination>
+                <a
+                    *ngIf="isBrandSupplier"
+                    routerLink="/products/tasks/simulation"
+                    (click)="simulateBtnClicked()"
+                    class="simulation-btn"
+                >
+                    {{ 'Simulate Product' | translate }}
+                </a>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-6">
+                <div class="table-search-filter">
+                    <div class="title-right-search">
+                        <input
+                            [formControl]="searchFormControl"
+                            type="text"
+                            (keyup.enter)="onSearch()"
+                            class="search"
+                            placeholder="{{ 'Search for products, ingredients etc' | translate }}"
+                        />
+                        <mat-icon class="search-icon">search </mat-icon>
+                    </div>
+                    <!-- Title Right Search -->
+                </div>
+                <!-- Table Search Filter -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+        <div class="row">
+            <div class="col-md-12 pl-0 pr-0">
+                <div class="table-cont table-responsive mt-0 ml-0 pl-0 pr-0">
+                    <table class="table custom-table table-striped">
+                        <thead class="product-category-thead">
+                            <tr>
+                                <ng-container *ngFor="let filter of tableHeaders | keys; let first = first">
+                                    <th>
+                                        <div class="table-header-filter sort-by-filter">
+                                            <span>{{ filter.key | translate }}</span>
+                                            <span *ngIf="filter.value.isMandatory" class="color-red"> *</span>
+                                        </div>
+                                    </th>
+                                    <th *ngIf="first">
+                                        <mat-checkbox
+                                            (click)="
+                                                $event.preventDefault();
+                                                selectAll(
+                                                    !(
+                                                        product.checkableProductsCount ===
+                                                        product.checkedProducts.length
+                                                    ),
+                                                    product.checkableProductsCount
+                                                )
+                                            "
+                                            [checked]="
+                                                product.checkableProductsCount === product.checkedProducts.length &&
+                                                product.checkableProductsCount !== 0
+                                            "
+                                        >
+                                        </mat-checkbox>
+                                    </th>
+                                </ng-container>
+                            </tr>
+                        </thead>
+                        <tbody
+                            class="product-category-tbody"
+                            *ngIf="product.filterList !== null && product.options !== null"
+                        >
+                            <app-product-list [selectAll]="selectAllSubject"> </app-product-list>
+                        </tbody>
+                        <tfoot *ngIf="product.filterList !== null">
+                            <tr>
+                                <td>
+                                    <div class="table-footer-block">
+                                        <ul class="table-footer-block-inner">
+                                            <li class="table-footer-block-inner-left">
+                                                <div class="mat-icon mat-save">
+                                                    <mat-icon matTooltip="{{ 'Save' | translate }}">save</mat-icon>
+                                                </div>
+                                                <p>
+                                                    {{ 'Auto saved on' | translate }}
+                                                    {{ product.productsConfig?.autoSaveDate | date: 'dd MMM, yyyy' }}
+                                                </p>
+                                            </li>
+                                            <li class="table-footer-block-inner-right">
+                                                <!-- submit all feature temporarily disabled due to version history overlap -->
+                                                <button
+                                                    class="submit-all-btn"
+                                                    mat-button
+                                                    type="button"
+                                                    (click)="submitAllProducts()"
+                                                >
+                                                    {{ 'Submit all products' | translate }}
+                                                </button>
+                                                <button
+                                                    class="btn btn-secondary"
+                                                    mat-button
+                                                    color="primary"
+                                                    type="button"
+                                                    (click)="submit()"
+                                                    [disabled]="
+                                                        product.submitOnProgress || product.checkedProducts.length === 0
+                                                    "
+                                                >
+                                                    {{ 'Submit selected products' | translate }}
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- Table Count -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+    </div>
+</ng-container>

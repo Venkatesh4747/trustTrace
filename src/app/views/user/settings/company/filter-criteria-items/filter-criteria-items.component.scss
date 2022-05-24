@@ -1,0 +1,19 @@
+@import '~styles/variables';
+@import '~styles/mixins';
+
+.mat-expansion-panel {
+    margin: 0 20px 15px;
+    border-radius: 10px;
+}
+.mat-expansion-panel:not([class*='mat-elevation-z']) {
+    box-shadow: 0 1px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+.mat-expansion-panel-header-title {
+    color: $text-color-primary;
+    font-family: $font-family-Bold;
+    font-size: 17px;
+    margin-left: 12px;
+}
+mat-expansion-panel-header {
+    height: 60px !important;
+}

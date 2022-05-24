@@ -1,0 +1,194 @@
+// Import font
+/* source-sans-pro-300 - latin */
+
+@import 'environmentVariables';
+
+@font-face {
+    font-family: 'Source Sans Pro-Regular';
+    src: url('/assets/Fonts/SourceSansPro-Regular.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-Light';
+    src: url('/assets/Fonts/SourceSansPro-Light.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-LightIt';
+    src: url('/assets/Fonts/SourceSansPro-LightIt.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-ExtraLight';
+    src: url('/assets/Fonts/SourceSansPro-ExtraLight.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-ExtraLightIt';
+    src: url('/assets/Fonts/SourceSansPro-ExtraLightIt.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-Bold';
+    src: url('/assets/Fonts/SourceSansPro-Bold.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-BoldIt';
+    src: url('/assets/Fonts/SourceSansPro-BoldIt.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-Semibold';
+    src: url('/assets/Fonts/SourceSansPro-Semibold.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-SemiboldIt';
+    src: url('/assets/Fonts/SourceSansPro-SemiboldIt.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-Black';
+    src: url('/assets/Fonts/SourceSansPro-Black.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-BlackIt';
+    src: url('/assets/Fonts/SourceSansPro-BlackIt.otf');
+}
+@font-face {
+    font-family: 'Source Sans Pro-It';
+    src: url('/assets/Fonts/SourceSansPro-It.otf');
+}
+
+$font-family-Regular: 'Source Sans Pro-Regular';
+$font-family-Light: 'Source Sans Pro-Light';
+$font-family-LightIt: 'Source Sans Pro-LightIt';
+$font-family-ExtraLight: 'Source Sans Pro-ExtraLight';
+$font-family-ExtraLightIt: 'Source Sans Pro-ExtraLightIt';
+$font-family-Bold: 'Source Sans Pro-Bold';
+$font-family-BoldIt: 'Source Sans Pro-BoldIt';
+$font-family-Semibold: 'Source Sans Pro-Semibold';
+$font-family-SemiboldIt: 'Source Sans Pro-SemiboldIt';
+$font-family-Black: 'Source Sans Pro-Black';
+$font-family-BlackIt: 'Source Sans Pro-BlackIt';
+$font-family-It: 'Source Sans Pro-It';
+
+$xs-device: 'only screen and (min-width: 320px) and (max-width : 575px)';
+$sm-device: 'only screen and (min-width: 576px) and (max-width : 767px)';
+$md-device: 'only screen and (min-width: 768px) and (max-width : 991px)';
+$lg-device: 'only screen and (min-width: 992px) and (max-width : 1199px)';
+$md-lg-device: 'only screen and (min-width: 1200px) and (max-width: 1400px)';
+$xl-device: 'only screen and (min-width: 1200px)';
+$responsive-max-967: 'only screen and (max-width: 967px)';
+$responsive-max-1023: 'only screen and (max-width: 1024px)';
+
+/* Color Code */
+$color_red: #ff6969 !important;
+$color_white: #ffffff !important;
+$color_bg_primary: #d8f7ff;
+$color_white: #fff;
+
+$color_gray: #777;
+$color_arrow_border-color: #b8b8b8;
+$color_table-border-bottom: #e9e9e9;
+$color_sky_blue: #36dcfd;
+
+$light-blue: #a1f0ff;
+$sub-text-color: #11c4db;
+
+$color-tt-primary: #33dbff;
+$color-tt-primary-light: #b9f0ff;
+$color-tt-secondary: #78ff9b;
+$color-tt-secondary-dark: #39ff84;
+
+$tt-button-color-primary: #7affad;
+$tt-button-color-secondary: #8df0ff;
+$tt-button-text-color: #373737;
+$tt-button-border-color: #0fc5e4;
+$tt-back-button-text-color: #325992;
+$tt-back-button-hover-color: #325992;
+
+$action-icon-color: #838383;
+
+$color-secondary-gray: #e5e5e5;
+
+$text-color-sky-blue: #00d7ff;
+
+$text-color: #00d6ff;
+$text-color-primary: #325992;
+$text-color-secondary: #212121;
+$text-font-color: $text-color-primary;
+$text-default-color: #333333;
+$text-color-placeholder: #9eb0cb;
+$text-color-drag-file: #4b4b4b;
+$text-color-certificate-category: #0092be;
+$text-font-color-muted: #a0a0a0;
+
+$checkbox-color-primary: #325992;
+
+$border-color-default: #aaaaaa;
+$border-color-primary: #d4d4d4;
+$border-color-secondary: #6291d5;
+$border-radius-default: 5px;
+
+$background-color-nav: #a1f0ff;
+$background-color-primary-tr: #e8faff;
+$background-color-primary-selected-tr: #91f1ff;
+$background-color-secondary-tr: #f2f2f2;
+$background-color-secondary-selected-tr: #d5d5d5;
+
+$background-color-primary: #7affad;
+$background-color-secondary: #71eeff;
+
+$hover-color-primary: #c7dcfa;
+
+$background-color-table-striped: #e6fbff;
+
+$table-border-color-light-gray: #e6fbff;
+
+$hover-color-back-btn: #acf2ff;
+$stroke-color-choose-btn: #0fc5e4;
+
+$button-color-primary: #92eeff;
+$button-color-secondary: #78ff9b;
+
+$button-action-background: #d4f2ff;
+$button-background-color: #7affad;
+$button-text-color: #373737;
+
+$dashboard-active-options: #a4fbbb;
+$dashboard-active-options-label: #1a1a1a;
+$dashboard-options-primary-border: #55d977;
+$dashboard-options-primary-label: #55d977;
+
+$chart-filters-options-active-primary: #a2fcb9;
+$chart-filters-options-active-secondary: #d2fd76;
+$chart-filters-options-text: #0fb0d2;
+$chart-filters-options-border: #0fb0d2;
+
+$side-nav-bar-width: 250px;
+
+$border-bottom-selected-options: 3px;
+
+$color-table-filter-1: #ff4d6a;
+$color-table-filter-2: #eeca20;
+$color-table-filter-3: #36cefa;
+$color-table-filter-4: #74eaab;
+$color-table-filter-5: #325992;
+$color-table-filter-6: #2be0e2;
+$color-table-filter-7: #2b9be2;
+
+$color-status-in-progress: #ff6969;
+
+$color-notification-default: #fdefb2;
+
+@mixin backgroundContent($color-default) {
+    background: $color-default;
+}
+
+$chart-thumbnail-height: 350px;
+
+$box-shadow-color-default: #f5f5f5;
+
+/* Responsive */
+$max_768: #{'only screen and (min-width: 768px)'};
+$min_767: #{'only screen and (min-width: 767px)'};
+
+$max_990: #{'only screen and (min-width: 990px)'};
+$min_991: #{'only screen and (min-width: 991px)'};
+
+$max_1400: #{'only screen and (max-width: 1400px)'};
+
+$image-url: 'https://static.trustrace.com/static/';

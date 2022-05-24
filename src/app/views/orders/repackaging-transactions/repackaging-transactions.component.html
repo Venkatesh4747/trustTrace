@@ -1,0 +1,231 @@
+<div id="record-transactions-categories">
+    <div id="inbound-transactions">
+        <div class="row pb-2">
+            <div class="hr">
+                <span class="hr-title">{{ 'Repackaging' | translate }} </span>
+            </div>
+        </div>
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div *ngIf="!pageLoading">
+            <form #createRepackageForm="ngForm">
+                <div class="row">
+                    <div class="col-md-8 col-xs-8 col-lg-8 col-sm-8">
+                        <div class="row pt-4">
+                            <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label mb-2">
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{ 'Reference Id' | translate }}:"
+                                        name="ReferenceId"
+                                        #referenceId
+                                        [(ngModel)]="transaction.externalId"
+                                        (blur)="checkIfReferenceIdIsUnique()"
+                                        matInput
+                                        required
+                                    />
+                                </mat-form-field>
+                                <div class="error" *ngIf="!referenceIdIsUnique">
+                                    {{ 'A lot with this reference ID already exists' | translate }}!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row pt-2">
+                            <div class="pl-0 col-md-8 col-xs-8 col-lg-8 col-sm-8 label">
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{ 'Article/Style Name & Number' | industry | translate }}:"
+                                        name="Article/Style"
+                                        [(ngModel)]="searchTerm"
+                                        matInput
+                                        [matAutocomplete]="stylesAuto"
+                                        (keyup)="searchStyleOrArticle($event)"
+                                        required
+                                    />
+                                    <mat-hint #soaSearchHint [ngStyle]="{ color: hintColor }">{{
+                                        'Type at least 3 characters to search' | translate
+                                    }}</mat-hint>
+                                    <mat-autocomplete
+                                        #stylesAuto="matAutocomplete"
+                                        [displayWith]="getSOAName"
+                                        (optionSelected)="onSOASelection($event.option.value)"
+                                    >
+                                        <mat-option *ngFor="let item of repackageConfig.SOA_search" [value]="item">
+                                            {{ item.artifactName_no }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                </mat-form-field>
+                            </div>
+                            <div class="pl-0 col-md-4 col-xs-4 col-lg-4 col-sm-4 mt-1">
+                                <mat-form-field>
+                                    <!-- <input matInput [matDatepicker]="picker" [name]="value" [(ngModel)]="value" placeholder="Date" readonly> -->
+                                    <input
+                                        class="input"
+                                        matInput
+                                        [matDatepicker]="picker"
+                                        name="date"
+                                        placeholder="{{ 'Date' | translate }}:"
+                                        readonly
+                                        [(ngModel)]="transaction.date"
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="row pt-2 repack-align">
+                            <div class="pl-0 col-md-4 col-xs-4 col-lg-4 col-sm-4 label">
+                                <app-tt-multi-dropdown-search
+                                    [(ngModel)]="transaction.facilities"
+                                    name="facilities"
+                                    [placeholder]="'Associated Facility:'"
+                                    [options]="repackageConfig.facilities"
+                                    required
+                                >
+                                </app-tt-multi-dropdown-search>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 text-center" hidden>
+                        <app-qr-code (response)="handleInputLotsQRResponse($event)"></app-qr-code>
+                    </div>
+                </div>
+                <div class="row mt-2 mb-2">
+                    <div class="col-md-8">
+                        <div class="hr text-center">
+                            <span class="hr-title text-muted">{{ 'Attachments' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row pt-2">
+                    <div class="pl-0 col-md-4 col-xs-4 col-lg-4 col-sm-4 label">
+                        <app-upload-certificates [certifications]="repackageConfig.certifications">
+                        </app-upload-certificates>
+                    </div>
+                    <div class="col-xs-6 col-sm-4 col-md-4 col-lg-4 pl-3">
+                        <app-certificates-list *ngIf="certTypeValueList"></app-certificates-list>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mb-2">
+                    <div class="col-md-8">
+                        <div class="hr text-center">
+                            <span class="hr-title text-muted">{{ 'Input Lots' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row pt-2">
+                    <div class="col-md-8 col-xs-8 col-lg-8 col-sm-8">
+                        <div
+                            *ngFor="let inputLot of transaction.repackagingInputLots; let isLast = last; let i = index"
+                        >
+                            <div class="row pt-2">
+                                <div class="pl-0 col-md-3 col-xs-3 col-lg-3 col-sm-3 label">
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            placeholder="{{ 'QR Code' | translate }}:"
+                                            name="externalId-{{ commonServices.makeId(5) }}"
+                                            [(ngModel)]="transaction.repackagingInputLots[i].externalId"
+                                            [disabled]="true"
+                                        />
+                                    </mat-form-field>
+                                </div>
+                                <div class="pl-0 col-md-3 col-xs-3 col-lg-3 col-sm-3 label">
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="repackageConfig.lots"
+                                        (selectionChange)="checkLotAlreadySelected($event, i)"
+                                        [(ngModel)]="transaction.repackagingInputLots[i].lotId"
+                                        [placeholder]="'Input Lot (ID):'"
+                                        name="lot-{{ commonServices.makeId(5) }}"
+                                        [optionalParams]="optional"
+                                        [selectedItem]="transaction.repackagingInputLots"
+                                        [required]="!isLast"
+                                        [isRequired]="!isLast"
+                                    ></app-tt-dropdown-search>
+                                </div>
+                                <div class="pl-0 col-md-3 col-xs-3 col-lg-3 col-sm-3 label">
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            placeholder="{{ 'Quantity used' | translate }}:"
+                                            name="Qty-{{ commonServices.makeId(5) }}"
+                                            [(ngModel)]="transaction.repackagingInputLots[i].quantity.quantity"
+                                            (ngModelChange)="checkQuantityEntered($event, i)"
+                                            [required]="!isLast"
+                                        />
+                                    </mat-form-field>
+                                </div>
+                                <div class="pl-0 col-md-1 col-xs-1 col-lg-1 col-sm-1 label">
+                                    <mat-form-field>
+                                        <mat-select
+                                            class="input"
+                                            placeholder="{{ 'Units' | translate }}:"
+                                            name="units-{{ commonServices.makeId(5) }}"
+                                            [(ngModel)]="transaction.repackagingInputLots[i].quantity.unit"
+                                            disabled
+                                            [required]="!isLast"
+                                        >
+                                            <mat-option
+                                                *ngFor="let qty_unit of repackageConfig.unit"
+                                                [value]="qty_unit"
+                                            >
+                                                {{ localeService.getDisplayText(qty_unit) }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div *ngIf="isLast" class="col-md-2 col-xs-2 col-lg-2 col-sm-2">
+                                    <div class="pl-0 col-md-4 col-xs-4 col-lg-4 col-sm-4 pl-0">
+                                        <div class="input-material-btn cursor-pointer" (click)="addInputLot()">
+                                            <i class="action-icons-big fa fa-plus"></i>
+                                        </div>
+                                    </div>
+                                    <div class="pl-0 col-md-8 col-xs-8 col-lg-8 col-sm-8 pl-0">
+                                        <div class="add-input-title pl-0">{{ 'Add more input Lots' | translate }}</div>
+                                    </div>
+                                </div>
+                                <div *ngIf="!isLast" class="col-md-2 col-xs-2 col-lg-2 col-sm-2">
+                                    <i class="action-icons-big fa fa-trash" (click)="deleteInputLot(i)"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row pt-2">
+                    <div class="col-md-offset-6 col-xs-offset-6 col-lg-offset-6 col-sm-offset-6">
+                        <button
+                            id="order-create-btn"
+                            type="button"
+                            class="btn btn-gray create-btn btn-align mr-2"
+                            (click)="save()"
+                            [disabled]="!createRepackageForm.valid"
+                        >
+                            {{ 'Save' | translate }}
+                        </button>
+                        <!--                        <button-->
+                        <!--                            id="order-create-print-btn"-->
+                        <!--                            type="button"-->
+                        <!--                            class="btn btn-gray create-btn btn-align"-->
+                        <!--                            (click)="saveAndPrint()"-->
+                        <!--                            [disabled]="!createRepackageForm.valid"-->
+                        <!--                        >-->
+                        <!--                            {{ 'Save & Print' | translate }}-->
+                        <!--                        </button>-->
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div style="visibility:hidden" *ngIf="isPrintReady">
+    <app-generate-qr-code #printQRCodeComponent [qrId]="qrCodeToPrint" [qrCodeId]="'qrCodeSectionToPrint'">
+    </app-generate-qr-code>
+</div>

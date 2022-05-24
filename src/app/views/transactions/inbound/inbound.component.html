@@ -1,0 +1,151 @@
+<div id="record-transactions-categories-v2" class="material-input-style-box-type">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div id="inbound-transactions">
+        <div class="row pb-2 pr-2">
+            <div class="hr">
+                <span class="hr-title">{{ 'Inbound' | translate }} </span>
+            </div>
+        </div>
+        <div *ngIf="!pageLoading" class="row pt-2">
+            <form #createInboundForm="ngForm" class="material-form-input">
+                <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 form-align">
+                    <div class="row">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ 'Style Name & Number' | translate }}:"
+                                    name="Article/Style"
+                                    [(ngModel)]="soaUniqueName"
+                                    (blur)="validateSelectedStyle()"
+                                    matInput
+                                    [matAutocomplete]="soaSearch"
+                                    (keyup)="searchStyleOrArticle($event)"
+                                    required
+                                    data-cy="inbound-transaction-style-name-number"
+                                />
+                                <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                    soaSearchHintText | translate
+                                }}</mat-hint>
+                                <mat-autocomplete
+                                    #soaSearch="matAutocomplete"
+                                    [displayWith]="getSOAName"
+                                    (optionSelected)="onSOASelection($event.option.value)"
+                                >
+                                    <mat-option *ngFor="let item of searchData" [value]="item">
+                                        {{ item?.code }}-{{ item?.name }}-{{ item?.year }}-{{ item?.season?.value }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ 'Lot ID' | translate }}:"
+                                    name="NewReferenceId"
+                                    [(ngModel)]="payload.inboundData.sellerLotId"
+                                    matInput
+                                    required
+                                    data-cy="inbound-transaction-new-reference-id"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="number"
+                                    placeholder="{{ 'Inbound Quantity(in Kgs)' | translate }}:"
+                                    name="Qty"
+                                    [(ngModel)]="payload.inboundData.quantity.quantity"
+                                    required
+                                    data-cy="inbound-transaction-quantity"
+                                />
+                            </mat-form-field>
+                        </div>
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    [matDatepicker]="picker"
+                                    placeholder="{{ 'Date of Inbound' | translate }}:"
+                                    name="date"
+                                    [(ngModel)]="payload.date"
+                                    readonly
+                                    required
+                                    (click)="picker.open()"
+                                    data-cy="inbound-transaction-date"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <app-supplier-list-element
+                                [listData]="suppliers"
+                                [(ngModel)]="payload.inboundData.supplierId"
+                                (valueChanges)="updateSupplier($event)"
+                                [options]="supplierListOptions"
+                                name="supplier"
+                                required
+                                unInvitedTooltip="Uninvited Supplier - Inbound Transaction can be created but no further transactions can be traced for this Supplier "
+                                [data_cy]="'inbound-transaction-suppliers'"
+                            >
+                            </app-supplier-list-element>
+                        </div>
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ 'Business Document Number' | translate }}:"
+                                    name="PurchaseOrderNumber"
+                                    [(ngModel)]="payload.inboundData.poNumber"
+                                    required
+                                    data-cy="inbound-transaction-purchase-order-no"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <app-tt-dropdown-search
+                                [(ngModel)]="payload.facilityId"
+                                name="facilities"
+                                [placeholder]="'Inbound facility:'"
+                                [searchOptions]="associatedFacility"
+                                [data_cy]="'inbound-transaction-associated-facility'"
+                                [isRequired]="false"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label"></div>
+                    </div>
+
+                    <div class="row mt-3 mb-3 pt-3 pb-3">
+                        <div class="col-md-12 talign-right">
+                            <button
+                                id="order-create-btn"
+                                type="button"
+                                class="btn btn-gray create-btn btn-align mr-2"
+                                (click)="save()"
+                                [disabled]="!createInboundForm.valid"
+                            >
+                                {{ 'Save' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

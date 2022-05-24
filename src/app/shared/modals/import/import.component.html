@@ -1,0 +1,189 @@
+<div class="import-container" *ngIf="!showErrors">
+    <div class="row close-btn-section">
+        <div class="close-btn" (click)="closeDialog(importStatuses.CLOSE)">
+            <span class="fa fa-close close-icon"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="modal-body text-center pd-35" *ngIf="steps.SELECTION === step">
+                <div class="modal-section">
+                    <h5 class="title">{{ 'How do you wish to proceed?' | translate }}</h5>
+                </div>
+                <div class="import-block">
+                    <div class="import-details" (click)="handleStepChange(steps.CREATE)">
+                        <mat-icon>add_circle_outline</mat-icon>
+                        <p class="import-title">{{ data.titles.createTitle | translate }}</p>
+                        <p class="import-desc" *ngIf="data.titles?.createDesc">
+                            {{ data.titles.createDesc | translate }}
+                        </p>
+                    </div>
+                    <div class="import-details opacity-5 pointer-none" (click)="handleStepChange(steps.UPDATE)">
+                        <mat-icon>update</mat-icon>
+                        <p class="import-title">{{ data.titles.updateTitle | translate }}</p>
+                        <p class="import-desc" *ngIf="data.titles?.updateDesc">
+                            {{ data.titles.updateDesc | translate }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body text-left" *ngIf="steps.SELECTION !== step">
+                <div class="modal-section">
+                    <h5 class="title">
+                        {{
+                            steps.CREATE === step
+                                ? (data.create.texts.title | translate)
+                                : (data.update.texts.title | translate)
+                        }}
+                    </h5>
+                </div>
+                <div class="import-list-block">
+                    <ol class="import-list-inner" type="1">
+                        <li class="import-list">
+                            <div class="import-list-item-details">
+                                <p class="list-details">
+                                    {{
+                                        steps.CREATE === step
+                                            ? (data.create.texts.downloadText | translate)
+                                            : (data.update.texts.downloadText | translate)
+                                    }}
+                                </p>
+                                <div class="download-btn-block">
+                                    <button class="download-btn" type="button" (click)="downloadData()">
+                                        {{
+                                            steps.CREATE === step
+                                                ? (data.create.texts.downloadBtnText | translate)
+                                                : (data.update.texts.downloadBtnText | translate)
+                                        }}
+                                    </button>
+                                    <span class="margin-0-auto" *ngIf="isDownloading">
+                                        <app-spinner [small]="true"></app-spinner>
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="import-list">
+                            <div class="import-list-item-details">
+                                <p class="list-details">
+                                    {{
+                                        steps.CREATE === step
+                                            ? (data.create.texts.editText | translate)
+                                            : (data.update.texts.editText | translate)
+                                    }}
+                                </p>
+                            </div>
+                        </li>
+                        <li class="import-list">
+                            <div class="import-list-item-details">
+                                <p class="list-details">
+                                    {{
+                                        steps.CREATE === step
+                                            ? (data.create.texts.uploadText | translate)
+                                            : (data.update.texts.uploadText | translate)
+                                    }}
+                                </p>
+                                <div class="uploaded-files-container">
+                                    <div
+                                        class="drag-file-upload"
+                                        (click)="isUploading ? $event.stopPropagation() : fileInput.click()"
+                                    >
+                                        <span class="drag-file-upload-icon">
+                                            <mat-icon>arrow_upward</mat-icon>
+                                        </span>
+                                        <span class="pl-1">{{ 'Choose file to upload' | translate }}</span>
+                                        <span class="margin-0-auto" *ngIf="isUploading">
+                                            <app-spinner [small]="true"></app-spinner>
+                                        </span>
+                                        <input
+                                            type="file"
+                                            class="hidden"
+                                            #fileInput
+                                            [hidden]="true"
+                                            (change)="uploadFile($event.target.files)"
+                                            [disabled]="isUploading"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="show-upload-file-details" *ngIf="uploadedFile">
+                                    <p class="uploaded-file-name">{{ uploadedFile.name }}</p>
+                                    <button type="button" class="delete-button" (click)="deleteFile()">
+                                        <img src="{{ env.IMG_URL }}images/delete-icon.png" alt="delete" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="button-block">
+                                <button
+                                    type="button"
+                                    class="btn btn-cancel"
+                                    mat-button
+                                    (click)="handleStepChange(steps.SELECTION)"
+                                >
+                                    {{ data.btnTexts.secondaryBtnText | translate }}
+                                </button>
+                                <button type="button" class="btn btn-gray" mat-button (click)="importData()">
+                                    {{ data.btnTexts.primaryBtnText | translate }}
+                                </button>
+                                <span class="margin-0-auto" *ngIf="isImporting">
+                                    <app-spinner [small]="true"></app-spinner>
+                                </span>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="import-data-status import-data-status-errors" *ngIf="showErrors">
+    <div class="import-data-status-title">{{ 'Error' | translate }}!</div>
+    <div class="import-data-status-body">
+        <div>
+            {{
+                'Following error(s) has been found in the excel sheet uploaded by you. Kindly fix errors and import again.'
+                    | translate
+            }}
+        </div>
+        <div class="import-data-status-error-details">
+            <div class="common-striped-table common-model-popup-table">
+                <div class="table">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th *ngIf="doesSheetNameExists">{{ 'Sheet Name' | translate }}</th>
+                                <th class="table-error-row-no">{{ 'Row No' | translate }}.</th>
+                                <th class="table-error-row-no">{{ 'Field' | translate }}.</th>
+                                <th>
+                                    <div class="table-header-section">
+                                        <span class="table-error-message">{{ 'Message' | translate }}</span>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="!importErrors && importErrors.length === 0">
+                                {{
+                                    'Not available' | translate
+                                }}
+                            </tr>
+                            <tr *ngFor="let error of importErrors">
+                                <td *ngIf="error.sheetName">{{ error.sheetName }}</td>
+                                <td class="error-row-no">{{ error.row || '--' }}</td>
+                                <td class="error-row-no">{{ error.field || '--' }}</td>
+                                <td class="text-red">
+                                    {{ error.errorMsg || ('Not available' | translate) }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="import-data-status-button">
+        <button class="close-btn" (click)="closeErrorDialog()">
+            {{ 'Close' | translate }}
+        </button>
+    </div>
+</div>

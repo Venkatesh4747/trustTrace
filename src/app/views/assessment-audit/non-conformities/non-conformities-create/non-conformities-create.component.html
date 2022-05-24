@@ -1,0 +1,107 @@
+<div class="non-conformity-section-content">
+    <div class="hr" *ngIf="showDivider">
+        <span class="hr-title">{{ 'Non Conformities' | translate }}:</span>
+    </div>
+    <h4 class="tt-font mb-2" *ngIf="!showDivider">{{ 'Non Conformities' | translate }}:</h4>
+
+    <form [formGroup]="nonConformitiesForm" (ngSubmit)="onSubmit()">
+        <div class="non-conformities-form">
+            <div class="row">
+                <div class="col-md-4 pd-0 pr-0">
+                    <label class="template-label nc-title"
+                        >{{ 'Main Category' | translate }}:
+                        <span *ngIf="!formStatus()">&#42;</span>
+                    </label>
+                    <div class="form-group">
+                        <tt-dropdown-search-v2
+                            placeholder="{{ 'E.g. Labor' | translate }}"
+                            [listItem]="nonConformitiesTemplate"
+                            optionDisplayTextKey="value"
+                            [isDisabled]="editMode"
+                            formControlName="category"
+                            float="never"
+                            (valueChanges)="validateCategory()"
+                            [customStyle]="customStyle"
+                            valueChangesFire="selection"
+                            [customOptionMethod]="customStatusValidation"
+                            [data_cy]="'non-conformities-test-main-category'"
+                        >
+                        </tt-dropdown-search-v2>
+                    </div>
+                </div>
+                <div class="col-md-4 sm-pd-0">
+                    <label class="template-label nc-title"
+                        >{{ 'Sub Category' | translate }}:
+                        <span *ngIf="!formStatus()">&#42;</span>
+                    </label>
+
+                    <div class="form-group">
+                        <tt-dropdown-search-v2
+                            placeholder="{{ 'E.g. Child Labor' | translate }}"
+                            [listItem]="getSubcategories()"
+                            optionDisplayTextKey="value"
+                            [isDisabled]="editMode"
+                            formControlName="subCategory"
+                            float="never"
+                            [customStyle]="customStyle"
+                            [customOptionMethod]="customStatusValidation"
+                            [data_cy]="'non-conformities-test-sub-category'"
+                        >
+                        </tt-dropdown-search-v2>
+                    </div>
+                </div>
+                <div class="col-md-4 sm-pd-0">
+                    <label class="template-label nc-title"
+                        >{{ 'Priority' | translate }}:
+                        <span *ngIf="!formStatus()">&#42;</span>
+                    </label>
+
+                    <div class="form-group">
+                        <tt-dropdown-search-v2
+                            placeholder="{{ 'E.g. Major, Minor etc' | translate }}"
+                            [listItem]="auditPriorities"
+                            optionDisplayTextKey="categoryName"
+                            formControlName="priority"
+                            float="never"
+                            [customStyle]="customStyle"
+                            [customOptionMethod]="customStatusValidation"
+                            [data_cy]="'non-conformities-test-priority'"
+                        ></tt-dropdown-search-v2>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8 pd-0 pr-0">
+                    <label class="template-label nc-title"
+                        >{{ 'Enter new Non Conformity' | translate }}:
+                        <span *ngIf="!formStatus()">&#42;</span>
+                    </label>
+
+                    <div class="from-group">
+                        <mat-form-field [floatLabel]="'never'">
+                            <input
+                                #editNC
+                                matInput
+                                placeholder="{{ 'E.g. Hazardous work and other worst forms' | translate }}"
+                                formControlName="nonConformity"
+                                data-cy="non-conformities-test-enter-new-non-conformity"
+                            />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="col-md-4 pd-0 ">
+                    <button
+                        type="submit"
+                        class="btn tt-btn tt-btn-primary margin-set"
+                        mat-button
+                        style="float: right;"
+                        data-cy="non-conformities-test-non-conformity-submit-btn"
+                        [disabled]="formStatus() || btnStatus"
+                    >
+                        {{ editMode ? ('Save' | translate) : ('Add' | translate) }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

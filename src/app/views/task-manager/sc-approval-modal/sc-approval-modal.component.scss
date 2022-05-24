@@ -1,0 +1,83 @@
+@import '~styles/variables';
+
+.sc-approval-container {
+    color: #325992;
+    font-family: 'Source Sans Pro-Regular';
+    display: block;
+    width: 100%;
+    align-items: center;
+    padding: 10px 15px;
+}
+
+.sc-supplier-details {
+    display: block;
+    padding-bottom: 15px;
+    .supplier-value {
+        font-weight: 600;
+    }
+}
+
+.sc-delay-reasons {
+    display: block;
+    text-align: left;
+    .sc-delay-reasons-title {
+        font-size: 16px;
+        font-family: $font-family-Bold;
+    }
+    .sc-delay-reasons-description {
+        padding: 0;
+    }
+}
+
+.sc-form-controls {
+    padding: 30px 40px;
+}
+
+.sc-form-controls-buttons {
+    display: block;
+    text-align: center;
+    width: 100%;
+}
+
+.secondary-btn {
+    display: inline-block;
+    border-radius: 4px;
+    margin: 0 auto;
+    margin: 0 10px;
+    border: 0;
+    background-color: #7affad;
+    padding: 10px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #4b4b4b;
+    text-align: center;
+    &:hover,
+    &:focus,
+    &:active {
+        outline: none;
+        background-color: #7affad;
+    }
+}
+
+.reject-button {
+    border-radius: 4px;
+    border: solid 1px #8e8e8e;
+    color: #4b4b4b;
+    margin: 0 10px;
+    padding: 10px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    background: #fff;
+    &:active,
+    &:focus,
+    &:hover {
+        outline: none;
+        background-color: #fff;
+    }
+}
+
+.mat-input-label {
+    display: block;
+    padding-bottom: 5px;
+    font-size: 14px;
+}

@@ -1,0 +1,320 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header no-border">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                <div class="page-title">
+                    <div>{{ 'Styles' | industry | translate }}</div>
+                    <div class="page-description font-color-primary">
+                        {{ 'View, Edit and Manage the styles' | industry | translate }}
+
+                    </div>
+                </div>
+                <div class="header-search">
+                    <div class="title-right-search">
+                        <input
+                            type="text"
+                            class="search"
+                            placeholder="{{ 'Type and press enter to search' | translate }}"
+                            (keyup)="searchStyle($event)"
+                            [(ngModel)]="searchText"
+                            data-cy="styles-search"
+                        />
+                        <i class="fa fa-search"></i>
+                    </div>
+                    <button
+                        class="btn btn-lg btn-blue pull-right btn-gradient cs-btn
+                    "
+                        *ngIf="checkAccess('STYLE_CREATE')"
+                        routerLink="create"
+                    >
+                        <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" />
+                        {{ 'Create Style' | industry | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- col -->
+            <!-- col import-->
+            <div class="col-md-12">
+                <div class="export-data-btn-container">
+                    <button
+                        *ngIf="checkAccess('STYLE_CREATE')"
+                        class="btn btn-bordered pull-right btn import-btn-bordered pull-right"
+                        data-cy="styles-import-btn"
+                        (click)="importStyles()"
+                    >
+                        <img src="{{ env.IMG_URL }}images/upload-blue-icon.png" alt="Import" />
+                        <span>{{ 'Import Styles' | translate }}</span>
+                    </button>
+                </div>
+            </div>
+            <!-- col import-->
+        </div>
+        <!-- row -->
+
+        <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="styleFilters">
+            <div class="col-md-12">
+                <ul class="filter-bar-container">
+                    <li *ngFor="let filter of styleFilters | keys; let filterInd = index">
+                        <app-tt-multi-select-search
+                            (selectionChange)="handleFilterSelection()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="filter_session"
+                            [optionsParam]="optionsParam"
+                            *ngIf="!isAGroup(filter.value)"
+                            [data_cy]="removeSpace(filter.key)"
+                        >
+                        </app-tt-multi-select-search>
+
+                        <app-tt-multi-select-group-search
+                            (selectionChange)="handleFilterSelection()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="filter_session"
+                            [optionsParam]="optionsParam"
+                            *ngIf="isAGroup(filter.value)"
+                            [data_cy]="removeSpace(filter.key)"
+                        >
+                        </app-tt-multi-select-group-search>
+                    </li>
+                    <li class="reset-filters">
+                        <button
+                            class="button-badge mat-button btn btn-gray"
+                            (click)="resetAllFilters()"
+                            data-cy="styles-reset-all-filters"
+                        >
+                            {{ 'Reset all filters' | translate }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                <div class="row">
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 total-count">
+                        <div class="float-l" *ngIf="productsList?.length > 0 || totalCountFlag">
+                            <app-card-pagination
+                                [paginationStart]="pagination.from + 1"
+                                [fetchSize]="pagination.size"
+                                [totalItemsCount]="totalCount"
+                                moduleName="Styles"
+                                (previous)="onScroll('back')"
+                                (next)="onScroll('next')"
+                            ></app-card-pagination>
+                        </div>
+                        <div class="export-data-btn-container">
+                            <button
+                                class="cs-btn export-data"
+                                data-cy="style-test-export-btn"
+                                (click)="downloadStyleDataAsExcel()"
+                                [disabled]="!(totalCount > 0)"
+                            >
+                                <img src="{{ env.IMG_URL }}images/share.png" alt="Download" />
+                                <ng-template [ngIf]="!isProcessing">
+                                    {{ 'Export Styles' | translate }}
+                                </ng-template>
+                                <ng-template [ngIf]="isProcessing">
+                                    <div class="spinner-wrapper">
+                                        <span>{{ 'Downloading' | translate }}</span>
+                                        <mat-spinner [diameter]="14"></mat-spinner>
+                                    </div>
+                                </ng-template>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                        <div dropdown class="dropdown sort-dropdown">
+                            <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                <span class="sort-name"
+                                    >{{ 'Sort By' | translate }}
+                                    <i class="fa fa-angle-down"></i>
+                                </span>
+                            </a>
+                            <ul *dropdownMenu class="dropdown-menu">
+                                <li>
+                                    <mat-radio-group [(ngModel)]="sortByFilter.sortBy" (change)="handleSortBy()">
+                                        <mat-radio-button value="name">{{
+                                            'Alphabetical Order' | translate
+                                        }}</mat-radio-button>
+                                        <mat-radio-button value="create_ts">{{
+                                            'Newly Added' | translate
+                                        }}</mat-radio-button>
+                                    </mat-radio-group>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Sort Dropdown -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!-- Row -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+
+        <div id="card">
+            <div
+                class="row styles-table"
+                [ngStyle]="{ 'top.px': height }"
+                *ngIf="productsList && productsList?.length >= 0"
+            >
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="no-assessments" *ngIf="tableDataLoading">
+                        <app-spinner [small]="true"></app-spinner>
+                    </div>
+                    <div class="no-assessments" *ngIf="productsList?.length === 0">
+                        {{ 'No Styles' | industry | translate }}
+                    </div>
+                    <div class="table-responsive" *ngIf="productsList?.length > 0">
+                        <div
+                            class="table-card"
+                            *ngFor="let product of productsList"
+                            (click)="viewStyle(product.id, $event)"
+                        >
+                            <div class="table-card-left flex-column">
+                                <div class="cursor-pointer">
+                                    <div class="desc blue-desc">
+                                        {{ 'Name' | translate }} & {{ 'Number' | translate }}:
+                                        <span>{{ getProductDisplayName(product) }}</span>
+                                    </div>
+                                    <div class="desc blue-desc">
+                                        {{ 'Style UID' | translate }}:
+                                        <span *ngIf="product?.product_unique_code; else dataNotAvailable">
+                                            {{ product?.product_unique_code }}</span
+                                        >
+                                    </div>
+                                    <div class="desc blue-desc">
+                                        {{ 'Season' | translate }} & {{ 'Year' | translate }}:
+                                        <span
+                                            >{{ product?.season?.value || '' }}&nbsp;{{
+                                                product?.year ? '- ' + product?.year : ''
+                                            }}</span
+                                        >
+                                    </div>
+                                    <div class="desc blue-desc">
+                                        {{ 'Type' | translate }} :
+                                        <span>{{ product?.product_type?.value || '' }}</span>
+                                    </div>
+                                    <div class="desc blue-desc">
+                                        {{ 'Manufacturer' | translate }}:
+                                        <span
+                                            *ngIf="
+                                                product?.supplier && product?.supplier?.length > 0;
+                                                else dataNotAvailable
+                                            "
+                                        >
+                                            <span *ngFor="let supplier of product?.supplier; let isLast = last"
+                                                >{{ supplier.name }}<span *ngIf="!isLast">, </span></span
+                                            >
+                                        </span>
+                                    </div>
+                                    <div class="desc blue-desc">
+                                        {{ 'Material Composition' | industry | translate }}:
+                                        <span
+                                            *ngIf="
+                                                product?.material_composition &&
+                                                    product?.material_composition?.length > 0;
+                                                else dataNotAvailable
+                                            "
+                                        >
+                                            <span *ngFor="let comp of product?.material_composition; let isLast = last"
+                                                >{{ comp.value }} {{ comp.composition }}%<span *ngIf="!isLast"
+                                                    >,
+                                                </span></span
+                                            >
+                                        </span>
+                                    </div>
+                                    <div class="desc blue-desc">
+                                        {{ 'Required Certificates' | translate }}:
+                                        <span
+                                            *ngIf="
+                                                product?.certifications && product?.certifications?.length > 0;
+                                                else dataNotAvailable
+                                            "
+                                        >
+                                            <span *ngFor="let cert of product?.certifications; let isLast = last"
+                                                >{{ cert.value }}<span *ngIf="!isLast">, </span></span
+                                            >
+                                        </span>
+                                    </div>
+                                    <div class="desc blue-desc">
+                                        {{ 'Sustainability Tags' | translate }}:
+                                        <span
+                                            *ngIf="
+                                                product?.sustainability_labels &&
+                                                    product?.sustainability_labels?.length > 0;
+                                                else dataNotAvailable
+                                            "
+                                        >
+                                            <span
+                                                *ngFor="let label of product?.sustainability_labels; let isLast = last"
+                                            >
+                                                {{ label.value }}
+                                                <img
+                                                    class="traceable-icons"
+                                                    src="{{ getProductComplianceIconUrl('traced.png') }}"
+                                                    *ngIf="label.label_group_id === 'Compliant'"
+                                                    matTooltip="Compliant"
+                                                    matTooltipPosition="above"
+                                                />
+                                                <img
+                                                    class="traceable-icons"
+                                                    src="{{ getProductComplianceIconUrl('caution.png') }}"
+                                                    *ngIf="label.label_group_id === 'Non Compliant'"
+                                                    matTooltip="Non Compliant"
+                                                    matTooltipPosition="above"
+                                                />
+                                                <span *ngIf="!isLast">, </span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <ng-template #dataNotAvailable>
+                                        <span>
+                                            {{ 'Not Available' | translate }}
+                                        </span>
+                                    </ng-template>
+                                </div>
+                            </div>
+                            <div class="table-card-right flex-column">
+                                <div></div>
+                                <div class="desc blue-desc display-flex-only">
+                                    <a
+                                        class="action-icons-small"
+                                        [matTooltip]="'Archive Style' | translate"
+                                        matTooltipPosition="above"
+                                        *ngIf="checkAccess('STYLE_ARCHIVE')"
+                                        (click)="archiveAudit(product.id)"
+                                    >
+                                        <i style="margin-right: 0px;" class="action-icons-small fa fa-archive"></i>
+                                    </a>
+                                    <a
+                                        [matTooltip]="'Clone Style' | translate"
+                                        matTooltipPosition="above"
+                                        *ngIf="checkAccess('STYLE_CREATE')"
+                                        [routerLink]="['/', 'styles', product.id, 'clone']"
+                                    >
+                                        <i class="action-icons-small fa fa-clone"></i>
+                                    </a>
+                                    <a
+                                        [matTooltip]="'Edit Style' | translate"
+                                        matTooltipPosition="above"
+                                        *ngIf="checkAccess('STYLE_UPDATE')"
+                                        [routerLink]="['/', 'styles', product.id, 'edit']"
+                                    >
+                                        <i class="action-icons-small fa fa-pencil"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>

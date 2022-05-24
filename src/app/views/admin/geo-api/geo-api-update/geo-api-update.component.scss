@@ -1,0 +1,15 @@
+.geoapi {
+    table {
+        th {
+            text-align: center;
+            text-transform: capitalize;
+            border-right: 1px solid #ddd;
+            padding: 1rem;
+        }
+        td {
+            span.fa {
+                cursor: pointer;
+            }
+        }
+    }
+}

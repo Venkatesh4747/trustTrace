@@ -1,0 +1,119 @@
+@import '~styles/variables';
+@import '~styles/mixins';
+
+.toby .form-group.top {
+    margin-top: -10px;
+}
+.toby {
+    padding-top: 0;
+    margin-left: 0;
+}
+.toby .form-group.bottom.selected {
+    margin-bottom: 0;
+    opacity: 1;
+}
+.toby .form-group.selected label {
+    position: relative;
+    &::before {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        width: 70%;
+        border-bottom: 3px solid $color-tt-primary;
+        @include transition(all 350ms);
+        @include radius(20px);
+    }
+}
+
+.toby label {
+    position: relative;
+    padding-left: 0px;
+    cursor: pointer;
+    line-height: 20px;
+    display: inline-block;
+    font-weight: normal;
+    &::before {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        width: 0%;
+        border-bottom: 3px solid $color-tt-primary;
+        @include transition(all 350ms);
+        @include radius(20px);
+    }
+}
+
+.toby .control-label {
+    font-weight: 500;
+}
+
+.additional-info-detail {
+    padding-left: 20px;
+    padding-top: 20px;
+}
+.information-details-block-inner-left {
+    display: inline-block;
+    width: 48%;
+}
+.information-details-block-inner-right {
+    display: inline-block;
+    width: 70%;
+    .information-details-value {
+        span {
+            color: $text-color-primary;
+        }
+    }
+}
+.information {
+    &-details {
+        &-block {
+            display: flex;
+            width: 100%;
+            padding-left: 0;
+            margin: 12px 0;
+            align-items: flex-start;
+        }
+        &-list {
+            display: block;
+            float: left;
+            align-items: center;
+            height: 100%;
+            font-family: $font-family-Bold;
+            color: $text-color-primary;
+            // word-break: break-all;
+            font-size: 16px;
+            &:first-child {
+                width: 70%;
+            }
+            &:nth-child(2) {
+                width: 5%;
+                padding: 0 5px;
+                text-align: center;
+            }
+            &:last-child {
+                width: 25%;
+                font-family: $font-family-Regular;
+            }
+        }
+        &-value {
+            width: 50%;
+            display: inline-flex;
+            padding-bottom: 10px;
+            .detail-list {
+                span {
+                    width: auto;
+                    padding-bottom: 10px;
+                    display: inline-block;
+                }
+            }
+        }
+    }
+}

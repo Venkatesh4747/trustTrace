@@ -1,0 +1,79 @@
+@import '~styles/variables';
+
+/* Table */
+.evidences-table {
+    position: absolute;
+    top: 250px;
+    left: 20px;
+    right: 38px;
+    bottom: 100px;
+    overflow-y: auto;
+    width: 100%;
+}
+.entity-table {
+    background-color: $border-color-secondary;
+    display: flex;
+    align-items: center;
+    min-height: 59px;
+    padding: 0 10px;
+    .tr-title {
+        color: #fff !important;
+    }
+}
+
+div.hr {
+    border-bottom: 1px solid $border-color-primary !important;
+}
+.hr-title {
+    font-family: $font-family-Semibold;
+    font-size: 17px;
+}
+.evidence-collection-buttons-row {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    .evidence-collection-buttons {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 0;
+        button {
+            width: 100px;
+            &:last-child {
+                margin-left: 10px;
+            }
+        }
+    }
+}
+
+.ec-title {
+    font-family: $font-family-Regular;
+    font-size: 16px;
+    color: $text-color-primary;
+    display: flex;
+    justify-content: space-between;
+    .dashed-border {
+        border: dashed 1px $text-color-primary;
+    }
+}
+.ec-sub-title {
+    font-family: $font-family-Regular;
+    font-size: 16px;
+    color: $text-color-primary;
+    padding-bottom: 20px;
+    padding-left: 0;
+}
+.vertical-dotted-line {
+    border-bottom: 2px dashed $border-color-primary;
+}
+.vertical-dotted-line-container {
+    padding-left: 15px;
+    padding-right: 30px;
+    &last-child {
+        display: none;
+    }
+}
+.padding-alignments {
+    padding-left: 30px;
+    padding-right: 15px;
+}

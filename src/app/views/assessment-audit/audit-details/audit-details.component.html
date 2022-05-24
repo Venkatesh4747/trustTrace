@@ -1,0 +1,187 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div class="row pt-3">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 display-flex align-items-flex-start">
+                <div class="page-title">{{ 'Audit' | translate }}</div>
+                <div class="audit-go-back">
+                    <button class="go-back-button" (click)="commonServices.goBack(['/', 'assessment-audit'])">
+                        {{ 'Back' | translate }}
+                    </button>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-2">
+                <div>
+                    <a routerLink="/assessment-audit">{{ 'Audit' | translate }}</a
+                    >&gt;&gt; {{ 'Scores' | translate }}
+                </div>
+            </div>
+        </div>
+        <div class="row pt-2" *ngIf="auditDetails">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="hr">
+                    <span class="hr-title">{{ auditDetails.name }}:</span>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pb-2">
+        <ul class="display-flex align-items-flex-start">
+          <li>
+            <div>Supplier Badge: Gold</div>
+            <div>Gold</div>
+          </li>
+          <li>
+            <div>Sustainability Score:</div>
+            <div>92</div>
+          </li>
+          <li>
+            <div>Supplier:</div>
+            <div>Olmac</div>
+          </li>
+          <li>
+            <div>Audit Type:</div>
+            <div>BSCI</div>
+          </li>
+          <li>
+            <div>Validity</div>
+            <div>13/09/19</div>
+          </li>
+        </ul>
+      </div> -->
+        <!-- <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-2">
+        <div class="filter-selection-content">
+          <ul class="list-unstyled">
+            <li *ngFor="let section of filterSections">
+              <app-assessment-input-card [section]="section" [selectedFilters]="selectedFilters"></app-assessment-input-card>
+            </li>
+          </ul>
+        </div>
+      </div> -->
+        <div class="row audit-detail-table" *ngIf="auditDetails">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="filter-selection-content">
+                    <form [formGroup]="recordAuditForm">
+                        <p class="audit-detail-title">{{ 'Audit Details' | translate }}</p>
+                        <p class="audit-input-title">
+                            <label>{{ 'Audit Name' | translate }}: </label>
+                            <input
+                                class="audit-input"
+                                type="text"
+                                value="{{ auditDetails.name }}"
+                                formControlName="assessmentNameCtrl"
+                            />
+                        </p>
+                        <p class="audit-input-title">
+                            <label>{{ 'Auditor' | translate }}: </label>
+                            {{ auditDetails.auditor }}
+                        </p>
+                        <p class="audit-input-title">
+                            <label>{{ 'Auditee' | translate }}: </label>
+                            {{ auditDetails.auditee }}
+                        </p>
+                        <p class="audit-input-title">
+                            <label>{{ 'Date of Audit' | translate }}: </label>
+                            <mat-form-field>
+                                <input matInput readonly [matDatepicker]="dateCtrl" formControlName="dateCtrl" />
+                                <mat-datepicker-toggle matSuffix [for]="dateCtrl"></mat-datepicker-toggle>
+                                <mat-datepicker #dateCtrl></mat-datepicker>
+                            </mat-form-field>
+                        </p>
+                        <p class="audit-input-title">
+                            <label>{{ 'Validity Till' | translate }}: </label>
+                            <mat-form-field>
+                                <input
+                                    class="audit-input"
+                                    matInput
+                                    readonly
+                                    [matDatepicker]="validityCtrl"
+                                    formControlName="validityCtrl"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="validityCtrl"></mat-datepicker-toggle>
+                                <mat-datepicker #validityCtrl [startAt]="dateCtrl"></mat-datepicker>
+                            </mat-form-field>
+                        </p>
+                        <p class="audit-input-title" *ngIf="auditDetails.validityStatus">
+                            <label>{{ 'Status' | translate }}: </label>
+                            {{ auditDetails.validityStatus }}
+                        </p>
+                        <p class="audit-input-title">
+                            <label>{{ 'Audit Type' | translate }}: </label>
+                            {{ auditDetails.auditTypeName }}
+                        </p>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ignore this block if not needed -->
+            <!--   <div>
+          <ul class="list-unstyled">
+      </div> -->
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-2" *ngIf="paramsValueExists">
+                <!-- Get Audit Type -->
+                <p class="audit-detail-title">{{ 'Other Parameters' | translate }}</p>
+                <p class="audit-input-title" *ngIf="auditDetails.overallRating">
+                    <label>{{ 'Overall Rating' | translate }}: </label>
+                    {{ auditDetails.overallRating }}
+                </p>
+                <p class="audit-input-title" *ngIf="auditDetails.nonConformitiesCount">
+                    <label>{{ 'Non Conformities' | translate }}: </label>
+                    {{ auditDetails.nonConformitiesCount }}
+                </p>
+
+                <div [ngSwitch]="auditDetails.type">
+                    <div *ngSwitchCase="'TRUSTRACE'">
+                        <ul class="list-unstyled">
+                            <li *ngFor="let section of sections; let i = index">
+                                <div class="audit-input-title pt-1" *ngIf="section.value">
+                                    <label class="width-100-percent">{{ section.value }}</label>
+                                    <div class="width-100-percent">
+                                        <p>{{ 'Scores' | translate }}:</p>
+                                        <ul class="list-unstyled">
+                                            <li *ngFor="let score of sections[i].scores">
+                                                <p class="audit-input-title" *ngIf="score.subGroupValue">
+                                                    <label
+                                                        >{{ localizationService.getDisplayText(score.subGroupName) }}:
+                                                    </label>
+                                                    {{ score.subGroupValue }}
+                                                </p>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div *ngSwitchDefault>
+                        <ul class="list-unstyled">
+                            <li *ngFor="let section of sections; let secIndex = index">
+                                <label>{{ section.header }}: </label>
+
+                                <div *ngFor="let field of section.fields; let fieldIndex = index">
+                                    <div class="audit-input-title pt-1" *ngIf="field.value">
+                                        <label>{{ field.name }}: </label>
+                                        <p *ngIf="field.type !== 'FILE'">{{ field.value }}</p>
+                                    </div>
+                                    <ul class="fileInputList" *ngIf="field.type === 'FILE'">
+                                        <li *ngFor="let fileName of field.fileName">
+                                            <span class="files download" (click)="getUploadedFile(field.id, fileName)">
+                                                <i class="fa fa-download"></i>
+                                                <span class="fileName">{{ fileName }}</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-2" *ngIf="!inViewMode">
+                <div class="update-audit-btn">
+                    <button class="btn btn-gradient" (click)="updateAudit()">{{ 'Update' | translate }} &gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+@import '~styles/variables';
+
+.ec-title {
+    font-family: $font-family-Regular;
+    font-size: 16px;
+    color: $text-color-primary;
+    display: flex;
+    justify-content: space-between;
+    .dashed-border {
+        border: dashed 1px $text-color-primary;
+    }
+}
+.ec-sub-title {
+    font-family: $font-family-Regular;
+    font-size: 16px;
+    color: $text-color-primary;
+    padding-bottom: 20px;
+}
+.vertical-dotted-line {
+    border-bottom: 2px dashed $border-color-primary;
+}
+.vertical-dotted-line-container {
+    &last-child {
+        display: none;
+    }
+}
+.add-more-input {
+    float: right;
+    // margin-right: 35px;
+    button {
+        padding: 5px 15px;
+        background-color: $button-action-background;
+    }
+}

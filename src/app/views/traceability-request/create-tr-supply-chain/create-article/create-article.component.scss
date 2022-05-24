@@ -1,0 +1,92 @@
+@import '~styles/variables';
+
+.entity-article-row {
+    display: flex;
+    align-items: flex-end;
+}
+
+.article-type {
+    padding: 8px 15px;
+    min-width: 100px;
+    min-height: 40px;
+    height: auto;
+    border: solid 1px #bababa;
+    background: transparent;
+    border-radius: 5px;
+    background: #ffff;
+    position: relative;
+    bottom: 2px;
+    font-size: 14px;
+    /* &.cursor-pointer {
+        background-color: $background-color-nav;
+        border: 1px solid $text-color-primary;
+        color: $text-color-primary;
+    } */
+}
+
+.article-name-no,
+.ponumber {
+    .mat-form-field {
+        width: 100%;
+    }
+}
+
+.article-data-collection {
+    font-size: 12px;
+    display: inline-flex;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    font-family: $font-family-Bold;
+    mat-checkbox {
+        vertical-align: top;
+        padding-left: 5px;
+    }
+}
+
+.action-icons-big {
+    position: relative;
+}
+
+.action-icon-delete {
+    border: none;
+    background: transparent;
+    cursor: pointer !important;
+    &:hover {
+        cursor: pointer !important;
+    }
+    &:focus {
+        outline: none;
+    }
+    img {
+        width: 14px;
+        height: 17px;
+    }
+}
+
+.action-icons-big,
+.action-icons-small {
+    font-size: 19px;
+    color: #777;
+    height: 35px;
+    width: 35px;
+    margin-right: 5px;
+    background: transparent;
+    border-radius: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: none;
+}
+.action-icons-small {
+    font-size: 14px;
+    height: 20px;
+    width: 20px;
+}
+
+.delete-button-container {
+    display: inline-block;
+    [disabled] {
+        pointer-events: none;
+    }
+}

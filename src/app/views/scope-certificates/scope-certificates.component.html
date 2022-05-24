@@ -1,0 +1,374 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div id="scope-certificates-container" class="scope-certificates-container">
+            <div id="scope-certificates-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Scope Certificate' | translate }}</div>
+                        <div class="page-description">
+                            {{ 'Manage all Scope Certificates' | industry | translate }}
+                        </div>
+                    </div>
+                    <div class="header-search" *ngIf="isScopeCertificatesAvailable && scopeCertificatesFilters">
+                        <div class="title-right-search">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Type and press enter to search' | translate }}"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchScopeCertificate($event)"
+                                data-cy="scope-certificates-search"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <button
+                            *ngIf="checkAccess('SCOPE_CERTIFICATE_CREATE')"
+                            type="button"
+                            class="btn btn-lg btn-bordered pull-right btn-gradient cs-btn mr-15"
+                            (click)="openCertificateRenewalModal()"
+                        >
+                            <img src="{{ env.IMG_URL }}images/upload-blue-icon.png" alt="Import" />
+                            <span>{{ 'Upload Scope Certificate' | translate }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                id="filter-bar-wrapper"
+                class="row filter-bar-wrapper"
+                *ngIf="isScopeCertificatesAvailable && scopeCertificatesFilters"
+            >
+                <div class="col-md-12">
+                    <ul class="filter-bar-container">
+                        <li *ngFor="let filter of scopeCertificatesFilters | keys; let filterInd = index">
+                            <app-tt-multi-select-search
+                                (selectionChange)="handleFilterSelection()"
+                                (refreshFilter)="refreshFilter()"
+                                [label]="filter.key"
+                                [options]="filter.value"
+                                [filter_session]="filter_session"
+                                [optionsParam]="optionsParam"
+                                *ngIf="!isAGroup(filter.value)"
+                                [data_cy]="removeSpace(filter.key)"
+                            >
+                            </app-tt-multi-select-search>
+                        </li>
+                        <li class="reset-filters">
+                            <button
+                                class="button-badge mat-button btn btn-gray"
+                                (click)="resetAllFilters()"
+                                data-cy="scope-certificate-reset-all-filters"
+                            >
+                                {{ 'Reset all filters' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-12 pd-0">
+                    <div class="tt-tabs pb-2">
+                        <div class="cursor-default" (click)="navigateTo(tab)" *ngFor="let tab of tabs; let ind = index">
+                            <label class="cursor-pointer" [ngClass]="{ active: activeTab === tab }">
+                                {{ tab | translate }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                    <div class="row">
+                        <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 total-count">
+                            <div class="float-l" *ngIf="scopeCertificates.length > 0 || totalCountFlag">
+                                <card-pagination
+                                    [paginationStart]="pagination.from + 1"
+                                    [fetchSize]="pagination.size"
+                                    [totalItemsCount]="totalCount"
+                                    [moduleName]="'Scope Certificates'"
+                                    (previous)="onScroll('back')"
+                                    (next)="onScroll('next')"
+                                ></card-pagination>
+                            </div>
+                        </div>
+                        <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                            <div dropdown class="dropdown sort-dropdown">
+                                <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                    <span class="sort-name"
+                                        >{{ 'Sort By' | translate }}
+                                        <i class="fa fa-angle-down"></i>
+                                    </span>
+                                </a>
+                                <ul *dropdownMenu class="dropdown-menu">
+                                    <li>
+                                        <mat-radio-group
+                                            [(ngModel)]="sortByFilter.sortBy"
+                                            (change)="handleSortBy($event)"
+                                        >
+                                            <mat-radio-button value="valid_until">{{
+                                                'Valid Until' | translate
+                                            }}</mat-radio-button>
+                                            <mat-radio-button value="create_ts">{{
+                                                'Newly Added' | translate
+                                            }}</mat-radio-button>
+                                        </mat-radio-group>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Sort Dropdown -->
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Filter Bar -->
+
+            <div id="card">
+                <div class="row scope-certificatetable" [ngStyle]="{ 'top.px': height }">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="table custom-table table-striped" *ngIf="activeTab === tabs[0]">
+                                    <thead>
+                                        <tr>
+                                            <th class="checkbox-width">
+                                                <mat-checkbox
+                                                    [checked]="hasUserSelectedAllEvidences()"
+                                                    (change)="userSelectedAllEvidences($event)"
+                                                >
+                                                </mat-checkbox>
+                                            </th>
+                                            <th>{{ 'Certification Standard' | translate }}</th>
+                                            <th>{{ 'Certification Body' | translate }}</th>
+                                            <th>{{ 'Certificate No' | translate }}</th>
+                                            <th>{{ 'SC Owner' | translate }}</th>
+                                            <th>{{ 'Valid From' | translate }}</th>
+                                            <th>{{ 'Valid Until' | translate }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngIf="!fetchingScopeCertificatesData && scopeCertificates.length === 0">
+                                            <p class="content-center">
+                                                {{ 'No scope certificates available!' | translate }}
+                                            </p>
+                                        </tr>
+                                        <tr *ngIf="fetchingScopeCertificatesData">
+                                            <p class="content-center">
+                                                <app-spinner [small]="true"></app-spinner>
+                                            </p>
+                                        </tr>
+                                        <tr
+                                            *ngFor="let scopeCertificate of scopeCertificates"
+                                            (click)="
+                                                openScopeCertificateDetailView(
+                                                    scopeCertificate.id,
+                                                    scopeCertificate.cert_id,
+                                                    scopeCertificate.file_name,
+                                                    $event
+                                                )
+                                            "
+                                        >
+                                            <td class="checkbox-width">
+                                                <mat-checkbox
+                                                    [checked]="hasUserSelectedEvidence(scopeCertificate.id)"
+                                                    (change)="userSelectedEvidence($event, scopeCertificate)"
+                                                >
+                                                </mat-checkbox>
+                                            </td>
+                                            <td>
+                                                <div class="mat-value">
+                                                    <p>{{ scopeCertificate.cert_std.value }}</p>
+                                                </div>
+                                            </td>
+                                            <td *ngIf="scopeCertificate.body_issuing_certificate; else notAvailable">
+                                                {{ scopeCertificate.body_issuing_certificate | translate }}
+                                            </td>
+                                            <td *ngIf="scopeCertificate.tc_reference_id; else notAvailable">
+                                                <a
+                                                    ><span
+                                                        (click)="
+                                                            downloadScopeCertificate(
+                                                                scopeCertificate.cert_id,
+                                                                scopeCertificate.file_name
+                                                            )
+                                                        "
+                                                        >{{ scopeCertificate.tc_reference_id }}</span
+                                                    ></a
+                                                >
+                                            </td>
+                                            <td
+                                                *ngIf="
+                                                    scopeCertificate.supplier && scopeCertificate.supplier.value;
+                                                    else notAvailable
+                                                "
+                                            >
+                                                {{ scopeCertificate.supplier.value | translate }}
+                                            </td>
+                                            <td *ngIf="scopeCertificate.valid_from; else notAvailable">
+                                                {{ scopeCertificate.valid_from | translate }}
+                                            </td>
+                                            <td *ngIf="scopeCertificate.valid_until; else notAvailable">
+                                                {{ scopeCertificate.valid_until | translate }}
+                                            </td>
+                                            <ng-template #notAvailable>
+                                                <td class="content-grey">
+                                                    {{ 'Not Available' | translate }}
+                                                </td>
+                                            </ng-template>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot *ngIf="activeTab === tabs[0] && userSelectedSC.length > 0">
+                                        <tr>
+                                            <td>
+                                                <div class="table-footer-block">
+                                                    <ul class="table-footer-block-inner">
+                                                        <li class="table-footer-block-inner-left"></li>
+                                                        <li class="table-footer-block-inner-right">
+                                                            <div class="sc-button-block">
+                                                                <button
+                                                                    class="btn cancel-btn"
+                                                                    type="button"
+                                                                    (click)="handleCancelClick()"
+                                                                >
+                                                                    {{ 'Cancel' | translate }}
+                                                                </button>
+                                                                <button
+                                                                    class="btn delete-btn"
+                                                                    (click)="deleteConfirmationEvidence(userSelectedSC)"
+                                                                    type="button"
+                                                                >
+                                                                    {{ 'Delete' | translate }}
+                                                                </button>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <table class="table custom-table table-striped" *ngIf="activeTab === tabs[1]">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ 'Certification Standard' | translate }}</th>
+                                            <th>{{ 'Certification Body' | translate }}</th>
+                                            <th>{{ 'Certificate No' | translate }}</th>
+                                            <th>{{ 'SC Owner' | translate }}</th>
+                                            <th>{{ 'Valid From' | translate }}</th>
+                                            <th>{{ 'Valid Until' | translate }}</th>
+                                            <th>{{ 'Requested Date' | translate }}</th>
+                                            <th>{{ 'Comments' | translate }}</th>
+                                            <th>{{ 'Status' | translate }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngIf="!fetchingScopeCertificatesData && scopeCertificates.length === 0">
+                                            <p class="content-center">
+                                                {{ 'No scope certificates available!' | translate }}
+                                            </p>
+                                        </tr>
+                                        <tr *ngIf="fetchingScopeCertificatesData">
+                                            <p class="content-center">
+                                                <app-spinner [small]="true"></app-spinner>
+                                            </p>
+                                        </tr>
+                                        <tr
+                                            *ngFor="let scopeCertificate of scopeCertificates"
+                                            (click)="
+                                                openScopeCertificateDetailView(
+                                                    scopeCertificate.id,
+                                                    scopeCertificate.cert_id,
+                                                    scopeCertificate.file_name,
+                                                    $event
+                                                )
+                                            "
+                                        >
+                                            <td>
+                                                <div class="mat-value">
+                                                    <p>{{ scopeCertificate.cert_std.value }}</p>
+                                                </div>
+                                            </td>
+                                            <td *ngIf="scopeCertificate.body_issuing_certificate; else notAvailable">
+                                                {{ scopeCertificate.body_issuing_certificate | translate }}
+                                            </td>
+                                            <td *ngIf="scopeCertificate.tc_reference_id; else notAvailable">
+                                                <a
+                                                    ><span
+                                                        (click)="
+                                                            downloadScopeCertificate(
+                                                                scopeCertificate.cert_id,
+                                                                scopeCertificate.file_name
+                                                            )
+                                                        "
+                                                        >{{ scopeCertificate.tc_reference_id }}</span
+                                                    ></a
+                                                >
+                                            </td>
+                                            <td
+                                                *ngIf="
+                                                    scopeCertificate.supplier && scopeCertificate.supplier.value;
+                                                    else notAvailable
+                                                "
+                                            >
+                                                {{ scopeCertificate.supplier.value | translate }}
+                                            </td>
+                                            <td *ngIf="scopeCertificate.valid_from; else notAvailable">
+                                                {{ scopeCertificate.valid_from | translate }}
+                                            </td>
+                                            <td *ngIf="scopeCertificate.valid_until; else notAvailable">
+                                                {{ scopeCertificate.valid_until | translate }}
+                                            </td>
+                                            <td *ngIf="scopeCertificate.creation_date; else notAvailable">
+                                                {{ scopeCertificate.creation_date }}
+                                            </td>
+                                            <td *ngIf="scopeCertificate.comments; else notAvailable">
+                                                {{ scopeCertificate.comments }}
+                                            </td>
+                                            <td *ngIf="scopeCertificate.workflow_status; else notAvailable">
+                                                {{ scopeCertificate.workflow_status }}
+                                            </td>
+                                            <ng-template #notAvailable>
+                                                <td class="content-grey">
+                                                    {{ 'Not Available' | translate }}
+                                                </td>
+                                            </ng-template>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot *ngIf="activeTab === tabs[0] && userSelectedSC.length > 0">
+                                        <tr>
+                                            <td>
+                                                <div class="table-footer-block">
+                                                    <ul class="table-footer-block-inner">
+                                                        <li class="table-footer-block-inner-left"></li>
+                                                        <li class="table-footer-block-inner-right">
+                                                            <div class="sc-button-block">
+                                                                <button
+                                                                    class="btn cancel-btn"
+                                                                    type="button"
+                                                                    (click)="handleCancelClick()"
+                                                                >
+                                                                    {{ 'Cancel' | translate }}
+                                                                </button>
+                                                                <button
+                                                                    class="btn delete-btn"
+                                                                    (click)="deleteConfirmationEvidence(userSelectedSC)"
+                                                                    type="button"
+                                                                >
+                                                                    {{ 'Delete' | translate }}
+                                                                </button>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

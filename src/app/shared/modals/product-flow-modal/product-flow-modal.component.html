@@ -1,0 +1,80 @@
+<div class="modal-header blue-head">
+  <h4 class="modal-title pull-left">{{ "Product Flow" | translate }}</h4>
+  <button
+    type="button"
+    class="close pull-right"
+    (click)="bsModalRef.hide()"
+    aria-label="Close"
+  >
+    <img class="sni" src="{{env.IMG_URL}}images/close.png" />
+  </button>
+</div>
+<div class="modal-body container-fluid">
+  <div class="text-center" *ngIf="!productFlowDataReady">
+    <app-spinner [small]="true"></app-spinner>
+  </div>
+  <div class="tree-container">
+    <div class="tree" *ngIf="productFlowDataReady">
+      <ul>
+        <ng-template #recursiveList let-modalFlowData>
+          <li *ngFor="let item of modalFlowData" [ngClass]="{'main-root': item.root, 'main-child': !item.root}">
+            <div class="dash-pointer-vertical" *ngIf="!item.root"></div>
+            <a [ngClass]="{'root': item.root, 'child': !item.root}" (click)="false">
+              <div class="material">
+                <img class="materials-icon icon-at-start" src="{{env.IMG_URL}}images/icons/products/{{item.name}}.png" />
+                <p class="materials-heading">{{item.supplier_name}}</p>
+                <p class="materials-subheading">{{localeService.getDisplayText(item.name)}}</p>
+                <img class="materials-icon icon-at-end" src="{{env.IMG_URL}}images/icons/products/{{item.name}}.png" />
+              </div>
+              <div *ngIf="item.root && item.children && item.children.length > 0">
+                <div class="dash-double-pointer-horizontal"></div>
+                <div class="dash-no-pointer-vertical"></div>
+              </div>
+              <div class="value-processess" *ngIf="item.processToFacility && item.processToFacility.length > 0">
+                <div class="dash-single-pointer-horizontal" *ngIf="item.root"></div>
+                <div class="value-processess-right">
+                  <div *ngFor="let processInfo of item.processToFacility">
+                    <img class="vp-icon" src="{{env.IMG_URL}}images/icons/valueProcesses/{{processInfo.valueProcess}}.png" />
+                    <span class="vp-facility">
+                      <strong>{{localeService.getDisplayText(processInfo.valueProcess)}}</strong> - {{processInfo.facility}}
+                    </span>
+                    <ng-template [ngIf]="item.facilityName">,&nbsp;{{item.facilityName}}</ng-template>
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="fc-materials" *ngIf="item.material">{{localeService.getDisplayText(item.material)}}</div> -->
+            </a>
+            <ul *ngIf="item.children && item.children.length > 0">
+              <li>
+                <div class="dash-no-pointer-vertical" *ngIf="!item.root"></div>
+                <ul>
+                  <ng-container *ngTemplateOutlet="recursiveList; context:{ $implicit: item.children }"></ng-container>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ng-template>
+        <ng-container *ngTemplateOutlet="recursiveList; context:{ $implicit: modalFlowData }"></ng-container>
+      </ul>
+    </div>
+    <!-- tree -->
+  </div>
+  <!-- tree-container -->
+</div>
+<!-- modal-body -->
+
+<div class="modal-footer">
+  <div class="col-md-6 text-left"></div>
+  <div class="col-md-6">
+    <button
+      type="button"
+      class="btn btn-gray"
+      data-dismiss="modal"
+      (click)="bsModalRef.hide()"
+    >
+      {{ "Close" | translate }}
+    </button>
+  </div>
+  <!-- col -->
+</div>
+<!-- modal-footer -->

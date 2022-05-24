@@ -1,0 +1,164 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="filter-section">
+            <h3 class="sub-title">{{ 'Filter' | translate }}</h3>
+            <!-- filters start -->
+            <div class="filter-list-block">
+                <ul class="filters-list-left">
+                    <li *ngFor="let filter of filters | keys">
+                        <app-tt-multi-select-search
+                            (selectionChange)="onFilter()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="INTEGRATION_LOG_FILTER_KEY"
+                            [optionsParam]="optionsParam"
+                            *ngIf="!isGroup(filter.value)"
+                        >
+                        </app-tt-multi-select-search>
+
+                        <app-tt-multi-select-group-search
+                            (selectionChange)="onFilter()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="INTEGRATION_LOG_FILTER_KEY"
+                            [optionsParam]="optionsParam"
+                            *ngIf="isGroup(filter.value)"
+                        >
+                        </app-tt-multi-select-group-search>
+                    </li>
+                </ul>
+                <ul class="filter-list-right">
+                    <li class="reset-filters">
+                        <button class="button-badge mat-button btn btn-gray" (click)="resetAllFilters()">
+                            {{ 'Reset all filters' | translate }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <!-- filters end -->
+        </div>
+    </div>
+</div>
+
+<div class="row pt-1 pl-15">
+    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 total-count">
+        <app-card-pagination
+            [paginationStart]="paginationCount * PAGINATION_SIZE + 1"
+            [fetchSize]="PAGINATION_SIZE"
+            [totalItemsCount]="middlewareProductList?.totalCount"
+            moduleName="Product Integration"
+            (previous)="onPaginate('back')"
+            (next)="onPaginate('forward')"
+        ></app-card-pagination>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+        <form class="pull-right">
+            <div class="form-group title-right-search">
+                <mat-icon class="search-icon">search </mat-icon>
+                <input
+                    type="search"
+                    placeholder="{{ 'Search by Product number' | translate }}"
+                    class="form-control"
+                    (keyup.enter)="onSearch()"
+                    [formControl]="searchFormControl"
+                />
+
+                <div dropdown class="dropdown sort-dropdown">
+                    <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                        <span class="sort-name"
+                            >{{ 'Sort By' | translate }}
+                            <span class="fa fa-angle-down"></span>
+                        </span>
+                    </a>
+                    <ul *dropdownMenu class="dropdown-menu">
+                        <li>
+                            <mat-radio-group [formControl]="sortControl" (change)="onSort()">
+                                <mat-radio-button value="name">{{
+                                    'Product Name Alphabetical Order' | translate
+                                }}</mat-radio-button>
+                            </mat-radio-group>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row table-container">
+    <div class="table-responsive">
+        <table class="table custom-table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">{{ 'Product ID' | translate }}</th>
+                    <th scope="col">{{ 'Product Name' | translate }}</th>
+                    <th scope="col">{{ 'Data Source' | translate }}</th>
+                    <th scope="col">{{ 'Brand Name' | translate }}</th>
+                    <th scope="col">{{ 'Supplier Name' | translate }}</th>
+                    <th scope="col">{{ 'Category' | translate }}</th>
+                    <th scope="col">{{ 'Sub Category' | translate }}</th>
+                    <th scope="col">{{ 'AKTU Code' | translate }}</th>
+                    <th scope="col" class="text-center">{{ 'Actions' | translate }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    *ngFor="let product of middlewareProductList?.searchResponse"
+                    (click)="navigateToIntegrationDetailPage(product.product_number)"
+                >
+                    <td>
+                        <app-tt-icon-image [status]="product?.integration_status"></app-tt-icon-image>
+                    </td>
+                    <td>{{ 'EAN' | translate }}: {{ product.product_number }}</td>
+                    <td *ngIf="product?.name; else notAvailable">
+                        <span class="overflow-with-dots">
+                            {{ product.name }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ getValues(product.data_source) }}
+                    </td>
+                    <td *ngIf="product?.brand_name; else notAvailable">{{ product.brand_name }}</td>
+                    <td *ngIf="product?.supplier_name; else notAvailable">
+                        {{ product.supplier_name }}
+                    </td>
+                    <td *ngIf="product?.category; else notAvailable">{{ product.category }}</td>
+                    <td *ngIf="product?.sub_category; else notAvailable">
+                        {{ product.sub_category }}
+                    </td>
+                    <td>
+                        {{ product.status }}
+                    </td>
+                    <td class="text-center" (click)="$event.stopPropagation()">
+                        <button class="action-button" (click)="downloadData(product.product_number)">
+                            <mat-icon [matTooltip]="'Download' | translate">file_download</mat-icon>
+                        </button>
+                        <button
+                            *ngIf="hasIntegrationUpdateAccess"
+                            class="action-button"
+                            (click)="reRunProductIntegrationProcess(product)"
+                        >
+                            <mat-icon [matTooltip]="'Re-run' | translate">replay</mat-icon>
+                        </button>
+                    </td>
+
+                    <ng-template #notAvailable>
+                        <td class="not-available">
+                            {{ 'Not available' | translate }}
+                        </td>
+                    </ng-template>
+                </tr>
+                <tr class="content-center" *ngIf="middlewareProductList?.searchResponse?.length">
+                    <p>
+                        {{ 'No product found' | translate }}
+                    </p>
+                </tr>
+            </tbody>
+            <tfoot></tfoot>
+        </table>
+    </div>
+</div>

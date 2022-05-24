@@ -1,0 +1,113 @@
+@import '~styles/variables';
+
+/* NO DATA CONTAINER */
+.no-data-text {
+    text-align: center;
+    color: #9b9b9b;
+    font-family: $font-family-Regular;
+    font-size: 17px;
+    margin-top: 17px;
+    padding-left: 28px;
+    padding-right: 28px;
+}
+
+.no-data-container {
+    margin-top: 50px;
+    display: block;
+    text-align: center;
+}
+
+.not-availble {
+    position: relative;
+    left: 0px;
+    width: 100% !important;
+    padding-right: 0 !important;
+    display: inline-flex;
+}
+.details-list {
+    align-items: center;
+    height: 100%;
+    font-family: $font-family-Regular;
+    color: $text-color-primary;
+    font-size: 16px;
+    width: 100%;
+
+    span {
+        width: 25%;
+        padding-right: 0;
+    }
+
+    &.no-data-img-container {
+        display: block;
+        text-align: center;
+        font-family: $font-family-Regular;
+        font-size: 14px;
+        line-height: 18px;
+        padding: 50px 0;
+        .no-data-img,
+        .no-data-img-table {
+            display: block;
+            margin: 0 auto;
+            width: 145px;
+            p {
+                color: #a8a8a8;
+            }
+        }
+        .no-data-img-table {
+            width: calc(100vw - 320px);
+            p {
+                width: 145px;
+                margin: 0 auto;
+                color: #a8a8a8;
+            }
+        }
+    }
+}
+.files {
+    img {
+        margin-left: 10px;
+    }
+    .fileName {
+        width: 30%;
+        word-break: break-all;
+    }
+}
+.row-with-icon {
+    text-align: center;
+}
+.table-card-icons {
+    width: 20px;
+}
+.content-width-break {
+    word-break: break-all;
+}
+.label-highlighted {
+    background-color: #e6fbff;
+    padding: 5px 10px;
+    border-radius: 6px;
+    min-width: 100%;
+    margin-bottom: 15px;
+}
+
+.row-with-bold {
+    font-weight: bold;
+}
+
+.table-responsive {
+    margin-bottom: 20px;
+}
+.common-striped-table .table-striped > tbody > tr > td:last-child {
+    vertical-align: top;
+}
+.common-striped-table .table-striped > tbody > tr > td:first-child {
+    padding: 15px 20px;
+}
+.common-striped-table .table-striped > tbody > tr > td {
+    padding: 15px 25px;
+}
+.common-striped-table .table-striped > thead > tr > th:first-child {
+    padding: 15px 20px;
+}
+.common-striped-table .table-striped > thead > tr > th {
+    padding: 15px 25px;
+}

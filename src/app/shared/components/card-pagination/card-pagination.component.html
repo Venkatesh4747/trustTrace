@@ -1,0 +1,20 @@
+<div class="pagination-container" data-cy="pagination">
+    <span>
+        <ng-container *ngIf="this.totalItemsCount !== 0; else notAvailable">
+            {{ 'Showing' | translate }} <strong>{{ paginationStart }}</strong> - <strong>{{ paginationEnd }}</strong>
+        </ng-container>
+        <ng-template #notAvailable> {{ 'Showing' | translate }} <strong>0</strong> </ng-template>
+
+        {{ 'of' | translate }}
+        <strong>{{ totalItemsCount }}</strong>
+        {{ moduleName | translate }}
+    </span>
+    <span>
+        <button mat-icon-button (click)="onPaginationActionButton(-1)" [disabled]="paginationStart <= 1">
+            <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-icon-button (click)="onPaginationActionButton(1)" [disabled]="paginationEnd >= totalItemsCount">
+            <mat-icon>chevron_right</mat-icon>
+        </button>
+    </span>
+</div>

@@ -1,0 +1,17 @@
+<div class="modal-input-group-container">
+    <div class="display-flex" *ngFor="let val of data.inputs; let inputInd = index">
+        <mat-form-field class="modal-input-field" [floatLabel]="'never'">
+            <input
+                matInput
+                [(ngModel)]="val.value"
+                (keydown.enter)="onAddInput($event)"
+                name="inputbox-{{ inputInd }}"
+                placeholder="{{ 'Hit enter to add' | translate }}"
+                [attr.data-cy]="removeSpace(data_cy) + '-enter-value-' + inputInd"
+            />
+        </mat-form-field>
+        <span [attr.data-cy]="removeSpace(data_cy) + '-delete-btn-' + inputInd"
+            ><i class="action-icons-small fa fa-trash" (click)="onDeleteInput(inputInd)"></i
+        ></span>
+    </div>
+</div>

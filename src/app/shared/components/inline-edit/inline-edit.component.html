@@ -1,0 +1,62 @@
+<div class="cursorp">
+    <div *ngIf="editing">
+        <span [ngSwitch]="type">
+            <input
+                *ngSwitchCase="'text'"
+                #inlineEditControl
+                [ngClass]="{ inEdit: type === 'text' }"
+                [required]="required"
+                (blur)="onBlur($event)"
+                [name]="value"
+                [(ngModel)]="value"
+                [type]="type"
+                [placeholder]="label"
+            />
+            <mat-form-field *ngSwitchCase="'date'">
+                <input matInput [matDatepicker]="picker" [name]="value" [(ngModel)]="value" readonly />
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker
+                    #picker
+                    [opened]="editing"
+                    (closed)="onBlur($event)"
+                    (selectedChanged)="onBlur($event)"
+                ></mat-datepicker>
+            </mat-form-field>
+
+            <input
+                *ngSwitchCase="'number'"
+                #inlineEditControl
+                [ngClass]="{ inEdit: type === 'number' }"
+                [required]="required"
+                (blur)="onBlur($event)"
+                [name]="value"
+                [(ngModel)]="value"
+                [type]="type"
+                [placeholder]="label"
+            />
+            <textarea
+                *ngSwitchCase="'textarea'"
+                #inlineEditControl
+                [ngClass]="{ inEdit: type === 'textarea' }"
+                [required]="required"
+                (blur)="onBlur($event)"
+                [name]="value"
+                [(ngModel)]="value"
+                rows="5"
+                cols="100"
+                [placeholder]="label"
+            ></textarea>
+        </span>
+    </div>
+    <div *ngIf="!editing && type !== 'date'">
+        <div title="Click to edit" (click)="edit(value)" (focus)="edit(value)" tabindex="0">
+            {{ value ? value : ('No Data' | translate) }}&nbsp;
+        </div>
+    </div>
+
+    <div *ngIf="!editing && type === 'date'">
+        <div title="Click to edit" (click)="edit(value)" (focus)="edit(value)" tabindex="0">
+            {{ (value | date: 'yyyy') || 'No Data' | translate }}&nbsp;
+        </div>
+    </div>
+</div>

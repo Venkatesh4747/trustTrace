@@ -1,0 +1,40 @@
+<!-- Sample Call -->
+
+<!-- <app-chip-input
+  [placeholderText] = "'New Item....'"
+  [showPlus] = true
+  [isRemovable] = false
+  [chipItems] = "chipItems"
+  [autoCompleteList] = "autoCompleteList"
+></app-chip-input> -->
+
+<mat-form-field class="chip-list">
+    <mat-chip-list #chipList>
+        <mat-chip *ngFor="let item of chipItems" [removable]="isRemovable" (removed)="remove(item)">
+            {{ item.value }}
+            <mat-icon matChipRemove *ngIf="isRemovable">cancel</mat-icon>
+        </mat-chip>
+
+        <input
+            [placeholder]="placeholderText"
+            #chipInput
+            [formControl]="searchTextboxControl"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            [attr.data-cy]="'tt-dropdown-' + data_cy"
+        />
+        <span *ngIf="showPlus" class="glyphicon glyphicon-plus" (click)="autoFocusChipInput()"></span>
+    </mat-chip-list>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+        <mat-option
+            *ngFor="let item of filteredOptions | async"
+            [value]="item"
+            [ngStyle]="{ display: checkIfSelected(item) ? 'none' : 'block' }"
+            [disabled]="checkIfSelected(item)"
+            [attr.data-cy]="'tt-dropdown-' + item.value"
+        >
+            {{ item.value }}
+        </mat-option>
+    </mat-autocomplete>
+</mat-form-field>

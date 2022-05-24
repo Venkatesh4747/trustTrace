@@ -1,0 +1,240 @@
+<div class="modal-page">
+    <div class="modal-header">
+        <h5 class="modal-title">{{ dialogData.title | translate }}</h5>
+        <a (click)="closeDialog()" *ngIf="showClose">
+            <img class="icon" src="{{ getImage('close-model.png') }}" alt="{{ 'Close' | translate }}" />
+        </a>
+    </div>
+    <div *ngIf="dialogData.title === 'Score History'" class="material-input-style-box-type">
+        <form class="version-history-table-form">
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="version-selected-label">{{ 'Choose version to view' | translate }}:</label>
+                    <div class="version-selected-details">
+                        <div class="version-inner">
+                            <mat-form-field [floatLabel]="'never'">
+                                <mat-select
+                                    panelClass="version-history-option"
+                                    [formControl]="searchControl"
+                                    (selectionChange)="getHistoryByDateTime($event)"
+                                    [placeholder]="'Select version' | translate"
+                                >
+                                    <mat-select-trigger class="color-change">
+                                        {{ showSelectedData }}</mat-select-trigger
+                                    >
+                                    <mat-option *ngFor="let option of scoreHistoryVersions" [value]="option">
+                                        <span class="list">{{ option.date }}</span>
+                                        <span class="list">{{ option.updatedBy }}</span>
+                                        <span class="list">{{ option.time }}</span>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="version-inner">
+                            <div class="last-edit-text">
+                                <p>{{ 'Last edit was made by' | translate }}</p>
+                                <p>{{ lastUpdatedBy }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="score-history-table" [ngClass]="{ 'score-history-view-table': dialogData.title === 'Score History' }">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <ng-container *ngFor="let header of scoreTableData.headers; let last = last; let first = first">
+                            <th *ngIf="first || last" rowspan="2">
+                                <span class="font-bold">{{ header | translate }}</span>
+                            </th>
+                            <th *ngIf="!first && !last" colspan="2">
+                                <span class="font-bold">{{ getDisplayText(header) | translate }}</span>
+                            </th>
+                        </ng-container>
+                    </tr>
+                    <tr>
+                        <ng-container *ngFor="let header of scoreTableData.headers; let first = first; let last = last">
+                            <ng-container *ngIf="!last && !first">
+                                <th *ngFor="let subheader of scoreTableData.subheaders" class="second-row-thead">
+                                    <span class="font-regular">{{ subheader | translate }}</span>
+                                </th>
+                            </ng-container>
+                        </ng-container>
+                    </tr>
+                </thead>
+                <tbody *ngIf="dialogData.title === 'Score History'; else editScore">
+                    <tr *ngFor="let score of scoreTableData.scoredata; let index = index; let first = first">
+                        <td>
+                            <span>{{ scoreTableData.parameters[index] | translate }}</span>
+                        </td>
+                        <ng-container *ngFor="let value of score['data']">
+                            <td class="{{ value['calculatedScoreChanged'] === true ? 'content-red' : '' }}">
+                                <span class="{{ value['calculatedScore'] < 1 ? 'content-grey' : '' }}">{{
+                                    value['calculatedScore'] || ('N/A' | translate)
+                                }}</span>
+                            </td>
+                            <td
+                                class="{{ value['updatedScoreChanged'] === true ? 'content-red' : '' }}"
+                                [matTooltip]="value['updatedScoreChanged'] ? tooltip : ''"
+                            >
+                                <span class="{{ value['updatedScore'] < 1 ? 'content-grey' : '' }}">{{
+                                    value['updatedScore'] || 'N/A'
+                                }}</span>
+                            </td>
+                        </ng-container>
+                        <td *ngIf="first" rowspan="10" class="td-last-child-width">
+                            <span
+                                class="{{ !dialogData.data.justification ? 'content-blue' : 'align-left' }}"
+                                [ngClass]="{
+                                    'no-document':
+                                        justificationDocument['value'].length >= 0 &&
+                                        justificationDocument['value'][0].fileName.length === 0
+                                }"
+                                >{{ justification }}</span
+                            >
+                            <div
+                                *ngIf="
+                                    justificationDocument['value'].length > 0 &&
+                                    justificationDocument['value'][0].fileName.length > 0
+                                "
+                            >
+                                <span class="document font-semi-bold">{{ 'Uploaded Document' | translate }}:</span>
+                                <div *ngFor="let fileName of justificationDocument['value'][0].fileName">
+                                    <span class="filename"
+                                        >{{ fileName }}
+                                        <span
+                                            (click)="downloadFile(justificationDocument['value'][0].fileId, fileName)"
+                                            class="download-btn"
+                                            tooltip="{{ 'Download' | translate }}"
+                                        >
+                                            <img
+                                                class="align-image"
+                                                src="{{ env.IMG_URL }}images/icon-download-black.png"
+                                                alt="{{ 'Download File' | translate }}"
+                                            />
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Table Responsive -->
+    </div>
+    <!-- Score History Table -->
+    <div *ngIf="dialogData.title === 'Edit Scores'" class="button-block">
+        <button class="btn btn-bordered" (click)="onCancel()" type="button">
+            {{ dialogData.secondaryBtn | translate }}
+        </button>
+        <button class="btn btn-secondary" (click)="onSave()" type="button">
+            {{ dialogData.primaryBtn | translate }}
+        </button>
+    </div>
+</div>
+
+<ng-template #editScore>
+    <tbody [formGroup]="values">
+        <ng-container formArrayName="parameterScores">
+            <ng-container
+                *ngFor="let scores of parameterScores().controls; let scoreindex = index"
+                [formGroupName]="scoreindex"
+            >
+                <ng-container *ngFor="let score of scoreTableData.scoredata; let rowInd = index; let first = first">
+                    <tr *ngIf="rowInd === scoreindex">
+                        <td>
+                            <span>{{ scoreTableData.parameters[rowInd] | translate }}</span>
+                        </td>
+                        <ng-container *ngFor="let value of score['data']; let colind = index">
+                            <td>
+                                <span class="{{ value['calculatedScore'] < 1 ? 'content-grey' : '' }}">{{
+                                    value['calculatedScore'] || ('N/A' | translate)
+                                }}</span>
+                            </td>
+                            <td>
+                                <input
+                                    class="score-table-input"
+                                    type="number"
+                                    step="0.1"
+                                    min="1"
+                                    max="5"
+                                    formControlName="{{ modifiedHeaders[colind + 1] }}"
+                                />
+                            </td>
+                        </ng-container>
+                        <td *ngIf="first" rowspan="10">
+                            <ng-container [formGroup]="values">
+                                <span>
+                                    <textarea
+                                        class="form-control textarea"
+                                        rows="4"
+                                        cols="19"
+                                        maxlength="2000"
+                                        formControlName="justification"
+                                        placeholder="{{ 'Enter your justification text here' | translate }}"
+                                    ></textarea>
+                                </span>
+                            </ng-container>
+                            <div>
+                                <span class="upload-document font-semi-bold">{{ 'Upload Document' | translate }}:</span>
+                                <div>
+                                    <div class="tt-file-upload-ui-container" (click)="InvokeFileUpload()">
+                                        <div class="tt-file-upload-ui-content">
+                                            <div class="spinner-wrapper">
+                                                <img
+                                                    class="upload-icon"
+                                                    src="{{ env.IMG_URL }}images/upload_icon.png"
+                                                    alt="{{ 'Upload file' | translate }}"
+                                                />
+                                                <h5 class="description tt-font tt-font-regular text-muted">
+                                                    {{ 'Choose file' | translate }}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="file"
+                                        class="hidden"
+                                        id="file_upload"
+                                        name="file_upload"
+                                        (change)="uploadFile($event.target.files)"
+                                        [hidden]="true"
+                                    />
+                                </div>
+                                <div class="template-file pb-2">
+                                    <ul
+                                        class="list-unstyled tt-uploaded-file-list-container"
+                                        *ngIf="getFileNames().length > 0"
+                                    >
+                                        <li *ngFor="let fileName of getFileNames()">
+                                            <span class="tt-uploaded-file">
+                                                <span class="fileName"
+                                                    >{{ fileName }}
+                                                    <span
+                                                        class="tt-remove-uploaded-file image-icon"
+                                                        tooltip="{{ 'Delete' | translate }}"
+                                                        (click)="removeFile(fileName)"
+                                                    >
+                                                        <img
+                                                            container="body"
+                                                            src="{{ env.IMG_URL }}images/questionaire-del.png"
+                                                            alt="{{ 'Delete' | translate }}"
+                                                        />
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    </tbody>
+</ng-template>

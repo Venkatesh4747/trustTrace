@@ -1,0 +1,110 @@
+@import '~styles/variables';
+
+.title {
+    font-family: $font-family-Bold;
+    color: $text-color-primary;
+    font-size: 18px;
+    margin-left: 10px;
+}
+
+.icon {
+    width: 22px;
+    height: 22px;
+    margin-left: 30px;
+    float: right;
+}
+
+.description {
+    margin-top: 1.5em;
+    margin-bottom: 1em;
+    font-family: $font-family-Regular;
+    font-size: 17px;
+    font-weight: normal;
+    text-align: center;
+    color: $text-color-primary;
+}
+
+button {
+    color: #474747;
+    border-radius: 5px;
+    padding: 0 15px;
+    font-family: $font-family-Semibold;
+    margin-right: 2px;
+    height: 36px;
+    min-width: 120px;
+    outline: none;
+    border: none;
+    float: right;
+}
+
+.button-grp {
+    text-align: center;
+    margin-bottom: 10px;
+    button {
+        float: none;
+        &:first-child {
+            margin-right: 2em;
+        }
+    }
+}
+
+.primary-btn {
+    height: 40px;
+    background: #7affad;
+    color: #4b4b4b;
+    min-width: 150px;
+    border-radius: 4px;
+}
+
+.secondary-btn {
+    border: solid 1px #8e8e8e;
+    background: #ffffff;
+    height: 40px;
+    min-width: 150px;
+    outline: 0;
+    padding: 0 10px;
+    border-radius: 4px;
+}
+
+.multiple-qus-description {
+    .description {
+        p {
+            display: inline-block;
+            &:first-child {
+                width: 80%;
+                margin-bottom: 10px;
+                margin-top: 10px;
+                line-height: 1.65;
+                font-family: $font-family-Bold;
+            }
+            &:last-child {
+                width: 80%;
+                margin-bottom: 10px;
+                line-height: 1.65;
+            }
+        }
+    }
+}
+.score-active-qus-description {
+    .description {
+        p {
+            display: inline-block;
+            &:first-child {
+                width: 80%;
+                margin-bottom: 10px;
+                margin-top: 10px;
+                line-height: 1.65;
+                font-family: $font-family-Bold;
+            }
+            &:last-child {
+                width: 80%;
+                margin-bottom: 10px;
+                line-height: 1.65;
+            }
+        }
+    }
+    .primary-btn {
+        color: #ffffff;
+        background-color: #ff5f5f;
+    }
+}

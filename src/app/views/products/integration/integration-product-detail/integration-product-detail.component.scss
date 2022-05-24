@@ -1,0 +1,77 @@
+@import '~styles/variables';
+
+.margin-rl-reset {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.tt-detail-value {
+    font-weight: bold;
+    color: $sub-text-color;
+}
+
+.tt-font-regular {
+    &.tt-detail-value {
+        line-height: 1.4 !important;
+    }
+}
+
+.tt-nc-font {
+    font-size: 16px;
+    font-family: $font-family-Semibold;
+    color: #0350aa;
+    font-weight: 700;
+}
+
+.logs-line {
+    border-bottom: 2px solid #cecece;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+}
+
+.action-button {
+    background: transparent;
+    border: none;
+    mat-icon {
+        color: black;
+        opacity: 0.6;
+    }
+}
+
+.scroll-bar {
+    height: 500px;
+    overflow: auto;
+}
+
+.not-available {
+    font-family: $font-family-Regular;
+    font-size: 14px;
+    text-align: left;
+    color: #a8a8a8 !important;
+}
+
+.processes-type {
+    font-family: $font-family-Semibold;
+    .mat-form-field {
+        width: 100%;
+    }
+    .mat-form-field-underline {
+        display: none;
+    }
+}
+
+.col-md-2 {
+    width: 12% !important;
+}
+
+.col-md-3 {
+    width: 30% !important;
+}
+
+.overflow-with-dots {
+    display: inline-block;
+    width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

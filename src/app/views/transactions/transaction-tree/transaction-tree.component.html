@@ -1,0 +1,94 @@
+<div class="view-container">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div class="container-fluid" *ngIf="!pageLoading">
+        <div class="transaction-tree-container">
+            <div id="transaction-tree-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Transaction Tree' | translate }}</div>
+                        <div class="page-description">
+                            {{ 'Get to know the complete tree view structure of your transaction' | translate }}
+                        </div>
+                    </div>
+                    <!-- page-title -->
+
+                    <div class="pr-0">
+                        <button class="go-back-button" (click)="commonService.goBack()">
+                            {{ 'Back' | translate }}
+                        </button>
+                    </div>
+                </div>
+                <!-- col -->
+                <div class="col-md-12">
+                    <button
+                        data-html2canvas-ignore
+                        class="edit-styled-btn"
+                        [disabled]="isDownloading"
+                        (click)="triggerScreenShot()"
+                    >
+                        <span class="pr-1 fa fa-download"></span>
+                        {{ 'Download Tree' | translate }}
+                    </button>
+                    <button
+                        data-html2canvas-ignore
+                        class="edit-styled-btn"
+                        (click)="downloadAll('transaction-tree-' + transaction_id)"
+                        [disabled]="isDownloading"
+                    >
+                        <span class="pr-1 fa fa-download"></span>
+                        {{ 'Download All' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- row -->
+
+            <!-- <div class="row mt-2">
+                <div class="col-md-12 tt-font">
+                    <div class=" pl-2">
+                        <div class="product-name">
+                            {{ 'Product' | translate }}:
+                            <span class="font-bold">{{ transactionTree.productNameAndNumber }}</span>
+                        </div>
+                        <div class="product-type">
+                            {{ 'Type' | translate }}:
+                            <span class="font-bold">{{ transactionTree.productType }}</span>
+                        </div>
+                        <div class="reference-id">
+                            {{ 'Reference ID' | translate }}:
+                            <span class="font-bold">{{ transactionTree.lotNo }}</span>
+                        </div>
+                        <div class="quantity">
+                            {{ 'Quantity' | translate }}:
+                            <span class="font-bold">{{ transactionTree.quantity }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+            <!-- row -->
+
+            <div
+                dragScroll="true"
+                class="row transaction-tree"
+                #transactionTreeContainer
+                *ngIf="transactionTreeDetails?.length > 0"
+            >
+                <div class="col-md-12 pl-3 center-block">
+                    <div
+                        appScreenshot
+                        [screenShotEvent]="screenshotEventEmitter"
+                        [fileName]="'transaction-tree-' + transaction_id"
+                        [scrollWidth]="treeContainerScrollWidth"
+                        [scrollHeight]="treeContainerScrollHeight"
+                    >
+                        <app-transaction-tree-node
+                            class="first-node"
+                            [lotData]="transactionTreeDetails"
+                            [rootNode]="true"
+                        >
+                        </app-transaction-tree-node>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

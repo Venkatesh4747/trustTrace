@@ -1,0 +1,98 @@
+@import '~styles/variables';
+
+#create-library-container {
+    .page-description {
+        padding-top: 5px;
+    }
+}
+
+#create-library-form {
+    width: 90%;
+    margin-left: 20px;
+    .row {
+        padding-top: 20px;
+    }
+    label {
+        font-family: $font-family-Semibold;
+        font-size: 14px;
+        color: $text-color-primary;
+
+        &.uniqueid-label {
+            display: block;
+        }
+    }
+    .mat-form-field {
+        width: 100%;
+    }
+    .mat-form-field-required-marker {
+        display: none;
+    }
+    .mat-form-field-label {
+        font-size: 13px;
+    }
+    .action-icons {
+        font-size: 19px;
+        color: #777;
+        height: 35px;
+        width: 35px;
+        margin-right: 5px;
+        background: $button-action-background;
+        border-radius: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        float: left;
+    }
+    .add-material-comp-btn {
+        color: $text-color-primary;
+    }
+}
+
+.cancel-btn {
+    background: #92eeff;
+    font-family: $font-family-Semibold;
+    color: #212121;
+    border-radius: 5px;
+    margin-left: 20px;
+    width: 110px;
+}
+
+.save-btn {
+    background: #78ff9b;
+    font-family: $font-family-Semibold;
+    color: #212121;
+    border-radius: 5px;
+    margin-left: 15px;
+    width: 110px;
+}
+
+.certification-required {
+    color: $text-color-primary;
+    fieldset {
+        width: 100%;
+        &.chip-card-input {
+            width: 100%;
+        }
+        label {
+            width: 100%;
+        }
+        .mat-form-field {
+            width: 100%;
+        }
+        .mat-form-field-label {
+            display: none;
+        }
+        .mat-form-field-underline {
+            border-bottom: 2px solid #ccc;
+        }
+    }
+}
+.input {
+    font-size: 14px;
+    color: $text-color-primary !important;
+}
+.input {
+    font-size: 14px;
+    color: $text-color-primary !important;
+}

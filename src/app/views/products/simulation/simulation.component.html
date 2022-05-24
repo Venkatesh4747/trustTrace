@@ -1,0 +1,113 @@
+<div class="simulation-container">
+    <div class="row pt-3">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <form class="search">
+                <input
+                    [formControl]="searchControl"
+                    type="search"
+                    class="search"
+                    [placeholder]="'Search and select the product' | translate"
+                    matInput
+                    [matAutocomplete]="auto"
+                    autofocus
+                />
+                <span class="fa fa-search"></span>
+                <mat-autocomplete [displayWith]="valueMapper" class="search-auto-complete" #auto="matAutocomplete">
+                    <mat-option *ngFor="let option of autoCompleteProductList" [value]="option">
+                        <span class="list">{{ option.name }}</span>
+                        <span class="list">{{ 'EAN:' | translate }} {{ option?.ean || 'NA' }}</span>
+                        <span class="list">{{ 'Item No:' | translate }} {{ option?.itemNo || 'NA' }}</span>
+                        <span class="list">{{ 'PLU No:' | translate }} {{ option?.sku || 'NA' }}</span>
+                    </mat-option>
+                </mat-autocomplete>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 pl-0 pr-0">
+            <div class="table-cont table-responsive mt-0 ml-0 pl-0 pr-0">
+                <table class="table custom-table table-striped">
+                    <thead class="product-category-thead">
+                        <tr>
+                            <ng-container *ngFor="let header of tableHeaders | keys; let first = first">
+                                <th>
+                                    <div class="table-header-filter sort-by-filter">
+                                        <span>{{ header.key | translate }}</span>
+                                        <span *ngIf="header.value.isMandatory" class="color-red"> *</span>
+                                    </div>
+                                </th>
+                                <th *ngIf="first"></th>
+                            </ng-container>
+                        </tr>
+                    </thead>
+                    <tbody class="product-category-tbody">
+                        <ng-container *ngIf="this.selectedProduct !== null; else noProducts">
+                            <tr class="application-product-list">
+                                <ng-container [formGroup]="productForm">
+                                    <app-product
+                                        [formControlName]="selectedProduct.id"
+                                        class="application-product"
+                                        [product]="selectedProduct"
+                                        [index]="0"
+                                        [isSimulation]="true"
+                                    ></app-product>
+                                </ng-container>
+                            </tr>
+                        </ng-container>
+
+                        <ng-template #noProducts>
+                            <div class="no-products-available" *ngIf="!fetchingProduct; else fetching">
+                                <img
+                                    src="{{ env.IMG_URL }}images/search-default.png"
+                                    alt="{{ 'Search' | translate }}"
+                                />
+                                <p class="description">
+                                    {{
+                                        'Search for products and change the parameters to simulate the scores'
+                                            | translate
+                                    }}
+                                </p>
+                            </div>
+                            <ng-template #fetching>
+                                <div class="fetching">
+                                    <app-spinner [small]="true"></app-spinner>
+                                </div>
+                            </ng-template>
+                        </ng-template>
+                    </tbody>
+                    <tfoot>
+                        <div *ngIf="selectedProduct !== null">
+                            <button
+                                class="btn btn-secondary"
+                                mat-button
+                                color="primary"
+                                type="button"
+                                (click)="simulate()"
+                                [disabled]="this.isFetchingAdditionalInfo"
+                            >
+                                {{ 'Simulate Product' | translate }}
+                            </button>
+                        </div>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-detail-container" *ngIf="isSimulationDone">
+        <section class="product-info">
+            <div class="row">
+                <div *ngIf="!isFetchingAdditionalInfo">
+                    <app-additional-information
+                        [entityId]="this.selectedProduct.productId"
+                        [entity]="entity"
+                        [entityData]="additionalInfo"
+                        [fieldResponse]="fieldData"
+                    >
+                    </app-additional-information>
+                </div>
+                <span class="fa fa-spinner fa-spin ec-loader" *ngIf="isFetchingAdditionalInfo"></span>
+            </div>
+        </section>
+    </div>
+</div>

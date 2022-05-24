@@ -1,0 +1,62 @@
+@import '~styles/variables';
+.product-color-size {
+    width: 100%;
+    color: $text-color-primary;
+    .product-color-size-fit-length {
+        max-height: 300px;
+        margin-bottom: 20px;
+        overflow-y: auto;
+        .row {
+            margin: 0;
+        }
+    }
+    .add-product-group-btn {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        color: $text-color-primary;
+        font-family: $font-family-Semibold;
+        font-size: 14px;
+        margin: 10px 0 30px 0;
+    }
+    .product-color-size-fit-length div {
+        fieldset {
+            &.chip-card-input {
+                width: 100%;
+            }
+            label {
+                width: 100%;
+            }
+            .mat-form-field {
+                width: 100%;
+            }
+            .mat-form-field-label {
+                display: none;
+            }
+            .mat-form-field-underline {
+                border-bottom: 2px solid #CCC;
+            }
+        }
+    }
+    .add-more-size-btn {
+        margin-top: 30px !important;
+    }
+}
+.delete-color-btn, .delete-size-btn {
+    i {
+        margin-top: 30px;
+    }
+}
+.action-icons-big {
+    font-size: 19px;
+    color: #777;
+    height: 35px;
+    width: 35px;
+    margin-right: 5px;
+    background: $button-action-background;
+    border-radius: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}

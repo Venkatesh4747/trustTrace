@@ -1,0 +1,71 @@
+<div class="tt-higg-steps-wrapper" *ngIf="modalConfigObj?.type === 'showSteps'">
+    <div mat-dialog-title class="tt-heading-title">
+        {{ 'Find your FEM' | translate }} / {{ 'FSLM key in Higg index' | translate }}
+    </div>
+    <div class="tt-higg-steps-close" (click)="closeHiggModal()">
+        <span class="material-icons">
+            close
+        </span>
+    </div>
+    <div mat-dialog-content>
+        <div class="tt-higg-steps">
+            <div class="tt-higg-steps-title">{{ 'Step' | translate }} 1</div>
+            <p class="tt-higg-steps-content">
+                {{ 'Login to your Higg Account' | translate }} -
+                <a [href]="env.higgPortalUrl" target="_blank">{{ env.higgPortalUrl }}</a>
+            </p>
+        </div>
+        <div class="tt-higg-steps">
+            <div class="tt-higg-steps-title">{{ 'Step' | translate }} 2</div>
+            <p class="tt-higg-steps-content">
+                {{ 'Click account profile' | translate }}({{ 'highlighted in yellow' | translate }})
+                {{ 'in your profile' | translate }}
+            </p>
+            <div>
+                <img class="step2-img" src="{{ env.IMG_URL }}images/higg/step_2.jpg" alt="Higg portal login steps" />
+            </div>
+        </div>
+        <div class="tt-higg-steps">
+            <div class="tt-higg-steps-title">{{ 'Step' | translate }} 3</div>
+            <p class="tt-higg-steps-content">
+                {{ 'Click on' | translate }} "{{ 'API Keys' | translate }}"
+                {{ 'tab to find the token. Copy the token and paste it in TrusTrace platform' | translate }}
+            </p>
+            <div class="tt-higg-step-3">
+                <img class="step3-img" src="{{ env.IMG_URL }}images/higg/step_3.jpg" alt="Higg portal login steps" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- higg mapping modal-->
+<div *ngIf="modalConfigObj?.type === 'mappModal'" class="tt-higg-mapp-modal">
+    <div mat-dialog-title class="tt-heading-title">
+        {{ modalConfigObj?.title | translate }}
+    </div>
+    <div class="tt-description mt-1 text-center" *ngIf="modalConfigObj?.eventType === 'sync audit'">
+        <div>{{ modalConfigObj.description | translate }}</div>
+    </div>
+    <div class="row mt-3">
+        <div
+            *ngIf="modalConfigObj?.btnType === 'secondry'; else singleBtnWrapper"
+            class="col-xs-12 col-sm-12 col-lg-12 tt-higg-modal-2-btn-wrapper"
+        >
+            <button class="btn btn-cancel" (click)="closeHiggModal('close')">
+                {{ 'I will do it later' | translate }}
+            </button>
+            <button class="btn btn-proceed" (click)="closeHiggModal(modalConfigObj?.eventType)">
+                {{ 'Map facilities' | translate }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<ng-template #singleBtnWrapper>
+    <div class="col-xs-12 col-sm-12 col-lg-12 tt-higg-modal-2-btn-wrapper">
+        <button class="btn btn-proceed btn-type-single" (click)="closeHiggModal(modalConfigObj.eventType)">
+            {{ 'Close' | translate }}
+        </button>
+    </div>
+</ng-template>
+<!-- higg mapping modal ends -->

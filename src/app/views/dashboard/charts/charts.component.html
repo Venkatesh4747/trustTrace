@@ -1,0 +1,36 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+<div class="loader-chart" *ngIf="!pageLoading">
+    <div class="chart-details-view">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="pt-2 row">
+                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                    <div id="filter-bar-wrapper" class="row filter-bar-wrapper">
+                        <div *ngIf="showFilterBar" class="col-md-12">
+                            <app-filter-bar
+                                [filters]="chartFilters"
+                                [filter_session]="filter_session"
+                                (handleFilterSelection)="getChartData()"
+                                [isKeyOptions]="true"
+                                [optionsParam]="optionsParam"
+                                class="chart-filter-bar"
+                            >
+                            </app-filter-bar>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-2 row" *ngIf="!isFetchingChartData">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <app-chart-detail
+                        (favorites)="updateFavCharts($event)"
+                        [chartConfig]="chartConfig"
+                        [itemId]="this.chartDetailData.id"
+                        [fieldId]="this.chartDetailData.fieldId"
+                        [filter_session]="filter_session"
+                    ></app-chart-detail>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

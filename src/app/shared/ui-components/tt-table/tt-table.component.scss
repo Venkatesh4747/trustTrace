@@ -1,0 +1,56 @@
+@import '../../../../styles/variables';
+:host {
+    width: 100%;
+}
+
+table {
+    font-family: $font-family-Regular;
+    color: $text-font-color;
+    thead {
+        font-size: 15px;
+        th {
+            padding: 1em 5px;
+        }
+    }
+    tbody {
+        box-shadow: 0 0px 4px rgba(0, 0, 0, 0.32);
+    }
+    td {
+        font-size: 14px !important;
+        position: relative;
+    }
+    tr {
+        cursor: pointer;
+    }
+    tfoot {
+        font-family: $font-family-Regular;
+        text-align: left;
+        color: $text-font-color;
+        td {
+            font-size: 15px !important;
+            padding: 1.2em 2em;
+        }
+    }
+}
+
+.overflow-with-dots {
+    display: inline-block;
+    width: 90px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    cursor: alias;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.fixed_header tbody {
+    display: block;
+    overflow: auto;
+    height: 400px;
+    width: 100%;
+}
+.fixed_header thead tr {
+    display: block;
+}

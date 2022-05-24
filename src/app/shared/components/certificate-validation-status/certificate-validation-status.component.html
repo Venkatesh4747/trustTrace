@@ -1,0 +1,10 @@
+<span class="validation-status" *ngIf="data" (click)="showDetailedValidationData(data)">
+    <span [ngSwitch]="data.validationStatus">
+        <span *ngSwitchCase="true">
+            <mat-icon>verified_user</mat-icon>
+        </span>
+        <span *ngSwitchCase="false">
+            <mat-icon>error</mat-icon>
+        </span>
+    </span>
+</span>

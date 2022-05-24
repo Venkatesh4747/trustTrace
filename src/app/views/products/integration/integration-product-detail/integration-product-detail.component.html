@@ -1,0 +1,130 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+<div class="container-fluid">
+    <div class="material-input-style-box-type">
+        <div class="material-input-style-box-type-inner">
+            <div class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Integration Details' | translate }}</div>
+                        <div class="page-description font-color-primary">
+                            {{ 'View Integration Summary' | translate }}
+                        </div>
+                    </div>
+                    <button class="go-back-button" [routerLink]="['../']">
+                        {{ 'Back' | translate }}
+                    </button>
+                </div>
+            </div>
+            <div class="row pt-3 pl-2">
+                <div class="col-md-6">
+                    <div class="page-title">
+                        <div>{{ 'Summary' | translate }}:</div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="row margin-rl-reset" *ngFor="let integrationInfo of integrationInfo.summary">
+                            <div class="col-md-6 col-sm-6 vcenter pd-0">
+                                <h5 class="tt-font">
+                                    {{ integrationInfo.title | translate }}
+                                    <span class="pull-right">:</span>
+                                </h5>
+                            </div>
+                            <div class="col-md-6 col-sm-6 vcenter">
+                                <h5 class="tt-font-regular tt-detail-value integration-value-details">
+                                    <span
+                                        [matTooltip]="integrationInfo.value"
+                                        class="overflow-with-dots"
+                                        *ngIf="integrationInfo.value; else notAvailable"
+                                    >
+                                        {{ integrationInfo.value }}</span
+                                    >
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4 class="tt-font">{{ 'Intergation Logs' | translate }}:</h4>
+                    <div class="mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="logs-line row">
+                                    <div class="col-md-2">
+                                        <h5 class="tt-nc-font">
+                                            {{ 'Status' | translate }}
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="tt-nc-font">
+                                            {{ 'Date' | translate }}
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <h5 class="tt-nc-font">
+                                            {{ 'Files / Logs' | translate }}
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h5 class="tt-nc-font">
+                                            {{ 'Action' | translate }}
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row  scroll-bar" [formGroup]="integrationlogsFormGroup">
+                            <div
+                                class="col-md-12 mt-1"
+                                *ngFor="let integrationLog of integrationLogsDetail; let logIndex = index"
+                            >
+                                <div class="col-md-2">
+                                    <div class="status-info">
+                                        <app-tt-icon-image [status]="integrationLog.status"></app-tt-icon-image>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <h5 *ngIf="integrationLog.updatedOn; else notAvailable" class="tt-nc-font mt-0">
+                                        {{ integrationLog.updatedOn | date: 'medium' }}
+                                    </h5>
+                                </div>
+                                <div class="col-md-5" formArrayName="files">
+                                    <div class="processes-type" [formGroupName]="logIndex">
+                                        <mat-form-field floatLabel="never">
+                                            <mat-select
+                                                formControlName="filePath"
+                                                [placeholder]="'Select Files / Logs' | translate"
+                                            >
+                                                <mat-option
+                                                    *ngFor="let option of integrationLog.files"
+                                                    [value]="option.id"
+                                                >
+                                                    {{ option.value }}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button
+                                        class="action-button"
+                                        (click)="downloadData(logIndex)"
+                                        [disabled]="disableDownload(logIndex)"
+                                    >
+                                        <div class="pl-15">
+                                            <mat-icon [matTooltip]="'Download' | translate">file_download</mat-icon>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ng-template #notAvailable>
+                    <td class="not-available">
+                        {{ 'Not Available' | translate }}
+                    </td>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>

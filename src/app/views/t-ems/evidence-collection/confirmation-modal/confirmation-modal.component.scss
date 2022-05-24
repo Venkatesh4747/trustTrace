@@ -1,0 +1,51 @@
+@import '~styles/variables';
+
+.ec-proceed-submit-modal {
+    font-family: $font-family-Regular;
+    color: $text-color-primary;
+    height: 100%;
+    position: relative;
+}
+.ec-proceed-submit-modal-title {
+    font-family: $font-family-Bold;
+    font-size: 16px;
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.ec-proceed-submit-details-container {
+    height: 95px;
+    width: 90%;
+    white-space: initial;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    text-align: center;
+    font-family: $font-family-Semibold;
+}
+.icon {
+    width: 18px;
+    height: 18px;
+    margin-left: 30px;
+    float: right;
+}
+.evidence-collection-buttons-row {
+    position: absolute;
+    bottom: 16px;
+    width: 100%;
+    .evidence-collection-buttons {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 0;
+        button {
+            width: 100px;
+            &:last-child {
+                margin-left: 10px;
+            }
+        }
+    }
+}

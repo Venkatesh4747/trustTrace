@@ -1,0 +1,32 @@
+<div class="parent-container">
+    <div id="title-container">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 p-0">
+            <p class="title">{{ 'Lot Origin Data' | translate }}</p>
+            <a (click)="closeDialog()">
+                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+            </a>
+        </div>
+    </div>
+    <!-- END OF TITLE BAR -->
+
+    <!-- MAIN CONTAINER -->
+    <div id="main-dialog-container">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <!-- <p class="del-message">{{ msg | translate }}</p> -->
+
+            <div class="row col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-2">
+                <div class="supply-chain-heading" *ngIf="data.transaction">
+                    {{ data.transaction.artifact_name }} - {{ data.transaction.artifact_number }}
+                </div>
+            </div>
+            <div class="row col-xs-12 col-sm-12 col-md-12 col-lg-12 pr-0">
+                <div class="supply-chain-container">
+                    <ul class="list-unstyled">
+                        <app-lot-origin-chart-traverser [lot]="data.chartData"></app-lot-origin-chart-traverser>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- END OF MAIN CONTAINER -->
+    </div>
+</div>

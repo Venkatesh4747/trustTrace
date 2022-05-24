@@ -1,0 +1,733 @@
+<div class="view-container">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+    <div class="container-fluid" *ngIf="!pageLoading">
+        <div class="content-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="tt-font" data-cy="audit-test-audit-title">{{ 'Record an audit' | translate }}</h4>
+                    <h5 class="tt-font" data-cy="audit-test-audit-sub-title">
+                        {{ 'Enter the required details to record the audit' | translate }}
+                    </h5>
+                </div>
+                <!-- col-md-12 -->
+            </div>
+            <!-- END: heading row -->
+
+            <div class="row">
+                <div class="col-md-12">
+                    <mat-horizontal-stepper linear="true" #stepper class="step-audit">
+                        <mat-step [stepControl]="supplierInformationForm" [editable]="true">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <form
+                                        [formGroup]="supplierInformationForm"
+                                        (ngSubmit)="submitSupplierInformation()"
+                                        data-cy="audit-test-audit-supplier-information-form"
+                                    >
+                                        <ng-template matStepLabel>
+                                            <div data-cy="audit-test-supplier-information">
+                                                {{ 'Supplier information' | translate }}
+                                            </div>
+                                        </ng-template>
+                                        <div class="form-group">
+                                            <mat-form-field [floatLabel]="'auto'">
+                                                <mat-label>{{ 'Name of the audit' | translate }}:</mat-label>
+                                                <input
+                                                    matInput
+                                                    formControlName="auditName"
+                                                    placeholder="{{ 'Eg. Hoodie - GOTs Audit' | translate }}"
+                                                    required
+                                                    data-cy="audit-test-audit-name"
+                                                />
+                                                <mat-error>{{ 'Please enter the audit name' | translate }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <!-- END: form-group -->
+
+                                        <div class="form-group">
+                                            <tt-dropdown-search-v2
+                                                inputLabel="{{ 'Audit Standard' | translate }}:"
+                                                [listItem]="auditTypesList"
+                                                optionDisplayTextKey="name"
+                                                [isRequired]="true"
+                                                errorMessage="Please select valid audit standard"
+                                                formControlName="auditStandard"
+                                                (valueChanges)="setAuditInitOnSubmit()"
+                                                [customStyle]="customStyle"
+                                                [data_cy]="'audit-test-audit-standard'"
+                                            >
+                                            </tt-dropdown-search-v2>
+                                        </div>
+                                        <!-- END: form-group -->
+
+                                        <div class="form-group">
+                                            <mat-form-field [floatLabel]="'auto'">
+                                                <mat-label>{{ 'Audit Body' | translate }}: </mat-label>
+                                                <input matInput formControlName="auditBody" />
+                                            </mat-form-field>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <app-supplier-list-element
+                                                [options]="supplierListOptions"
+                                                formControlName="supplier"
+                                                (valueChanges)="fetchFacilityBySupplier($event?.supplier_id)"
+                                                data_cy="audit-test-supplier-name"
+                                            >
+                                            </app-supplier-list-element>
+                                        </div>
+                                        <!-- END: form-group -->
+
+                                        <div class="form-group">
+                                            <div class="spinner-wrapper">
+                                                <tt-dropdown-search-v2
+                                                    inputLabel="{{ 'Facility Name' | translate }}:"
+                                                    [listItem]="facilitiesList"
+                                                    optionDisplayTextKey="name"
+                                                    [isRequired]="true"
+                                                    errorMessage="Please select valid supplier's facility"
+                                                    formControlName="facility"
+                                                    [customStyle]="customStyle"
+                                                    customEditNotAllowedTooltip="Please select a supplier to view their facilities"
+                                                    [data_cy]="'audit-test-facility-name'"
+                                                >
+                                                </tt-dropdown-search-v2>
+
+                                                <span *ngIf="isFetching.facilities" class="spinner-wrapper">
+                                                    <mat-spinner [diameter]="20"></mat-spinner>&nbsp;{{
+                                                        'Fetching' | translate
+                                                    }}.
+                                                </span>
+                                            </div>
+                                            <!-- END: spinner-wrapper -->
+                                        </div>
+                                        <!-- END: form-group -->
+                                        <div class="form-group">
+                                            <mat-form-field [floatLabel]="'auto'">
+                                                <mat-label>{{ 'Auditor' | translate }}:</mat-label>
+                                                <input
+                                                    matInput
+                                                    formControlName="auditor"
+                                                    placeholder="{{ 'Eg. John Doe' | translate }}"
+                                                />
+                                            </mat-form-field>
+                                        </div>
+                                        <!-- END: form-group -->
+                                        <div class="form-group">
+                                            <mat-form-field [floatLabel]="'auto'">
+                                                <mat-label>{{ 'Audit Date' | translate }}:</mat-label>
+                                                <input
+                                                    matInput
+                                                    [matDatepicker]="auditValidFrom"
+                                                    (dateChange)="auditValidFromLocalUpdate($event)"
+                                                    [matDatepickerFilter]="auditValidFromFilter"
+                                                    (focus)="auditValidFrom.open()"
+                                                    (click)="auditValidFrom.open()"
+                                                    formControlName="auditValidFromDate"
+                                                    readonly
+                                                    required
+                                                    data-cy="audit-test-audit-date"
+                                                />
+                                                <mat-datepicker #auditValidFrom></mat-datepicker>
+                                                <mat-datepicker-toggle
+                                                    matSuffix
+                                                    [for]="auditValidFrom"
+                                                ></mat-datepicker-toggle>
+                                                <mat-error>{{ 'Please select the audit date' | translate }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <!-- END: form-group -->
+
+                                        <div class="form-group">
+                                            <mat-form-field [floatLabel]="'auto'">
+                                                <mat-label>{{ 'Expiry Date' | translate }}: </mat-label>
+                                                <input
+                                                    matInput
+                                                    [matDatepicker]="auditValidTill"
+                                                    [min]="auditValidFromLocal"
+                                                    (focus)="auditValidTill.open()"
+                                                    (click)="auditValidTill.open()"
+                                                    formControlName="auditValidToDate"
+                                                    readonly
+                                                    required
+                                                    data-cy="audit-test-expiry-date"
+                                                />
+                                                <mat-datepicker #auditValidTill></mat-datepicker>
+                                                <mat-datepicker-toggle
+                                                    matSuffix
+                                                    [for]="auditValidTill"
+                                                ></mat-datepicker-toggle>
+                                                <mat-error
+                                                    >{{ 'Please select the audit valid through date' | translate }}
+                                                </mat-error>
+                                            </mat-form-field>
+                                        </div>
+
+                                        <div class="text-right w-75 mb-2 button-group">
+                                            <button
+                                                [disabled]="isProcessing.supplierInformationForm"
+                                                type="button"
+                                                (click)="cancel()"
+                                                mat-button
+                                                matStepperNext
+                                                class="btn tt-btn tt-btn-secondary"
+                                                mat-button
+                                                data-cy="audit-test-audit-cancel-btn"
+                                            >
+                                                {{ 'Cancel' | translate }}
+                                            </button>
+                                            <button
+                                                [disabled]="isProcessing.supplierInformationForm"
+                                                type="submit"
+                                                mat-button
+                                                matStepperNext
+                                                class="btn tt-btn tt-btn-primary"
+                                                data-cy="audit-test-audit-submit-btn"
+                                            >
+                                                <ng-template
+                                                    [ngIf]="!isProcessing.supplierInformationForm"
+                                                    data-cy="audit-test-audit-proceed-btn"
+                                                >
+                                                    {{ 'Proceed' | translate }}
+                                                </ng-template>
+
+                                                <ng-template [ngIf]="isProcessing.supplierInformationForm">
+                                                    <div class="spinner-wrapper">
+                                                        <span>{{ 'Processing' | translate }}&nbsp;</span>
+                                                        <mat-spinner [diameter]="14"></mat-spinner>
+                                                    </div>
+                                                </ng-template>
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <!-- END: supplier-information-form -->
+                                </div>
+                                <!-- col-md -->
+                            </div>
+                            <!-- row -->
+                        </mat-step>
+                        <!-- END: Supplier=Information -->
+
+                        <mat-step [stepControl]="auditInformationForm" [editable]="'true'">
+                            <ng-template matStepLabel>
+                                <div data-cy="audit-test-audit-details">
+                                    {{ 'Audit Details' | translate }}
+                                </div>
+                            </ng-template>
+                            <form
+                                [formGroup]="auditInformationForm"
+                                (ngSubmit)="submitAuditDetails()"
+                                [hidden]="!isReady['auditInformationForm']"
+                                data-cy="audit-test-audit-details-form"
+                            >
+                                <div class="mt-2 row">
+                                    <div class="col-md-12">
+                                        <span class="audit-standard">
+                                            {{
+                                                ('Audit Standard' | translate) +
+                                                    ':' +
+                                                    getFormValue('auditStandard')?.name
+                                            }}
+                                        </span>
+
+                                        <div [ngSwitch]="auditInformation.overAllRatingSection.type">
+                                            <div *ngSwitchCase="'SELECT'" class="form-row form-details">
+                                                <div class="col-md-6 col-sm-6 vcenter pd-0">
+                                                    <label class="template-label"
+                                                        >{{
+                                                            auditInformation.overAllRatingSection.name
+                                                                | titlecase
+                                                                | translate
+                                                        }}<span *ngIf="auditInformation.overAllRatingSection.mandatory"
+                                                            >&#42;</span
+                                                        ></label
+                                                    >
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 text-right vcenter">
+                                                    <mat-form-field [floatLabel]="'never'">
+                                                        <mat-select
+                                                            [formControlName]="
+                                                                auditInformation.overAllRatingSection.formControlName
+                                                            "
+                                                            placeholder="{{ 'Select . . .' | translate }}"
+                                                            data-cy="audit-test-overall-rating"
+                                                        >
+                                                            <mat-option
+                                                                *ngFor="
+                                                                    let option of _.keys(
+                                                                        auditInformation.overAllRatingSection.options
+                                                                    ) | sortByFilter
+                                                                "
+                                                                [value]="
+                                                                    auditInformation.overAllRatingSection.options[
+                                                                        option
+                                                                    ]
+                                                                "
+                                                            >
+                                                                {{
+                                                                    auditInformation.overAllRatingSection.options[
+                                                                        option
+                                                                    ]
+                                                                }}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                        <mat-error
+                                                            *ngIf="
+                                                                auditFormHasError(
+                                                                    auditInformation.overAllRatingSection
+                                                                        .formControlName,
+                                                                    'required'
+                                                                )
+                                                            "
+                                                            >{{ 'Required field' | translate }}</mat-error
+                                                        >
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                            <!-- END: switchCase - select -->
+                                            <div *ngSwitchCase="'TEXT'" class="form-row form-details">
+                                                <div class="col-md-6 col-sm-6 vcenter pd-0">
+                                                    <label class="template-label"
+                                                        >{{
+                                                            auditInformation.overAllRatingSection.name
+                                                                | titlecase
+                                                                | translate
+                                                        }}<span *ngIf="auditInformation.overAllRatingSection.mandatory"
+                                                            >&#42;</span
+                                                        ></label
+                                                    >
+                                                </div>
+                                                <!-- col-md -->
+                                                <div class="col-md-6 col-sm-6 text-right vcenter">
+                                                    <mat-form-field [floatLabel]="'never'">
+                                                        <input
+                                                            matInput
+                                                            placeholder="{{ 'Enter value' | translate }}"
+                                                            type="text"
+                                                            [formControlName]="
+                                                                auditInformation.overAllRatingSection.formControlName
+                                                            "
+                                                            [name]="auditInformation.overAllRatingSection.name"
+                                                            [required]="auditInformation.overAllRatingSection.required"
+                                                        />
+                                                        <mat-error
+                                                            *ngIf="
+                                                                auditFormHasError(
+                                                                    auditInformation.overAllRatingSection
+                                                                        .formControlName,
+                                                                    'required'
+                                                                )
+                                                            "
+                                                            >{{ 'Required field' | translate }}</mat-error
+                                                        >
+                                                        <mat-error
+                                                            *ngIf="
+                                                                auditFormHasError(
+                                                                    auditInformation.overAllRatingSection
+                                                                        .formControlName,
+                                                                    'minlength'
+                                                                ) ||
+                                                                auditFormHasError(
+                                                                    auditInformation.overAllRatingSection
+                                                                        .formControlName,
+                                                                    'maxlength'
+                                                                )
+                                                            "
+                                                        >
+                                                            {{ 'Length should be within' | translate }}
+                                                            {{ auditInformation.overAllRatingSection.minLength }}
+                                                            {{ 'and' | translate }}
+                                                            {{ auditInformation.overAllRatingSection.maxLength }}
+                                                        </mat-error>
+                                                    </mat-form-field>
+                                                </div>
+                                                <!-- col-md -->
+                                            </div>
+                                            <!-- END: switchCase - text -->
+                                            <div *ngSwitchCase="'NUMBER'" class="form-row form-details">
+                                                <div class="col-md-6 col-sm-6 vcenter pd-0">
+                                                    <label class="template-label"
+                                                        >{{
+                                                            auditInformation.overAllRatingSection.name
+                                                                | titlecase
+                                                                | translate
+                                                        }}<span *ngIf="auditInformation.overAllRatingSection.mandatory"
+                                                            >&#42;</span
+                                                        ></label
+                                                    >
+                                                </div>
+                                                <!-- col-md -->
+                                                <div class="col-md-6 col-sm-6 text-right vcenter">
+                                                    <mat-form-field [floatLabel]="'never'">
+                                                        <input
+                                                            matInput
+                                                            type="number"
+                                                            placeholder="{{ 'Enter value' | translate }}"
+                                                            [min]="auditInformation.overAllRatingSection.min"
+                                                            [max]="auditInformation.overAllRatingSection.max"
+                                                            [step]="auditInformation.overAllRatingSection.step"
+                                                            [formControlName]="
+                                                                auditInformation.overAllRatingSection.formControlName
+                                                            "
+                                                            [required]="auditInformation.overAllRatingSection.mandatory"
+                                                        />
+
+                                                        <mat-error
+                                                            *ngIf="
+                                                                auditFormHasError(
+                                                                    auditInformation.overAllRatingSection
+                                                                        .formControlName,
+                                                                    'required'
+                                                                )
+                                                            "
+                                                            >{{ 'Required field' | translate }}</mat-error
+                                                        >
+                                                        <mat-error
+                                                            *ngIf="
+                                                                auditFormHasError(
+                                                                    auditInformation.overAllRatingSection
+                                                                        .formControlName,
+                                                                    'min'
+                                                                ) ||
+                                                                auditFormHasError(
+                                                                    auditInformation.overAllRatingSection
+                                                                        .formControlName,
+                                                                    'max'
+                                                                )
+                                                            "
+                                                        >
+                                                            {{ 'Value should be within' | translate }}
+                                                            {{ auditInformation.overAllRatingSection.min }}
+                                                            {{ 'and' | translate }}
+                                                            {{ auditInformation.overAllRatingSection.max }}
+                                                        </mat-error>
+                                                    </mat-form-field>
+                                                </div>
+                                                <!-- col-md -->
+                                            </div>
+                                            <!-- END: swicthCase - number -->
+                                            <div *ngSwitchDefault class="tt-font h4">
+                                                {{ 'Unknown field type' | translate }}.
+                                            </div>
+                                        </div>
+                                        <!-- END: ngSwitch - auditInfo.overAllRatingSection.type -->
+
+                                        <div class="form-row" *ngIf="auditInformation.normalisedRating">
+                                            <div class="col-md-6 col-sm-6 vcenter pd-0">
+                                                <label class="template-label">{{
+                                                    'Normalised Rating' | translate
+                                                }}</label>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 text-right vcenter">
+                                                <mat-form-field [floatLabel]="'never'">
+                                                    <mat-select
+                                                        [formControlName]="
+                                                            auditInformation.normalisedRating.formControlName
+                                                        "
+                                                        placeholder="{{ 'Select . . .' | translate }}"
+                                                    >
+                                                        <mat-option
+                                                            *ngFor="let rating of normalisedRatings"
+                                                            [value]="rating"
+                                                        >
+                                                            {{ rating }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- END: col-md-12  -->
+                                </div>
+                                <!-- END: row - overAll Rating Section -->
+
+                                <div
+                                    class="mt-2"
+                                    *ngFor="let section of auditInformation.sections; let sectionIndex = index"
+                                >
+                                    <h4 class="tt-font mb-2">{{ section.header | titlecase | translate }}</h4>
+                                    <div *ngFor="let field of section.fields; let fieldIndex = index">
+                                        <div [ngSwitch]="field.type">
+                                            <div *ngSwitchCase="'SELECT'" class="form-row">
+                                                <div class="col-md-6 col-sm-6 vcenter pd-0">
+                                                    <label class="template-label"
+                                                        >{{ field.name.trim() | titlecase | translate
+                                                        }}<span *ngIf="field.mandatory">&#42;</span></label
+                                                    >
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 text-right vcenter">
+                                                    <mat-form-field [floatLabel]="'never'">
+                                                        <mat-select
+                                                            formControlName="{{ field.formControlName }}"
+                                                            placeholder="{{ 'Select . . .' | translate }}"
+                                                        >
+                                                            <mat-option
+                                                                *ngFor="
+                                                                    let option of _.keys(field.options) | sortByFilter
+                                                                "
+                                                                [value]="field.options[option]"
+                                                            >
+                                                                {{ field.options[option] }}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                        <mat-error
+                                                            *ngIf="auditFormHasError(field.formControlName, 'required')"
+                                                            >{{ 'Required field' | translate }}</mat-error
+                                                        >
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                            <!-- END: switchCase - select -->
+                                            <div *ngSwitchCase="'TEXT'" class="form-row">
+                                                <div class="col-md-6 col-sm-6 vcenter pd-0">
+                                                    <label class="template-label"
+                                                        >{{ field.name.trim() | titlecase | translate
+                                                        }}<span *ngIf="field.mandatory">&#42;</span></label
+                                                    >
+                                                </div>
+                                                <!-- col-md -->
+                                                <div class="col-md-6 col-sm-6 text-right vcenter">
+                                                    <mat-form-field [floatLabel]="'never'">
+                                                        <input
+                                                            matInput
+                                                            placeholder="{{ 'Enter value' | translate }}"
+                                                            type="text"
+                                                            [formControlName]="field.formControlName"
+                                                            [name]="field.name"
+                                                            [required]="field.required"
+                                                        />
+                                                        <mat-error
+                                                            *ngIf="auditFormHasError(field.formControlName, 'required')"
+                                                            >{{ 'Required field' | translate }}</mat-error
+                                                        >
+                                                        <mat-error
+                                                            *ngIf="
+                                                                auditFormHasError(field.formControlName, 'minlength') ||
+                                                                auditFormHasError(field.formControlName, 'maxlength')
+                                                            "
+                                                        >
+                                                            {{ 'Length should be within' | translate }}
+                                                            {{ field.minLength }} {{ 'and' | translate }}
+                                                            {{ field.maxLength }}
+                                                        </mat-error>
+                                                    </mat-form-field>
+                                                </div>
+                                                <!-- col-md -->
+                                            </div>
+                                            <!-- END: switchCase - text -->
+                                            <div *ngSwitchCase="'NUMBER'" class="form-row">
+                                                <div class="col-md-6 col-sm-6 vcenter pd-0">
+                                                    <label class="template-label"
+                                                        >{{ field.name.trim() | titlecase | translate
+                                                        }}<span *ngIf="field.mandatory">&#42;</span></label
+                                                    >
+                                                </div>
+                                                <!-- col-md -->
+                                                <div class="col-md-6 col-sm-6 text-right vcenter">
+                                                    <mat-form-field [floatLabel]="'never'">
+                                                        <input
+                                                            matInput
+                                                            type="number"
+                                                            placeholder="{{ 'Enter value' | translate }}"
+                                                            [min]="field.min"
+                                                            [max]="field.max"
+                                                            [step]="field.step"
+                                                            [formControlName]="field.formControlName"
+                                                            [required]="field.mandatory"
+                                                        />
+
+                                                        <mat-error
+                                                            *ngIf="auditFormHasError(field.formControlName, 'required')"
+                                                            >{{ 'Required field' | translate }}</mat-error
+                                                        >
+                                                        <mat-error
+                                                            *ngIf="
+                                                                auditFormHasError(field.formControlName, 'min') ||
+                                                                auditFormHasError(field.formControlName, 'max')
+                                                            "
+                                                        >
+                                                            {{ 'Value should be within' | translate }} {{ field.min }}
+                                                            {{ 'and' | translate }} {{ field.max }}
+                                                        </mat-error>
+                                                    </mat-form-field>
+                                                </div>
+                                                <!-- col-md -->
+                                            </div>
+                                            <!-- END: swicthCase - number -->
+                                            <div *ngSwitchCase="'FILE'" class="form-row">
+                                                <div class="col">
+                                                    <div>
+                                                        <label class="template-label pb-1"
+                                                            >{{ field.name.trim() | titlecase | translate
+                                                            }}<span *ngIf="field.mandatory">&#42;</span></label
+                                                        >
+                                                    </div>
+                                                    <div>
+                                                        <div
+                                                            class="tt-file-upload-ui-container"
+                                                            (click)="InvokeFileUpload(field.name)"
+                                                            data-cy="audit-test-tt-file-upload"
+                                                        >
+                                                            <div class="tt-file-upload-ui-content">
+                                                                <div class="spinner-wrapper">
+                                                                    <img
+                                                                        src="{{
+                                                                            env.IMG_URL
+                                                                        }}images/icon-upload-grey.png"
+                                                                        alt="Upload file"
+                                                                        class="mr-2"
+                                                                    />
+                                                                    <h5
+                                                                        class="description tt-font tt-font-regular text-muted"
+                                                                    >
+                                                                        {{ 'Click here to upload file' | translate }}
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <input
+                                                            type="file"
+                                                            class="hidden"
+                                                            id="file_upload_{{ field.name }}"
+                                                            name="file_upload_{{ field.name }}"
+                                                            data-cy="audit-test-tt-file-upload-input-field"
+                                                            (change)="
+                                                                uploadFile(
+                                                                    field.name,
+                                                                    $event.target.files,
+                                                                    sectionIndex,
+                                                                    fieldIndex
+                                                                )
+                                                            "
+                                                            [hidden]="true"
+                                                        />
+                                                        <span
+                                                            class="input-error tt-font"
+                                                            *ngIf="auditFormHasError(field.formControlName, 'required')"
+                                                            >{{ 'Required to upload documents' | translate }}</span
+                                                        >
+                                                    </div>
+                                                    <div class="template-file pb-2">
+                                                        <!-- Listing uploaded files   -->
+                                                        <ul class="list-unstyled tt-uploaded-file-list-container">
+                                                            <li
+                                                                *ngFor="
+                                                                    let fileName of getFileNames(
+                                                                        field.name,
+                                                                        sectionIndex,
+                                                                        fieldIndex
+                                                                    )
+                                                                "
+                                                            >
+                                                                <span class="tt-uploaded-file">
+                                                                    <span class="fileName">{{ fileName }}</span>
+                                                                </span>
+                                                                <span
+                                                                    class="tt-remove-uploaded-file image-icon"
+                                                                    (click)="
+                                                                        removeFile(
+                                                                            field.name,
+                                                                            fileName,
+                                                                            sectionIndex,
+                                                                            fieldIndex
+                                                                        )
+                                                                    "
+                                                                >
+                                                                    <img
+                                                                        tooltip="Delete"
+                                                                        container="body"
+                                                                        src="{{
+                                                                            env.IMG_URL
+                                                                        }}images/questionaire-del.png"
+                                                                        alt="Delete"
+                                                                    />
+                                                                </span>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <!-- col -->
+                                            </div>
+                                            <!-- END: swicthCase - file -->
+                                            <div *ngSwitchDefault>{{ 'Unknown field type' | translate }}.</div>
+                                        </div>
+                                        <!-- END: ngSwitch - field.type -->
+                                    </div>
+                                    <!-- END: section.fields -->
+                                </div>
+                                <!-- END: auditInfo.sections -->
+
+                                <div class="non-conformity-section-container mt-2">
+                                    <app-non-conformities-create
+                                        (nonConformitiesUpdated)="onUpdateNonconformities($event)"
+                                        [ncEditEvent]="ncEdit"
+                                    >
+                                    </app-non-conformities-create>
+                                    <div class="col-md-12 pd-0">
+                                        <app-non-conformities-list
+                                            [nonConformities]="nonConformities"
+                                            ncMode="record"
+                                            (updateNcEvent)="onUpdateNC($event)"
+                                        >
+                                        </app-non-conformities-list>
+                                    </div>
+                                </div>
+                                <!-- END: non-conformities-section -->
+
+                                <div class="col-md-12 pd-0 text-right mt-4 mb-3 button-group">
+                                    <button
+                                        [disabled]="isProcessing.supplierInformationForm"
+                                        type="button"
+                                        (click)="cancel()"
+                                        mat-button
+                                        matStepperNext
+                                        class="btn tt-btn tt-btn-secondary"
+                                        mat-button
+                                        data-cy="audit-test-audit-cancel-second-tab-btn"
+                                    >
+                                        {{ 'Cancel' | translate }}
+                                    </button>
+                                    <button
+                                        class="btn tt-btn tt-btn-secondary"
+                                        style="margin-right: 10px"
+                                        mat-button
+                                        matStepperPrevious
+                                        data-cy="audit-test-audit-previous-second-tab-btn"
+                                    >
+                                        {{ 'Previous' | translate }}
+                                    </button>
+                                    <button
+                                        [disabled]="isProcessing.auditInformationForm"
+                                        style="margin-right: 12px"
+                                        type="submit"
+                                        class="btn tt-btn tt-btn-primary mr-0"
+                                        mat-button
+                                        matStepperNext
+                                        data-cy="audit-test-audit-save-second-tab-btn"
+                                    >
+                                        <ng-template [ngIf]="!isProcessing.auditInformationForm">
+                                            {{ 'Save' | translate }}
+                                        </ng-template>
+
+                                        <ng-template [ngIf]="isProcessing.auditInformationForm">
+                                            <div class="spinner-wrapper">
+                                                <span>{{ 'Saving' | translate }} </span>
+                                                <mat-spinner [diameter]="14"></mat-spinner>
+                                            </div>
+                                        </ng-template>
+                                    </button>
+                                </div>
+                            </form> </mat-step
+                        ><!-- END: Audit-Information -->
+                    </mat-horizontal-stepper>
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+        <!-- END: content-container -->
+    </div>
+    <!-- END: container-fluid -->
+</div>
+<!-- END: view container -->

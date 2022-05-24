@@ -1,0 +1,84 @@
+<app-sass-helper></app-sass-helper>
+<div class="chart-thumbnail-container cursor-pointer" (click)="onChartClick()">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 image-container" *ngIf="dataPresent && type !== 'TABLE'">
+        <div #chartContainer class="chart-container cursor-pointer" id="container-{{ index }}"></div>
+    </div>
+    <div class="chart-container cursor-pointer" *ngIf="!pageLoading && !showNoDataChart && type === 'TABLE'">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-img-block">
+                    <table class="table table-line-block">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="line-white"></div>
+                                </th>
+                                <th>
+                                    <div class="line-white"></div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="line-blue"></div>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="line-green"></div>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="line-yellow"></div>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="line-dark-blue"></div>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Table Img Block -->
+            </div>
+            <!-- Column -->
+        </div>
+    </div>
+    <div class="no-data-chart" *ngIf="!dataPresent && showNoDataChart">
+        <img src="{{ env.IMG_URL }}images/no-data-chart.png" />
+        <p>{{ 'No Data Available' | translate }}</p>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 footer-container cursor-pointer" (click)="onChartClick()">
+    <div class="footer-container-title">{{ title | translate }}</div>
+    <!-- <div class="">
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+            <img class="sni" src="{{ env.IMG_URL }}images/charts-download-image.png" />
+        </button>
+        <mat-menu
+            #menu="matMenu"
+            [overlapTrigger]="false"
+            class="chart-download-icon"
+            yPosition="above"
+            xPosition="before"
+        >
+            <button
+                mat-menu-item
+                *ngFor="let option of menuOptions"
+                (click)="onMenuSelect(option.name)"
+                [disabled]="!option.enabled"
+            >
+                <span>{{ option.name }}</span>
+            </button>
+        </mat-menu>
+    </div> -->
+</div>

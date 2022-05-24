@@ -1,0 +1,694 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header no-border">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 header-search pt-3">
+                <div class="page-title">
+                    <div>{{ activeTab !== 'sub_suppliers' ? 'Suppliers' : ('Sub Suppliers' | translate) }}</div>
+                    <div class="page-description font-color-primary">
+                        {{
+                            (activeTab !== 'sub_suppliers'
+                                ? 'View, Manage and Invite new Suppliers'
+                                : 'View and Manage Sub Suppliers'
+                            ) | translate
+                        }}
+                    </div>
+                </div>
+            </div>
+            <!-- col -->
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 pt-3 header-search justify-content-flex-end">
+                <div class="header-search">
+                    <div class="title-right-search" *ngIf="activeTab !== tabs.SUPPLIER_CONFLICTS">
+                        <input
+                            type="text"
+                            class="search"
+                            placeholder="{{ 'Type and press enter to search' | translate }}"
+                            (keyup)="searchSuppliers($event)"
+                            [(ngModel)]="searchText"
+                            data-cy="suppliers-search"
+                        />
+                        <i class="fa fa-search"></i>
+                    </div>
+                    <button
+                        class="btn btn-lg btn-blue pull-right btn-gradient cs-btn"
+                        (click)="openAddSupplierModalV2()"
+                        *ngIf="isSuppliersSelected && isNotFoodIndustry && checkAccess('SUPPLIER_CREATE')"
+                    >
+                        <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" /> {{ 'Add Supplier' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- col -->
+            <div class="col-md-12" *ngIf="haveSupplierCreateAccess">
+                <div class="export-data-btn-container">
+                    <button
+                        class="btn import-btn-bordered btn-bordered pull-right"
+                        data-cy="suppliers-import-btn"
+                        *ngIf="checkAccess('SUPPLIER_CREATE')"
+                        (click)="importSuppliers()"
+                    >
+                        <img src="{{ IMG_URL }}images/upload-blue-icon.png" alt="Import" />
+                        <span>{{ 'Import Suppliers' | translate }}</span>
+                    </button>
+                </div>
+            </div>
+            <!-- col -->
+        </div>
+        <!-- row -->
+
+        <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="supplierFilters" #filterBarWrapper>
+            <div class="col-md-12">
+                <ul class="filter-bar-container" *ngIf="activeTab !== tabs.SUPPLIER_CONFLICTS">
+                    <li *ngFor="let filter of supplierFilters | keys; let filterInd = index">
+                        <app-tt-multi-select-search
+                            (selectionChange)="handleFilterSelection()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="getSession().filter"
+                            [optionsParam]="optionsParam"
+                            [data_cy]="removeSpace(filter.key)"
+                        >
+                        </app-tt-multi-select-search>
+                    </li>
+                    <li class="reset-filters">
+                        <button
+                            class="button-badge mat-button btn btn-gray"
+                            (click)="resetAllFilters()"
+                            data-cy="suppliers-reset-all-filters"
+                        >
+                            {{ 'Reset all filters' | translate }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 mt-3">
+                <div class="tt-tabs">
+                    <div class="cursor-default" (click)="navigateTo()">
+                        <label class="cursor-pointer" [ngClass]="{ active: activeTab === null }">
+                            {{ 'Suppliers' | translate }}
+                        </label>
+                    </div>
+                    <div
+                        class="cursor-default"
+                        *ngIf="isNotFoodIndustry"
+                        (click)="navigateTo(tabs.UNINVITED_SUPPLIERS)"
+                    >
+                        <label class="cursor-pointer" [ngClass]="{ active: activeTab === tabs.UNINVITED_SUPPLIERS }">
+                            <span>{{ 'Uninvited suppliers' | translate }}</span>
+                        </label>
+                    </div>
+                    <div
+                        class="cursor-default"
+                        *ngIf="checkAccess('SUPPLIER_UPDATE')"
+                        (click)="navigateTo(tabs.SUB_SUPPLIERS)"
+                    >
+                        <label class="cursor-pointer" [ngClass]="{ active: activeTab === tabs.SUB_SUPPLIERS }">
+                            <span>{{ 'Sub Suppliers' | translate }}</span>
+                        </label>
+                    </div>
+                    <div
+                        class="cursor-default"
+                        *ngIf="checkAccess('SUPPLIER_UPDATE')"
+                        (click)="navigateTo(tabs.SUPPLIER_CONFLICTS)"
+                    >
+                        <label class="cursor-pointer" [ngClass]="{ active: activeTab === tabs.SUPPLIER_CONFLICTS }">
+                            <span>{{ 'Supplier conflicts' | translate }}</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by mt-3">
+                <div class="row" *ngIf="activeTab !== tabs.SUPPLIER_CONFLICTS">
+                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 total-count">
+                        <div class="float-l" *ngIf="suppliers.length > 0 || totalCountFlag">
+                            <app-card-pagination
+                                [paginationStart]="pagination.from + 1"
+                                [fetchSize]="pagination.size"
+                                [totalItemsCount]="totalCount"
+                                moduleName="Suppliers"
+                                (previous)="onScroll('back')"
+                                (next)="onScroll('next')"
+                            ></app-card-pagination>
+                        </div>
+                        <div class="export-data-btn-container">
+                            <button
+                                class="cs-btn export-data"
+                                data-cy="suppliers-test-export-btn"
+                                (click)="downloadSupplierDataAsExcel()"
+                                [disabled]="!(totalCount > 0)"
+                            >
+                                <img src="{{ env.IMG_URL }}images/share.png" alt="Download" />
+                                <ng-template [ngIf]="!isProcessing">
+                                    {{ 'Export Suppliers' | translate }}
+                                </ng-template>
+                                <ng-template [ngIf]="isProcessing">
+                                    <div class="spinner-wrapper">
+                                        <span>{{ 'Downloading' | translate }}</span>
+                                        <mat-spinner [diameter]="14"></mat-spinner>
+                                    </div>
+                                </ng-template>
+                            </button>
+                        </div>
+                        <div class="export-data-btn-container" *ngIf="checkAccess('SUPPLIER_UPDATE')">
+                            <button
+                                class="cs-btn export-data"
+                                data-cy="suppliers-test-export-btn"
+                                (click)="downloadSupplierLinkingDataAsExcel()"
+                                [disabled]="!totalCount"
+                            >
+                                <img src="{{ env.IMG_URL }}images/share.png" alt="Download" />
+                                <ng-template [ngIf]="!isSupplierLinkingProcessing" [ngIfElse]="display_downloading">
+                                    {{ 'Export Supplier Linking' | translate }}
+                                </ng-template>
+                                <ng-template #display_downloading>
+                                    <div class="spinner-wrapper">
+                                        <span>{{ 'Downloading' | translate }}</span>
+                                        <mat-spinner [diameter]="14"></mat-spinner>
+                                    </div>
+                                </ng-template>
+                            </button>
+                        </div>
+                        <div class="export-data-btn-container" *ngIf="activeTab === tabs.SUB_SUPPLIERS">
+                            <button
+                                class="cs-btn export-data"
+                                data-cy="suppliers-test-export-btn"
+                                (click)="downloadSubSupplierDataAsExcel()"
+                                [disabled]="!(totalCount > 0)"
+                            >
+                                <img [src]="getImage('share.png')" alt="Download" />
+
+                                <ng-template [ngIf]="!isProcessing">
+                                    {{ 'Export Sub Suppliers' | translate }}
+                                </ng-template>
+                                <ng-template [ngIf]="isSubSupplierProcessing">
+                                    <div class="spinner-wrapper">
+                                        <span>{{ 'Downloading' | translate }}</span>
+                                        <mat-spinner [diameter]="14"></mat-spinner>
+                                    </div>
+                                </ng-template>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" *ngIf="activeTab !== tabs.SUPPLIER_CONFLICTS">
+                        <div dropdown class="dropdown sort-dropdown">
+                            <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                <span class="sort-name"
+                                    >{{ 'Sort By' | translate }}
+                                    <i class="fa fa-angle-down"></i>
+                                </span>
+                            </a>
+                            <ul *dropdownMenu class="dropdown-menu">
+                                <li>
+                                    <mat-radio-group [(ngModel)]="sortByFilter.sortBy" (change)="handleSortBy()">
+                                        <mat-radio-button value="supplier_name">{{
+                                            'Alphabetical Order' | translate
+                                        }}</mat-radio-button>
+                                        <mat-radio-button value="create_ts">{{
+                                            'Newly Added' | translate
+                                        }}</mat-radio-button>
+                                        <mat-radio-button
+                                            *ngIf="activeTab === null && isNotFoodIndustry"
+                                            value="supplier_association_status.id_desc"
+                                            >{{ 'Accepted First' | translate }}</mat-radio-button
+                                        >
+                                        <mat-radio-button
+                                            *ngIf="activeTab === null && isNotFoodIndustry"
+                                            value="supplier_association_status.id"
+                                            >{{ 'Unaccepted First' | translate }}
+                                        </mat-radio-button>
+                                    </mat-radio-group>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Sort Dropdown -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!-- Row -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+
+        <div *ngIf="suppliers && activeTab !== tabs.SUPPLIER_CONFLICTS">
+            <div
+                class="row suppliers-table"
+                [ngStyle]="{ 'top.px': height }"
+                *ngIf="suppliers && suppliers.length >= 0"
+            >
+                <app-suppliers-list
+                    [suppliers]="suppliers"
+                    [totalCount]="totalCount"
+                    (events)="handleEvents($event)"
+                    (events)="initialize()"
+                    [launchAssessmentModalLoading]="launchAssessmentModalLoading"
+                    [activeTab]="activeTab"
+                >
+                </app-suppliers-list>
+            </div>
+            <!-- col -->
+        </div>
+
+        <div *ngIf="activeTab === tabs.SUPPLIER_CONFLICTS">
+            <div
+                class="row suppliers-table"
+                [ngStyle]="{ 'top.px': height }"
+                *ngIf="supplierConflicts && supplierConflicts.length >= 0"
+            >
+                <app-supplier-conflicts [suppliers]="supplierConflicts"> </app-supplier-conflicts>
+            </div>
+        </div>
+    </div>
+    <!-- container-fluid -->
+</div>
+<!-- views-container -->
+<router-outlet></router-outlet>
+
+<div
+    bsModal
+    #launchAssessmentModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="launchAssessmentModal"
+    aria-hidden="true"
+    *ngIf="launchAssessmentModalReady"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content" *ngIf="questionnaires.length > 0">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">{{ 'Launch Questionnaire' | translate }}</h4>
+                <button
+                    type="button"
+                    class="close pull-right"
+                    (click)="launchAssessmentModal.hide()"
+                    aria-label="Close"
+                >
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <form>
+                        <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 cq-left">
+                            <div class="form-group">
+                                <label for="questionnaire_name">{{ 'Question Name' | translate }}</label>
+                                <select
+                                    name="questionnaire_name"
+                                    id="questionnaire_name"
+                                    class="form-control"
+                                    [(ngModel)]="questionnaire"
+                                    (change)="selected = questionnaires[questionnaire]; initFilterOptions(selected)"
+                                >
+                                    <ng-template
+                                        ngFor
+                                        let-questionnaire
+                                        [ngForOf]="questionnaires"
+                                        let-i="index"
+                                        let-f="first"
+                                    >
+                                        <option *ngIf="f" selected="selected" [value]="i">{{
+                                            questionnaire.name
+                                        }}</option>
+                                        <option *ngIf="!f" [value]="i">{{ questionnaire.name }}</option>
+                                    </ng-template>
+                                </select>
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="form-group">
+                                <label for="question_description">{{ 'Description' | translate }}</label>
+                                <textarea
+                                    name="question_description"
+                                    id="question_description"
+                                    cols="30"
+                                    rows="10"
+                                    [disabled]="true"
+                                    [(ngModel)]="selected.description"
+                                    class="form-control"
+                                ></textarea>
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="form-group" [attr.contenteditable]="false">
+                                <label for="filter_questions">{{ 'Filter Questions' | translate }}</label>
+                                <div id="filter_questions">
+                                    <div class="filterHeaderBar">
+                                        <span class="heading">{{
+                                            filterQuestionsHeading[filterStep].value | titlecase | translate
+                                        }}</span>
+                                        <span class="left-arrow" (click)="filterCount('left')"
+                                            ><i class="fa fa-caret-left"></i
+                                        ></span>
+                                        <span class="right-arrow" (click)="filterCount('right')">
+                                            <i class="fa fa-caret-right"></i>
+                                        </span>
+                                    </div>
+
+                                    <div class="filterContent" style="cursor: not-allowed">
+                                        <div class="row">
+                                            <app-spinner
+                                                class="Absolute-Center"
+                                                [small]="true"
+                                                *ngIf="
+                                                    !options[filterQuestionsHeading[filterStep].id] ||
+                                                    options[filterQuestionsHeading[filterStep].id].length <= 0
+                                                "
+                                            >
+                                            </app-spinner>
+                                            <div
+                                                class="col-md-6"
+                                                *ngFor="let option of options[filterQuestionsHeading[filterStep].id]"
+                                            >
+                                                <span class="check_box_group">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="{{ option }}"
+                                                        name="{{ option }}"
+                                                        [disabled]="true"
+                                                        [(ngModel)]="response[option]"
+                                                        (change)="
+                                                            checkFilter(
+                                                                $event,
+                                                                filterQuestionsHeading[filterStep].value,
+                                                                filterStep,
+                                                                option
+                                                            )
+                                                        "
+                                                    />
+                                                    <label
+                                                        class="disabled"
+                                                        for="{{ option }}"
+                                                        style="padding-bottom: 0; margin-bottom: 0"
+                                                    >
+                                                        <span>{{ localeService.getDisplayText(option) }}</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- filterContent -->
+                                </div>
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label style="padding-top: 17px;">{{ 'Selected Questions' | translate }}</label>
+                                    </div>
+                                    <div class="col-md-7" style="font-size: 35px; color: #27c7e5;">
+                                        <span *ngIf="!selectedQuestionsLoading">{{ selectedQuestions }}</span>
+                                        <app-spinner [small]="true" *ngIf="selectedQuestionsLoading"></app-spinner>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- col -->
+
+                        <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 cq-right filter-selection-container">
+                            <div class="filter-selection-content">
+                                <ul class="list-unstyled">
+                                    <li *ngFor="let section of filterQuestionsHeading">
+                                        <p class="filter-title">{{ section.label | translate }}</p>
+
+                                        <ul class="list-unstyled list-inline selected-suppliers-facilities-list">
+                                            <li
+                                                class="selected-suppliers-facilities-item"
+                                                *ngFor="
+                                                    let item of selectedFilters[toCamelCase(section.value)];
+                                                    let last = last
+                                                "
+                                            >
+                                                {{ localeService.getDisplayText(item) }}
+                                            </li>
+                                        </ul>
+
+                                        <div
+                                            class="disabled-text"
+                                            *ngIf="
+                                                !selectedFilters[toCamelCase(section.value)] ||
+                                                selectedFilters[toCamelCase(section.value)]?.length === 0
+                                            "
+                                        >
+                                            {{ 'No options selected' | translate }}
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- col -->
+                    </form>
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer">
+                <div class="col-md-6 text-left">
+                    <!--<p class="pt-1">Total Questions: <span class="text-blue total-q"><b>{{assessment.totalQuestion}}</b></span>-->
+                    <!--</p>-->
+                </div>
+                <div class="col-md-6">
+                    <button
+                        type="button"
+                        class="btn btn-white"
+                        *ngIf="!modalLaunchingBusy"
+                        (click)="launchAssessmentModal.hide(); openLaunchQuestionnaireModal(selected)"
+                    >
+                        <span>{{ 'Launch' | translate }}</span>
+                    </button>
+                    <span style="padding-right: 40px;" *ngIf="modalLaunchingBusy">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                    <button
+                        type="button"
+                        class="btn btn-gray"
+                        data-dismiss="modal"
+                        (click)="launchAssessmentModal.hide()"
+                    >
+                        {{ 'Cancel' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->
+
+<div
+    bsModal
+    #launchQuestionnaireModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="launchQuestionnaireModal"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">{{ 'Launch' | translate }} - {{ response['questionnaire_name'] }}</h4>
+                <button
+                    type="button"
+                    class="close pull-right"
+                    (click)="launchQuestionnaireModal.hide()"
+                    aria-label="Close"
+                >
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <form>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="border-right: 1px solid #ccc">
+                            <div class="form-group">
+                                <h5>{{ 'Suppliers' | translate }} & {{ 'Facilities' | translate }}</h5>
+
+                                <div class="selected-suppliers-facilities-container">
+                                    <div class="selected-suppliers-facilities-content">
+                                        <ul class="list-unstyled list-inline selected-suppliers-facilities-list">
+                                            <li
+                                                class="selected-suppliers-facilities-item"
+                                                *ngFor="let supplier of selectedSuppliers"
+                                            >
+                                                {{ supplier.name }}
+                                                <span
+                                                    (click)="onSelectSupplier(this, $event, supplier.id, true)"
+                                                    data-role="remove"
+                                                ></span>
+                                            </li>
+
+                                            <li
+                                                class="selected-suppliers-facilities-item"
+                                                *ngFor="let facility of selectedFacilities"
+                                            >
+                                                {{ facility.name }}
+                                                <span
+                                                    (click)="onSelectFacility(this, $event, facility.id, true)"
+                                                    data-role="remove"
+                                                ></span>
+                                            </li>
+                                        </ul>
+                                        <!-- selected-suppliers-facilities-list -->
+                                    </div>
+                                    <!-- selected-suppliers-facilities-content -->
+                                </div>
+                                <!-- selected-suppliers-facilities-container -->
+
+                                <div class="search-suppliers-facilities-container container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-6" style="padding-left: 0;">
+                                            <h5>{{ 'Search Suppliers' | translate }}</h5>
+                                            <div class="search-suppliers-facilities">
+                                                <div class="search-box">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="{{ 'Search' | translate }}"
+                                                        name="searchSupplierTerm"
+                                                        [(ngModel)]="searchSupplierTerm"
+                                                    />
+                                                </div>
+
+                                                <ul class="search-suppliers-facilities-list list-unstyled">
+                                                    <li
+                                                        class="search-suppliers-facilities-item"
+                                                        [ngClass]="{ selected: !!markedSuppliers[supplier.id] }"
+                                                        *ngFor="
+                                                            let supplier of suppliers | filter: searchSupplierTerm;
+                                                            let i = index
+                                                        "
+                                                        (click)="triggerCheckbox('ss', i)"
+                                                    >
+                                                        <span class="title">{{ supplier.name }}</span>
+                                                        <span class="check_box_group pull-right">
+                                                            <input
+                                                                type="checkbox"
+                                                                name="ssf-{{ i }}"
+                                                                id="ss-{{ i }}"
+                                                                (change)="onSelectSupplier(this, $event, supplier.id, false)"
+                                                                [checked]="markedSuppliers[supplier.id]"
+                                                            />
+
+                                                            <label for="ss-{{ i }}" (click)="triggerCheckbox('ss', i)"
+                                                                ><span></span
+                                                            ></label>
+                                                        </span>
+                                                        <div class="clearfix"></div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!-- col -->
+                                        <div class="col-md-6" style="padding-right: 0;">
+                                            <h5>{{ 'Search Facilities' | translate }}</h5>
+                                            <div class="search-suppliers-facilities">
+                                                <div class="search-box">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="{{ 'Search' | translate }}"
+                                                        name="searchFacilityTerm"
+                                                        [(ngModel)]="searchFacilityTerm"
+                                                    />
+                                                </div>
+
+                                                <ul class="search-suppliers-facilities-list list-unstyled">
+                                                    <li
+                                                        class="search-suppliers-facilities-item"
+                                                        [ngClass]="{ selected: !!markedFacilities[facility.id] }"
+                                                        *ngFor="
+                                                            let facility of facilities | filter: searchFacilityTerm;
+                                                            let i = index
+                                                        "
+                                                        (click)="triggerCheckbox('sf', i)"
+                                                    >
+                                                        <span class="title">{{ facility.name }}</span>
+                                                        <span class="check_box_group pull-right">
+                                                            <input
+                                                                type="checkbox"
+                                                                id="sf-{{ i }}"
+                                                                (change)="onSelectFacility(this, $event, facility.id, false)"
+                                                                [checked]="markedFacilities[facility.id]"
+                                                            />
+                                                            <label for="sf-{{ i }}" (click)="triggerCheckbox('sf', i)"
+                                                                ><span></span
+                                                            ></label>
+                                                        </span>
+                                                        <div class="clearfix"></div>
+                                                    </li>
+                                                </ul>
+                                                <!-- search-suppliers-facilities-list -->
+                                            </div>
+                                        </div>
+                                        <!-- col -->
+                                    </div>
+                                    <!-- row -->
+                                </div>
+                                <!-- search-suppliers-facilities-container -->
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="material-input-style-box-type material-date-picker">
+                                <mat-label>{{ 'Target Date' | translate }}</mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        [(ngModel)]="response['target_date']"
+                                        [matDatepicker]="pick_date"
+                                        (click)="pick_date.open()"
+                                        name="target_date"
+                                        [min]="minDate"
+                                        readonly
+                                    />
+                                    <mat-datepicker #pick_date></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix [for]="pick_date"></mat-datepicker-toggle>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <!-- col -->
+                    </form>
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer">
+                <div class="col-md-6 text-left">
+                    <!--<p class="pt-1">Total Questions: <span class="text-blue total-q"><b>{{assessment.totalQuestion}}</b></span>-->
+                    <!--</p>-->
+                </div>
+                <div class="col-md-6">
+                    <button
+                        type="button"
+                        class="btn btn-white"
+                        *ngIf="!modalLaunchingBusy"
+                        (click)="launchQuestionnaire()"
+                    >
+                        <span>{{ 'Launch' | translate }}</span>
+                    </button>
+                    <span style="padding-right: 40px;" *ngIf="modalLaunchingBusy">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                    <button
+                        type="button"
+                        class="btn btn-gray"
+                        data-dismiss="modal"
+                        (click)="launchQuestionnaireModal.hide(); launchAssessmentModal.show()"
+                    >
+                        {{ 'Cancel' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->

@@ -1,0 +1,161 @@
+<div class="add-supplier-modal">
+    <div class="add-supplier-modal-title">
+        <span class="add-supplier-modal-title">{{ modelData.templateConfig.title | translate }}</span>
+    </div>
+    <!-- Add Supplier Modal-->
+
+    <div class="add-supplier-modal-body mt-3">
+        <form [formGroup]="addSupplierForm" (ngSubmit)="onSubmit()" *ngIf="!showMessage.flag; else showMessageTemplate">
+            <div class="form-group mb-fg">
+                <mat-form-field [ngClass]="{ disabled: this.modelData.formControlConfig.companyName.isNotEditable }">
+                    <label class="template-label pb-1"
+                        >{{ 'Company Name' | translate }} :
+                        <span *ngIf="modelData.formControlConfig.companyName.isRequired" class="mandatory"
+                            >*</span
+                        ></label
+                    >
+                    <input type="text" formControlName="companyName" matInput />
+                </mat-form-field>
+            </div>
+            <div
+                *ngIf="modelData.formControlConfig.doNotInvite.visibility"
+                class="from-group mb-fg"
+                [tooltip]="!!modelData.formControlConfig.doNotInvite.notCheckable ? 'Not allowed' : ''"
+            >
+                <mat-checkbox
+                    (click)="doNotInvite = !doNotInvite"
+                    [disabled]="true"
+                    [checked]="doNotInvite"
+                    [ngClass]="{ disabled: this.modelData.formControlConfig.doNotInvite.notCheckable }"
+                >
+                    <span>
+                        {{ 'Do not invite this supplier to TrusTrace platform' | translate }}
+                    </span>
+                </mat-checkbox>
+            </div>
+            <div class="form-group mb-fg" *ngIf="!isSupplier">
+                <mat-form-field [ngClass]="{ disabled: modelData.formControlConfig.supplierUid.isNotEditable }">
+                    <label class="template-label pb-1"
+                        >{{ 'Supplier UID' | translate }}:
+                        <span *ngIf="modelData.formControlConfig.supplierUid.isRequired" class="mandatory">*</span>
+                    </label>
+                    <span
+                        class="supplier-uid-info-btn"
+                        [popover]="supplierInfoTemplate"
+                        placement="bottom right"
+                        containerClass="tooltipInfo"
+                        triggers="mouseenter:mouseleave"
+                        *ngIf="modelData.actionType === 'ADD'"
+                    >
+                        {{ 'How to Create?' | translate }}
+                    </span>
+                    <input type="text" formControlName="supplierUid" matInput />
+                </mat-form-field>
+            </div>
+            <div class="form-group mb-fg">
+                <mat-form-field [ngClass]="{ disabled: this.modelData.formControlConfig.email.isNotEditable }">
+                    <label class="template-label pb-1"
+                        >{{ "User's Email ID" | translate }}:
+                        <span
+                            *ngIf="!doNotInvite && this.modelData.formControlConfig.email.isRequired"
+                            class="mandatory"
+                            >*</span
+                        ></label
+                    >
+                    <input type="email" formControlName="emailId" matInput />
+                </mat-form-field>
+            </div>
+            <div class="form-group mb-fg">
+                <mat-form-field [ngClass]="{ disabled: this.modelData.formControlConfig.location.isNotEditable }">
+                    <label class="template-label pb-1"
+                        >{{ 'Location' | translate }} :
+                        <span *ngIf="modelData.formControlConfig.location.isRequired" class="mandatory">*</span></label
+                    >
+                    <input
+                        autocomplete="random-string-to-workaround-browser-autosuggest"
+                        type="text"
+                        name="location"
+                        (keyup)="searchCity($event)"
+                        matInput
+                        formControlName="location"
+                        [matAutocomplete]="cityAuto"
+                        data-cy="location"
+                    />
+                    <i class="fa fa-search input-fa-search"></i>
+
+                    <mat-hint #supplierSearchHint>{{ 'Type to search' | translate }} </mat-hint>
+
+                    <mat-autocomplete #cityAuto="matAutocomplete" [displayWith]="getLocationDisplayName">
+                        <mat-option *ngFor="let item of cities" [value]="item">
+                            {{ getLocationDisplayName(item) }}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <div class="modal-footer">
+                <button
+                    [disabled]="addSupplierProcessing"
+                    type="button"
+                    class="btn btn-blue reset-password-button"
+                    (click)="hide()"
+                >
+                    {{ modelData.templateConfig.btnLabel.cancel | translate }}
+                </button>
+
+                <button
+                    [disabled]="addSupplierProcessing || !addSupplierForm.valid"
+                    type="submit"
+                    class="btn btn-reset"
+                >
+                    <span style="display: inline-block; width: 76px !important;" *ngIf="addSupplierProcessing">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                    <span *ngIf="!addSupplierProcessing">
+                        {{ (doNotInvite ? 'Add Supplier' : modelData.templateConfig.btnLabel.submit) | translate }}
+                    </span>
+                </button>
+            </div>
+            <!-- Modal Footer -->
+        </form>
+        <ng-template #showMessageTemplate>
+            <div class="text-center">
+                <h3 class="info-title">{{ addSupplierForm?.value?.companyName }}</h3>
+                <p class="info-content">{{ showMessage.message }}</p>
+                <button type="button" class="btn btn-blue reset-password-button mt-2" (click)="hide('close')">
+                    {{ 'Close' | translate }}
+                </button>
+            </div>
+        </ng-template>
+    </div>
+</div>
+<!-- Add Supplier Modal -->
+<!--Supplier UID info templete start-->
+<ng-template #supplierInfoTemplate>
+    <div class="showTooltipInfo">
+        <p class="tooltip-title">
+            {{ 'What is a Supplier UID?' | translate }}
+        </p>
+        <p>
+            {{ 'A UID that is to be created for the supplier in TrusTrace platform' | translate }}
+        </p>
+        <p class="tooltip-title">
+            {{ 'Rules to create a UID:' | translate }}
+        </p>
+        <ul>
+            <li>{{ 'Maximum of 100 characters without space.' | translate }}</li>
+            <li>{{ 'Only Alphanumeric' | translate }} [0-9 a-z A-Z]</li>
+            <li>{{ 'Allowed special characters' | translate }}: - (hyphen) _(underscore)</li>
+        </ul>
+        <p>
+            <span class="tooltip-title">{{ 'Sample Supplier UID:' | translate }}</span>
+            {{ 'Supplier001' | translate }}
+        </p>
+        <p class="tooltip-title">{{ 'Don’t have a Supplier UID?' | translate }}</p>
+        <p>
+            {{ 'Check the' | translate }} <span class="tooltip-title">{{ 'User Manual' | translate }}</span> >>
+            <span class="tooltip-title">{{ 'Add supplier section' | translate }}</span>
+            {{ 'for the supplier UID nomenclature.' | translate }}
+        </p>
+    </div>
+</ng-template>
+<!--Supplier UID info template end-->

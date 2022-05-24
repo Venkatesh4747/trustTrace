@@ -1,0 +1,994 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <!-- 
+        <div class="row header no-border">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 header-search pt-3">
+                <div class="page-title">{{ 'Facilities' | translate }}</div>
+            </div>
+        </div> -->
+        <!-- row -->
+        <!-- Show Facilities List -->
+        <div *ngIf="!isSuppliersSelected">
+            <app-facilities [suppliers]="suppliers" [countries]="countries" [searchText]="searchText"></app-facilities>
+        </div>
+    </div>
+    <!-- container-fluid -->
+</div>
+<!-- views-container -->
+
+<div
+    bsModal
+    #launchAssessmentModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="launchAssessmentModal"
+    aria-hidden="true"
+    *ngIf="launchAssessmentModalReady"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">{{ 'Launch Questionnaire' | translate }}</h4>
+                <button
+                    type="button"
+                    class="close pull-right"
+                    (click)="launchAssessmentModal.hide()"
+                    aria-label="Close"
+                >
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <form>
+                        <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 cq-left">
+                            <div class="form-group">
+                                <label for="questionnaire_name">{{ 'Question Name' | translate }}</label>
+                                <select
+                                    name="questionnaire_name"
+                                    id="questionnaire_name"
+                                    class="form-control"
+                                    [(ngModel)]="questionnaire"
+                                    (change)="selected = questionnaires[questionnaire]; initFilterOptions(selected)"
+                                >
+                                    <ng-template
+                                        ngFor
+                                        let-questionnaire
+                                        [ngForOf]="questionnaires"
+                                        let-i="index"
+                                        let-f="first"
+                                    >
+                                        <option *ngIf="f" selected="selected" [value]="i">{{
+                                            questionnaire.name
+                                        }}</option>
+                                        <option *ngIf="!f" [value]="i">{{ questionnaire.name }}</option>
+                                    </ng-template>
+                                </select>
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="form-group">
+                                <label for="question_description">{{ 'Description' | translate }}</label>
+                                <textarea
+                                    name="question_description"
+                                    id="question_description"
+                                    cols="30"
+                                    rows="10"
+                                    [disabled]="true"
+                                    [(ngModel)]="selected.description"
+                                    class="form-control"
+                                ></textarea>
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="form-group" [attr.contenteditable]="false">
+                                <label for="filter_questions">{{ 'Filter Questions' | translate }}</label>
+                                <div id="filter_questions">
+                                    <div class="filterHeaderBar">
+                                        <span class="heading">{{
+                                            filterQuestionsHeading[filterStep].value | titlecase | translate
+                                        }}</span>
+                                        <span class="left-arrow" (click)="filterCount('left')"
+                                            ><i class="fa fa-caret-left"></i
+                                        ></span>
+                                        <span class="right-arrow" (click)="filterCount('right')">
+                                            <i class="fa fa-caret-right"></i>
+                                        </span>
+                                    </div>
+
+                                    <div class="filterContent" style="cursor: not-allowed">
+                                        <div class="row">
+                                            <app-spinner
+                                                class="Absolute-Center"
+                                                [small]="true"
+                                                *ngIf="
+                                                    !options[filterQuestionsHeading[filterStep].id] ||
+                                                    options[filterQuestionsHeading[filterStep].id].length <= 0
+                                                "
+                                            >
+                                            </app-spinner>
+                                            <div
+                                                class="col-md-6"
+                                                *ngFor="let option of options[filterQuestionsHeading[filterStep].id]"
+                                            >
+                                                <span class="check_box_group">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="{{ option }}"
+                                                        name="{{ option }}"
+                                                        [disabled]="true"
+                                                        [(ngModel)]="response[option]"
+                                                        (change)="
+                                                            checkFilter(
+                                                                $event,
+                                                                filterQuestionsHeading[filterStep].value,
+                                                                filterStep,
+                                                                option
+                                                            )
+                                                        "
+                                                    />
+                                                    <label
+                                                        class="disabled"
+                                                        for="{{ option }}"
+                                                        style="padding-bottom: 0; margin-bottom: 0"
+                                                    >
+                                                        <span>{{ getDisplayText(option) }}</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- filterContent -->
+                                </div>
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label style="padding-top: 17px;">{{ 'Selected Questions' | translate }}</label>
+                                    </div>
+                                    <div class="col-md-7" style="font-size: 35px; color: #27c7e5;">
+                                        <span *ngIf="!selectedQuestionsLoading">{{ selectedQuestions }}</span>
+                                        <app-spinner [small]="true" *ngIf="selectedQuestionsLoading"></app-spinner>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- col -->
+
+                        <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 cq-right filter-selection-container">
+                            <div class="filter-selection-content">
+                                <ul class="list-unstyled">
+                                    <li *ngFor="let section of filterQuestionsHeading">
+                                        <p class="filter-title">{{ section.value | translate }}</p>
+
+                                        <ul class="list-unstyled list-inline selected-suppliers-facilities-list">
+                                            <li
+                                                class="selected-suppliers-facilities-item"
+                                                *ngFor="
+                                                    let item of selectedFilters[toCamelCase(section.value)];
+                                                    let last = last
+                                                "
+                                            >
+                                                {{ getDisplayText(item) }}
+                                            </li>
+                                        </ul>
+
+                                        <div
+                                            class="disabled-text"
+                                            *ngIf="
+                                                !selectedFilters[toCamelCase(section.value)] ||
+                                                selectedFilters[toCamelCase(section.value)]?.length === 0
+                                            "
+                                        >
+                                            {{ 'No options selected' | translate }}
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- col -->
+                    </form>
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer">
+                <div class="col-md-6 text-left">
+                    <!--<p class="pt-1">Total Questions: <span class="text-blue total-q"><b>{{assessment.totalQuestion}}</b></span>-->
+                    <!--</p>-->
+                </div>
+                <div class="col-md-6">
+                    <button
+                        type="button"
+                        class="btn btn-white"
+                        *ngIf="!modalLaunchingBusy"
+                        (click)="launchAssessmentModal.hide(); openLaunchQuestionnaireModal(selected)"
+                    >
+                        <span>{{ 'Launch' | translate }}</span>
+                    </button>
+                    <span style="padding-right: 40px;" *ngIf="modalLaunchingBusy">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                    <button
+                        type="button"
+                        class="btn btn-gray"
+                        data-dismiss="modal"
+                        (click)="launchAssessmentModal.hide()"
+                    >
+                        {{ 'Cancel' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->
+
+<div
+    bsModal
+    #launchQuestionnaireModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="launchQuestionnaireModal"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">{{ 'Launch' | translate }} - {{ response['questionnaire_name'] }}</h4>
+                <button
+                    type="button"
+                    class="close pull-right"
+                    (click)="launchQuestionnaireModal.hide()"
+                    aria-label="Close"
+                >
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <form>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="border-right: 1px solid #ccc">
+                            <div class="form-group">
+                                <h5>{{ 'Suppliers' | translate }} & {{ 'Facilities' | translate }}</h5>
+
+                                <div class="selected-suppliers-facilities-container">
+                                    <div class="selected-suppliers-facilities-content">
+                                        <ul class="list-unstyled list-inline selected-suppliers-facilities-list">
+                                            <li
+                                                class="selected-suppliers-facilities-item"
+                                                *ngFor="let supplier of selectedSuppliers"
+                                            >
+                                                {{ supplier.name }}
+                                                <span
+                                                    (click)="onSelectSupplier(this, $event, supplier.id, true)"
+                                                    data-role="remove"
+                                                ></span>
+                                            </li>
+
+                                            <li
+                                                class="selected-suppliers-facilities-item"
+                                                *ngFor="let facility of selectedFacilities"
+                                            >
+                                                {{ facility.name }}
+                                                <span
+                                                    (click)="onSelectFacility(this, $event, facility.id, true)"
+                                                    data-role="remove"
+                                                ></span>
+                                            </li>
+                                        </ul>
+                                        <!-- selected-suppliers-facilities-list -->
+                                    </div>
+                                    <!-- selected-suppliers-facilities-content -->
+                                </div>
+                                <!-- selected-suppliers-facilities-container -->
+
+                                <div class="search-suppliers-facilities-container container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-6" style="padding-left: 0;">
+                                            <h5>{{ 'Search Suppliers' | translate }}</h5>
+                                            <div class="search-suppliers-facilities">
+                                                <div class="search-box">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="{{ 'Search' | translate }}"
+                                                        name="searchSupplierTerm"
+                                                        [(ngModel)]="searchSupplierTerm"
+                                                    />
+                                                </div>
+
+                                                <ul class="search-suppliers-facilities-list list-unstyled">
+                                                    <li
+                                                        class="search-suppliers-facilities-item"
+                                                        [ngClass]="{ selected: !!markedSuppliers[supplier.id] }"
+                                                        *ngFor="
+                                                            let supplier of suppliers | filter: searchSupplierTerm;
+                                                            let i = index
+                                                        "
+                                                        (click)="triggerCheckbox('ss', i)"
+                                                    >
+                                                        <span class="title">{{ supplier.name }}</span>
+                                                        <span class="check_box_group pull-right">
+                                                            <input
+                                                                type="checkbox"
+                                                                name="ssf-{{ i }}"
+                                                                id="ss-{{ i }}"
+                                                                (change)="onSelectSupplier(this, $event, supplier.id, false)"
+                                                                [checked]="markedSuppliers[supplier.id]"
+                                                            />
+
+                                                            <label for="ss-{{ i }}" (click)="triggerCheckbox('ss', i)"
+                                                                ><span></span
+                                                            ></label>
+                                                        </span>
+                                                        <div class="clearfix"></div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!-- col -->
+                                        <div class="col-md-6" style="padding-right: 0;">
+                                            <h5>{{ 'Search Facilities' | translate }}</h5>
+                                            <div class="search-suppliers-facilities">
+                                                <div class="search-box">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="{{ 'Search' | translate }}"
+                                                        name="searchFacilityTerm"
+                                                        [(ngModel)]="searchFacilityTerm"
+                                                    />
+                                                </div>
+
+                                                <ul class="search-suppliers-facilities-list list-unstyled">
+                                                    <li
+                                                        class="search-suppliers-facilities-item"
+                                                        [ngClass]="{ selected: !!markedFacilities[facility.id] }"
+                                                        *ngFor="
+                                                            let facility of facilities | filter: searchFacilityTerm;
+                                                            let i = index
+                                                        "
+                                                        (click)="triggerCheckbox('sf', i)"
+                                                    >
+                                                        <span class="title">{{ facility.name }}</span>
+                                                        <span class="check_box_group pull-right">
+                                                            <input
+                                                                type="checkbox"
+                                                                id="sf-{{ i }}"
+                                                                (change)="onSelectFacility(this, $event, facility.id, false)"
+                                                                [checked]="markedFacilities[facility.id]"
+                                                            />
+                                                            <label for="sf-{{ i }}" (click)="triggerCheckbox('sf', i)"
+                                                                ><span></span
+                                                            ></label>
+                                                        </span>
+                                                        <div class="clearfix"></div>
+                                                    </li>
+                                                </ul>
+                                                <!-- search-suppliers-facilities-list -->
+                                            </div>
+                                        </div>
+                                        <!-- col -->
+                                    </div>
+                                    <!-- row -->
+                                </div>
+                                <!-- search-suppliers-facilities-container -->
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="form-group" style="position: relative; width: 180px;">
+                                <label for="target_date">{{ 'Target Date' | translate }}</label>
+                                <input
+                                    type="text"
+                                    id="target_date"
+                                    name="target_date"
+                                    [(ngModel)]="response['target_date']"
+                                    class="form-control"
+                                    [minDate]="minDate"
+                                    data-placement="top"
+                                    [bsConfig]="bsConfig"
+                                    #target_date="bsDatepicker"
+                                    bsDatepicker
+                                    [(bsValue)]="bsValue"
+                                />
+                                <i class="material-icons date cursor-pointer" (click)="target_date.toggle()">{{
+                                    'today' | translate
+                                }}</i>
+                            </div>
+                        </div>
+                        <!-- col -->
+                    </form>
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer">
+                <div class="col-md-6 text-left">
+                    <!--<p class="pt-1">Total Questions: <span class="text-blue total-q"><b>{{assessment.totalQuestion}}</b></span>-->
+                    <!--</p>-->
+                </div>
+                <div class="col-md-6">
+                    <button
+                        type="button"
+                        class="btn btn-white"
+                        *ngIf="!modalLaunchingBusy"
+                        (click)="launchQuestionnaire()"
+                    >
+                        <span>{{ 'Launch' | translate }}</span>
+                    </button>
+                    <span style="padding-right: 40px;" *ngIf="modalLaunchingBusy">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                    <button
+                        type="button"
+                        class="btn btn-gray"
+                        data-dismiss="modal"
+                        (click)="launchQuestionnaireModal.hide(); launchAssessmentModal.show()"
+                    >
+                        {{ 'Cancel' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->
+
+<router-outlet></router-outlet>
+
+<app-add-supplier #addSupplierModal></app-add-supplier>
+
+<div
+    bsModal
+    #supplierProfileModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="supplierProfileModal"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">{{ profileData.companyName }}</h4>
+                <button type="button" class="close pull-right" (click)="closeSupplierProfileModal()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <!-- modal-header -->
+            <div class="modal-body" style="padding: 15px 30px;">
+                <div class="row viewMode">
+                    <div class="col-md-3">
+                        <div class="companyLogo">
+                            <img
+                                style="max-height: 260px; max-width: 100%;"
+                                class="img-responsive"
+                                src="{{ profileData.logo_url }}"
+                                alt="Company Logo"
+                            />
+                        </div>
+                        <!-- companyLogo -->
+
+                        <div class="companyName">{{ profileData.companyName }}</div>
+                        <!-- Company Name -->
+
+                        <div class="companyAddress">
+                            <address
+                                *ngIf="
+                                    profileData.address.addressLine1 ||
+                                    profileData.address.country ||
+                                    profileData.address.city ||
+                                    profileData.address.state
+                                "
+                            >
+                                <span>{{ profileData.address.addressLine1 }}</span
+                                ><br />
+                                <span>{{ profileData.address.addressLine2 }}</span
+                                ><br />
+                                <span>{{ profileData.address.city }}</span
+                                ><br />
+                                <span>{{ profileData.address.state }}</span
+                                ><br />
+                                <span>{{ profileData.address.country }} - {{ profileData.address.zip }}</span
+                                ><br />
+                            </address>
+
+                            <p
+                                class="disabled-text"
+                                style="text-align: left !important;"
+                                *ngIf="
+                                    !profileData.address.addressLine1 &&
+                                    !profileData.address.country &&
+                                    !profileData.address.city &&
+                                    !profileData.address.state
+                                "
+                            >
+                                {{ 'Address / Location Not Provided' | translate }}
+                            </p>
+                        </div>
+                        <!-- Address -->
+
+                        <div class="contact">
+                            <h4>{{ 'Contact Person' | translate }}</h4>
+                            <p class="contactName">{{ profileData.contactPersonName }}</p>
+                            <p class="contactEmail">{{ profileData.contactEmail }}</p>
+                            <p class="contactMobile">{{ profileData.contactMobile }}</p>
+                        </div>
+                        <!-- contact -->
+                    </div>
+                    <!-- col -->
+
+                    <div class="col-md-9">
+                        <div class="description" *ngIf="profileData?.description?.length > 1">
+                            <h4>{{ 'Description' | translate }}</h4>
+                            <p style="text-align: justify; text-justify: inter-word;">{{ profileData.description }}</p>
+                        </div>
+                        <!-- description -->
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="valueProcesses" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Value Processes' | translate }} ({{ valueProcesses?.length }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 12</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="valueProcessesContainer">
+                                        <p class="noMaterials pt-1" *ngIf="valueProcesses?.length <= 0">
+                                            {{ 'No Value Processes' | translate }}
+                                        </p>
+                                        <ul class="list-unstyled list-inline itemList">
+                                            <li class="item" *ngFor="let vp of valueProcesses | sortByFilter">
+                                                {{ vp }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- valueProcessesContainer -->
+                                </div>
+                                <!-- ValueProcesses -->
+
+                                <div class="materials" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Materials' | industry | translate }} ({{ materials?.length }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 11</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="materialsContainer">
+                                        <p class="noMaterials pt-1" *ngIf="materials?.length <= 0">
+                                            {{ 'No Materials' | industry | translate }}
+                                        </p>
+                                        <ul class="list-unstyled list-inline itemList">
+                                            <li class="item" *ngFor="let material of materials | sortByFilter">
+                                                {{ material }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- materialsContainer -->
+                                </div>
+                                <!-- materials -->
+
+                                <div class="standards" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Standards' | translate }} &amp; {{ 'Certifications' | translate }} ({{
+                                                standards?.length
+                                            }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 9</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="standardsContainer">
+                                        <p class="noMaterials pt-1" *ngIf="standards?.length <= 0">
+                                            {{ 'No Standards' | translate }} &amp; {{ 'Certifications' | translate }}
+                                        </p>
+                                        <div class="row" *ngIf="standards?.length > 0">
+                                            <div
+                                                class="col-md-2 standardsImageContainer"
+                                                tooltip="{{ getDisplayText(standard) }}"
+                                                data-placement="top"
+                                                container="body"
+                                                *ngFor="let standard of standards; let i = index"
+                                            >
+                                                <img
+                                                    class="img-responsive standardsImage"
+                                                    src="{{ getStandardImageUrl(standard) }}"
+                                                    alt=""
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- standardsContainer -->
+                                </div>
+                                <!-- standards -->
+                                <div class="todoContainer">
+                                    <div class="todoTitle">
+                                        <h4>{{ 'To-Do : List' | translate }}</h4>
+                                    </div>
+                                    <!-- todoTitle -->
+                                    <ol class="list-unstyled todoList">
+                                        <li
+                                            class="todoList-item check_box_group"
+                                            *ngFor="let task of todoTask_data.tasks; let i = index"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                id="{{ task.title }}"
+                                                (change)="saveTodoStatus($event, task)"
+                                                name="{{ task.title }}"
+                                                [checked]="task.itemStatus === todoStatus.COMPLETED"
+                                            />
+                                            <label for="{{ task.title }}">
+                                                <span></span>
+                                            </label>
+                                            <input
+                                                (keydown.enter)="updateTodo(task, i)"
+                                                #todoItem
+                                                class="todoEditableItem"
+                                                *ngIf="todoEditable[i]"
+                                                type="text"
+                                                [(ngModel)]="task.title"
+                                            />
+                                            <span *ngIf="!todoEditable[i]">{{ task.title }}</span>
+                                            <i
+                                                (click)="removeTodo(task.itemId, i)"
+                                                class="todoDelete fa fa-trash pull-right"
+                                            ></i>
+                                            <i (click)="editTodo(i)" class="todoDelete fa fa-pencil pull-right"></i>
+                                        </li>
+                                    </ol>
+                                    <!-- todoList -->
+                                    <div class="newTodoContainer">
+                                        <input
+                                            type="text"
+                                            name="newTaskTitle"
+                                            [(ngModel)]="newTask.title"
+                                            (keydown.enter)="createTodo()"
+                                            placeholder="{{ 'Please enter new todo' | translate }}"
+                                        />
+                                    </div>
+                                </div>
+                                <!-- todoContainer -->
+                            </div>
+                            <!-- col -->
+
+                            <div class="col-md-4">
+                                <div class="facilities">
+                                    <h4>
+                                        <ng-template
+                                            [ngIf]="
+                                                profileData.Facilities?.length === 0 ||
+                                                profileData.Facilities?.length === 1
+                                            "
+                                            >{{ 'Facility' | translate }}</ng-template
+                                        >
+                                        <ng-template [ngIf]="profileData.Facilities?.length > 1">{{
+                                            'Facilities' | translate
+                                        }}</ng-template>
+                                        ({{ profileData.Facilities?.length }})
+                                    </h4>
+                                    <div class="facilitiesContainer">
+                                        <p class="noMaterials pt-1" *ngIf="profileData.Facilities?.length <= 0">
+                                            {{ 'No Facilities' | translate }}
+                                        </p>
+                                        <ul class="list-unstyled">
+                                            <li *ngFor="let facility of profileData.Facilities">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <span
+                                                            class="facility-name hyperlink"
+                                                            (click)="openFacilityInfoModal(facility)"
+                                                            >{{ facility.name }}</span
+                                                        >
+                                                    </div>
+                                                    <!-- col -->
+                                                    <div class="col-md-6">
+                                                        <span
+                                                            class="disabled-text fs-12"
+                                                            *ngIf="!facility.address.country"
+                                                            >{{ 'Not Specified' | translate }}</span
+                                                        >
+                                                        <span>{{ facility.address.country }}</span>
+                                                        <span
+                                                            class="flag-icon flag-icon-{{
+                                                                getCountryCode(facility.address.country)
+                                                            }}"
+                                                        ></span>
+                                                    </div>
+                                                    <!-- col -->
+                                                </div>
+                                                <!-- row -->
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- facilitiesContainer -->
+                                </div>
+                                <!-- facilities -->
+                            </div>
+                            <!-- col -->
+                        </div>
+                        <!-- row -->
+                    </div>
+                    <!-- col -->
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer" style="text-align: center !important;">
+                <button class="btn btn-reset reset-password-button" (click)="closeSupplierProfileModal()">
+                    {{ 'Close' | translate }}
+                </button>
+            </div>
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->
+
+<div
+    bsModal
+    #facilityInfoModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="facilityInfoModal"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">{{ viewingFacility?.name }}</h4>
+                <button type="button" class="close pull-right" (click)="facilityInfoModal.hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <!-- modal-header -->
+            <div class="modal-body" style="padding: 15px 30px;">
+                <div class="row viewMode" *ngIf="viewingFacility">
+                    <div class="col-md-3">
+                        <div class="companyLogo">
+                            <img
+                                style="max-height: 260px; max-width: 100%;"
+                                class="img-responsive"
+                                src="{{ profileData.logo_url }}"
+                                alt="Company Logo"
+                            />
+                        </div>
+                        <!-- companyLogo -->
+
+                        <div class="companyName">{{ viewingFacility.name }}</div>
+                        <!-- Company Name -->
+
+                        <div class="companyAddress">
+                            <address
+                                *ngIf="
+                                    viewingFacility.address.addressLine1 ||
+                                    viewingFacility.address.country ||
+                                    viewingFacility.address.city ||
+                                    viewingFacility.address.state
+                                "
+                            >
+                                <div *ngIf="viewingFacility.address.addressLine1">
+                                    {{ viewingFacility.address.addressLine1 }}
+                                </div>
+                                <div *ngIf="viewingFacility.address.addressLine2">
+                                    {{ viewingFacility.address.addressLine2 }}
+                                </div>
+                                <div *ngIf="viewingFacility.address.city">{{ viewingFacility.address.city }}</div>
+                                <div *ngIf="viewingFacility.address.state">{{ viewingFacility.address.state }}</div>
+                                <div>
+                                    {{ viewingFacility.address.country }}
+                                    <ng-template [ngIf]="viewingFacility.address.zip">-</ng-template>
+                                    {{ viewingFacility.address.zip }}
+                                </div>
+                                <br />
+                            </address>
+
+                            <p
+                                class="disabled-text fs-12"
+                                style="text-align: left !important;"
+                                *ngIf="
+                                    !viewingFacility.address.addressLine1 &&
+                                    !viewingFacility.address.country &&
+                                    !viewingFacility.address.city &&
+                                    !viewingFacility.address.state
+                                "
+                            >
+                                {{ 'Location Not Provided' | translate }}
+                            </p>
+                        </div>
+                        <!-- Address -->
+
+                        <div class="contact">
+                            <h4>{{ 'Contact Person' | translate }}</h4>
+                            <p class="contactName">{{ profileData.contactPersonName }}</p>
+                            <p class="contactEmail">{{ profileData.contactEmail }}</p>
+                            <p class="contactMobile">{{ profileData.contactMobile }}</p>
+                        </div>
+                        <!-- contact -->
+                    </div>
+                    <!-- col -->
+
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="valueProcesses" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Value Processes' | translate }} ({{
+                                                viewingFacility.valueProcess?.length
+                                            }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 12</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="valueProcessesContainer">
+                                        <p
+                                            class="noMaterials pt-1 fs-14"
+                                            *ngIf="viewingFacility.valueProcess?.length <= 0"
+                                        >
+                                            {{ 'No Value Processes' | translate }}
+                                        </p>
+                                        <ul class="list-unstyled list-inline itemList">
+                                            <li class="item" *ngFor="let vp of viewingFacility.valueProcess">
+                                                {{ getDisplayText(vp) }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- valueProcessesContainer -->
+                                </div>
+                                <!-- ValueProcesses -->
+
+                                <div class="materials" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Materials' | industry | translate }} ({{
+                                                viewingFacility.materials?.length
+                                            }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 11</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="materialsContainer">
+                                        <p
+                                            class="noMaterials pt-1 fs-14"
+                                            *ngIf="viewingFacility.materials?.length <= 0"
+                                        >
+                                            {{ 'No Materials' | industry | translate }}
+                                        </p>
+                                        <ul class="list-unstyled list-inline itemList">
+                                            <li class="item" *ngFor="let material of viewingFacility.materials">
+                                                {{ getDisplayText(material) }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- materialsContainer -->
+                                </div>
+                                <!-- materials -->
+
+                                <div class="standards" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Standards' | translate }} &amp; {{ 'Certifications' | translate }} ({{
+                                                viewingFacility.standards?.length
+                                            }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 9</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="standardsContainer">
+                                        <p
+                                            class="noMaterials pt-1 fs-14"
+                                            *ngIf="viewingFacility.standards?.length <= 0"
+                                        >
+                                            {{ 'No Standards' | translate }} &amp; {{ 'Certifications' | translate }}
+                                        </p>
+                                        <div class="row" *ngIf="viewingFacility.standards?.length > 0">
+                                            <div
+                                                class="col-md-2 standardsImageContainer"
+                                                tooltip="{{ getDisplayText(standard) }}"
+                                                data-placement="top"
+                                                container="body"
+                                                *ngFor="let standard of viewingFacility.standards; let i = index"
+                                            >
+                                                <img
+                                                    class="img-responsive standardsImage"
+                                                    src="{{ getStandardImageUrl(standard) }}"
+                                                    alt=""
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- standardsContainer -->
+                                </div>
+                                <!-- standards -->
+                            </div>
+                            <!-- col -->
+
+                            <div class="col-md-4">
+                                <div class="facilities">
+                                    <h4>{{ 'Facility Location' | translate }}</h4>
+                                    <div class="facilitiesContainer">
+                                        <p
+                                            class="noMaterials disabled-text fs-14 pt-1"
+                                            *ngIf="!viewingFacility.address?.country"
+                                        >
+                                            {{ 'Not Provided' | translate }}
+                                        </p>
+                                        <p class="pt-1">
+                                            <span
+                                                class="flag-icon flag-icon-{{
+                                                    getCountryCode(viewingFacility.address?.country)
+                                                }}"
+                                            ></span>
+                                            <span style="margin-left: 10px;">{{
+                                                viewingFacility.address?.country
+                                            }}</span>
+                                        </p>
+                                    </div>
+                                    <!-- facilitiesContainer -->
+                                </div>
+                                <!-- facilities -->
+                            </div>
+                            <!-- col -->
+                        </div>
+                        <!-- row -->
+                    </div>
+                    <!-- col -->
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer" style="text-align: center !important;">
+                <button class="btn btn-reset reset-password-button" (click)="facilityInfoModal.hide()">
+                    {{ 'Close' | translate }}
+                </button>
+            </div>
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->

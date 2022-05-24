@@ -1,0 +1,127 @@
+@import '~styles/variables';
+
+.orders-association-table {
+    max-height: 500px;
+    overflow: auto;
+    padding: 10px 1px 30px 1px;
+}
+
+.material-composition {
+    height: 350px;
+    .mat-table,
+    div.no-data-available {
+        height: 100%;
+        overflow: auto;
+        border-radius: 5px;
+        box-shadow: 0 0 4px #ccc;
+    }
+    div.no-data-available {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: $font-family-Semibold;
+        font-size: 15px;
+        color: #ccc;
+    }
+    .mat-header-row {
+        position: sticky;
+        position: -webkit-sticky;
+        top: 0;
+        background-color: inherit;
+        text-transform: uppercase;
+        font-family: $font-family-Bold;
+        box-shadow: 0 0 16px #ccc;
+    }
+    .mat-header-cell,
+    .mat-cell {
+        color: #325992;
+        padding: 0 0 0 10px;
+        font-size: 15px;
+        font-family: $font-family-Semibold;
+    }
+    .mat-header-cell {
+        text-transform: capitalize;
+        font-family: $font-family-Bold;
+        &:last-child {
+            justify-content: center;
+        }
+    }
+    .mat-row {
+        border-bottom: 0;
+        font-family: $font-family-Semibold;
+    }
+    .materials-icon {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 15%;
+    }
+}
+
+.supply-chain {
+    border: 1px solid #d4d4d4;
+    border-radius: 10px;
+    padding: 10px;
+    position: relative;
+
+    .supplychain-supplier-name {
+        overflow-wrap: break-word;
+        display: flex;
+        flex-direction: column;
+
+        .supply-chain-flag-country {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .heading-sub-title-gray {
+            width: 80%;
+        }
+    }
+    .load-supply-chain-tree {
+        position: absolute;
+        background: #fff;
+        height: 90%;
+        width: 95%;
+        i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate((-50%, -50%));
+        }
+    }
+}
+.no-supply-chain {
+    width: 100%;
+    height: 290px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    img {
+        width: 75px;
+    }
+}
+.mat-row:nth-child(even) {
+    background-color: $background-color-primary-tr;
+    &.row-selected {
+        background: $background-color-primary-selected-tr;
+    }
+}
+.mat-row:nth-child(odd) {
+    background-color: #fff;
+    &.row-selected {
+        background: $background-color-primary-selected-tr;
+    }
+}
+.heading-title {
+    font-family: $font-family-Bold;
+    font-size: 16px !important;
+    color: #325992 !important;
+    height: 45px;
+    padding-top: 15px;
+}
+
+.material-composition .mat-header-cell:last-child {
+    justify-content: start !important;
+}

@@ -1,0 +1,35 @@
+@import '~styles/variables';
+
+.entity-article-row {
+    height: 59px;
+    margin-right: -5px;
+    display: flex;
+    align-items: center;
+    color: $text-color-primary;
+    font-family: $font-family-Semibold;
+    cursor: pointer;
+
+    &.odd-row {
+        background: $background-color-primary-tr;
+    }
+    &.even-row {
+        background: #fff;
+    }
+    &.odd-row.row-selected {
+        background: $background-color-primary-selected-tr;
+    }
+    &.even-row.row-selected {
+        background: $background-color-primary-selected-tr;
+    }
+}
+
+.article-data-collection {
+    word-break: break-word;
+    padding-right: 10px;
+}
+
+.no-ponumber {
+    color: #a7a7a7;
+    font-family: $font-family-Semibold;
+    font-size: 14px;
+}

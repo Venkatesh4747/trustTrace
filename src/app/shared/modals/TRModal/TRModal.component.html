@@ -1,0 +1,37 @@
+<div bsModal #TRModal="bs-modal" id="trInfo" class="modal fade" tabindex="-1" role="dialog"
+     aria-labelledby="TRModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content" *ngIf="modalData.length > 0">
+      <div class="modal-header blue-head">
+        <h4 class="modal-title pull-left">{{'Traceability Requests' | translate}}</h4>
+        <button type="button" class="close pull-right" (click)="hide()" aria-label="Close">
+          <img class="sni" src="{{env.IMG_URL}}images/close.png">
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+              <h4>{{'Details' | translate}}</h4>
+              <h5 *ngFor="let trData of modalData">
+                {{trData.styleName}}
+              </h5>
+            </div>
+            <div class="col-md-2"></div>
+          </div>
+          <div class="clearfix"></div>
+        </div><!-- container-fluid -->
+      </div>
+
+      <div class="modal-footer">
+        <div class="col-md-6 text-left"></div>
+        <div class="col-md-6">
+          <button type="button" class="btn btn-blue" data-dismiss="modal" (click)="hide()">
+              {{'Close' | translate}}
+          </button>
+        </div>
+      </div> <!-- modal-footer-->
+    </div> <!-- modal-content-->
+  </div> <!-- modal-dialog -->
+</div> <!-- bs-modal-->

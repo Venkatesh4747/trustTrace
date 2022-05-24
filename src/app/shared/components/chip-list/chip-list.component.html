@@ -1,0 +1,13 @@
+<div class="sub-supplier-hr hr">
+    <span class="hr-title">{{ title | translate | uppercase }}</span>
+</div>
+<p class="noMaterials pt-1" *ngIf="!chipList?.length">
+    {{ getNoDataDisplayName | translate }}
+</p>
+<div id="profile-chip-list">
+    <mat-chip-list>
+        <mat-chip class="{{ title }}-chip-style" *ngFor="let chip of getDisplayTextForList() | sortByFilter">{{
+            chip
+        }}</mat-chip>
+    </mat-chip-list>
+</div>

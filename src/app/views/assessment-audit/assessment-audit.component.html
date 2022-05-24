@@ -1,0 +1,388 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header no-border">
+            <div id="audits-header" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-35 pl-0">
+                <div class=" header-search">
+                    <div class="page-title">
+                        <div>{{ 'Audit' | translate }}</div>
+                        <div class="page-description font-color-primary">
+                            {{ 'Record and Manage your audits' | translate }}
+                        </div>
+                    </div>
+                    <div class="header-search">
+                        <div class="title-right-search" *ngIf="tabDetail !== 'Drafts'">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Search for audits' | translate }}"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchAudit($event)"
+                                data-cy="assessments-audit-search"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <div id="header-audit-btn-container">
+                            <div class="mt-0">
+                                <a routerLink="record-audit">
+                                    <button class="btn btn-lg btn-blue pull-right btn-gradient cs-btn">
+                                        <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" />
+                                        <span>{{ 'Record Audit Manually' | translate }}</span>
+                                    </button>
+                                </a>
+                            </div>
+                            <div class="mt-1" *ngIf="authServiceHaveAccess('AUDIT_DRAFT_CREATE')">
+                                <a routerLink="upload-audit">
+                                    <button
+                                        type="button"
+                                        class="btn btn-lg btn-blue pull-right btn-gradient cs-btn upload-audit-btn-container"
+                                    >
+                                        <img src="{{ env.IMG_URL }}images/upload-blue-icon.png" alt="Upload" />
+                                        <span>{{ 'Upload Audit Document' | translate }}</span>
+                                    </button>
+                                </a>
+                            </div>
+                            <div *ngIf="authServiceHaveAccess('AUDIT_DRAFT_CREATE')" class="upload-audit-btn-text">
+                                {{ 'Upload document to record Audit' | translate }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div id="export-audit-btn-container">
+                    <button
+                        type="button"
+                        class="btn btn-lg pull-right btn-gradient cs-btn"
+                        (click)="downloadAuditDataAsExcel()"
+                        [disabled]="!isDataAvailable"
+                    >
+                        <img src="{{ env.IMG_URL }}images/share.png" alt="Add" />
+                        <ng-template [ngIf]="!isProcessing">
+                            {{ 'Export Audits' | translate }}
+                        </ng-template>
+
+                        <ng-template [ngIf]="isProcessing">
+                            <div class="spinner-wrapper">
+                                <span>{{ 'downloading' | translate }}</span>
+                                <mat-spinner [diameter]="14"></mat-spinner>
+                            </div>
+                        </ng-template>
+                    </button>
+                </div> -->
+            </div>
+            <!-- col -->
+        </div>
+        <!-- row -->
+
+        <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="auditsFilters">
+            <div class="col-md-12" *ngIf="tabDetail !== 'Drafts'">
+                <ul class="filter-bar-container">
+                    <li *ngFor="let filter of auditsFilters | keys; let filterInd = index">
+                        <app-tt-multi-select-search
+                            (selectionChange)="handleFilterSelection()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="filter_session"
+                            [optionsParam]="optionsParam"
+                            [data_cy]="removeSpace(filter.key)"
+                        >
+                        </app-tt-multi-select-search>
+                    </li>
+                    <li class="reset-filters">
+                        <button
+                            class="button-badge mat-button btn btn-gray"
+                            (click)="resetAllFilters()"
+                            data-cy="assessment-audit-reset-all-filters"
+                        >
+                            {{ 'Reset all filters' | translate }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-12 col-xs-12 col-s-12 col-lg-12">
+                <div id="submenu" class="toby">
+                    <div
+                        class="form-group bottom ml-1 cursor-default"
+                        [ngClass]="{ selected: tabDetail === 'Audits' }"
+                        (click)="routeToTab('Audits')"
+                    >
+                        <label class="cursor-pointer">{{ 'Audits' | translate }}</label>
+                        <div [ngClass]="{ selected: tabDetail === 'Audits' }"></div>
+                    </div>
+                    <div
+                        *ngIf="authServiceHaveAccess('AUDIT_DRAFT_READ')"
+                        class="form-group bottom cursor-default"
+                        [ngClass]="{ selected: tabDetail === 'Drafts' }"
+                        (click)="routeToTab('Drafts')"
+                    >
+                        <label class="cursor-pointer display-flex-justify-align-items-center">
+                            <span>{{ 'Drafts' | translate }}</span>
+                            <span class="notification-badge ml-1" *ngIf="notificationCount > 0">{{
+                                notificationCount
+                            }}</span>
+                        </label>
+                        <div [ngClass]="{ selected: tabDetail === 'Drafts' }"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                <div class="row">
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 total-count">
+                        <div class="float-l" *ngIf="tabDetail === 'Audits' && audits && totalCount > 0">
+                            <app-card-pagination
+                                [paginationStart]="pagination.from + 1"
+                                [fetchSize]="pagination.size"
+                                [totalItemsCount]="totalCount"
+                                moduleName="Audits"
+                                (previous)="onScroll('back')"
+                                (next)="onScroll('next')"
+                            ></app-card-pagination>
+                        </div>
+                        <div class="float-l" *ngIf="tabDetail === 'Drafts' && drafts && totalCount > 0">
+                            <app-card-pagination
+                                [paginationStart]="pagination.from + 1"
+                                [fetchSize]="pagination.size"
+                                [totalItemsCount]="totalCount"
+                                moduleName="Draft Audits"
+                                (previous)="onScroll('back')"
+                                (next)="onScroll('next')"
+                            ></app-card-pagination>
+                        </div>
+                        <div class="export-audit-btn-container" *ngIf="tabDetail === 'Audits'">
+                            <button
+                                class="cs-btn export-audit"
+                                data-cy="audit-test-export-btn"
+                                (click)="downloadAuditDataAsExcel()"
+                                [disabled]="!(totalCount > 0)"
+                            >
+                                <img src="{{ env.IMG_URL }}images/share.png" alt="Download" />
+                                <ng-template [ngIf]="!isProcessing">
+                                    {{ 'Export Audits' | translate }}
+                                </ng-template>
+                                <ng-template [ngIf]="isProcessing">
+                                    <div class="spinner-wrapper">
+                                        <span>{{ 'Downloading' | translate }}</span>
+                                        <mat-spinner [diameter]="14"></mat-spinner>
+                                    </div>
+                                </ng-template>
+                            </button>
+                        </div>
+                    </div>
+                    <div
+                        class="col-xs-4 col-sm-4 col-md-4 col-lg-4 audit-sort-wrapper pr-4"
+                        *ngIf="tabDetail !== 'Drafts'"
+                    >
+                        <div class="audit-left-align-container" *ngIf="authServiceHaveAccess('HIGG_READ')">
+                            <div
+                                [ngStyle]="{ opacity: canEnableHiggSync ? 1 : 0.5 }"
+                                [popover]="higgDisabledTooltip"
+                                containerClass="higgSyncDisableInfoTooltip"
+                                triggers=""
+                                [isOpen]="!canEnableHiggSync && canShowDisabledTooltip"
+                                (mouseenter)="togglePopOverHandler(true)"
+                                (mouseleave)="togglePopOverHandler(false)"
+                            >
+                                <img
+                                    class="higg-sync-img"
+                                    src="{{ env.IMG_URL }}images/higg/refresh_image.png"
+                                    alt="Sync Higg Assessments"
+                                />
+                                <span class="refresh-audit-btn" (click)="longPollingApiInvoke(true)">
+                                    {{ 'Sync Higg Assessments' | translate }}
+                                </span>
+                                <span
+                                    class="higg-sync-info-icon"
+                                    tooltip="{{
+                                        'On clicking this it will fetch new assessments from Higg platform. And also will update the scores/status for the integrated Higg audits.'
+                                            | translate
+                                    }}"
+                                    [isDisabled]="!canEnableHiggSync"
+                                >
+                                    i
+                                </span>
+                            </div>
+                        </div>
+                        <div dropdown class="audit-left-align-container dropdown sort-dropdown">
+                            <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                <span class="sort-name"
+                                    >{{ 'Sort By' | translate }}
+                                    <i class="fa fa-angle-down"></i>
+                                </span>
+                            </a>
+                            <ul *dropdownMenu class="dropdown-menu">
+                                <li>
+                                    <mat-radio-group [(ngModel)]="sortByFilter.sortBy" (change)="handleSortBy()">
+                                        <mat-radio-button value="name">
+                                            {{ 'Alphabetical Order' | translate }}
+                                        </mat-radio-button>
+                                        <mat-radio-button value="create_ts">
+                                            {{ 'Newly Added' | translate }}
+                                        </mat-radio-button>
+                                        <!-- <mat-radio-button value="rating"> {{ 'Rating' | translate }} </mat-radio-button> -->
+                                        <p style="visibility: hidden;"></p>
+                                    </mat-radio-group>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Sort Dropdown -->
+                    </div>
+                    <!-- Column -->
+                </div>
+            </div>
+            <!-- col -->
+        </div>
+
+        <div
+            class="row audits-table"
+            [ngStyle]="{ 'top.px': height }"
+            *ngIf="tabDetail === 'Audits' && audits && audits.length >= 0"
+        >
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="no-assessments" *ngIf="audits.length === 0">
+                    {{ 'No' | translate }} <span tooltip="Traceability Requests">{{ 'Audits' | translate }}</span>
+                </div>
+                <div class="table-responsive" *ngIf="audits.length > 0">
+                    <div class="table-card" *ngFor="let audit of audits; let index = index">
+                        <div class="table-card-left" routerLink="{{ audit.id }}">
+                            <a class="title">{{ audit.name }}</a>
+                            <div class="desc">
+                                {{ 'Name of the supplier' | translate }}:
+                                <span class="font-family-semi-bold">{{ audit.supplier_name }}</span>
+                            </div>
+                            <div class="desc">
+                                {{ 'Name of the facility' | translate }}:
+                                <span class="font-family-semi-bold">{{ audit.facility.name }}</span>
+                            </div>
+                            <div class="desc">
+                                {{ 'Audit Date' | translate }}:
+                                <span class="font-family-semi-bold">{{
+                                    audit.date_of_audit | date: 'mediumDate'
+                                }}</span>
+                            </div>
+                            <div class="desc">
+                                {{ 'Validity Till' | translate }}:
+                                <span class="font-family-semi-bold">{{ audit.valid_till | date: 'mediumDate' }}</span>
+                            </div>
+                            <div class="desc">
+                                {{ 'Audit Standard' | translate }}:
+                                <span class="font-family-semi-bold">{{ audit.standard }}</span>
+                            </div>
+                        </div>
+                        <div class="table-card-right flex-column justify-flex-end">
+                            <div class="action-item flex-end">
+                                <a
+                                    class="tooltip-bottom"
+                                    tooltip="{{ 'Edit' | translate }}"
+                                    (click)="editAudit(audit.id)"
+                                    data-placement="bottom"
+                                    style="padding-right: 10px;"
+                                >
+                                    <img src="{{ env.IMG_URL }}images/edit.png" />
+                                </a>
+                                <a
+                                    class="tooltip-bottom"
+                                    tooltip="{{ 'Delete' | translate }}"
+                                    (click)="deleteAudit(audit.id, index)"
+                                    data-placement="bottom"
+                                >
+                                    <img src="{{ env.IMG_URL }}images/questionaire-del.png" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div
+            class="row audits-table"
+            [ngStyle]="{ 'top.px': height }"
+            *ngIf="tabDetail === 'Drafts' && drafts && drafts.length >= 0"
+            infiniteScroll
+            [infiniteScrollDistance]="0.5"
+            (scrolled)="onDraftScroll()"
+            [scrollWindow]="false"
+            [infiniteScrollDisabled]="disableInfiniteScroll"
+        >
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="no-assessments" *ngIf="drafts.length === 0">
+                    {{ 'No' | translate }} <span tooltip="Audit Drafts">{{ 'Drafts' | translate }}</span>
+                </div>
+                <div class="table-responsive" *ngIf="drafts.length > 0">
+                    <div
+                        class="table-card drafts-table-card card-pointer"
+                        *ngFor="let draft of drafts; let index = index"
+                        (click)="openExtractedFile(draft.id, draft.status, $event)"
+                    >
+                        <!-- <div class="table-card-left" routerLink="{{ draft.id }}"> -->
+                        <div class="table-card-left">
+                            <div class="desc">
+                                <span class="font-family-semi-bold">
+                                    {{ draft.audit_type.value }} - {{ draft.audit_name }}</span
+                                >
+                            </div>
+                            <div class="desc">
+                                {{ 'Audit Standard' | translate }}:
+                                <span class="font-family-semi-bold">
+                                    {{ draft.audit_type.value }}
+                                </span>
+                            </div>
+                            <div class="desc" *ngIf="+draft.status === 20 || +draft.status === 30">
+                                <span class="font-family-semi-bold verification-status">
+                                    {{
+                                        getExtractionStatus(draft.status) +
+                                            (+draft.status === 20
+                                                ? ''
+                                                : ', '('Please enter audit data manually' | translate))
+                                    }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="table-card-right flex-column">
+                            <div class="action-item flex-end">
+                                <span class="status-text">
+                                    <i
+                                        class="fa fa-circle"
+                                        [ngClass]="getStatusColor(+draft.status === 20 ? 35 : draft.status)"
+                                    >
+                                    </i>
+                                </span>
+                                <span class="desc">
+                                    {{ 'Status' | translate }}:
+                                    <span class="font-family-semi-bold" *ngIf="+draft.status === 20">
+                                        {{ 'Extraction ' + getExtractionStatus(35) }}
+                                    </span>
+                                    <span class="font-family-semi-bold" *ngIf="+draft.status !== 20">
+                                        {{ getExtractionStatus(draft.status) }}
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="action-item flex-end">
+                                <a
+                                    class="tooltip-bottom"
+                                    tooltip="Delete"
+                                    (click)="deleteDraft(draft, index)"
+                                    data-placement="bottom"
+                                >
+                                    <img src="{{ env.IMG_URL }}images/questionaire-del.png" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- container-fluid -->
+</div>
+<!-- views-container -->
+
+<ng-template #higgDisabledTooltip>
+    <div>
+        {{ 'Disabled due to the' | translate }} <br />
+        {{ 'Assessments is getting' | translate }} <br />
+        {{ 'fetched' | translate }}
+    </div>
+</ng-template>
+
+<router-outlet></router-outlet>

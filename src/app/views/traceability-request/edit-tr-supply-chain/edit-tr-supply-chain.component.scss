@@ -1,0 +1,171 @@
+@import '~styles/variables';
+
+.create-supply-chain {
+    font-family: 'Source Sans Pro-Regular';
+    color: #325992;
+    font-size: 17px;
+    text-align: left;
+}
+
+.manufacturer-name {
+    color: $text-color;
+    font-weight: bold;
+}
+
+.entity-table {
+    background-color: $border-color-secondary;
+    display: flex;
+    align-items: center;
+    min-height: 59px;
+    padding: 0 10px;
+    margin-right: 20px;
+    .tr-title {
+        color: #fff !important;
+    }
+}
+
+.tt-dropdown-search-container {
+    .mat-form-field-label {
+        font-size: 14px;
+    }
+}
+
+.construct-supply-chain-data {
+    position: absolute;
+    width: 90%;
+    height: 500px;
+    text-align: center;
+    margin-top: 100px;
+}
+
+.cancel-btn,
+.save-btn {
+    border-radius: 5px;
+    width: auto;
+}
+
+.talign-right {
+    .btn {
+        margin-left: 10px;
+        padding: 0 30px;
+        &.save-btn {
+            background: transparent;
+            border-radius: 4px;
+            border: solid 1px #8e8e8e;
+            height: 36px;
+            color: #4b4b4b;
+            vertical-align: middle;
+            &:focus,
+            &:hover {
+                color: #4b4b4b;
+            }
+        }
+        &:last-child {
+            margin-right: 15px;
+        }
+    }
+}
+.vertical-dotted-line {
+    border-bottom: 2px dashed $border-color-primary;
+}
+
+#toCollectFromSupplier-overlay {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    /* background-color: #ccc;
+    z-index: 2;
+    opacity: 0.5; */
+}
+.edit-button-block {
+    margin-right: 15px;
+}
+mat-checkbox {
+    display: block;
+}
+
+.manufacturer-name {
+    display: inline-block;
+    padding: 15px 5px 15px 0;
+    color: #03b2e6;
+    span {
+        color: #325992;
+        margin-top: 15px;
+        margin-bottom: 30px;
+        display: inline-block;
+    }
+}
+.edit-manufacture-details {
+    width: 290px;
+}
+.edit-manufacture-details,
+.edit-manufacture-radio-block {
+    padding-left: 20px;
+}
+
+.edit-manufacture-btn {
+    margin-left: 20px;
+}
+.check-trader-block {
+    padding: 25px;
+    padding-bottom: 30px;
+    margin: 25px 25px 5px 20px;
+    border-radius: 6px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2);
+    background-color: #ffffff;
+    font-size: 14px;
+    color: #325992;
+    app-tt-supplier-search {
+        #tt-supplier-search-container {
+            display: inline-block;
+        }
+        display: inline-block;
+    }
+    .collect-maufacture-checkbox {
+        display: inline-block;
+    }
+    .form-control {
+        display: inline-block;
+        width: 180px;
+        background: transparent;
+        border: 1px solid #bababa;
+        border-radius: 4px;
+        vertical-align: middle;
+        margin-left: 5px;
+        padding-left: 15px;
+        height: 40px;
+        &:focus {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+}
+
+.manufacturer-description {
+    font-size: 14px;
+    padding-bottom: 5px;
+    padding-right: 5px;
+}
+
+.manufacturer-label {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.material-input-style-box-type {
+    mat-checkbox {
+        display: block;
+    }
+}
+
+.table-cont.table-t-trace .table > tbody.product-category-tbody {
+    max-height: calc(100vh - 20em);
+}
+
+.table-cont.table-t-trace .table > thead.product-category-thead > tr > th {
+    &:last-child {
+        width: 240px !important;
+    }
+}

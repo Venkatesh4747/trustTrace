@@ -1,0 +1,496 @@
+@import './variables';
+
+.mat-expansion-panel-header .ng-animating,
+.mat-expansion-panel-content .ng-animating {
+    visibility: hidden;
+}
+.mat-form-field-label .mat-placeholder-required {
+    color: red;
+}
+#tt-form-field {
+    font-family: $font-family-Bold;
+    padding-bottom: 5px;
+}
+.tt-input-label {
+    font-family: $font-family-Bold;
+    font-size: 16px;
+    color: #325992 !important;
+}
+.tt-title {
+    font-family: $font-family-Bold;
+    font-size: 15px;
+    color: #325992 !important;
+}
+.tt-table-title-with-background {
+    font-family: $font-family-Bold;
+    font-size: 15px;
+    color: #fff !important;
+}
+.tt-radio-button-group {
+    font-family: $font-family-Regular;
+    color: $text-color-primary;
+    font-size: 15px;
+    .tt-radio-button-title {
+        font-family: $font-family-Bold;
+        padding-bottom: 15px;
+    }
+    .mat-radio-button {
+        padding: 10px 15px 10px 0px;
+    }
+    .mat-radio-outer-circle {
+        border-color: $text-color-primary !important;
+    }
+    .mat-radio-inner-circle {
+        background-color: $text-color-primary !important;
+    }
+    .mat-radio-label-content {
+        font-family: $font-family-Semibold;
+        color: $text-color-primary !important;
+    }
+    .showInRow {
+        display: flex;
+        flex-direction: column;
+        .mat-radio-button {
+            margin: 0 5px;
+        }
+    }
+}
+
+.mat-form-field {
+    .mat-form-field-infix {
+        padding: 1em 0 0.5em 0;
+        input {
+            color: $text-color-primary;
+        }
+    }
+}
+
+.mat-radio-outer-circle {
+    border-color: $text-color-primary !important;
+}
+.mat-radio-inner-circle {
+    background-color: $text-color-primary !important;
+}
+
+/* this will hide the element while it's being animated because
+   the animation happens for the original position */
+.mat-select-panel.ng-animating {
+    // display: none;
+}
+
+.cdk-overlay-container .cdk-overlay-pane .select-panel {
+    margin-top: 2em;
+    min-width: 95% !important;
+    float: left;
+    margin-left: 5%;
+}
+
+.cdk-overlay-container .cdk-overlay-pane .select-panel-right {
+    margin-top: 2em;
+    min-width: 50% !important;
+    max-width: 80% !important;
+    float: right;
+}
+
+.mat-menu-panel {
+    max-height: 200px !important;
+}
+.article-data-collection {
+    .mat-slide-toggle.mat-checked {
+        .mat-slide-toggle-thumb {
+            background-color: $text-color-primary;
+        }
+        .mat-slide-toggle-bar {
+            background-color: rgba(0, 0, 0, 0.38);
+        }
+    }
+    .mat-slide-toggle-thumb {
+        background-color: $text-color-primary;
+    }
+    .mat-slide-toggle-bar {
+        background-color: rgba(0, 0, 0, 0.38);
+    }
+
+    .mat-checkbox-layout {
+        margin: 0;
+        vertical-align: inherit;
+        .mat-checkbox-label {
+            width: auto !important;
+        }
+    }
+}
+
+.ng-untouched.mat-form-field-invalid .mat-input-element {
+    caret-color: #3f51b5;
+}
+.ng-untouched .mat-form-field.mat-form-field-invalid .mat-form-field-label {
+    caret-color: #3f51b5;
+}
+
+.createTRFormClass {
+    .mat-form-field {
+        width: 100%;
+    }
+    .mat-checkbox-checked.mat-accent .mat-checkbox-background,
+    .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background {
+        background-color: $text-color-primary;
+    }
+}
+.input-fa-search {
+    position: absolute;
+    right: 0;
+    color: #d4d4d4;
+}
+.reusable-supply-chain {
+    .mat-checkbox-background {
+        background-color: #fff;
+        border: 2px solid $text-color-primary;
+    }
+    .mat-checkbox-checked.mat-accent .mat-checkbox-background,
+    .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background {
+        background-color: $text-color-primary;
+    }
+}
+.tr-tree-view-modal {
+    .tree-container {
+        position: relative !important;
+        top: 0 !important;
+    }
+}
+.simplified-chain-product-type-image img {
+    border: 2px dotted #235ea4;
+    height: 95px;
+    width: 95px;
+    border-radius: 80px;
+    text-align: center;
+    float: right;
+}
+.tree-view-image-icon img {
+    max-width: 35px;
+}
+#fc_frame {
+    left: 15px;
+    bottom: 70px !important;
+}
+.qr-code-view-wrapper {
+    margin-top: -15px;
+    margin-left: 20px;
+    text-align: center;
+}
+.display-none {
+    display: none;
+}
+.notification-badge {
+    width: 21px;
+    height: 21px;
+    background: $color-table-filter-1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+}
+
+.upload-audit-form {
+    margin-bottom: 50px;
+    .mat-form-field {
+        width: 100%;
+    }
+    .form-group {
+        padding-top: 10px;
+    }
+    .btn-container {
+        width: 100%;
+        margin-right: 30px;
+    }
+    .tt-input-label {
+        font-family: $font-family-Semibold;
+        font-size: 14px;
+        line-height: 18px;
+        color: $text-color-primary;
+    }
+    .tt-file-upload-ui-container {
+        width: 100%;
+        max-width: 100%;
+        border: 1px dashed #9d9d9d;
+        margin: 15px auto;
+        text-align: center;
+        padding: 20px;
+        cursor: pointer;
+
+        .tt-file-upload-ui-content {
+            text-align: center;
+            .description {
+                color: #cccccc !important;
+                font-family: $font-family-Regular;
+                font-size: 16px;
+                margin-left: 15px;
+            }
+        }
+
+        .tt-uploaded-file-list-container {
+            .tt-uploaded-file {
+                cursor: auto;
+                padding: 15px 20px 15px 0;
+                .fileName {
+                    font-family: $font-family-Semibold;
+                    font-size: 14px;
+                    color: $text-color-primary;
+                }
+            }
+
+            .tt-remove-uploaded-file {
+                margin-left: 10px;
+                cursor: pointer;
+            }
+        }
+    }
+
+    .save-btn {
+        margin-top: 10px;
+        background: #7effbe;
+        color: #474747;
+        border-radius: 5px;
+        font-family: $font-family-Semibold;
+        width: 100px;
+    }
+
+    .cancel-btn {
+        margin-top: 10px;
+        background: #71eeff;
+        color: #474747;
+        border-radius: 5px;
+        font-family: $font-family-Semibold;
+        width: 100px;
+        margin-right: 10px;
+    }
+}
+
+.status-text {
+    i {
+        margin-left: 5px;
+    }
+    .UnOpened {
+        color: $color-table-filter-2;
+    }
+    .UnAccepted {
+        color: $color-table-filter-1;
+    }
+    .InProgress {
+        color: $color-status-in-progress;
+    }
+    .Closed {
+        color: $color-table-filter-4;
+    }
+    .InReview {
+        color: $color-table-filter-5;
+    }
+}
+
+.pr-15-imp {
+    padding-right: 15px !important;
+}
+.mat-tab-group {
+    // width: calc(100% - 100px);
+    width: 95%;
+}
+.mat-drawer-container {
+    height: auto !important;
+}
+.mat-drawer {
+    overflow-y: scroll;
+}
+.mat-tab-header {
+    border: none;
+    .mat-tab-label {
+        justify-content: flex-start !important;
+        padding-left: 0 !important;
+    }
+}
+.mat-tab-body-content {
+    height: auto !important;
+}
+.mat-tab-group.mat-primary .mat-ink-bar,
+.mat-tab-nav-bar.mat-primary .mat-ink-bar {
+    background-color: transparent !important;
+}
+.mat-tab-header-pagination {
+    background: #fff;
+    box-shadow: none;
+    &.mat-tab-header-pagination-before {
+        position: absolute;
+        right: 32px;
+        height: 100%;
+        padding-left: 25px;
+    }
+    .mat-tab-header-pagination-chevron {
+        width: 15px;
+        height: 15px;
+    }
+}
+.ec-loader {
+    text-align: center;
+    margin-top: 3em;
+    display: block;
+    font-size: 25px;
+}
+.ec-loader-no-margin {
+    text-align: center;
+    display: block;
+    font-size: 25px;
+}
+
+/* Materil Tab View Page SCSS */
+.mat-tab-view-page {
+    .mat-tab {
+        &-group {
+        }
+        &-header {
+            &-pagination {
+                &-controls-enabled {
+                    .mat-tab-header-pagination {
+                    }
+                }
+                &-before {
+                }
+            }
+            .mat-tab {
+                &-label {
+                    &-container {
+                        .mat-tab-list {
+                            .mat-tab-labels {
+                                .mat-tab-label {
+                                    flex-basis: inherit;
+                                    flex-grow: inherit;
+                                    min-width: auto;
+                                    padding: 0 35px !important;
+                                    opacity: 1;
+                                    &:first-child {
+                                        padding-left: 0 !important;
+                                    }
+                                    &:last-child {
+                                        padding-right: 50px !important;
+                                    }
+                                    .mat-ripple-element {
+                                        background-color: transparent !important;
+                                    }
+                                    .mat-tab-label-content {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.common-striped-table {
+    display: inline-grid;
+    .table {
+        &-striped {
+            font-family: $font-family-Regular;
+            box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 0;
+            > thead {
+                display: table;
+                width: 100%;
+                table-layout: fixed;
+                position: relative;
+                > tr {
+                    th {
+                        padding: 15px 20px;
+                        font-size: 15px;
+                        font-weight: bold;
+                        text-align: left;
+                        width: 200px;
+                        vertical-align: middle;
+                    }
+                }
+            }
+            > tbody {
+                display: block;
+                max-height: 500px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                > tr {
+                    display: table;
+                    width: 100%;
+                    table-layout: fixed;
+                    &:nth-of-type(odd) {
+                        background-color: #e6fbff;
+                    }
+                    > td {
+                        padding: 15px 20px;
+                        border: 0 !important;
+                        font-size: 16px;
+                        width: 200px;
+                        text-align: left;
+                        &:last-child {
+                            vertical-align: middle;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.opacity-5 {
+    opacity: 0.5;
+}
+
+.pointer-none {
+    pointer-events: none;
+}
+
+.import-product-data-dialog {
+    mat-dialog-container {
+        padding: 0;
+    }
+}
+
+.material-detail-view-container,
+.bom-detail-view-container,
+.style-detail-view-container {
+    .edit-btn-container {
+        display: none;
+    }
+}
+
+.overflow-wrap-break-word {
+    overflow-wrap: break-word;
+}
+
+.tt-dropdown-search-option-wrap {
+    height: unset !important;
+    text-overflow: unset !important;
+    overflow: unset !important;
+    white-space: normal !important;
+    line-height: normal !important;
+    display: flex !important;
+    padding: 10px 16px !important;
+    .mat-option-text {
+        height: unset;
+        text-overflow: unset;
+        overflow: unset;
+        white-space: normal;
+        line-height: normal;
+    }
+}
+
+.sub-supplier-hr.hr {
+    margin-top: 70px;
+    border-bottom: 1px solid #ececec;
+    font-family: $font-family-Bold;
+    color: #cccccc;
+}
+.apikeyfield .mat-form-field-label {
+    padding: 6px 20px;
+}

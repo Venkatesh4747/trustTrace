@@ -1,0 +1,52 @@
+<div class="collect-supplier-info-modal">
+    <div class="collect-supplier-info-modal-title">
+        <span>{{ 'No Supplier Information' | translate }}</span>
+    </div>
+    <br />
+    <div class="collect-supplier-info-modal-content">
+        {{
+            "Are you sure you don't wish to provide the supplier information? would you like to provide the" | translate
+        }}
+        <span class="collect-supplier-info-modal-content-highlight"> {{ 'City of the Supplier' | translate }} </span>
+        {{ 'instead' | translate }}?
+    </div>
+    <div style="width:100%" style="padding: 15px 30px;">
+        <form #collectSupplierInfoForm>
+            <div class="form-group">
+                <mat-form-field [floatLabel]="'never'">
+                    <input
+                        class="input"
+                        type="text"
+                        placeholder="{{ 'Eg. Visby' | translate }}"
+                        name="citySearch"
+                        [(ngModel)]="citySearchText"
+                        (keyup)="searchCity($event)"
+                        matInput
+                        [matAutocomplete]="cityAuto"
+                    />
+                    <i class="fa fa-search input-fa-search"></i>
+                    <mat-hint #supplierSearchHint>{{ 'Type to search' | translate }} </mat-hint>
+                    <mat-autocomplete
+                        #cityAuto="matAutocomplete"
+                        [displayWith]="getLocationDisplayName"
+                        (optionSelected)="citySelection($event.option.value)"
+                    >
+                        <mat-option *ngFor="let item of cities" [value]="item">
+                            {{ getLocationDisplayName(item) }}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+        </form>
+    </div>
+    <!-- modal-body -->
+
+    <div class="modal-footer" style="text-align: center !important;">
+        <button class="btn btn-blue width-100-px reset-password-button" (click)="hide()">
+            {{ 'Discard' | translate }}
+        </button>
+        <button class="btn btn-reset width-100-px" (click)="submit()">
+            {{ 'Submit' | translate }}
+        </button>
+    </div>
+</div>

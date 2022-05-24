@@ -1,0 +1,95 @@
+@import '~styles/variables';
+
+/* Table */
+.styles-table {
+    position: absolute;
+    top: 250px;
+    left: 30px;
+    right: 45px;
+    bottom: 21px;
+    overflow-y: auto;
+    margin-top: 20px;
+}
+
+.table-filter {
+    font-size: 19px;
+    > li {
+        padding: 0;
+    }
+    p.title {
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .mat-select {
+        font-size: 16px;
+    }
+}
+
+.action-icons-small {
+    font-size: 15px;
+    color: #777;
+    height: 35px;
+    width: 40px;
+    margin-right: 5px;
+    background: #d4f2ff;
+    border-radius: 5px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    cursor: pointer;
+}
+.align-self-flex-end {
+    a {
+        &:focus,
+        &:hover,
+        &:active {
+            text-decoration: none;
+        }
+        &:last-child {
+            .action-icons-small {
+                margin-right: 0;
+            }
+        }
+    }
+}
+.table-card-right {
+    .title {
+        font-size: 14px;
+        text-align: right;
+    }
+}
+.float-r {
+    padding: 10px 0;
+}
+.display-flex-only {
+    flex-direction: row-reverse;
+}
+
+.table-card-left {
+    .desc.blue-desc {
+        span {
+            font-size: 14px;
+            color: $text-color-primary;
+            font-family: $font-family-Bold;
+        }
+    }
+}
+
+.table-card-bottom {
+    bottom: 5px;
+}
+.traceable-icons {
+    width: 20px;
+}
+
+.import-btn-bordered {
+    width: 158px;
+}

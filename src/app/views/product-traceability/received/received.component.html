@@ -1,0 +1,1410 @@
+<div class="view-container" [ngClass]="{ collapsed: sideNavigation.state === 'expanded' }">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header no-border">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pb-2">
+                <div class="page-title">{{ 'Traceability Request Received' | translate }}</div>
+                <div class="title-right-search">
+                    <input
+                        type="text"
+                        class="search"
+                        placeholder="{{ 'Search' | translate }}"
+                        [(ngModel)]="searchText"
+                    />
+                    <i class="fa fa-search"></i>
+                </div>
+            </div>
+            <!-- col -->
+        </div>
+        <!-- row -->
+
+        <div class="row"></div>
+        <div id="filter-bar-wrapper" class="row filter-bar-wrapper">
+            <div class="col-md-12">
+                <app-filter-bar
+                    [filters]="trFilters"
+                    [filter_session]="filter_session"
+                    [filterOptions]="filterOptions"
+                    (handleFilterSelection)="getAllReceivedTR()"
+                >
+                </app-filter-bar>
+            </div>
+            <!-- col -->
+        </div>
+
+        <div
+            class="row suppliers-table"
+            [ngClass]="{ 'band-disabled': !launched_status_enabled }"
+            *ngIf="trs && trs.length >= 0"
+        >
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="no-assessments" *ngIf="trs.length === 0">
+                    {{ 'No' | translate }} <span tooltip="Traceability Requests">TRs</span> {{ 'Received' | translate }}
+                </div>
+                <div class="table-responsive" *ngIf="trs.length > 0">
+                    <div
+                        class="table-card"
+                        *ngFor="
+                            let tr of trs
+                                | searchFilter
+                                    : {
+                                          styleName: searchText,
+                                          supplierName: searchText,
+                                          poNumber: searchText,
+                                          year: searchText,
+                                          season: searchText,
+                                          statusText: searchText
+                                      };
+                            let i = index
+                        "
+                    >
+                        <div class="table-card-left" (click)="openSubTRModal(tr.id)">
+                            <div class="title">
+                                <span [innerHTML]="tr.styleName | highlightText: searchText">
+                                    {{ tr.styleName }}
+                                </span>
+                            </div>
+                            <div class="desc" [innerHTML]="tr.supplierName | highlightText: searchText">
+                                {{ 'Launched By' | translate }}: {{ tr.supplierName }}
+                            </div>
+                            <div class="desc" [innerHTML]="tr.poNumber | highlightText: searchText">
+                                {{ 'PO Number' | translate }}: {{ tr.poNumber }}
+                            </div>
+                            <div class="desc">
+                                {{ 'Year' | translate }} &amp; {{ 'Season' | translate }}:
+                                <span [innerHTML]="tr.year | highlightText: searchText">{{ tr.year }}</span> -
+                                <span [innerHTML]="tr.season | highlightText: searchText">{{ tr.season }}</span>
+                            </div>
+                            <div class="desc">
+                                {{ 'Quantity' | translate }}: {{ tr.quantity?.quantity }}
+                                {{ localeService.getDisplayText(tr.quantity?.unit) }}
+                            </div>
+                            <div class="desc">{{ 'Launched Date' | translate }}: {{ tr.createTs }}</div>
+                        </div>
+                    </div>
+                    <!-- <table class="table table-striped">
+              <thead>
+              <tr style="border-bottom: 2px solid #999;">
+                <th>{{'Style Name' | translate}}</th>
+                <th>{{'Launched By' | translate}}</th>
+                <th>{{'PO Number' | translate}}</th>
+                <th>{{'Year' | translate}} &amp; {{'Season' | translate}}</th>
+                <th>{{'Quantity' | translate}}</th>
+                <th>{{'Launched Date' | translate}}</th>
+                <th class="text-center" hidden>{{'Action' | translate}}</th>
+              </tr>
+              </thead>
+              <tbody class="check_box_group">
+              <tr *ngFor="let tr of trs | searchFilter : {styleName:searchText, supplierName:searchText, poNumber:searchText}; let i = index">
+                <td class="hyperlink" (click)="openSubTRModal(tr.id)">{{tr.styleName}}</td>
+                <td>{{tr.supplierName}}</td>
+                <td>{{tr.poNumber}}</td>
+                <td>{{tr.year}} - {{tr.season}}</td>
+                <td>{{tr.quantity?.quantity}} {{localeService.getDisplayText(tr.quantity?.unit)}}</td>
+                <td>{{tr.createTs}}</td>
+                <td class="status text-center" hidden>
+                  <button *ngIf="tr.status === 'UNACCEPTED' && !trAccepting[tr.id]"
+                          class="btn accept"> {{'Accept' | translate}}
+                  </button>
+                  <button *ngIf="tr.status === 'UNOPENED' && !trStarting[tr.id]" (click)="openSurveyModal(tr)"
+                          class="btn start">{{'Start' | translate}}
+                  </button>
+                  <button *ngIf="( tr.status === 'IN_PROGRESS') && !trResuming[tr.id]" (click)="openSurveyModal(tr)"
+                          class="btn resume InProgress">{{'Resume' | translate}}
+                  </button>
+                  <button *ngIf="tr.status === 'CLOSED'"
+                          class="btn closed">{{'Closed' | translate}}
+                  </button>
+                  <button *ngIf="tr.status === 'IN_REVIEW'"
+                          class="btn InReview">{{'In Review' | translate}}
+                  </button>
+                  <div style="margin-left: 30px;" *ngIf="trResuming[tr.id] || trAccepting[tr.id] || trStarting[tr.id]">
+                    <app-spinner [small]="true"></app-spinner>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table> -->
+                </div>
+                <!-- table-responsive -->
+            </div>
+            <!-- col -->
+        </div>
+        <!-- row -->
+    </div>
+    <!-- container-fluid -->
+</div>
+<!-- views-container -->
+
+<div
+    bsModal
+    #subTRModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="subTRModal"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">{{ 'Traceability Requests' | translate }}</h4>
+                <button type="button" class="close pull-right" (click)="subTRModal.hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body container-fluid">
+                <div class="noMaterials" style="padding: 20px;" *ngIf="subTRLoading">
+                    <app-spinner></app-spinner>
+                </div>
+
+                <table class="table table-striped" *ngIf="!subTRLoading">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #999;">
+                            <!--<th></th>-->
+                            <th>{{ 'Style Name' | translate }}</th>
+                            <th>{{ 'Launched To' | translate }}</th>
+                            <th>{{ 'PO Number' | translate }}</th>
+                            <th>{{ 'Year' | translate }} &amp; {{ 'Season' | translate }}</th>
+                            <th>{{ 'Quantity' | translate }}</th>
+                            <th>{{ 'Launched Date' | translate }}</th>
+                            <th class="text-center">{{ 'Action' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="check_box_group">
+                        <tr *ngFor="let tr of subTRs; let i = index">
+                            <!--<td>-->
+                            <!--<div>-->
+                            <!--<input type="checkbox" id="{{style.id}}" name="{{style.id}}">-->
+                            <!--<label for="{{style.id}}"><span></span></label>-->
+                            <!--</div>-->
+                            <!--</td>-->
+                            <td>{{ tr.styleName }}</td>
+                            <td class="hyperlink" (click)="openSupplierProfileModal(tr.launchedTo)">
+                                {{ tr.supplierName }}
+                            </td>
+                            <td>{{ tr.poNumber }}</td>
+                            <td>{{ tr.year }} - {{ tr.season }}</td>
+                            <td>{{ tr.quantity?.quantity }} {{ localeService.getDisplayText(tr.quantity?.unit) }}</td>
+                            <td>{{ tr.createTs }}</td>
+                            <!--<td class="status text-center" *ngIf="tr.launchedTo === 'myid'">-->
+
+                            <td class="status text-center">
+                                <button *ngIf="tr.status === 'UNACCEPTED' && !trAccepting[tr.id]" class="btn accept">
+                                    {{ 'Accept' | translate }}
+                                </button>
+
+                                <button
+                                    *ngIf="!tr.preview && tr.status === 'UNOPENED' && !trStarting[tr.id]"
+                                    (click)="openSurveyModal(tr)"
+                                    class="btn start"
+                                >
+                                    {{ 'Start' | translate }}
+                                </button>
+
+                                <button
+                                    *ngIf="
+                                        !tr.preview &&
+                                        (tr.status === 'IN_PROGRESS' ||
+                                            tr.status === 'SUBMITTED' ||
+                                            tr.status === 'APPROVED') &&
+                                        !trResuming[tr.id]
+                                    "
+                                    (click)="openSurveyModal(tr)"
+                                    class="btn resume InProgress"
+                                >
+                                    {{ 'Resume' | translate }}
+                                </button>
+
+                                <button
+                                    *ngIf="tr.preview && !trResuming[tr.id]"
+                                    class="btn preview InReview"
+                                    (click)="openSurveyModal(tr)"
+                                >
+                                    {{ 'Preview' | translate }}
+                                </button>
+
+                                <button *ngIf="tr.status === 'CLOSED'" class="btn closed">
+                                    {{ 'Closed' | translate }}
+                                </button>
+
+                                <button *ngIf="tr.status === 'IN_REVIEW'" class="btn InReview">
+                                    {{ 'In Review' | translate }}
+                                </button>
+
+                                <div
+                                    style="margin-left: 30px;"
+                                    *ngIf="trResuming[tr.id] || trAccepting[tr.id] || trStarting[tr.id]"
+                                >
+                                    <app-spinner [small]="true"></app-spinner>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer" hidden>
+                <div class="col-md-6 text-left">
+                    <!--<p class="pt-1">Total Questions: <span class="text-blue total-q"><b>{{assessment.totalQuestion}}</b></span>-->
+                    <!--</p>-->
+                </div>
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-gray" data-dismiss="modal" (click)="subTRModal.hide()">
+                        {{ 'Close' | translate }}
+                    </button>
+                </div>
+                <!-- col -->
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->
+
+<div
+    bsModal
+    #supplierProfileModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="supplierProfileModal"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">{{ profileData.companyName }}</h4>
+                <button type="button" class="close pull-right" (click)="supplierProfileModal.hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <!-- modal-header -->
+            <div class="modal-body" style="padding: 15px 30px;">
+                <div class="row viewMode">
+                    <div class="col-md-3">
+                        <div class="companyLogo">
+                            <img
+                                style="max-height: 260px; max-width: 100%;"
+                                class="img-responsive"
+                                src="{{ profileData.logo_url }}"
+                                alt="Company Logo"
+                            />
+                        </div>
+                        <!-- companyLogo -->
+
+                        <div class="companyName">{{ profileData.companyName }}</div>
+                        <!-- Company Name -->
+
+                        <div class="companyAddress">
+                            <address
+                                *ngIf="
+                                    profileData.address.addressLine1 ||
+                                    profileData.address.country ||
+                                    profileData.address.city ||
+                                    profileData.address.state
+                                "
+                            >
+                                <span>{{ profileData.address.addressLine1 }}</span
+                                ><br />
+                                <span>{{ profileData.address.addressLine2 }}</span
+                                ><br />
+                                <span>{{ profileData.address.city }}</span
+                                ><br />
+                                <span>{{ profileData.address.state }}</span
+                                ><br />
+                                <span>{{ profileData.address.country }} - {{ profileData.address.zip }}</span
+                                ><br />
+                            </address>
+
+                            <p
+                                class="disabled-text"
+                                style="text-align: left !important;"
+                                *ngIf="
+                                    !profileData.address.addressLine1 &&
+                                    !profileData.address.country &&
+                                    !profileData.address.city &&
+                                    !profileData.address.state
+                                "
+                            >
+                                {{ 'Address / Location Not Provided' | translate }}
+                            </p>
+                        </div>
+                        <!-- Address -->
+
+                        <div class="contact">
+                            <h4>{{ 'Contact Person' | translate }}</h4>
+                            <p class="contactName">{{ profileData.contactPersonName }}</p>
+                            <p class="contactEmail">{{ profileData.contactEmail }}</p>
+                            <p class="contactMobile">{{ profileData.contactMobile }}</p>
+                        </div>
+                        <!-- contact -->
+                    </div>
+                    <!-- col -->
+
+                    <div class="col-md-9">
+                        <div class="description" *ngIf="profileData?.description?.length > 1">
+                            <h4>{{ 'Description' | translate }}</h4>
+                            <p style="text-align: justify; text-justify: inter-word;">{{ profileData.description }}</p>
+                        </div>
+                        <!-- description -->
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="valueProcesses" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Value Processes' | translate }} ({{ valueProcesses?.length }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 12</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="valueProcessesContainer">
+                                        <p class="noMaterials pt-1" *ngIf="valueProcesses?.length <= 0">
+                                            {{ 'No Value Processes' | translate }}
+                                        </p>
+                                        <ul class="list-unstyled list-inline itemList">
+                                            <li class="item" *ngFor="let vp of valueProcesses">
+                                                {{ localeService.getDisplayText(vp) }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- valueProcessesContainer -->
+                                </div>
+                                <!-- ValueProcesses -->
+
+                                <div class="materials" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Materials' | translate }} ({{ materials?.length }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 11</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="materialsContainer">
+                                        <p class="noMaterials pt-1" *ngIf="materials?.length <= 0">
+                                            {{ 'No Materials' | industry | translate }}
+                                        </p>
+                                        <ul class="list-unstyled list-inline itemList">
+                                            <li class="item" *ngFor="let material of materials">
+                                                {{ localeService.getDisplayText(material) }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- materialsContainer -->
+                                </div>
+                                <!-- materials -->
+
+                                <div class="standards" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Standards' | translate }} &amp; {{ 'Certifications' | translate }} ({{
+                                                standards?.length
+                                            }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 9</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="standardsContainer">
+                                        <p class="noMaterials pt-1" *ngIf="standards?.length <= 0">
+                                            {{ 'No Standards' | translate }} &amp; {{ 'Certifications' | translate }}
+                                        </p>
+                                        <div class="row" *ngIf="standards?.length > 0">
+                                            <div
+                                                class="col-md-2 standardsImageContainer"
+                                                tooltip="{{ localeService.getDisplayText(standard) }}"
+                                                data-placement="top"
+                                                container="body"
+                                                *ngFor="let standard of standards; let i = index"
+                                            >
+                                                <img
+                                                    class="img-responsive standardsImage"
+                                                    src="{{ utilService.getStandardImageUrl(standard) }}"
+                                                    alt=""
+                                                />
+                                            </div>
+                                            <!-- col -->
+                                        </div>
+                                        <!-- row -->
+                                    </div>
+                                    <!-- standardsContainer -->
+                                </div>
+                                <!-- standards -->
+                            </div>
+                            <!-- col -->
+
+                            <div class="col-md-4">
+                                <div class="facilities">
+                                    <h4>
+                                        <ng-template
+                                            [ngIf]="
+                                                profileData.Facilities?.length === 0 ||
+                                                profileData.Facilities?.length === 1
+                                            "
+                                            >{{ 'Facility' | translate }}</ng-template
+                                        >
+                                        <ng-template [ngIf]="profileData.Facilities?.length > 1">{{
+                                            'Facilities' | translate
+                                        }}</ng-template>
+                                        ({{ profileData.Facilities?.length }})
+                                    </h4>
+                                    <div class="facilitiesContainer">
+                                        <p class="noMaterials pt-1" *ngIf="profileData.Facilities?.length <= 0">
+                                            {{ 'No Facilities' | translate }}
+                                        </p>
+                                        <ul class="list-unstyled">
+                                            <li *ngFor="let facility of profileData.Facilities">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <span
+                                                            class="facility-name hyperlink"
+                                                            (click)="openFacilityModal(facility)"
+                                                            >{{ facility.name }}</span
+                                                        >
+                                                    </div>
+                                                    <!-- col -->
+                                                    <div class="col-md-6">
+                                                        <span
+                                                            class="disabled-text fs-12"
+                                                            *ngIf="!facility.address.country"
+                                                            >{{ 'Not Specified' | translate }}</span
+                                                        >
+                                                        <span>{{ facility.address.country }}</span>
+                                                        <span
+                                                            class="flag-icon flag-icon-{{
+                                                                getCountryCode(facility.address.country)
+                                                            }}"
+                                                        ></span>
+                                                    </div>
+                                                    <!-- col -->
+                                                </div>
+                                                <!-- row -->
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- facilitiesContainer -->
+                                </div>
+                                <!-- facilities -->
+                            </div>
+                            <!-- col -->
+                        </div>
+                        <!-- row -->
+                    </div>
+                    <!-- col -->
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer" style="text-align: center !important;">
+                <button class="btn btn-reset reset-password-button" (click)="supplierProfileModal.hide()">
+                    {{ 'Close' | translate }}
+                </button>
+            </div>
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->
+
+<div
+    bsModal
+    #surveyModal="bs-modal"
+    class="surveyModal modal fade"
+    [config]="{ keyboard: false }"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="surveyModalLabel"
+    aria-hidden="true"
+    *ngIf="surveyModalTR"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">TR - {{ surveyModalTR.id }}</h4>
+                <button type="button" class="close pull-right" (click)="surveyModal.hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-1 survey-group-container">
+                            <ul class="list-unstyled survey-group-list">
+                                <li
+                                    class="survey-group-item"
+                                    (click)="setCurrentSurveyTab(0)"
+                                    [ngClass]="{ active: currentSurveyTab === 0 }"
+                                >
+                                    <div class="question-name">
+                                        <p class="tab-name">{{ 'Supplier Inputs' | translate }}</p>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </li>
+                                <li
+                                    class="survey-group-item"
+                                    (click)="setCurrentSurveyTab(1)"
+                                    [ngClass]="{ active: currentSurveyTab === 1 }"
+                                >
+                                    <div class="question-name">
+                                        <p class="tab-name">{{ 'Production Facilities' | translate }}</p>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </li>
+                                <li
+                                    class="survey-group-item"
+                                    (click)="setCurrentSurveyTab(2)"
+                                    [ngClass]="{ active: currentSurveyTab === 2 }"
+                                >
+                                    <div class="question-name">
+                                        <p class="tab-name">{{ 'Production Questionnaire' | translate }}</p>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </li>
+                                <li
+                                    class="survey-group-item"
+                                    (click)="setCurrentSurveyTab(3)"
+                                    [ngClass]="{ active: currentSurveyTab === 3 }"
+                                >
+                                    <div class="question-name">
+                                        <!-- <p class="tab-name">{{'Production Questionnaire' | translate}}</p> -->
+                                        <p class="tab-name">{{ 'Certifications' | translate }}</p>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </li>
+                                <li
+                                    class="survey-group-item"
+                                    (click)="setCurrentSurveyTab(4)"
+                                    [ngClass]="{ active: currentSurveyTab === 4 }"
+                                >
+                                    <div class="question-name">
+                                        <!-- <p class="tab-name">{{'Production Questionnaire' | translate}}</p> -->
+                                        <p class="tab-name">{{ 'Shipment Details' | translate }}</p>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- col -->
+                        <div class="col-md-11">
+                            <div class="row survey-group-title">
+                                <div class="col-md-3">
+                                    <h4>{{ surveyModalTR.styleName }}</h4>
+                                </div>
+                                <!-- col -->
+
+                                <div class="col-md-2 col-md-offset-2 text-right">
+                                    <h4>
+                                        {{ 'Output' | translate }}: {{ surveyModalTR.quantity?.quantity }}
+                                        {{ localeService.getDisplayText(surveyModalTR.quantity?.unit) }}
+                                    </h4>
+                                </div>
+                                <!-- col -->
+
+                                <div class="col-md-2 text-right">
+                                    <h4>
+                                        {{ 'PO Number' | translate }} : {{ surveyModalTR.poNumber }}
+                                        <button
+                                            class="btn btn-small btn-blue"
+                                            *ngIf="surveyModalTR.poEvidenceId"
+                                            container="body"
+                                            tooltip="Download PO"
+                                            (click)="downloadPO(surveyModalTR.poEvidenceId, surveyModalTR.poNumber)"
+                                        >
+                                            <i class="fa fa-download"></i>
+                                        </button>
+                                    </h4>
+                                    <h4 *ngIf="isBotPOsAvailable()">
+                                        {{ 'Subsuppliers PO' | translate }}:
+                                        <button
+                                            class="btn btn-small btn-blue"
+                                            *ngIf="isBotPOsAvailable()"
+                                            container="body"
+                                            tooltip="Download bot collected POs"
+                                            (click)="
+                                                downloadPO(
+                                                    surveyModalTR.supplierInput[0].botPoIds,
+                                                    surveyModalTR.poNumber
+                                                )
+                                            "
+                                        >
+                                            <i class="fa fa-download"></i>
+                                        </button>
+                                    </h4>
+                                </div>
+                                <!-- col -->
+                            </div>
+                            <!-- row -->
+
+                            <div *ngIf="currentSurveyTab === 0 && inputs">
+                                <div
+                                    class="survey-questions-container container-fluid"
+                                    style="top: 80px; padding: 15px;"
+                                    tabindex="-1"
+                                    [ngClass]="{ 'top-120': isBotPOsAvailable() }"
+                                    #surveyQuestionContainer
+                                >
+                                    <!--<ng-template [ngIf]="!fibreMaterialSelection">-->
+                                    <div class="row" *ngIf="!inputs || inputs.length === 0">
+                                        <div class="col-md-12">
+                                            <div class="noMaterials">
+                                                {{ 'No Supplier Inputs' | translate }}
+                                            </div>
+                                            <!-- noMaterials -->
+                                        </div>
+                                        <!-- col -->
+                                    </div>
+                                    <!-- col -->
+
+                                    <ng-template ngFor let-inp [ngForOf]="inputs" let-k="index">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="text-center">
+                                                    {{ localeService.getDisplayText(inp.type) }}
+                                                </h2>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="row"
+                                            style="margin-top: 10px; margin-bottom: 10px; overflow: visible"
+                                            *ngFor="let input of inp.values; let i = index"
+                                        >
+                                            <input
+                                                type="hidden"
+                                                id="inputName-{{ i }}"
+                                                name="inputName-{{ i }}"
+                                                [value]="input"
+                                            />
+                                            <div class="col-md-3">
+                                                <div
+                                                    class="input-group"
+                                                    [ngClass]="{
+                                                        'error-marker-red':
+                                                            submittedSupplierInput &&
+                                                            !validateSupplierInput('materials', k, i)
+                                                    }"
+                                                    style="width: 100%"
+                                                >
+                                                    <span class="input-group-addon text-center">
+                                                        <span
+                                                            class="text-ellipsis"
+                                                            [tooltip]="localeService.getDisplayText(input)"
+                                                            container="body"
+                                                            >{{ localeService.getDisplayText(input) }}</span
+                                                        >
+                                                    </span>
+                                                    <angular2-multiselect
+                                                        style="width: 100% !important;"
+                                                        *ngIf="
+                                                            !canProceed[0] &&
+                                                            TRVPSupplier[k][i].supplierId !== 'NA' &&
+                                                            !surveyModalTR.preview
+                                                        "
+                                                        [data]="
+                                                            utilService.sortData(inputs_materials[input], 'itemName')
+                                                        "
+                                                        [(ngModel)]="selectedItems[k][i]"
+                                                        [settings]="dropdownSettings"
+                                                    ></angular2-multiselect>
+
+                                                    <angular2-multiselect
+                                                        style="width: 100% !important;"
+                                                        *ngIf="
+                                                            canProceed[0] ||
+                                                            TRVPSupplier[k][i].supplierId === 'NA' ||
+                                                            surveyModalTR.preview
+                                                        "
+                                                        [data]="
+                                                            utilService.sortData(inputs_materials[input], 'itemName')
+                                                        "
+                                                        [(ngModel)]="selectedItems[k][i]"
+                                                        [tooltip]="displayMaterialsTooltip(TRVPSupplier[k][i].material)"
+                                                        container="body"
+                                                        [settings]="dropdownSettingsDisabled"
+                                                    ></angular2-multiselect>
+                                                </div>
+                                            </div>
+                                            <!-- col -->
+
+                                            <div class="col-md-2">
+                                                <select
+                                                    name="supplier-{{ i }}"
+                                                    class="form-control cursorp"
+                                                    [ngClass]="{
+                                                        'error-marker-red':
+                                                            submittedSupplierInput &&
+                                                            !validateSupplierInput('supplierId', k, i)
+                                                    }"
+                                                    [(ngModel)]="TRVPSupplier[k][i].supplierId"
+                                                    [disabled]="canProceed[0] || surveyModalTR.preview"
+                                                    id="supplier-{{ i }}"
+                                                >
+                                                    <option value="" selected disabled>{{
+                                                        'Select Supplier' | translate
+                                                    }}</option>
+                                                    <option value="NA">{{ 'Not Applicable' | translate }}</option>
+                                                    <option [value]="authService.user.companyId">{{
+                                                        'Self' | translate
+                                                    }}</option>
+                                                    <option
+                                                        [value]="supplier['id']"
+                                                        *ngFor="let supplier of garmentSuppliers | sortByFilter: 'name'"
+                                                    >
+                                                        {{ supplier['name'] }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <!-- col -->
+
+                                            <div class="col-md-2">
+                                                <input
+                                                    class="form-control"
+                                                    name="TRVPSupplierPO"
+                                                    type="text"
+                                                    [ngClass]="{
+                                                        'error-marker-red':
+                                                            submittedSupplierInput && !validateSupplierInput('po', k, i)
+                                                    }"
+                                                    *ngIf="TRVPSupplier[k][i].supplierId !== authService.user.companyId"
+                                                    [(ngModel)]="TRVPSupplier[k][i].po"
+                                                    [disabled]="
+                                                        canProceed[0] ||
+                                                        TRVPSupplier[k][i].supplierId === 'NA' ||
+                                                        surveyModalTR.preview
+                                                    "
+                                                    placeholder="{{ 'Purchase Order Number' | translate }}"
+                                                />
+                                            </div>
+                                            <!-- col -->
+
+                                            <div
+                                                class="col-md-2 text-center"
+                                                *ngIf="canProceed[0] && TRVPSupplier[k][i].supplierId"
+                                            >
+                                                <button
+                                                    class="btn btn-sm btn-blue"
+                                                    *ngIf="
+                                                        TRVPSupplier[k][i].supplierId !== authService.user.companyId &&
+                                                        TRVPSupplier[k][i].poFile
+                                                    "
+                                                    (click)="
+                                                        downloadPO(TRVPSupplier[k][i].poFile, TRVPSupplier[k][i].po)
+                                                    "
+                                                >
+                                                    {{ 'Download PO' | translate }}
+                                                    <i class="fa fa-download"></i>
+                                                </button>
+
+                                                <button
+                                                    class="btn btn-sm btn-default disabled no-po"
+                                                    disabled
+                                                    *ngIf="
+                                                        TRVPSupplier[k][i].supplierId !== authService.user.companyId &&
+                                                        !TRVPSupplier[k][i].poFile
+                                                    "
+                                                    (click)="
+                                                        downloadPO(TRVPSupplier[k][i].poFile, TRVPSupplier[k][i].po)
+                                                    "
+                                                >
+                                                    {{ 'No PO File' | translate }}
+                                                    <i class="fa fa-download"></i>
+                                                </button>
+                                            </div>
+
+                                            <div class="col-md-2" *ngIf="!canProceed[0] && !surveyModalTR.preview">
+                                                <div
+                                                    class="form-control file_upload_button"
+                                                    id="file_upload_button_{{ input }}"
+                                                    *ngIf="TRVPSupplier[k][i].supplierId !== authService.user.companyId"
+                                                    [ngClass]="{
+                                                        'disabled-input-file': TRVPSupplier[k][i].supplierId === 'NA'
+                                                    }"
+                                                    (click)="InvokeTRVPFileUpload(input, k, i)"
+                                                >
+                                                    <div class="disabled-text upload-po-text">
+                                                        <span *ngIf="!POFileName[k][i]">{{
+                                                            'Upload PO' | translate
+                                                        }}</span>
+                                                        <span *ngIf="POFileName[k][i]">{{ POFileName[k][i] }}</span>
+                                                    </div>
+                                                    <span class="pull-right">
+                                                        <i class="fa fa-upload"></i>
+                                                    </span>
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    class="hidden"
+                                                    id="file_upload_{{ input }}-{{ k }}-{{ i }}"
+                                                    name="file_upload_{{ input }}-{{ k }}-{{ i }}"
+                                                    (change)="uploadPO($event.target.files, k, i)"
+                                                    [(ngModel)]="TRVPSupplier[k][i].poFile"
+                                                    [hidden]="true"
+                                                />
+                                            </div>
+                                            <!-- col -->
+
+                                            <div class="col-md-2">
+                                                <div
+                                                    class="input-group"
+                                                    [ngClass]="{
+                                                        'error-marker-red':
+                                                            submittedSupplierInput &&
+                                                            !validateSupplierInput('quantity', k, i)
+                                                    }"
+                                                >
+                                                    <input
+                                                        class="form-control"
+                                                        name="TRVPSupplier[k][i].quantity"
+                                                        type="number"
+                                                        [(ngModel)]="TRVPSupplier[k][i].quantity"
+                                                        [disabled]="
+                                                            canProceed[0] ||
+                                                            TRVPSupplier[k][i].supplierId === 'NA' ||
+                                                            surveyModalTR.preview
+                                                        "
+                                                        placeholder="{{ 'Quantity' | translate }}"
+                                                    />
+                                                    <span class="input-group-addon text-right quantity-unit">
+                                                        <select
+                                                            class="cursorp"
+                                                            name="quantityUnit"
+                                                            [(ngModel)]="TRVPSupplier[k][i].unit"
+                                                        >
+                                                            <option value="" selected disabled>{{
+                                                                'Select' | translate
+                                                            }}</option>
+                                                            <option
+                                                                [value]="unit"
+                                                                *ngFor="let unit of units | sortByFilter"
+                                                                >{{ localeService.getDisplayText(unit) }}</option
+                                                            >
+                                                        </select>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <!-- col -->
+
+                                            <div
+                                                class="col-md-1"
+                                                *ngIf="
+                                                    !canProceed[0] &&
+                                                    !surveyModalTR.preview &&
+                                                    inputs_static &&
+                                                    i > inputs_static[k].values.length - 1
+                                                "
+                                            >
+                                                <button class="btn btn-default no-po" (click)="removeNewInput(k, i)">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            <!-- col -->
+                                        </div>
+                                        <!-- row -->
+
+                                        <div class="row" style="overflow: visible">
+                                            <div class="col-md-12">
+                                                <div
+                                                    class="btn-group"
+                                                    dropdown
+                                                    *ngIf="!canProceed[0] && !surveyModalTR.preview"
+                                                >
+                                                    <button
+                                                        id="button-basic"
+                                                        dropdownToggle
+                                                        type="button"
+                                                        class="btn btn-primary dropdown-toggle"
+                                                        aria-controls="dropdown-basic"
+                                                    >
+                                                        {{ 'Add new input' | translate }} <span class="caret"></span>
+                                                    </button>
+                                                    <ul
+                                                        id="dropdown-basic"
+                                                        *dropdownMenu
+                                                        class="dropdown-menu"
+                                                        role="menu"
+                                                        aria-labelledby="button-basic"
+                                                    >
+                                                        <li
+                                                            role="menuitem"
+                                                            *ngFor="let input of inputs_static[k].values"
+                                                            style="padding: 2px 0; border-bottom : none;"
+                                                        >
+                                                            <a class="dropdown-item" (click)="addNewInput(k, input)">{{
+                                                                localeService.getDisplayText(input)
+                                                            }}</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!-- btn-group -->
+                                            </div>
+                                            <!-- col -->
+                                        </div>
+                                        <!-- row -->
+                                    </ng-template>
+                                    <!--</ng-template>-->
+                                </div>
+                                <!-- survey-questions-container -->
+                            </div>
+
+                            <div *ngIf="currentSurveyTab === 1">
+                                <div
+                                    class="survey-questions-container"
+                                    style="top: 120px; padding: 15px;"
+                                    tabindex="-1"
+                                    #surveyQuestionContainer
+                                >
+                                    <ng-template ngFor let-process [ngForOf]="processes">
+                                        <div class="row">
+                                            <div class="col-md-4 text-center">
+                                                <h4>{{ localeService.getDisplayText(process.type) }}</h4>
+                                            </div>
+                                            <!-- col -->
+                                        </div>
+                                        <!-- row -->
+
+                                        <div class="row">
+                                            <div class="col-md-2 text-center">
+                                                <h5>{{ 'Process' | translate }}</h5>
+                                            </div>
+                                            <!-- col -->
+                                            <div class="col-md-2 text-center">
+                                                <h5>{{ 'Facility' | translate }}</h5>
+                                            </div>
+                                            <!-- col -->
+                                        </div>
+                                        <!-- row -->
+
+                                        <div class="row" style="margin: 10px 0;" *ngFor="let vp of process.values">
+                                            <div class="col-md-4">
+                                                <div class="input-group" style="width: 100%;">
+                                                    <span class="input-group-addon" style="width: 50%;">
+                                                        {{ localeService.getDisplayText(vp) }}
+                                                    </span>
+                                                    <select
+                                                        class="form-control"
+                                                        name="vpToFacility"
+                                                        id="vpToFacility"
+                                                        [disabled]="canProceed[1] || surveyModalTR.preview"
+                                                        [(ngModel)]="vpToFacility[vp]"
+                                                    >
+                                                        <option [value]="" disabled selected>{{
+                                                            'Select Facility' | translate
+                                                        }}</option>
+                                                        <option value="NA">{{ 'Not Applicable' | translate }}</option>
+                                                        <option
+                                                            [value]="facility.id"
+                                                            *ngFor="let facility of facilities | sortByFilter"
+                                                            >{{ facility.name }}</option
+                                                        >
+                                                    </select>
+                                                </div>
+                                                <!-- input-group -->
+                                            </div>
+                                            <!-- col -->
+                                        </div>
+                                        <!-- row -->
+                                        <hr />
+                                    </ng-template>
+                                </div>
+                                <!-- survey-questions-container -->
+                            </div>
+
+                            <div *ngIf="currentSurveyTab === 2">
+                                <div>
+                                    <ul class="survey-sub-groups-menu">
+                                        <li
+                                            *ngFor="let tab of subGroupTabs"
+                                            [ngClass]="{ current: selectedTabName === tab }"
+                                            (click)="selectedTabName = tab"
+                                        >
+                                            {{ localeService.getDisplayText(tab) }}
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div></div>
+                                <div
+                                    class="survey-questions-container"
+                                    tabindex="-1"
+                                    #surveyQuestionContainer
+                                    *ngIf="!loadingSurveyQuestions"
+                                >
+                                    <app-survey-questions
+                                        [questions]="surveyQuestions"
+                                        [groupName]="groupName"
+                                        [isDisabled]="surveyModalTR.preview"
+                                        [subGroupName]="selectedTabName"
+                                        [answered]="answered"
+                                        [responses]="responses"
+                                        [assessmentId]="assessmentId"
+                                        [isSubQuestion]="false"
+                                    >
+                                    </app-survey-questions>
+                                </div>
+                                <!-- survey-questions-container -->
+                            </div>
+
+                            <!-- Certifications tab -->
+                            <div *ngIf="currentSurveyTab === 3">
+                                <div
+                                    class="survey-questions-container"
+                                    style="top: 120px; padding: 15px;"
+                                    tabindex="-1"
+                                >
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <app-add-certifications
+                                                [certifications_types]="certifications_types"
+                                                [trId]="currentTRId"
+                                                [isDisabled]="surveyModalTR.preview"
+                                            >
+                                            </app-add-certifications>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Shipment Details Tab -->
+                            <div *ngIf="currentSurveyTab === 4">
+                                <div
+                                    class="survey-questions-container"
+                                    style="top: 120px; padding: 15px;"
+                                    tabindex="-1"
+                                >
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <app-add-shipment-details
+                                                [trId]="currentTRId"
+                                                [isDisabled]="surveyModalTR.preview"
+                                            >
+                                            </app-add-shipment-details>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- col -->
+                    </div>
+                    <!-- row -->
+                </div>
+                <!-- container-fluid -->
+            </div>
+            <!-- modal-body -->
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-6">
+                        <ng-template [ngIf]="!canProceed[currentSurveyTab]">
+                            <button
+                                type="button"
+                                class="btn btn-blue"
+                                (click)="saveFibreMaterials()"
+                                *ngIf="currentSurveyTab === 0 && !launchTRModalLaunchingBusy && fibreMaterialSelection"
+                            >
+                                {{ 'Confirm' | translate }}
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-blue"
+                                (click)="createTR()"
+                                *ngIf="currentSurveyTab === 0 && !launchTRModalLaunchingBusy && !fibreMaterialSelection"
+                            >
+                                {{ 'Confirm' | translate }}
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-blue"
+                                (click)="createVPToFacility()"
+                                *ngIf="currentSurveyTab === 1"
+                            >
+                                {{ 'Confirm' | translate }}
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-blue"
+                                (click)="submitSurvey()"
+                                *ngIf="currentSurveyTab === 2"
+                            >
+                                {{ 'Submit' | translate }}
+                            </button>
+                        </ng-template>
+                        <ng-template [ngIf]="canProceed[currentSurveyTab]">
+                            <button
+                                type="button"
+                                class="btn btn-blue"
+                                (click)="setCurrentSurveyTab(currentSurveyTab + 1)"
+                            >
+                                {{ 'Next' | translate }}
+                            </button>
+                        </ng-template>
+
+                        <app-spinner [small]="true" *ngIf="launchTRModalLaunchingBusy"></app-spinner>
+
+                        <button type="button" class="btn btn-gray" data-dismiss="modal" (click)="surveyModal.hide()">
+                            {{ 'Cancel' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content -->
+    </div>
+    <!-- modal-dialog-->
+</div>
+<!-- surveyModal -->
+
+<div
+    bsModal
+    #facilityModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="facilityInfoModal"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">{{ viewingFacility?.name }}</h4>
+                <button type="button" class="close pull-right" (click)="facilityModal.hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <!-- modal-header -->
+            <div class="modal-body" style="padding: 15px 30px;">
+                <div class="row viewMode" *ngIf="viewingFacility">
+                    <div class="col-md-3">
+                        <div class="companyLogo">
+                            <img
+                                style="max-height: 260px; max-width: 100%;"
+                                class="img-responsive"
+                                src="{{ profileData.logo_url }}"
+                                alt="Company Logo"
+                            />
+                        </div>
+                        <!-- companyLogo -->
+
+                        <div class="companyName">{{ viewingFacility.name }}</div>
+                        <!-- Company Name -->
+
+                        <div class="companyAddress">
+                            <address
+                                *ngIf="
+                                    viewingFacility.address.addressLine1 ||
+                                    viewingFacility.address.country ||
+                                    viewingFacility.address.city ||
+                                    viewingFacility.address.state
+                                "
+                            >
+                                <div *ngIf="viewingFacility.address.addressLine1">
+                                    {{ viewingFacility.address.addressLine1 }}
+                                </div>
+                                <div *ngIf="viewingFacility.address.addressLine2">
+                                    {{ viewingFacility.address.addressLine2 }}
+                                </div>
+                                <div *ngIf="viewingFacility.address.city">{{ viewingFacility.address.city }}</div>
+                                <div *ngIf="viewingFacility.address.state">{{ viewingFacility.address.state }}</div>
+                                <div>
+                                    {{ viewingFacility.address.country }}
+                                    <ng-template [ngIf]="viewingFacility.address.zip">-</ng-template>
+                                    {{ viewingFacility.address.zip }}
+                                </div>
+                                <br />
+                            </address>
+
+                            <p
+                                class="disabled-text fs-12"
+                                style="text-align: left !important;"
+                                *ngIf="
+                                    !viewingFacility.address.addressLine1 &&
+                                    !viewingFacility.address.country &&
+                                    !viewingFacility.address.city &&
+                                    !viewingFacility.address.state
+                                "
+                            >
+                                {{ 'Address / Location Not Provided' | translate }}
+                            </p>
+                        </div>
+                        <!-- Address -->
+
+                        <div class="contact">
+                            <h4>{{ 'Contact Person' | translate }}</h4>
+                            <p class="contactName">{{ profileData.contactPersonName }}</p>
+                            <p class="contactEmail">{{ profileData.contactEmail }}</p>
+                            <p class="contactMobile">{{ profileData.contactMobile }}</p>
+                        </div>
+                        <!-- contact -->
+                    </div>
+                    <!-- col -->
+
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="valueProcesses" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Value Processes' | translate }} ({{
+                                                viewingFacility.valueProcess?.length
+                                            }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 12</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="valueProcessesContainer">
+                                        <p
+                                            class="noMaterials pt-1 fs-14"
+                                            *ngIf="viewingFacility.valueProcess?.length <= 0"
+                                        >
+                                            {{ 'No Value Processes' | translate }}
+                                        </p>
+                                        <ul class="list-unstyled list-inline itemList">
+                                            <li class="item" *ngFor="let vp of viewingFacility.valueProcess">
+                                                {{ localeService.getDisplayText(vp) }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- valueProcessesContainer -->
+                                </div>
+                                <!-- ValueProcesses -->
+
+                                <div class="materials" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Materials' | translate }} ({{ viewingFacility.materials?.length }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 11</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="materialsContainer">
+                                        <p
+                                            class="noMaterials pt-1 fs-14"
+                                            *ngIf="viewingFacility.materials?.length <= 0"
+                                        >
+                                            {{ 'No Materials' | industry | translate }}
+                                        </p>
+                                        <ul class="list-unstyled list-inline itemList">
+                                            <li class="item" *ngFor="let material of viewingFacility.materials">
+                                                {{ localeService.getDisplayText(material) }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- materialsContainer -->
+                                </div>
+                                <!-- materials -->
+
+                                <div class="standards" style="margin-top: 0;">
+                                    <div>
+                                        <h4 class="pull-left">
+                                            {{ 'Standards' | translate }} &amp; {{ 'Certifications' | translate }} ({{
+                                                viewingFacility.standards?.length
+                                            }})
+                                        </h4>
+                                        <!--<span class="pull-right" style="margin-top: 10px;">-->
+                                        <!--<i class="fa fa-caret-left" style="cursor: pointer; font-size: 20px; margin-right: 5px;"></i>-->
+                                        <!--<span style="position: relative; color: #A0A0A0; top: -2px;">1 - 9</span>-->
+                                        <!--<i class="fa fa-caret-right" style="cursor: pointer; font-size: 20px; margin-left: 5px;"></i>-->
+                                        <!--</span>-->
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="standardsContainer">
+                                        <p
+                                            class="noMaterials pt-1 fs-14"
+                                            *ngIf="viewingFacility.standards?.length <= 0"
+                                        >
+                                            {{ 'No Standards' | translate }} &amp; {{ 'Certifications' | translate }}
+                                        </p>
+                                        <div class="row" *ngIf="viewingFacility.standards?.length > 0">
+                                            <div
+                                                class="col-md-2 standardsImageContainer"
+                                                tooltip="{{ localeService.getDisplayText(standard) }}"
+                                                data-placement="top"
+                                                container="body"
+                                                *ngFor="let standard of viewingFacility.standards; let i = index"
+                                            >
+                                                <img
+                                                    class="img-responsive standardsImage"
+                                                    src="{{ utilService.getStandardImageUrl(standard) }}"
+                                                    alt=""
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- standardsContainer -->
+                                </div>
+                                <!-- standards -->
+                            </div>
+                            <!-- col -->
+
+                            <div class="col-md-4">
+                                <div class="facilities">
+                                    <h4>{{ 'Facility Location' | translate }}</h4>
+                                    <div class="facilitiesContainer">
+                                        <p
+                                            class="noMaterials disabled-text fs-14 pt-1"
+                                            *ngIf="!viewingFacility.address?.country"
+                                        >
+                                            {{ 'Not Provided' | translate }}
+                                        </p>
+                                        <p class="pt-1">
+                                            <span
+                                                class="flag-icon flag-icon-{{
+                                                    getCountryCode(viewingFacility.address?.country)
+                                                }}"
+                                            ></span>
+                                            <span style="margin-left: 10px;">{{
+                                                viewingFacility.address?.country
+                                            }}</span>
+                                        </p>
+                                    </div>
+                                    <!-- facilitiesContainer -->
+                                </div>
+                                <!-- facilities -->
+                            </div>
+                            <!-- col -->
+                        </div>
+                        <!-- row -->
+                    </div>
+                    <!-- col -->
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer" style="text-align: center !important;">
+                <button class="btn btn-reset reset-password-button" (click)="facilityModal.hide()">
+                    {{ 'Close' | translate }}
+                </button>
+            </div>
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->

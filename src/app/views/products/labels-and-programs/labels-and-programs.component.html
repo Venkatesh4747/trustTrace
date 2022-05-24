@@ -1,0 +1,25 @@
+<div class="row header no-border">
+    <div class="col-md-12 header-search ">
+        <div class="page-title">
+            <div>{{ titles.active.title | translate }}</div>
+            <div class="page-description font-color-primary">
+                {{ titles.active.description | translate }}
+            </div>
+        </div>
+
+        <button
+            class="btn btn-lg btn-blue pull-right btn-gradient cs-btn"
+            *ngIf="isRoot && hasLabelCreateAccess"
+            routerLink="create"
+        >
+            <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Create" />
+            {{ 'Create Labels' | translate }}
+        </button>
+
+        <button class="go-back-button" *ngIf="!isRoot" [routerLink]="['.']">
+            {{ 'Back' | translate }}
+        </button>
+    </div>
+</div>
+
+<router-outlet></router-outlet>

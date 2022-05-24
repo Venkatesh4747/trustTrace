@@ -1,0 +1,73 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="view-container">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header-section fix-header-block">
+                    <div class="page-header-section-inner">
+                        <div class="page-title">
+                            <h4 class="title">{{ 'User Management' | translate }}</h4>
+                            <h5 class="sub-title">{{ 'Manage the users of TrusTrace app' | translate }}</h5>
+                        </div>
+                        <!-- Page Title -->
+                    </div>
+                    <!-- Page Header Section Inner -->
+                    <div class="page-header-section-inner alignment-right"></div>
+                    <!-- Page Header Section Inner Alignment Right -->
+                </div>
+                <!-- Page Header Section -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+        <div class="page-body-section body-section-top-space">
+            <div class="row display-none">
+                <div class="col-md-12">
+                    <div class="mat-collapse-section mt-30">
+                        <mat-accordion>
+                            <mat-expansion-panel (click)="onMenuClick('Groups')">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        <h4 class="title">{{ 'Groups' | translate }}</h4>
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <div class="user-create-group-component-section">
+                                    <app-groups></app-groups>
+                                </div>
+                                <!-- User Create Group Component Section -->
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
+                    <!-- Collapse Section -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mat-collapse-section">
+                        <mat-accordion>
+                            <mat-expansion-panel (click)="onMenuClick('Users')">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        <h4 class="title">{{ 'Users' | translate }}</h4>
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <div class="user-create-component-section">
+                                    <app-users> </app-users>
+                                </div>
+                                <!-- User Create Component Section -->
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
+                    <!-- Collapse Section -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+        <!-- Page Body Section -->
+    </div>
+    <!-- Container Fluid -->
+</div>
+<!-- View Container -->

@@ -1,0 +1,32 @@
+/* .bold {
+  font-weight: 700;
+} */
+
+.block {
+  display: inline-block;
+}
+
+div.inline-edit {
+  text-decoration: none;
+  /* border-bottom: #A8B9CE dashed 5px; */
+  cursor: pointer;
+  text-align: center;
+  padding: .5em 0;
+  /* color: #444 !important; */
+  width: auto;
+  border: none;
+}
+
+input {
+  /* border: 1px solid #ccc;
+  border-radius: 2px; */
+  /* text-align: center; */
+  width: 100%;
+  border: none;
+}
+
+.inEdit{
+  text-align: center;
+}
+
+

@@ -1,0 +1,164 @@
+<div id="record-transactions-categories-v2" class="material-input-style-box-type">
+    <div id="outbound-transactions">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div class="row pb-2">
+            <div class="hr mr-2">
+                <span class="hr-title">{{ 'Outbound' | translate }}</span>
+            </div>
+        </div>
+        <div class="row" *ngIf="!pageLoading">
+            <form #createOutboundForm="ngForm" class="material-form-input">
+                <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label mb-2">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ 'Style Name & Number' | translate }}:"
+                                    name="Style"
+                                    [(ngModel)]="searchTerm"
+                                    (blur)="validateSelectedStyle()"
+                                    matInput
+                                    [matAutocomplete]="soaSearch"
+                                    (keyup)="searchStyle($event)"
+                                    required
+                                    data-cy="outbound-transaction-style-name-number"
+                                />
+                                <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                    soaSearchHintText | translate
+                                }}</mat-hint>
+                                <mat-autocomplete
+                                    #soaSearch="matAutocomplete"
+                                    [displayWith]="getStyleName"
+                                    (optionSelected)="onSOASelection($event.option.value)"
+                                >
+                                    <mat-option *ngFor="let item of config.SOA_search" [value]="item">
+                                        {{ item.product_name }}-{{ item.product_number }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <app-tt-dropdown-search
+                                [searchOptions]="config.lots"
+                                (selectionChange)="checkLotAlreadySelected($event)"
+                                [(ngModel)]="payload.outboundData.productionLotId"
+                                [placeholder]="'Lot ID:'"
+                                name="referenceId"
+                                [optionalParams]="optional"
+                                required
+                                [isRequired]="isRequired"
+                                [data_cy]="'outbound-transaction-reference-id'"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    [matDatepicker]="lotDatepicker"
+                                    placeholder="{{ 'Lot Manufactured Date' | translate }}:"
+                                    name="lotManufacturedDate"
+                                    [(ngModel)]="payload.outboundData.lotManufacturedDate"
+                                    readonly
+                                    data-cy="outbound-transaction-date"
+                                    required
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="lotDatepicker" disabled></mat-datepicker-toggle>
+                                <mat-datepicker #lotDatepicker disabled></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ 'Outbound Quantity(in Kgs)' | translate }}:"
+                                    name="quantity"
+                                    [(ngModel)]="payload.outboundData.quantity.quantity"
+                                    required
+                                    data-cy="outbound-transaction-quantity"
+                                />
+                            </mat-form-field>
+                        </div>
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    [matDatepicker]="outboundDatePicker"
+                                    placeholder="{{ 'Outbound Date' | translate }}:"
+                                    name="date"
+                                    [(ngModel)]="payload.date"
+                                    readonly
+                                    (click)="outboundDatePicker.open()"
+                                    data-cy="outbound-transaction-date"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="outboundDatePicker"></mat-datepicker-toggle>
+                                <mat-datepicker #outboundDatePicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <app-tt-dropdown-search
+                                [searchOptions]="config.customers | sortByFilter"
+                                [(ngModel)]="payload.outboundData.customerId"
+                                [placeholder]="'Customer:'"
+                                name="customer"
+                                required
+                                [isRequired]="isRequired"
+                                [data_cy]="'outbound-transaction-customer-name'"
+                            ></app-tt-dropdown-search>
+                        </div>
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ 'Business Document Number' | translate }}:"
+                                    name="purchaseOrderNo"
+                                    [(ngModel)]="payload.outboundData.poNumber"
+                                    required
+                                    data-cy="outbound-transaction-purchase-order-no"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <app-tt-dropdown-search
+                                [(ngModel)]="payload.facilityId"
+                                name="facilities"
+                                [placeholder]="'Outbound Facility:'"
+                                [searchOptions]="config.facilities"
+                                [isRequired]="false"
+                                [data_cy]="'outbound-transaction-associated-facility'"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+                    </div>
+                    <div class="row mt-3 mb-3 pt-3">
+                        <div class="col-md-12 text-center">
+                            <button
+                                id="order-create-btn"
+                                type="button"
+                                class="btn btn-gray create-btn btn-align mr-2"
+                                (click)="save()"
+                                [disabled]="!createOutboundForm.valid || pageLoading"
+                            >
+                                {{ 'Save' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,59 @@
+<div class="row card-input-single-container" provide-parent-form>
+    <form #chipCardForm="ngForm">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 display-flex">
+            <div class="card-input">
+                <mat-form-field [floatLabel]="'auto'">
+                    <input
+                        matInput
+                        [placeholder]="placeholderText | translate"
+                        [(ngModel)]="inputData.value"
+                        name="cardInput"
+                        required
+                    />
+                </mat-form-field>
+            </div>
+            <div>
+                <button
+                    type="button"
+                    class="btn btn-blue save-btn custom-margin mr-1"
+                    data-dismiss="modal"
+                    (click)="clearForm()"
+                >
+                    {{ 'Clear' | translate }}
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-gray save-btn"
+                    data-dismiss="modal"
+                    (click)="onSave(inputData)"
+                    [disabled]="!inputData.value"
+                    *ngIf="!isEditing"
+                >
+                    {{ 'Save' | translate }}
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-gray save-btn"
+                    data-dismiss="modal"
+                    (click)="onSave(inputData)"
+                    [disabled]="!inputData.value"
+                    *ngIf="isEditing"
+                >
+                    {{ 'Update' | translate }}
+                </button>
+            </div>
+        </div>
+    </form>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="hr">
+            <span class="hr-title">{{ hrTitle | translate }}: </span>
+        </div>
+    </div>
+    <app-chip-card
+        [cardData]="cardData"
+        [isCardDataStatusExists]="isCardDataStatusExists"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+        [hideEditDeleteCondition]="hideEditDeleteCondition"
+    ></app-chip-card>
+</div>

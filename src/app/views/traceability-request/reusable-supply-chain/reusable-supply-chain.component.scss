@@ -1,0 +1,52 @@
+@import '~styles/variables';
+
+.reusable-supply-chain {
+    font-family: 'Source Sans Pro-Regular';
+    color: #325992;
+    font-size: 17px;
+    text-align: left;
+}
+
+.reusable-chain-list {
+    position: relative;
+    max-height: calc(100vh - 24em);
+    overflow: auto;
+}
+
+.tt-table-title-with-background {
+    color: #325992 !important;
+}
+.mat-checkbox-layout .mat-checkbox-label {
+    font-weight: bold !important;
+}
+.entity-table {
+    background-color: $border-color-secondary;
+    display: flex;
+    align-items: center;
+    min-height: 59px;
+    padding: 0 10px;
+    margin: 0;
+    box-shadow: 0px 1px 4px 0 rgba(0, 0, 0, 0.2);
+    background-color: #ffffff;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    width: 100%;
+    margin-bottom: 0.2em;
+    z-index: 10;
+
+    .tr-title {
+        color: #325992 !important;
+    }
+}
+
+.entity-article-row {
+    margin: 0;
+}
+
+.odd-row {
+    background: $background-color-secondary-tr;
+}
+
+.even-row {
+    background: $background-color-primary-tr;
+}

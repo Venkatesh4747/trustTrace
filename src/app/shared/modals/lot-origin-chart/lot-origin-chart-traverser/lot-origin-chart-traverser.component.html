@@ -1,0 +1,21 @@
+<ng-template [ngIf]="!lot.length" [ngIfElse]="lotIsArray">
+    <li class="lot-item">
+        {{ lot.displayName }} <ng-template [ngIf]="lot.uniqueCode"> - {{ lot.uniqueCode }}</ng-template>
+    </li>
+    <app-lot-origin-chart-traverser
+        *ngIf="lot.hasOwnProperty('fromLotView') && lot.fromLotView !== null"
+        [lot]="lot.fromLotView"
+    ></app-lot-origin-chart-traverser>
+</ng-template>
+
+<ng-template #lotIsArray>
+    <li class="lot-item" *ngFor="let item of lot">
+        {{ item.displayName }} <ng-template [ngIf]="item.uniqueCode"> - {{ item.uniqueCode }}</ng-template>
+        <ul class="list-unstyled">
+            <app-lot-origin-chart-traverser
+                *ngIf="item.hasOwnProperty('fromLotView') && item.fromLotView !== null"
+                [lot]="item.fromLotView"
+            ></app-lot-origin-chart-traverser>
+        </ul>
+    </li>
+</ng-template>

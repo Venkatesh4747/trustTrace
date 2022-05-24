@@ -1,0 +1,210 @@
+<span
+    class="information-details-edit"
+    [ngSwitch]="data.displayConfig.type"
+    [formGroup]="parentForm"
+    *ngIf="data && data.displayConfig.editable"
+>
+    <span *ngSwitchCase="'SINGLE_SELECT'" class="form-row">
+        <mat-form-field [floatLabel]="'never'">
+            <mat-select [placeholder]="getPlaceHolderValue('SINGLE_SELECT')" [formControlName]="data.fieldId">
+                <mat-option *ngFor="let option of data.displayConfig.options" [value]="option.value">
+                    {{ option.value }}
+                </mat-option>
+            </mat-select>
+            <mat-error>
+                <span *ngIf="data.displayConfig.constraintConfig.errorMsg">{{
+                    data.displayConfig.constraintConfig.errorMsg
+                }}</span>
+                <span *ngIf="!data.displayConfig.constraintConfig.errorMsg">{{ 'Invalid input' | translate }}</span>
+            </mat-error>
+        </mat-form-field>
+    </span>
+
+    <span *ngSwitchCase="'MULTI_SELECT'" class="form-row">
+        <mat-form-field [floatLabel]="'never'">
+            <mat-select
+                [placeholder]="getPlaceHolderValue('MULTI_SELECT')"
+                [formControlName]="data.fieldId"
+                multiple
+                disableOptionCentering="true"
+                [(ngModel)]="value"
+            >
+                <mat-option
+                    *ngFor="let option of data.displayConfig.options"
+                    [value]="option.value"
+                    (click)="handleMultiSelect(option.value)"
+                >
+                    {{ option.value }}
+                </mat-option>
+            </mat-select>
+            <mat-error>
+                <span *ngIf="data.displayConfig.constraintConfig.errorMsg">{{
+                    data.displayConfig.constraintConfig.errorMsg
+                }}</span>
+                <span *ngIf="!data.displayConfig.constraintConfig.errorMsg">{{ 'Invalid input' | translate }}</span>
+            </mat-error>
+        </mat-form-field>
+    </span>
+
+    <span *ngSwitchCase="'TEXT'" class="form-row">
+        <mat-form-field [floatLabel]="'never'">
+            <input
+                matInput
+                [formControlName]="data.fieldId"
+                [name]="data.fieldId"
+                [placeholder]="getPlaceHolderValue('TEXT')"
+            />
+            <mat-error>
+                <span *ngIf="data.displayConfig.constraintConfig.errorMsg">{{
+                    data.displayConfig.constraintConfig.errorMsg
+                }}</span>
+                <span *ngIf="!data.displayConfig.constraintConfig.errorMsg">{{ 'Invalid input' | translate }}</span>
+            </mat-error>
+        </mat-form-field>
+    </span>
+
+    <span *ngSwitchCase="'TEXTAREA'" class="form-row">
+        <mat-form-field [floatLabel]="'never'">
+            <textarea
+                matInput
+                [formControlName]="data.fieldId"
+                [name]="data.fieldId"
+                [placeholder]="getPlaceHolderValue('TEXTAREA')"
+                rows="1"
+            ></textarea>
+            <mat-error>
+                <span *ngIf="data.displayConfig.constraintConfig.errorMsg">{{
+                    data.displayConfig.constraintConfig.errorMsg
+                }}</span>
+                <span *ngIf="!data.displayConfig.constraintConfig.errorMsg">{{ 'Invalid input' | translate }}</span>
+            </mat-error>
+        </mat-form-field>
+    </span>
+
+    <span *ngSwitchCase="'NUMBER'" class="form-row">
+        <mat-form-field [floatLabel]="'never'">
+            <input
+                matInput
+                type="number"
+                [errorStateMatcher]="matcher"
+                [min]="data.displayConfig.constraintConfig.min"
+                [max]="data.displayConfig.constraintConfig.max"
+                [step]="data.displayConfig.constraintConfig.step"
+                [name]="data.fieldId"
+                [formControlName]="data.fieldId"
+                [placeholder]="getPlaceHolderValue('NUMBER')"
+            />
+            <mat-error>
+                <span *ngIf="data.displayConfig.constraintConfig.errorMsg">{{
+                    data.displayConfig.constraintConfig.errorMsg
+                }}</span>
+                <span *ngIf="!data.displayConfig.constraintConfig.errorMsg">{{ 'Invalid input' | translate }}</span>
+            </mat-error>
+        </mat-form-field>
+    </span>
+
+    <span *ngSwitchCase="'DATE'" class="form-row">
+        <mat-form-field [floatLabel]="'never'">
+            <input
+                matInput
+                [formControlName]="data.fieldId"
+                [matDatepicker]="ind"
+                (focus)="ind.open()"
+                (click)="ind.open()"
+                [placeholder]="getPlaceHolderValue('DATE')"
+                [required]="data.displayConfig.constraintConfig.mandatory"
+                readonly
+            />
+            <mat-datepicker #ind></mat-datepicker>
+            <mat-datepicker-toggle matSuffix [for]="ind"></mat-datepicker-toggle>
+            <mat-error>
+                <span *ngIf="data.displayConfig.constraintConfig.errorMsg">
+                    {{ data.displayConfig.constraintConfig.errorMsg }}
+                </span>
+                <span *ngIf="!data.displayConfig.constraintConfig.errorMsg">{{ 'Invalid input' | translate }}</span>
+            </mat-error>
+        </mat-form-field>
+    </span>
+
+    <span *ngSwitchCase="'FILE'" class="form-row">
+        <span class="ec-file">
+            <span class="drag-file-upload-container " *ngIf="!uploadingFile">
+                <span class="drag-file-upload" (click)="InvokeFileUpload(data.fieldId)">
+                    <span *ngIf="!uploadingFile" class="drag-file-upload-icon">
+                        <mat-icon>arrow_upward</mat-icon>
+                    </span>
+                    <span *ngIf="!uploadingFile" class="pl-1">{{ getPlaceHolderValue('FILE') | translate }}</span>
+                    <input
+                        type="file"
+                        class="hidden"
+                        id="file_upload_{{ data.fieldId }}"
+                        name="file_upload_{{ data.fieldId }}"
+                        (change)="uploadFile(data, $event.target.files)"
+                        [hidden]="true"
+                    />
+                </span>
+                <!-- Drag File Upload -->
+            </span>
+            <span *ngIf="uploadingFile" class="margin-0-auto">
+                <app-spinner [small]="true"></app-spinner>
+            </span>
+        </span>
+        <!-- Display Inline Block -->
+        <span class="display-inline-block upload-file-block" *ngIf="uploadedFile && uploadedFile.data.length > 0">
+            <div *ngFor="let uploaded_file of uploadedFile.data; let fileIndex = index" class="width-210-px">
+                {{ uploaded_file.fileName }}
+                <span
+                    class="files download image-icon cursorp"
+                    tooltip="Download File"
+                    (click)="downloadFile(uploaded_file.id, uploaded_file.fileName)"
+                >
+                    <img src="{{ env.IMG_URL }}images/file-download.png" alt="Download" />
+                </span>
+                <span
+                    class="files download image-icon cursorp"
+                    tooltip="Delete File"
+                    (click)="removeFile(uploadedFile, fileIndex)"
+                >
+                    <img src="{{ env.IMG_URL }}images/questionaire-del.png" alt="Delete" />
+                </span>
+            </div>
+        </span>
+    </span>
+</span>
+<span *ngIf="data && !data.displayConfig.editable">
+    <span [ngSwitch]="data.displayConfig.type">
+        <span *ngSwitchCase="'DATE'">
+            {{ fieldResponse[data.fieldId][0] | date: 'd-MMM-yyyy' }}
+        </span>
+
+        <span *ngSwitchCase="'FILE'">
+            <div
+                class="files download"
+                *ngFor="let fileInfo of fileInfos"
+                (click)="downloadFile(fileInfo.id, fileInfo.fileName)"
+            >
+                <span class="fileName cursorp">{{ fileInfo.fileName }}</span>
+
+                <span class="files download image-icon cursorp">
+                    <img src="{{ env.IMG_URL }}images/file-download.png" alt="Download" />
+                </span>
+            </div>
+        </span>
+
+        <span *ngSwitchCase="'MULTI_SELECT'">
+            <span *ngFor="let val of fieldResponse[data.fieldId]; let isLast = last">
+                {{ val }}{{ isLast ? '' : ',' }}
+            </span>
+        </span>
+
+        <span *ngSwitchCase="'TABLE'">
+            <span *ngFor="let val of fieldResponse[data.fieldId]; let isLast = last">
+                {{ val }}{{ isLast ? '' : ',' }}
+            </span>
+        </span>
+
+        <span *ngSwitchDefault>
+            {{ fieldResponse[data.fieldId][0] }}
+        </span>
+    </span>
+</span>

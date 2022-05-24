@@ -1,0 +1,75 @@
+@import '~styles/variables';
+
+#tr-container {
+    .table-card-left {
+        .desc.blue-desc {
+            span {
+                font-size: 14px;
+                color: $text-color-primary;
+                font-family: $font-family-Bold;
+            }
+        }
+    }
+}
+
+.circle {
+    width: 40px;
+    height: 15px;
+    border-radius: 3px;
+}
+.red-circle {
+    background-color: #fc814a;
+}
+.yellow-circle {
+    background-color: #fcd34a;
+}
+.green-circle {
+    background-color: #95ffad;
+}
+
+.margin-auto {
+    margin: 0 auto;
+}
+/* Table */
+.tr-table {
+    position: absolute;
+    top: 250px;
+    left: 30px;
+    right: 45px;
+    bottom: 21px;
+    overflow-y: auto;
+}
+.supply-chain-tree {
+    width: 25px;
+    height: 25px;
+}
+
+.action-icons-small {
+    font-size: 15px;
+    color: #777;
+    height: 35px;
+    width: 40px;
+    margin-right: 5px;
+    background: #d4f2ff;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    float: right;
+}
+
+.certificate-validation-count .count-details {
+    color: $text-color-primary;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.supplier-article-lable {
+    font-size: 15px;
+    font-weight: bold;
+    color: #18a0fb;
+}
+.grey-out-action {
+    opacity: 0.65;
+}

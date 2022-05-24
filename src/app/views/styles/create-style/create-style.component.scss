@@ -1,0 +1,21 @@
+@import '~styles/variables';
+.mat-expansion-panel {
+    margin: 0 30px 15px 0;
+    border-radius: 10px !important;
+}
+.mat-expansion-panel-header-title {
+    color: $text-color-primary;
+    font-family: $font-family-Semibold;
+    font-size: 20px;
+}
+.styles-text-input {
+    border: none;
+    box-shadow: none;
+    border-bottom: 2px solid #ccc;
+}
+.cancel-btn,
+.save-btn {
+    border-radius: 5px;
+    width: 110px;
+    margin-left: 15px;
+}

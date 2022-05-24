@@ -1,0 +1,42 @@
+@import '~styles/variables';
+.input-materials-btn {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    color: $text-color-primary;
+    font-family: $font-family-Semibold;
+    font-size: 14px;
+}
+
+.action-icons-big,
+.action-icons-small {
+    font-size: 19px;
+    color: #777;
+    height: 35px;
+    width: 35px;
+    margin-right: 5px;
+    background: $button-action-background;
+    border-radius: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.add-input-title {
+    font-family: $font-family-Semibold;
+    color: $text-color-primary;
+    font-size: 15px;
+    text-align: left;
+    text-align: center;
+}
+.repack-align {
+    margin-top: 10px;
+}
+
+.label {
+    font-size: 19px;
+}
+.input {
+    font-size: 14px;
+    color: $text-color-primary;
+}

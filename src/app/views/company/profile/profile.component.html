@@ -1,0 +1,362 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <div class="main-container">
+            <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+            <!--****** LEFT DIV *******-->
+            <div class="company-profile">
+                <div class="company-pic-container">
+                    <a (click)="invokeFileUpload()">
+                        <img class="edit-company-pic-btn" src="{{ utilService.getcdnImage('edit-model.png') }}" />
+                    </a>
+                    <input
+                        type="file"
+                        name="companyLogo"
+                        id="companyLogo"
+                        #companyLogoInput
+                        (change)="uploadLogo($event.target.files)"
+                        style="visibility: hidden; position: absolute;"
+                    />
+                    <img
+                        class="thumbnail"
+                        class="img-responsive"
+                        src="{{ profileData.logo_url || utilService.getcdnImage('no-company-logo-found.png') }}"
+                        alt="Company Logo"
+                    />
+
+                    <!-- LOCATION DETAILS -->
+                    <app-address
+                        [address]="address"
+                        (addressValueChange)="onValueChange($event, 'ADDRESS')"
+                        [formMode]="editAddress"
+                        [editVisible]="editVisible"
+                    ></app-address>
+
+                    <!-- CONTACT DETAILS SECTION -->
+                    <app-contact-info
+                        [contact]="contact"
+                        (contactValueChange)="onValueChange($event, 'CONTACT')"
+                        [formMode]="editContactInfo"
+                        [showEditIcon]="false"
+                    ></app-contact-info>
+                    <!-- CONTACT DETAILS ENDS -->
+                </div>
+            </div>
+            <!--****** LEFT DIV ENDS *******-->
+
+            <!--****** RIGHT DIV *******-->
+            <div class="company-statistics">
+                <div class="company-location-details" *ngIf="!editCompanyDetail">
+                    <div class="company-name">
+                        <p class="company-heading" *ngIf="company.companyName">{{ company.companyName }}</p>
+                        <div class="edit-btn-container">
+                            <a (click)="showCompanyDetailForm()">
+                                <img class="edit-img" src="{{ utilService.getcdnImage('edit-model.png') }}" />
+                            </a>
+                        </div>
+                    </div>
+                    <div id="profile-completeness">
+                        <div class="progress-container">
+                            <div>
+                                <div class="title">
+                                    {{ 'Profile Completeness' | translate }}: <span>{{ pcScore }}%</span>
+                                </div>
+                                <div class="progress">
+                                    <div
+                                        class="progress-bar"
+                                        [style.background-color]="changeProgressColor()"
+                                        [style.width]="pcScore + '%'"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div *ngIf="incompleteFields?.length > 0">
+                                <app-tt-expansion-list-menu [menuList]="incompleteFields"> </app-tt-expansion-list-menu>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p *ngIf="!company.companyName && !company.description">
+                        {{ 'No company details available. Click the edit button to add.' | translate }}
+                    </p>
+                    <div class="company-description" *ngIf="company.description">{{ company.description }}</div>
+                </div>
+
+                <!-- OPEN CONTAINER: TO ENTER THE COMPANY DETAILS -->
+
+                <div class="add-company-container" *ngIf="editCompanyDetail">
+                    <form class="location-form">
+                        <!--Company Name -->
+                        <mat-form-field class="company-input">
+                            <input
+                                matInput
+                                placeholder="{{ 'Company Name' | translate }}"
+                                [(ngModel)]="profileData.companyName"
+                                name="profileData.companyName"
+                                required
+                            />
+                        </mat-form-field>
+
+                        <!-- Company Description -->
+                        <mat-form-field class="company-input">
+                            <input
+                                matInput
+                                placeholder="{{ 'Description' | translate }}"
+                                name="profileData.description"
+                                [(ngModel)]="profileData.description"
+                            />
+                        </mat-form-field>
+
+                        <!-- Cancel Button -->
+                        <div class="btn-container display-flex-justify-flex-end">
+                            <button mat-button class="cancel-btn" (click)="showCompanyDetailBlock()">
+                                {{ 'Cancel' | translate }}
+                            </button>
+                            <button mat-button class="save-btn" (click)="saveCompanyDetailForm()">
+                                {{ 'Save' | translate }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <!-- COMPANY DETAILS ENDS -->
+
+                <div class="supplier-stats">
+                    <div class="flex-container">
+                        <div class="male">
+                            <p class="male-numbers">{{ employeeCount.men || 0 }}</p>
+                            <p class="male-title">{{ 'Male Employees' | translate }}</p>
+                        </div>
+                        <div class="female">
+                            <p class="female-numbers">{{ employeeCount.women || 0 }}</p>
+                            <p class="female-title">{{ 'Female Employees' | translate }}</p>
+                        </div>
+                        <div class="others-numbers">
+                            <p class="others-numbers">{{ employeeCount.others || 0 }}</p>
+                            <p class="others-title">{{ 'Others Employees' | translate }}</p>
+                        </div>
+                        <div class="orders placed">
+                            <p class="op-numbers">{{ profileData.noOfSuppliers || 0 }}</p>
+                            <a class="op-title" routerLink="/suppliers">{{ 'Suppliers' | translate }}</a>
+                        </div>
+                        <div class="styles">
+                            <p class="style-numbers">{{ profileData.noOfStyles || 0 }}</p>
+                            <a class="style-title" routerLink="/styles">{{ 'Styles' | translate }}</a>
+                        </div>
+                    </div>
+
+                    <div class="horizontal-div-wrapper">
+                        <!-- **VALUE PROCESS DIV** -->
+                        <div class="value-process-div">
+                            <!-- VP DETAILS -->
+                            <div class="hr">
+                                <span class="hr-title">{{ 'VALUE PROCESS' | translate }}</span>
+                            </div>
+                            <!-- VP CHIPS -->
+                            <p class="noMaterials pt-1" *ngIf="valueProcesses?.length <= 0">
+                                {{ 'No Value process' | translate }}
+                            </p>
+                            <div id="profile-chip-list">
+                                <mat-chip-list>
+                                    <mat-chip
+                                        class="vp-chip-style"
+                                        *ngFor="
+                                            let vp of localeService.getDisplayTextForList(valueProcesses) | sortByFilter
+                                        "
+                                        >{{ vp }}</mat-chip
+                                    >
+                                </mat-chip-list>
+                            </div>
+                            <!-- VP CHIPS -->
+                            <!-- VP DETAILS ENDS -->
+                            <!-- MATERIALS DETAILS -->
+                            <div class="hr">
+                                <span class="hr-title">{{ 'MATERIALS' | industry | translate }}</span>
+                            </div>
+                            <!-- MATERIAL CHIPS -->
+                            <p class="noMaterials pt-1" *ngIf="materials?.length <= 0">
+                                {{ 'No Materials' | industry | translate }}
+                            </p>
+                            <div id="profile-chip-list">
+                                <mat-chip-list>
+                                    <mat-chip
+                                        class="mat-chip-style"
+                                        *ngFor="
+                                            let material of localeService.getDisplayTextForList(materials)
+                                                | sortByFilter
+                                        "
+                                        >{{ material }}</mat-chip
+                                    >
+                                </mat-chip-list>
+                            </div>
+                            <!-- END OF MATERIAL CHIPS -->
+                            <!-- MATERIALS DETAILS ENDS -->
+
+                            <!-- CERT DETAILS -->
+                            <div class="certifications-container">
+                                <div class="hr">
+                                    <span class="hr-title">{{ 'CERTIFICATIONS' | translate }}</span>
+                                </div>
+                                <div class="standardsContainer" style="border:none;">
+                                    <p class="noMaterials pt-1" *ngIf="standards?.length <= 0">
+                                        {{ 'No Standards' | translate }} &amp;
+                                        {{ 'Certifications' | translate }}
+                                    </p>
+                                    <div class="row" *ngIf="standards?.length > 0">
+                                        <div
+                                            class="standardsImageContainer"
+                                            *ngFor="let standard of standards; let i = index"
+                                        >
+                                            <div
+                                                class="certificate-item"
+                                                [tooltip]="certificateTooltipContent"
+                                                data-placement="top"
+                                                (click)="
+                                                    certificateManagerService.downloadFile(
+                                                        standard.id,
+                                                        standard.uploadedFiles[0]
+                                                    )
+                                                "
+                                                containerClass="certificateTooltip"
+                                                container="body"
+                                            >
+                                                <img
+                                                    src="{{ utilService.getStandardImageUrl(standard.typeId) }}"
+                                                    (error)="utilService.getDefaultCertificateImage($event.target)"
+                                                    alt="Certificate Image"
+                                                />
+                                                <div class="overlay-download-icon">
+                                                    <img
+                                                        src="{{ env.IMG_URL }}images/icon-download-white.png"
+                                                        alt="Download Certificate"
+                                                    />
+                                                </div>
+                                                <div class="download-icon placement-bottom-right">
+                                                    <img
+                                                        src="{{ env.IMG_URL }}images/icon-download-grey.png"
+                                                        alt="Download Certificate"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <ng-template #certificateTooltipContent>
+                                                <div
+                                                    class="text-left"
+                                                    style="background-color: #fff; border: 1px solid #f5f5f5;"
+                                                >
+                                                    <h5 class="tt-font">
+                                                        {{ getCertificateNameById(standard.typeId) }}
+                                                    </h5>
+                                                    <h5 class="tt-font tt-font-regular">
+                                                        {{ 'Validity' | translate }}:
+                                                        <span style="font-weight: bold !important;">{{
+                                                            standard.expiryDate | date
+                                                        }}</span>
+                                                    </h5>
+                                                    <h5 class="tt-font tt-font-regular">
+                                                        {{ 'Certification Body' | translate }}:
+                                                        <span style="font-weight: bold !important;">{{
+                                                            standard.body
+                                                        }}</span>
+                                                    </h5>
+                                                    <h5 class="tt-font tt-font-regular">
+                                                        {{ 'Facility Name' | translate }}:
+                                                        <span style="font-weight: bold !important;">{{
+                                                            standard.facilityName
+                                                        }}</span>
+                                                    </h5>
+                                                </div>
+                                            </ng-template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- CERT DETAILS ENDS -->
+                        </div>
+                        <!-- **VALUE PROCESS DIV ENDS** -->
+
+                        <!-- **FACILITIES DIV** -->
+                        <div class="todo-list-div">
+                            <div class="hr">
+                                <span class="hr-title" data-cy="profile-facilities-count"
+                                    >{{ 'FACILITIES' | translate }}({{ profileData.Facilities.length }})</span
+                                >
+                            </div>
+
+                            <div class="create-facility-container" data-cy="create-facility-container">
+                                <a class="create-facility-title" (click)="addFacility()">
+                                    <p>{{ 'Create Facility' | translate }}</p>
+                                </a>
+                                <a (click)="addFacility()"
+                                    ><img class="create-btn" src="{{ utilService.getcdnImage('add-model.png') }}"
+                                /></a>
+                            </div>
+
+                            <div class="facilities-div">
+                                <!-- CARD1 -->
+                                <div class="table-card" *ngFor="let facility of profileData.Facilities; index as i">
+                                    <div class="table-card-left no-cursor">
+                                        <p class="company-name">
+                                            <a
+                                                style="color: #325992;
+                                            "
+                                                (click)="viewFacility(i)"
+                                                >{{ facility.name }}</a
+                                            >
+                                        </p>
+                                        <p class="desc" *ngIf="facility.createdCompanyName">
+                                            {{ 'Created By' | translate }}:
+                                            {{ facility.createdCompanyName }}
+                                        </p>
+                                        <p class="desc">
+                                            {{ 'Production Capacity' | translate }}:
+                                            {{ facility.productionCapacity || ('Not Available' | translate) }}
+                                        </p>
+                                        <p class="desc">{{ facility.address?.country }}</p>
+                                    </div>
+                                    <div class="table-card-right flex-column">
+                                        <div
+                                            class="flag-icon flag-icon-{{
+                                                getCountryCode(facility.address?.country)
+                                            }} action-item align-self-flex-end ml-10"
+                                        ></div>
+                                        <div class="edit-del-container">
+                                            <a (click)="editFacility(i)">
+                                                <img
+                                                    class="create-btn"
+                                                    alt="Edit"
+                                                    src="{{ utilService.getcdnImage('edit-model.png') }}"
+                                                />
+                                            </a>
+                                            <a
+                                                (click)="
+                                                    facility.companyId !== facility.createdCompanyId
+                                                        ? $event.stopPropagation()
+                                                        : openDelDialog(i)
+                                                "
+                                                *ngIf="!facility.type || facility.type !== 'HQ'"
+                                                [ngClass]="{
+                                                    'disabled-opacity': facility.companyId !== facility.createdCompanyId
+                                                }"
+                                                [tooltip]="
+                                                    facility.companyId !== facility.createdCompanyId
+                                                        ? ('This is a brand created facility and cannot be deleted'
+                                                          | translate)
+                                                        : ('Delete Facility' | translate)
+                                                "
+                                            >
+                                                <img
+                                                    class="create-btn"
+                                                    alt="Delete"
+                                                    src="{{ utilService.getcdnImage('delete-model.png') }}"
+                                                />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- **FACILITIES DIV ENDS** -->
+                        </div>
+                    </div>
+                    <!--****** RIGHT DIV ENDS *******-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

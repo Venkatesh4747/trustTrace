@@ -1,0 +1,18 @@
+<div class="view-container text-center">
+  <div class="panel panel-default" style="display: inline-block; margin-top: 50px">
+    <div class="panel-heading">
+      <h2>{{'You have been invited' | translate}}</h2>
+    </div>
+
+    <div class="panel-body">
+      <p>
+        {{verificationCode}}
+      </p>
+
+
+      <p>{{'Processing your invitation' | translate}}</p>
+      <app-spinner [small]="true"></app-spinner>
+      <p>{{'Please Wait' | translate}}</p>
+    </div>
+  </div>
+</div>

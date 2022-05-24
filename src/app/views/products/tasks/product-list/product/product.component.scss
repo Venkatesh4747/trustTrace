@@ -1,0 +1,124 @@
+.mat-error {
+    display: inline-block;
+    line-height: 1.4;
+    margin-top: 0.2em;
+    font-size: 12px;
+    margin-bottom: 0.4em;
+}
+
+.split-group {
+    border-left: 1px solid #bababa4d;
+}
+
+.content-grey {
+    color: #a5a5a5;
+}
+
+.mat-checkbox {
+    cursor: pointer;
+}
+
+.opacity-5 {
+    cursor: not-allowed;
+}
+
+.width-auto {
+    width: auto !important;
+}
+
+.width-20-px {
+    width: 20px !important;
+}
+
+.view-icon {
+    img {
+        width: 15px;
+        cursor: pointer;
+        margin-top: 1.2em;
+    }
+}
+.product-detail-block {
+    margin-top: 0.3em;
+}
+
+.instructions-text {
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.57;
+    letter-spacing: normal;
+    text-align: left;
+    color: #4b4b4b;
+    padding-left: 15px;
+}
+
+.addNewFormArrayItemBtn {
+    button {
+        font-size: 14px;
+        font-weight: 600;
+        font-stretch: normal;
+        font-style: normal;
+        line-height: 1.57;
+        letter-spacing: normal;
+        text-align: left;
+
+        i {
+            font-weight: bold;
+            font-stretch: normal;
+            font-style: normal;
+            line-height: 1.09;
+            letter-spacing: normal;
+            text-align: left;
+            color: #4b4b4b;
+        }
+    }
+}
+
+.move-icon {
+    cursor: pointer;
+    background-color: #dddddd;
+    height: 25px;
+    width: 25px;
+    border-radius: 23px;
+    margin-top: 6px;
+    mat-icon {
+        color: #686868;
+        font-size: 19px;
+        margin-top: 2px;
+        margin-left: 3px;
+    }
+}
+
+.delete-icon {
+    width: 13px;
+    cursor: pointer;
+    img {
+        width: 13px;
+        margin-top: 0.6em;
+    }
+}
+
+.noFormArrayData {
+    position: relative;
+    top: 2em;
+    .addNewFormArrayItemBtn {
+        text-align: center;
+        margin-top: 0.5;
+    }
+    .instructions-text {
+        text-align: center;
+    }
+
+    @media screen and (max-width: 1366px) {
+        top: 4.5em;
+    }
+}
+
+.score-unavailable-api-icon {
+    img {
+        width: 18px;
+        cursor: pointer;
+        margin-top: 16px;
+    }
+}

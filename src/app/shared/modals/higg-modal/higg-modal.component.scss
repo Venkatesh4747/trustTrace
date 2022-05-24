@@ -1,0 +1,106 @@
+@import '~styles/variables';
+
+//higg steps modal
+.tt-higg-steps-wrapper {
+    position: relative;
+
+    .tt-higg-steps {
+        margin-top: 15px;
+
+        .tt-higg-steps-title {
+            color: $text-color-primary;
+            font-family: $font-family-Semibold;
+            font-size: 17px;
+            padding: 10px 0;
+        }
+
+        .tt-higg-steps-content {
+            color: $text-color-primary;
+        }
+    }
+
+    .tt-higg-steps-close {
+        position: absolute;
+        top: 0px;
+        right: 10px;
+        font-size: 24px;
+        background: $text-color-primary;
+        color: $color_white;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        text-align: center;
+        cursor: pointer;
+    }
+    .step2-img {
+        max-height: 280px;
+    }
+    .step3-img {
+        max-width: 420px;
+    }
+}
+
+.tt-higg-mapp-modal {
+    position: relative;
+
+    .tt-heading-title {
+        color: $text-color-primary;
+        font-family: $font-family-Semibold;
+        font-size: 16px;
+        padding: 10px 0;
+        font-weight: 600;
+    }
+
+    .tt-description {
+        color: $text-color-primary;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .btn {
+        border-radius: 5px;
+    }
+
+    .btn-cancel,
+    .btn-proceed {
+        padding: 5px 8px;
+        color: $text-color-drag-file;
+        font-weight: bold;
+    }
+
+    .btn-cancel {
+        background: transparent;
+        border: 1px solid;
+    }
+
+    .btn-proceed {
+        background-color: $tt-button-color-primary;
+    }
+
+    .btn-type-single {
+        padding: 5px 40px;
+        color: $button-text-color;
+        background-color: $tt-button-color-secondary;
+    }
+
+    .tt-higg-modal-2-btn-wrapper {
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    .table-display-content {
+        display: contents;
+    }
+
+    .table-borderless {
+        td,
+        th {
+            border-bottom: none !important;
+            padding: 10px;
+            line-height: 20px;
+            vertical-align: top;
+            font-weight: normal;
+        }
+    }
+}

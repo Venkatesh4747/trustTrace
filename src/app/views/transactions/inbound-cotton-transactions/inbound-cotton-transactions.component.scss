@@ -1,0 +1,27 @@
+@import '~styles/variables';
+
+.delete-row {
+    text-align: right;
+    cursor: pointer;
+}
+
+.talign-right {
+    width: 94%;
+}
+
+.inbound-transaction-cotton-form {
+    position: relative;
+    left: -5px;
+}
+
+.inbound-transaction-cotton-form .label {
+    padding-bottom: 20px;
+}
+.input-material-btn {
+    text-align: right;
+}
+.action-icons-big {
+    background: #d8f7ff;
+    padding: 8px 10px;
+    border-radius: 50%;
+}

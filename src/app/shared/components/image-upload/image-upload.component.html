@@ -1,0 +1,26 @@
+<div class="image-upload-container">
+    <div *ngFor="let imageName of style.styleImageNames" class="image-wrapper">
+        <!-- <img [src]="image" alt="Product Image" class="product-image"> -->
+        <a (click)="removeFile(style.imagesId, imageName)"><mat-icon class="image-icon">close</mat-icon></a>
+        <app-secured-img
+            [id]="style.imagesId"
+            [fName]="imageName"
+            [altText]="'Product Image'"
+            [className]="'product-image'"
+        ></app-secured-img>
+    </div>
+    <div>
+        <i class="fa fa-spinner fa-spin" style="font-size:24px" *ngIf="uploadingProductImage"></i>
+        <a (click)="invokeFileUpload()" *ngIf="!uploadingProductImage">
+            + {{ 'Click here to upload product images' | translate }}
+        </a>
+        <input
+            type="file"
+            name="productImage"
+            id="productImage"
+            #productImageInput
+            (change)="uploadImage($event.target.files)"
+            style="visibility: hidden; position: absolute;"
+        />
+    </div>
+</div>

@@ -1,0 +1,208 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div class="row header no-border" *ngIf="!pageLoading">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 header-search pt-3">
+                <div class="page-title">
+                    <h4 class="title mt-0">{{ 'Pending Tasks' | translate }}</h4>
+                    <h5 class="sub-title">
+                        {{ 'New Tasks ' | translate }}: {{ newTaskCount }} | {{ 'Total Tasks ' | translate }}:
+                        {{ totalTaskCount }}
+                    </h5>
+                </div>
+                <!-- Page Title -->
+            </div>
+            <!-- col -->
+            <!-- <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 pt-3 justify-content-flex-end">
+                <div class="progress-bar-details">
+                    <a routerLink="/company/profile" (click)="onMenuClick('Edit Company Profile')" class="profile-url">
+                        Company Profile
+                    </a>
+                </div>
+            </div> -->
+            <div class="col-md-12 mt-2">
+                <div class="tt-tabs pb-2">
+                    <div class="cursor-default" (click)="navigateTo()">
+                        <label class="cursor-pointer" [ngClass]="{ active: activeTab === null }">
+                            {{ 'Pending Tasks' | translate }}
+                        </label>
+                    </div>
+                    <div class="cursor-default" (click)="navigateTo(tabNames[1])">
+                        <label class="cursor-pointer" [ngClass]="{ active: activeTab === tabNames[1] }">
+                            <span>{{ 'Approval Status' | translate }}</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 mt-1">
+                <div class="table-cont table-responsive" id="table-cont">
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th id="sno">{{ 'S.No' | translate }}</th>
+                                <!-- <th id="workingNumber">{{ 'Working Number' | translate }}</th> -->
+                                <th id="taskDescription">{{ 'Task Description' | translate }}</th>
+                                <!-- <th id="scOwner">{{ 'SC Owner' | translate }}</th> -->
+                                <th id="referenceNumber">{{ 'Reference / PO Number' | translate }}</th>
+                                <!-- <th id="expiryDate">{{ 'Expiry Date' | translate }}</th> -->
+                                <th id="sentBy">
+                                    {{ 'Sent By' | translate }}
+                                </th>
+                                <th id="sentDate">
+                                    {{ 'Sent Date' | translate }}
+                                </th>
+                                <th id="requestType">
+                                    {{ 'Request Type' | translate }}
+                                </th>
+                                <th id="action" *ngIf="activeTab !== tabNames[1]">{{ 'Action' | translate }}</th>
+                                <th id="status" *ngIf="activeTab === tabNames[1]">{{ 'Status' | translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <p class="content-center" *ngIf="!isFetchingTasks && tasks.length === 0">
+                                    {{ 'No request available' | translate }}
+                                </p>
+                            </tr>
+                            <tr>
+                                <p class="content-center" *ngIf="isFetchingTasks">
+                                    <app-spinner [small]="true"></app-spinner>
+                                </p>
+                            </tr>
+                            <ng-template ngFor [ngForOf]="taskApprovalCounter(tasks)" let-task let-i="index">
+                                <tr>
+                                    <td>
+                                        {{ i + 1 }}
+                                    </td>
+                                    <!-- <td *ngIf="task.working_number; else notAvailable">
+                                        <span [matTooltip]="task.working_number">{{ task.working_number }}</span>
+                                    </td> -->
+                                    <td>
+                                        <b>{{ task.description || ('Not Available' | translate) }}</b>
+                                    </td>
+                                    <!-- <td>
+                                        <b>{{ task.supplier?.value || ('Not Available' | translate) }}</b>
+                                    </td> -->
+                                    <td>
+                                        <span *ngIf="task.reference_number">
+                                            {{ task.reference_number }}
+                                        </span>
+                                        <span *ngIf="task.po_number">
+                                            {{ task.po_number }}
+                                        </span>
+                                        <span *ngIf="!task.reference_number && !task.po_number">
+                                            {{ 'Not Available' | translate }}
+                                        </span>
+                                    </td>
+                                    <!-- <td>
+                                        {{ task.valid_until || ('Not Available' | translate) }}
+                                    </td> -->
+                                    <td>{{ task.from_company?.name || ('Not Available' | translate) }}</td>
+                                    <td>
+                                        {{ task.sent_date | date: 'dd MMM yyyy' || ('Not Available' | translate) }}
+                                    </td>
+                                    <td>{{ task.task_type.value || ('Not Available' | translate) }}</td>
+                                    <td
+                                        class="action-btn"
+                                        *ngIf="activeTab !== tabNames[1] && task.task_type.id === 'NOTIFICATION'"
+                                    >
+                                        <button
+                                            type="button"
+                                            class="btn tt-btn tt-btn-primary"
+                                            (click)="handleNotificationViewButtonClick(task)"
+                                        >
+                                            {{ 'Clear' | translate }}
+                                        </button>
+                                    </td>
+                                    <td
+                                        class="action-btn"
+                                        *ngIf="
+                                            activeTab !== tabNames[1] &&
+                                            task.task_type.id === 'REASON_FOR_DELAY' &&
+                                            task.task_type.id !== 'NOTIFICATION'
+                                        "
+                                    >
+                                        <button
+                                            type="button"
+                                            class="btn tt-btn tt-btn-primary"
+                                            (click)="handleScopeCertificateButtonClick(task)"
+                                        >
+                                            {{ 'View' | translate }}
+                                        </button>
+                                    </td>
+                                    <td
+                                        class="action-btn"
+                                        *ngIf="
+                                            activeTab !== tabNames[1] &&
+                                            task.task_type.id !== 'REASON_FOR_DELAY' &&
+                                            task.task_type.id !== 'NOTIFICATION'
+                                        "
+                                    >
+                                        <a [routerLink]="task.link" [queryParams]="task.queryParams">
+                                            <button
+                                                type="button"
+                                                class="btn tt-btn tt-btn-primary"
+                                                *ngIf="task.task_type.id === 'CERT-EXPIRY'"
+                                                (click)="onActionButtonClicked('Update', task.description)"
+                                            >
+                                                {{ 'Update' | translate }}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn tt-btn tt-btn-primary"
+                                                *ngIf="
+                                                    task.task_type.id === 'SUPPLIER_ASSOCIATION' && task.status === 15
+                                                "
+                                                (click)="onActionButtonClicked('Accept', task.description)"
+                                            >
+                                                {{ 'Accept' | translate }}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn tt-btn tt-btn-primary"
+                                                *ngIf="task.status === 20"
+                                                (click)="onActionButtonClicked('Respond', task.description)"
+                                            >
+                                                {{ 'Respond' | translate }}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn tt-btn tt-btn-secondary"
+                                                *ngIf="task.status === 30"
+                                                (click)="onActionButtonClicked('Resume', task.description)"
+                                            >
+                                                {{ 'Resume' | translate }}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn tt-btn tt-btn-outline-secondary"
+                                                *ngIf="task.status === 40"
+                                                (click)="onActionButtonClicked('View', task.description)"
+                                            >
+                                                {{ 'View' | translate }}
+                                            </button>
+                                        </a>
+                                    </td>
+                                    <td *ngIf="activeTab === tabNames[1]">
+                                        {{ 'Pending' | translate }}
+                                    </td>
+                                    <ng-template #notAvailable>
+                                        <td class="content-grey">
+                                            {{ 'Not Available' | translate }}
+                                        </td>
+                                    </ng-template>
+                                </tr>
+                            </ng-template>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Table Count -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+    </div>
+    <!-- Container Fluid -->
+</div>
+<!-- View Container -->

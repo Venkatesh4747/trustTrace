@@ -1,0 +1,87 @@
+<div class="tt-date-filter-container" [ngClass]="className">
+    <button ngClass="menu-filter-item-button" type="button" mat-button (click)="dateSelect.open()">
+        <strong class="menu-filter-item-title">{{ label | getFieldLabel: '@dateRange' }}</strong>
+        <mat-icon>{{ arrowIcon }}</mat-icon>
+    </button>
+    <mat-select #dateSelect multiple (openedChange)="handleClose($event)">
+        <div class="tt-date-filter-section">
+            <div class="options-list">
+                <mat-option class="mat-option-date-filter-section">
+                    <div class="radio-block">
+                        <mat-radio-group
+                            aria-label="Select an option"
+                            [(ngModel)]="selectedValue"
+                            (change)="handleDateFilterTypeChange($event)"
+                        >
+                            <mat-radio-button
+                                *ngFor="let dateRange of dateRanges; let ind = index"
+                                [value]="dateRanges[ind].value"
+                                [hidden]="dateRange.hideField"
+                            >
+                                {{ dateRanges[ind].value | translate }}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                    <!-- Radio Block -->
+                </mat-option>
+                <mat-option class="mat-option-date-filter-section" [disabled]="selectedValue !== dateRanges[2].value">
+                    <div class="start-date">
+                        <mat-label class="mat-label">{{ 'Start Date' | translate }}</mat-label>
+                        <input
+                            matInput
+                            [matDatepicker]="startDateCtrl"
+                            [placeholder]="'Enter Start Date' | translate"
+                            [(ngModel)]="filterPayload['startDate']"
+                            [disabled]="selectedValue !== dateRanges[2].value"
+                        />
+                        <mat-datepicker-toggle
+                            matSuffix
+                            [for]="startDateCtrl"
+                            [disabled]="selectedValue !== dateRanges[2].value"
+                        ></mat-datepicker-toggle>
+                        <mat-datepicker #startDateCtrl [disabled]="selectedValue !== dateRanges[2].value">
+                        </mat-datepicker>
+                    </div>
+                    <!-- Start Date -->
+                </mat-option>
+                <mat-option class="mat-option-date-filter-section" [disabled]="selectedValue !== dateRanges[2].value">
+                    <div class="end-date">
+                        <mat-label class="mat-label">{{ 'End Date' | translate }}</mat-label>
+                        <input
+                            matInput
+                            [matDatepicker]="endDateCtrl"
+                            [placeholder]="'Enter End Date' | translate"
+                            [(ngModel)]="filterPayload['endDate']"
+                            [disabled]="selectedValue !== dateRanges[2].value"
+                        />
+                        <mat-datepicker-toggle
+                            matSuffix
+                            [for]="endDateCtrl"
+                            [disabled]="selectedValue !== dateRanges[2].value"
+                        ></mat-datepicker-toggle>
+                        <mat-datepicker #endDateCtrl [disabled]="selectedValue !== dateRanges[2].value">
+                        </mat-datepicker>
+                    </div>
+                    <!-- End Date -->
+                </mat-option>
+            </div>
+            <!-- Options List -->
+            <div class="button-block">
+                <button mat-button class="btn-group btn-bordered" data-cy="dropdown-clear-all-btn" *ngIf="showClearAll">
+                    {{ 'Clear All' | translate }}
+                </button>
+                <button
+                    mat-button
+                    class="btn-group btn-secondary-green"
+                    data-cy="dropdown-select-all-btn"
+                    (click)="applyDateChanges()"
+                >
+                    {{ 'Apply' | translate }}
+                </button>
+            </div>
+            <!-- Button Block -->
+        </div>
+        <!-- TT Date Filter Section -->
+    </mat-select>
+</div>
+<!-- TT Date Filter Container -->

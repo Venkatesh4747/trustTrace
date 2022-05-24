@@ -1,0 +1,36 @@
+@import '~styles/variables';
+.card-input-single-container {
+    font-family: $font-family-Regular;
+    color: $text-color-primary;
+    margin: 10px 0;
+    .display-flex {
+        padding-left: 15px;
+        padding-right: 10px;
+    }
+}
+.hr {
+    margin-top: 50px;
+    border-bottom: 2px solid #ececec;
+    font-family: $font-family-Semibold;
+    color: #ccc;
+}
+.hr-title {
+    font-family: $font-family-Semibold;
+    font-size: 16px;
+    color: $text-color-primary;
+}
+.card-input {
+    width: 50%;
+    text-align: left;
+    float: left;
+    font-size: 16px;
+}
+.save-btn {
+    border-radius: 5px;
+    cursor: pointer;
+    width: 125px;
+}
+
+.custom-margin {
+    margin-left: 10px;
+}

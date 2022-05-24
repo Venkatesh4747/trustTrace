@@ -1,0 +1,45 @@
+<span
+    class="information-details-edit"
+    [ngSwitch]="filterCriteriaItem.display_config.value_type"
+    [formGroup]="parentForm"
+>
+    <span *ngSwitchCase="'TEXT'" class="form-row">
+        <mat-form-field [floatLabel]="'never'">
+            <input matInput [formControlName]="filterCriteriaItem._id" [name]="filterCriteriaItem._id" />
+        </mat-form-field>
+    </span>
+
+    <span *ngSwitchCase="'NUMBER'" class="form-row">
+        <mat-form-field [floatLabel]="'never'">
+            <input
+                matInput
+                type="number"
+                [errorStateMatcher]="matcher"
+                [min]="0"
+                [max]="filterCriteriaItem.display_config.max"
+                [name]="filterCriteriaItem._id"
+                [formControlName]="filterCriteriaItem._id"
+            />
+        </mat-form-field>
+    </span>
+
+    <span *ngSwitchCase="'SINGLE_SELECT'" class="form-row">
+        <mat-form-field [floatLabel]="'never'">
+            <mat-select [formControlName]="filterCriteriaItem._id">
+                <mat-option *ngFor="let option of filterCriteriaItem.display_config.values" [value]="option">
+                    {{ option }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </span>
+
+    <span *ngSwitchCase="'MULTI_SELECT'" class="form-row">
+        <mat-form-field [floatLabel]="'never'">
+            <mat-select [formControlName]="filterCriteriaItem._id" multiple disableOptionCentering="true">
+                <mat-option *ngFor="let option of filterCriteriaItem.display_config.values" [value]="option">
+                    {{ option }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </span>
+</span>

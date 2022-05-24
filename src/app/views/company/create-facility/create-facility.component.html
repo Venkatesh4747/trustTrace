@@ -1,0 +1,279 @@
+<div class="view-container">
+    <ng-template #loadingPage>
+        <app-full-page-loader></app-full-page-loader>
+    </ng-template>
+    <div class="container-fluid content-container" *ngIf="isPageReady; else loadingPage">
+        <div class="absolute-buttons">
+            <button (click)="goBack()">
+                {{ 'Back' | translate }}
+            </button>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <ng-template [ngIf]="!isEditFacility" [ngIfElse]="editFacilityHeading">
+                    <h4 class="page-title">{{ 'Company Profile » Create Facility' | translate }}</h4>
+                    <h5 class="page-description">
+                        {{ 'Create facilities that are associated with your company' | translate }}
+                    </h5>
+                </ng-template>
+
+                <ng-template #editFacilityHeading>
+                    <h4 class="tt-heading tt-font">{{ 'Company Profile » Edit Facility' | translate }}</h4>
+                    <h5 class="tt-font tt-font-regular">
+                        {{ 'Modifying facility details associated with your company' | translate }}
+                    </h5>
+                </ng-template>
+            </div>
+        </div>
+        <div class="facilityForm mt-2">
+            <form [formGroup]="facilityForm" #facilityFormFGD="ngForm" (ngSubmit)="createFacility()">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div>
+                            <h5 class="tt-font">
+                                {{ 'Name of the facility' | translate }}
+                                <span class="tt-required-asterisk">*</span>
+                            </h5>
+                            <mat-form-field [floatLabel]="'never'" [hideRequiredMarker]="'true'">
+                                <input
+                                    matInput
+                                    type="text"
+                                    formControlName="name"
+                                    placeholder="{{ 'Eg' | translate }}., {{
+                                        'SuperFine Cottons Rio Facility' | translate
+                                    }}"
+                                    required
+                                    data-cy="create-facility-name-facility"
+                                />
+                                <mat-error *ngIf="facilityFormHasError('name', 'required')">{{
+                                    'Please enter the name of the facility' | translate
+                                }}</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <!-- row -->
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <ng-template ngFor let-field [ngForOf]="fieldsList" let-fieldIndex="index">
+                                <div class="col-md-6" [hidden]="field?.hidden">
+                                    <ng-template [ngIf]="!field.dummy" [ngIfElse]="dummy">
+                                        <div [ngSwitch]="field.type" class="form-group">
+                                            <div *ngSwitchCase="'multiSelect'">
+                                                <h5 class="tt-font">
+                                                    {{ field.label | translate }}
+                                                    <span class="tt-required-asterisk" *ngIf="field.required">*</span>
+                                                </h5>
+                                                <mat-form-field [floatLabel]="'never'" [hideRequiredMarker]="'true'">
+                                                    <mat-select
+                                                        [formControlName]="field.formControlName"
+                                                        [placeholder]="field.placeholder"
+                                                        [required]="field.required"
+                                                        [multiple]="field.multiple"
+                                                        (selectionChange)="
+                                                            selectionChange(field.formControlName, $event)
+                                                        "
+                                                        [attr.data-cy]="removeSpace(field.label)"
+                                                    >
+                                                        <mat-option
+                                                            *ngFor="let option of field.options"
+                                                            [value]="option.id"
+                                                        >
+                                                            {{ option.value }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                    <mat-error
+                                                        *ngIf="facilityFormHasError(field.formControlName, 'required')"
+                                                        >{{ 'Please select the' | translate }}
+                                                        {{ field.label | translate }}
+                                                    </mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div *ngSwitchCase="'singleSelect'">
+                                                <h5 class="tt-font">
+                                                    {{ field.label | translate }}
+                                                    <span class="tt-required-asterisk" *ngIf="field.required">*</span>
+                                                </h5>
+                                                <app-tt-dropdown-search
+                                                    (click)="markTouched(field.formControlName)"
+                                                    class="form-field-width-alignment"
+                                                    [searchOptions]="field.options"
+                                                    [(ngModel)]="dropdownValues[field.formControlName]"
+                                                    (selectionChange)="selectionChange(field.formControlName, $event)"
+                                                    [ngModelOptions]="{ standalone: true }"
+                                                    [floatLabel]="'never'"
+                                                    [optionalParams]="parameters[field.formControlName]"
+                                                    [placeholder]="field.placeholder"
+                                                    [isRequired]="isRequired"
+                                                    required
+                                                    [data_cy]="removeSpace(field.label)"
+                                                ></app-tt-dropdown-search>
+                                                <mat-error
+                                                    class="tt-search-block-error"
+                                                    *ngIf="singleSelectHasError(field.formControlName)"
+                                                    >{{ 'Please select the' | translate }}
+                                                    {{ field.label | translate }}</mat-error
+                                                >
+                                            </div>
+                                            <!-- switch:select -->
+                                            <div *ngSwitchCase="'number'">
+                                                <h5 class="tt-font">
+                                                    {{ field.label | translate }}
+                                                    <span class="tt-required-asterisk" *ngIf="field.required">*</span>
+                                                </h5>
+                                                <mat-form-field [floatLabel]="'never'" [hideRequiredMarker]="'true'">
+                                                    <input
+                                                        matInput
+                                                        type="number"
+                                                        [formControlName]="field.formControlName"
+                                                        [placeholder]="field.placeholder"
+                                                        [min]="field?.min"
+                                                        [max]="field?.max"
+                                                        [required]="field.required"
+                                                        [attr.data-cy]="removeSpace(field.label)"
+                                                    />
+                                                    <mat-error
+                                                        *ngIf="facilityFormHasError(field.formControlName, 'required')"
+                                                        >{{ 'Please select the' | translate }}
+                                                        {{ field.label | translate }}</mat-error
+                                                    >
+                                                </mat-form-field>
+                                            </div>
+                                            <!-- switch:number -->
+
+                                            <div *ngSwitchCase="'text'">
+                                                <h5 class="tt-font">
+                                                    {{ field.label | translate }}
+                                                    <span class="tt-required-asterisk" *ngIf="field.required">*</span>
+                                                </h5>
+                                                <mat-form-field [floatLabel]="'never'" [hideRequiredMarker]="'true'">
+                                                    <input
+                                                        matInput
+                                                        type="text"
+                                                        [formControlName]="field.formControlName"
+                                                        [placeholder]="field.placeholder"
+                                                        [required]="field.required"
+                                                        [attr.data-cy]="removeSpace(field.label)"
+                                                    />
+                                                    <mat-error
+                                                        *ngIf="facilityFormHasError(field.formControlName, 'required')"
+                                                        >{{ 'Please select the' | translate }}
+                                                        {{ field.label | translate }}</mat-error
+                                                    >
+                                                </mat-form-field>
+                                            </div>
+                                            <!-- text -->
+
+                                            <div *ngSwitchCase="'date'">
+                                                <h5 class="tt-font">
+                                                    {{ field.label | translate }}
+                                                    <span class="tt-required-asterisk" *ngIf="field.required">*</span>
+                                                </h5>
+                                                <mat-form-field [floatLabel]="'never'" [hideRequiredMarker]="'true'">
+                                                    <input
+                                                        matInput
+                                                        [formControlName]="field.formControlName"
+                                                        [matDatepicker]="certificateExpiryDate"
+                                                        (focus)="certificateExpiryDate.open()"
+                                                        (click)="certificateExpiryDate.open()"
+                                                        [placeholder]="field.placeholder"
+                                                        [required]="field.required"
+                                                        readonly
+                                                        [attr.data_cy]="removeSpace(field.label)"
+                                                    />
+                                                    <mat-datepicker #certificateExpiryDate></mat-datepicker>
+                                                    <mat-datepicker-toggle
+                                                        matSuffix
+                                                        [for]="certificateExpiryDate"
+                                                    ></mat-datepicker-toggle>
+                                                    <mat-error
+                                                        *ngIf="facilityFormHasError(field.formControlName, 'required')"
+                                                        >{{ 'Please select the' | translate }}
+                                                        {{ field.label | translate }}</mat-error
+                                                    >
+                                                </mat-form-field>
+                                            </div>
+                                            <!-- switch:date -->
+
+                                            <div *ngSwitchCase="'radio'">
+                                                <h5 class="tt-font">
+                                                    {{ field.label | translate }}
+                                                    <span class="tt-required-asterisk" *ngIf="field.required">*</span>
+                                                </h5>
+                                                <mat-radio-group
+                                                    [formControlName]="field.formControlName"
+                                                    [required]="field.required"
+                                                >
+                                                    <mat-radio-button
+                                                        *ngFor="let option of field.options"
+                                                        [value]="option.value"
+                                                        [checked]="option.default"
+                                                    >
+                                                        {{ option.label }}
+                                                    </mat-radio-button>
+                                                </mat-radio-group>
+                                                <h6
+                                                    class="error-message text-left tt-font tt-font-regular"
+                                                    *ngIf="facilityFormHasError(field.formControlName, 'required')"
+                                                >
+                                                    {{ 'Please select the' | translate }} {{ field.label | translate }}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                        <!-- form-group -->
+                                    </ng-template>
+                                </div>
+                                <!-- hidden -->
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-7 mt-2">
+                        <app-certificate-manager
+                            #certificateManager
+                            entityType="FACILITY"
+                            (certificateHttpObservers)="initCertificateObservers($event)"
+                        ></app-certificate-manager>
+                    </div>
+                    <!-- col-md-12 -->
+                </div>
+
+                <div class="row">
+                    <div class="col-md-7 mt-3 mb-3 text-right">
+                        <button
+                            type="button"
+                            (click)="discardFacilityForm()"
+                            mat-button
+                            class="btn tt-btn tt-btn-secondary"
+                            data-cy="create-facility-discard-btn"
+                        >
+                            {{ 'Discard' | translate }}
+                        </button>
+                        <button
+                            type="submit"
+                            mat-button
+                            style="margin-left: 20px;"
+                            class="btn tt-btn tt-btn-primary"
+                            data-cy="create-facility-create-btn"
+                        >
+                            <ng-template [ngIf]="!isEditFacility" [ngIfElse]="editFacilityLabel">{{
+                                'Create' | translate
+                            }}</ng-template>
+                            <ng-template #editFacilityLabel>{{ 'Update' | translate }}</ng-template>
+                        </button>
+                    </div>
+                    <!-- col -->
+                </div>
+                <!-- row -->
+            </form>
+        </div>
+        <!-- facilityForm -->
+    </div>
+    <!-- container-fluid -->
+</div>
+<!-- view-container -->

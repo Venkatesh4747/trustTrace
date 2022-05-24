@@ -1,0 +1,85 @@
+@import '../../../../../styles/variables';
+
+.parent-list {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+.sub-list {
+    list-style-type: none;
+    margin-left: -20px;
+    margin-bottom: 25px;
+}
+@mixin Mtext($fontWeight, $color) {
+    font-family: $font-family-Regular;
+    font-size: 14px;
+    font-weight: $fontWeight;
+    color: $color;
+}
+
+.sub-category {
+    @include Mtext(600, #02a4b9);
+}
+
+.subNCData {
+    list-style-type: none;
+    margin-top: 15px;
+    margin-bottom: 3px;
+    margin-left: -20px;
+    li {
+        margin: 0px;
+        padding: 0px;
+        margin-bottom: 12px;
+        line-height: 24px;
+        margin-left: -8px;
+    }
+}
+
+.sub-n-data {
+    @include Mtext(normal, #325992);
+    .list-icon {
+        img {
+            width: 18px;
+            height: auto;
+        }
+        padding-right: 10px;
+    }
+    .edit-icon {
+        padding: 0px 10px;
+        cursor: pointer;
+        img {
+            width: 11px;
+            height: auto;
+        }
+    }
+    .delete-icon {
+        padding: 0px 4px;
+        cursor: pointer;
+        img {
+            width: 11px;
+            height: auto;
+        }
+    }
+}
+
+.priority {
+    @include Mtext(normal, #00c0d9);
+    margin-left: 31px;
+}
+
+.date {
+    @include Mtext(normal, #a8a8a8);
+    padding: 0px 10px;
+}
+
+.check {
+    margin-right: 12px;
+}
+
+.addressed {
+    text-decoration: line-through;
+}
+
+.green-label {
+    background-color: #7dd364 !important;
+}

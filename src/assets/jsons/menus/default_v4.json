@@ -1,0 +1,402 @@
+{
+    "BRAND": {
+        "default_landing": "/dashboard",
+        "sideNavigationMenus": [
+            {
+                "title": "Visualization",
+                "route_url": "/dashboard",
+                "authorities": ["CHART_READ"],
+                "icon": "visualisation.png",
+                "childUrls": ["/dashboard", "/analytics", "/maps", "/reports"],
+                "children": [
+                    {
+                        "title": "Charts",
+                        "route_url": "/dashboard",
+                        "icon": "dashboard-icon.png",
+                        "authorities": ["CHART_READ"]
+                    },
+                    {
+                        "title": "Analytics",
+                        "route_url": "/analytics",
+                        "icon": "dash.png",
+                        "authorities": ["QUICKSIGHT_ANALYTICS_READ"]
+                    },
+                    {
+                        "title": "Map View",
+                        "route_url": "/maps",
+                        "icon": "map-view.png",
+                        "authorities": ["MAP_READ"]
+                    },
+                    {
+                        "title": "Reports",
+                        "route_url": "/reports",
+                        "icon": "dash.png",
+                        "authorities": ["REPORTS_READ"]
+                    }
+                ]
+            },
+            {
+                "title": "Product",
+                "route_url": "/styles",
+                "icon": "styles.png",
+                "childUrls": [
+                    "/task-manager",
+                    "/styles",
+                    "/material-library",
+                    "/orders",
+                    "/transactions",
+                    "/orders-lite",
+                    "/evidence",
+                    "/scope-certificates",
+                    "/po-management",
+                    "/t-trace",
+                    "/t-ems"
+                ],
+                "children": [
+                    {
+                        "title": "Task Manager",
+                        "route_url": "/task-manager",
+                        "icon": "taskmanager.png",
+                        "authorities": ["TASK_MANAGER_READ"]
+                    },
+                    {
+                        "title": "Styles",
+                        "route_url": "/styles",
+                        "icon": "side-nav-styles.png"
+                    },
+                    {
+                        "title": "Raw Materials",
+                        "route_url": "/material-library",
+                        "icon": "raw-materials.png"
+                    },
+                    {
+                        "title": "Transactions - Demo",
+                        "route_url": "/orders",
+                        "icon": "transaction.png",
+                        "authorities": ["ORDER_READ"]
+                    },
+                    {
+                        "title": "Transactions",
+                        "route_url": "/transactions",
+                        "icon": "transaction.png",
+                        "authorities": ["TRANSACTION_READ"]
+                    },
+                    {
+                        "title": "Transactions-Lite",
+                        "route_url": "/orders-lite",
+                        "icon": "transaction-lite.png",
+                        "authorities": ["ADIDAS_DEMO_READ"]
+                    },
+                    {
+                        "title": "Transaction Certificate",
+                        "route_url": "/evidence",
+                        "icon": "transaction_evidence.png",
+                        "authorities": ["TRANSACTION_CERTIFICATE_READ"]
+                    },
+                    {
+                        "title": "Scope Certificate",
+                        "route_url": "/scope-certificates",
+                        "icon": "transaction_evidence.png",
+                        "authorities": ["SCOPE_CERTIFICATE_READ"]
+                    },
+                    {
+                        "title": "PO Management",
+                        "route_url": "/po-management",
+                        "icon": "po-management.png",
+                        "authorities": ["PO_READ"]
+                    },
+                    {
+                        "title": "T-Trace",
+                        "route_url": "/t-trace",
+                        "icon": "traceability.png",
+                        "authorities": ["TTRACE_READ"]
+                    },
+                    {
+                        "title": "T-EMS",
+                        "route_url": "/t-ems",
+                        "icon": "t-ems.png",
+                        "authorities": ["TEMS_READ"]
+                    }
+                ]
+            },
+            {
+                "title": "Supplier",
+                "route_url": "/suppliers",
+                "icon": "suppliers.png",
+                "childUrls": [
+                    "/suppliers",
+                    "/facilities",
+                    "/assessment-audit",
+                    "/assessments-launched",
+                    "/assessments-received",
+                    "/assessment-templates"
+                ],
+                "children": [
+                    {
+                        "title": "Suppliers",
+                        "route_url": "/suppliers",
+                        "icon": "supplier-profile.png"
+                    },
+                    {
+                        "title": "Facilities",
+                        "route_url": "/facilities",
+                        "icon": "facilities.png"
+                    },
+                    {
+                        "title": "Audits",
+                        "route_url": "/assessment-audit",
+                        "icon": "audit.png"
+                    },
+                    {
+                        "title": "Assessments",
+                        "route_url": "/assessments-launched",
+                        "icon": "assessments.png",
+                        "childUrls": ["/assessments-launched", "/assessments-received", "/assessment-templates"],
+                        "children": [
+                            {
+                                "title": "Sent",
+                                "route_url": "/assessments-launched",
+                                "icon": "side-nav-sent.png"
+                            },
+                            {
+                                "title": "Received",
+                                "route_url": "/assessments-received",
+                                "icon": "side-nav-received.png"
+                            },
+                            {
+                                "title": "Questionnaire",
+                                "route_url": "/assessment-templates",
+                                "icon": "questionnaire.png"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "title": "Application Logs",
+                "route_url": "/integration-logs",
+                "icon": "integration-logs.png",
+                "authorities": ["INTEGRATION_LOG_READ"]
+            }
+        ],
+        "topNavigationMenus": [
+            {
+                "title": "Company Profile",
+                "route_url": "/company/profile",
+                "icon": "company_profile_icon.svg"
+            },
+            {
+                "title": "User Profile",
+                "route_url": "/user/profile",
+                "icon": "user_profile_icon.svg"
+            },
+            {
+                "title": "User Management",
+                "route_url": "/user/brand-user-management",
+                "icon": "user-management.svg",
+                "authorities": ["UM_READ"]
+            },
+            {
+                "title": "Settings",
+                "route_url": "user/settings",
+                "icon": "settings_icon.svg"
+            },
+            {
+                "title": "Log Out",
+                "route_url": "/logout",
+                "icon": "logout_icon.svg"
+            }
+        ]
+    },
+    "BRAND_SUPP": {
+        "default_landing": "/products",
+        "sideNavigationMenus": [
+            {
+                "title": "Product",
+                "route_url": "/products",
+                "icon": "pending-tasks.png"
+            }
+        ],
+        "topNavigationMenus": [
+            {
+                "title": "User Profile",
+                "route_url": "/user/profile",
+                "icon": "user_profile_icon.svg"
+            },
+            {
+                "title": "User Management",
+                "route_url": "/user/brand-user-management",
+                "icon": "user-management.svg",
+                "authorities": ["UM_READ"]
+            },
+            {
+                "title": "Log Out",
+                "route_url": "/logout",
+                "icon": "logout_icon.svg"
+            }
+        ]
+    },
+    "SUPPLIER": {
+        "default_landing": "/supplier-dashboard",
+        "sideNavigationMenus": [
+            {
+                "title": "Pending Tasks",
+                "route_url": "/supplier-dashboard",
+                "icon": "pending-tasks.png"
+            },
+            {
+                "title": "T-Trace",
+                "route_url": "/t-trace",
+                "icon": "traceability.png",
+                "authorities": ["TTRACE_READ"]
+            },
+            {
+                "title": "T-EMS",
+                "route_url": "/t-ems",
+                "icon": "t-ems.png",
+                "authorities": ["TEMS_READ"]
+            },
+            {
+                "title": "Reports",
+                "route_url": "/reports",
+                "icon": "dash.png",
+                "authorities": ["REPORTS_READ"]
+            },
+            {
+                "title": "Transactions - Demo",
+                "route_url": "/orders",
+                "icon": "transaction.png",
+                "authorities": ["ORDER_READ"]
+            },
+            {
+                "title": "Transactions",
+                "route_url": "/transactions",
+                "icon": "transaction.png",
+                "authorities": ["TRANSACTION_READ"]
+            },
+            {
+                "title": "Transactions-Lite",
+                "route_url": "/orders-lite",
+                "icon": "transaction-lite.png",
+                "authorities": ["ADIDAS_DEMO_READ"]
+            },
+            {
+                "title": "Transaction Certificate",
+                "route_url": "/evidence",
+                "icon": "transaction_evidence.png",
+                "authorities": ["TRANSACTION_CERTIFICATE_READ"]
+            },
+            {
+                "title": "Scope Certificate",
+                "route_url": "/scope-certificates",
+                "icon": "transaction_evidence.png",
+                "authorities": ["SCOPE_CERTIFICATE_READ"]
+            },
+            {
+                "title": "PO Management",
+                "route_url": "/po-management",
+                "icon": "transaction.png",
+                "authorities": ["PO_READ"]
+            },
+            {
+                "title": "Assessments",
+                "route_url": "/assessments-received",
+                "icon": "side-nav-received.png"
+            },
+            {
+                "title": "Suppliers",
+                "route_url": "/suppliers",
+                "icon": "supplier-profile.png"
+            }
+        ],
+        "topNavigationMenus": [
+            {
+                "title": "Company Profile",
+                "route_url": "/company/profile",
+                "icon": "company_profile_icon.svg"
+            },
+            {
+                "title": "User Profile",
+                "route_url": "/user/profile",
+                "icon": "user_profile_icon.svg"
+            },
+            {
+                "title": "User Management",
+                "route_url": "/user/brand-user-management",
+                "icon": "user-management.svg",
+                "authorities": ["UM_READ"]
+            },
+            {
+                "title": "Log Out",
+                "route_url": "/logout",
+                "icon": "logout_icon.svg"
+            }
+        ]
+    },
+    "FASHION_BRAND_SUPP": {
+        "default_landing": "/supplier-dashboard",
+        "sideNavigationMenus": [
+            {
+                "title": "Pending Tasks",
+                "route_url": "/supplier-dashboard",
+                "icon": "pending-tasks.png"
+            },
+            {
+                "title": "Assessments",
+                "route_url": "/assessments-received",
+                "icon": "side-nav-received.png"
+            }
+        ],
+        "topNavigationMenus": [
+            {
+                "title": "User Profile",
+                "route_url": "/user/profile",
+                "icon": "user_profile_icon.svg"
+            },
+            {
+                "title": "User Management",
+                "route_url": "/user/brand-user-management",
+                "icon": "user-management.svg",
+                "authorities": ["UM_READ"]
+            },
+            {
+                "title": "Log Out",
+                "route_url": "/logout",
+                "icon": "logout_icon.svg"
+            }
+        ]
+    },
+    "FOOD_SUPPLIER": {
+        "default_landing": "/products",
+        "sideNavigationMenus": [
+            {
+                "title": "Product",
+                "route_url": "/products",
+                "icon": "pending-tasks.png"
+            },
+            {
+                "title": "Assessments",
+                "route_url": "/assessments-received",
+                "icon": "side-nav-received.png"
+            }
+        ],
+        "topNavigationMenus": [
+            {
+                "title": "User Profile",
+                "route_url": "/user/profile",
+                "icon": "user_profile_icon.svg"
+            },
+            {
+                "title": "User Management",
+                "route_url": "/user/brand-user-management",
+                "icon": "user-management.svg",
+                "authorities": ["UM_READ"]
+            },
+            {
+                "title": "Log Out",
+                "route_url": "/logout",
+                "icon": "logout_icon.svg"
+            }
+        ]
+    }
+}

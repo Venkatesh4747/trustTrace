@@ -1,0 +1,274 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="row header no-border">
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 header-search pt-3">
+        <div class="page-title">
+            <div>
+                {{
+                    (activeTab !== 'sub_suppliers_facility' ? 'Supplier Facilities' : 'Sub Supplier Facilities')
+                        | translate
+                }}
+            </div>
+            <div class="page-description font-color-primary">
+                {{
+                    (activeTab !== 'sub_suppliers_facility'
+                        ? 'View and Edit Facility Information'
+                        : 'View Facility Information'
+                    ) | translate
+                }}
+            </div>
+        </div>
+    </div>
+    <!-- col -->
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 pt-3 header-search justify-content-flex-end">
+        <div class="header-search">
+            <div class="title-right-search">
+                <input
+                    type="text"
+                    class="search"
+                    placeholder="{{ 'Type and press enter to search' | translate }}"
+                    (keyup)="searchFacilities($event)"
+                    [(ngModel)]="searchText"
+                    data-cy="facilites-search"
+                />
+                <i class="fa fa-search"></i>
+            </div>
+        </div>
+        <div class="export-data-btn-container" *ngIf="haveFacilityCreateAccess('SUPPLIER_FACILITY_CREATE')">
+            <button
+                class="btn import-btn-bordered btn-bordered pull-right"
+                data-cy="facilities-import-btn"
+                (click)="importFacilities()"
+            >
+                <img src="{{ env.IMG_URL }}images/upload-blue-icon.png" alt="Import" />
+                <span>{{ 'Import Facilities' | translate }}</span>
+            </button>
+        </div>
+    </div>
+    <!-- col -->
+</div>
+<!-- row -->
+<div class="row filter-bar-wrapper" #filterBarWrapper>
+    <div class="col-md-12">
+        <ul class="filter-bar-container">
+            <li *ngFor="let filter of facilityFilters | keys; let filterInd = index">
+                <app-tt-multi-select-search
+                    (selectionChange)="handleFilterSelection()"
+                    (refreshFilter)="refreshFilter()"
+                    [label]="filter.key"
+                    [options]="filter.value"
+                    [filter_session]="getSession().filter"
+                    [optionsParam]="optionsParam"
+                    [data_cy]="removeSpace(filter.key)"
+                >
+                </app-tt-multi-select-search>
+            </li>
+            <li class="reset-filters">
+                <button
+                    class="button-badge mat-button btn btn-gray"
+                    (click)="resetAllFilters()"
+                    data-cy="facilities-reset-all-filters"
+                >
+                    {{ 'Reset all filters' | translate }}
+                </button>
+            </li>
+        </ul>
+    </div>
+    <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 mt-3 mb-3">
+        <div class="tt-tabs">
+            <div class="cursor-default" (click)="navigateToFragments()">
+                <label class="cursor-pointer" [ngClass]="{ active: activeTab === null }">
+                    {{ 'Suppliers Facilities' | translate }}
+                </label>
+            </div>
+            <div
+                class="cursor-default"
+                *ngIf="haveFacilityCreateAccess('SUPPLIER_FACILITY_UPDATE')"
+                (click)="navigateToFragments('sub_suppliers_facility')"
+            >
+                <label class="cursor-pointer" [ngClass]="{ active: activeTab === 'sub_suppliers_facility' }">
+                    <span>{{ 'Sub Suppliers Facilities' | translate }}</span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <!-- make sure this is integreated well with filter  -->
+    <!-- <div id="multiTireValueFatch">
+        <mat-checkbox class="multiTireValueFatch" color="primary" [(ngModel)]="isSubFacilitiesSelected">
+            Show Sub-Supplier's facility</mat-checkbox
+        >
+    </div> -->
+    <!-- col -->
+    <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+        <div class="row">
+            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 total-count">
+                <div class="float-l" *ngIf="facilities || totalCountFlag">
+                    <app-card-pagination
+                        [paginationStart]="pagination.from + 1"
+                        [fetchSize]="pagination.size"
+                        [totalItemsCount]="totalCount"
+                        moduleName="Facilities"
+                        (previous)="onScroll('back')"
+                        (next)="onScroll('next')"
+                    ></app-card-pagination>
+                </div>
+                <div class="export-data-btn-container">
+                    <button
+                        class="cs-btn export-data"
+                        data-cy="facilities-test-export-btn"
+                        (click)="downloadFacilitiesDataAsExcel()"
+                        [disabled]="!(totalCount > 0)"
+                    >
+                        <img src="{{ env.IMG_URL }}images/share.png" alt="Download" />
+                        <ng-template [ngIf]="!isProcessing">
+                            {{ 'Export Facilities' | translate }}
+                        </ng-template>
+                        <ng-template [ngIf]="isProcessing">
+                            <div class="spinner-wrapper">
+                                <span>{{ 'Downloading' | translate }}</span>
+                                <mat-spinner [diameter]="14"></mat-spinner>
+                            </div>
+                        </ng-template>
+                    </button>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <div dropdown class="dropdown sort-dropdown">
+                    <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                        <span class="sort-name"
+                            >{{ 'Sort By' | translate }}
+                            <i class="fa fa-angle-down"></i>
+                        </span>
+                    </a>
+                    <ul *dropdownMenu class="dropdown-menu">
+                        <li>
+                            <mat-radio-group [(ngModel)]="sortByFilter.sortBy" (change)="handleSortBy()">
+                                <mat-radio-button value="name">{{ 'Alphabetical Order' | translate }}</mat-radio-button>
+                                <mat-radio-button value="create_ts">{{ 'Newly Added' | translate }}</mat-radio-button>
+                            </mat-radio-group>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Sort Dropdown -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+    </div>
+    <!-- Column -->
+</div>
+<!-- Row -->
+
+<div class="row facilities-table" [ngStyle]="{ 'top.px': height }" *ngIf="facilities && facilities.length >= 0">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="no-assessments" *ngIf="facilities.length === 0">
+            <p>
+                {{ 'No facilities' | translate }}
+            </p>
+        </div>
+        <div class="facilities-lists" *ngIf="facilities && facilities.length > 0">
+            <div class="facilities-div" *ngFor="let facility of facilities">
+                <div class="table-card cursorp" (click)="navigateToFacilityProfile(facility)">
+                    <div class="table-card-left">
+                        <p class="facility-name">
+                            {{ facility.name }}
+                        </p>
+                        <p
+                            class="facility-value"
+                            *ngIf="facility.reference_id && activeTab !== 'sub_suppliers_facility'"
+                        >
+                            {{ 'Facility UID' | translate }}: <span>{{ facility.reference_id }}</span>
+                        </p>
+                        <p class="supplier-name facility-value">
+                            {{ 'Supplier Name' | translate }}: <span>{{ facility.supplier_name }}</span>
+                        </p>
+                        <p class="supplier-name facility-value" *ngIf="facility.created_company_name">
+                            {{ 'Created By' | translate }}: <span>{{ facility.created_company_name }}</span>
+                        </p>
+                        <p
+                            class="facility-location facility-value"
+                            *ngIf="
+                                facility.address_city || facility.address_state || facility.address_country;
+                                else notAvailable
+                            "
+                        >
+                            {{ 'Location' | translate }} :
+                            <span
+                                >{{ facility.address_city }}{{ facility.address_state ? ', ' : ''
+                                }}{{ facility.address_state }}{{ facility.address_country ? ', ' : ''
+                                }}{{ facility.address_country }}</span
+                            >
+                        </p>
+                        <ng-template #notAvailable>
+                            <p class="facility-value">
+                                {{ 'Location' | translate }} : <span>{{ 'Not Available' | translate }}</span>
+                            </p>
+                        </ng-template>
+                        <div *ngIf="!facility.is_sub_supplier">
+                            <p class="facility-value" *ngIf="facility?.launched_assessment_count; else noAssessment">
+                                {{ 'Launched Assessment' | translate }} : <span>Yes</span>
+                            </p>
+                        </div>
+                        <ng-template #noAssessment>
+                            <p class="facility-value">{{ 'Launched Assessment' | translate }} : <span>No</span></p>
+                        </ng-template>
+                        <p class="facility-value">
+                            {{ 'Certifications' | translate }} :
+                            <ng-container *ngFor="let standard of facility?.standards; let isLast = last">
+                                <span>{{ standard?.value }}</span>
+                                <ng-container *ngIf="!isLast">
+                                    <span>,</span>
+                                </ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="!facility?.standards || facility?.standards.length === 0">
+                                <span>{{ 'None' | translate }}</span>
+                            </ng-container>
+                        </p>
+                    </div>
+                    <div class="table-card-right flex-column" *ngIf="facility.address_country">
+                        <div
+                            class="flag-icon flag-icon-{{
+                                getCountryCode(facility.address_country)
+                            }} action-item align-self-flex-end"
+                        ></div>
+                        <p class="facility-value text-semi-bold" style="float:right;">{{ facility.address_country }}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- <div *ngIf="isSubFacilitiesSelected">
+                <div
+                    class="facilities-div"
+                    *ngFor="
+                        let facility of (subfacilities
+                            | searchFilter
+                                : {
+                                      name: searchText,
+                                      supplierName: searchText,
+                                      address: { city: searchText, state: searchText, country: searchText }
+                                  })
+                    "
+                >
+                    <div class="table-card">
+                        <div class="table-card-left">
+                            <p class="facility-name">{{ facility.name }}</p>
+                            <p class="supplier-name">Supplier Name: {{ facility.supplierName }}</p>
+                            <p class="facility-location" *ngIf="facility.address">
+                                {{ facility.address.city }}, {{ facility.address.state }}
+                            </p>
+                        </div>
+                        <div class="table-card-right flex-column" *ngIf="facility.address">
+                            <div
+                                class="flag-icon flag-icon-{{
+                                    getCountryCode(facility.address.country)
+                                }} action-item align-self-flex-end"
+                            ></div>
+                            <p style="float:right;">{{ facility.address.country }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            **FACILITIES DIV ENDS** -->
+        </div>
+    </div>
+    <!-- col -->
+</div>
+<!-- row -->

@@ -1,0 +1,12 @@
+@import '~styles/variables';
+
+.mat-form-field-infix {
+    padding: 1em 0 0.5em 0;
+}
+
+i.fa-search {
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+    color: $border-color-primary;
+}

@@ -1,0 +1,35 @@
+@import '~styles/variables';
+
+.supplier-details {
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 20px;
+    font-family: $font-family-Regular;
+    span {
+        margin-left: 25px;
+        width: 80%;
+        word-break: break-word;
+        color: #325992;
+    }
+}
+
+.icon-rotate-360 {
+    transform: rotate(180deg);
+    color: #33dbff;
+}
+
+.supplier-title {
+    font-weight: 900;
+    color: #325992;
+    font-family: $font-family-Bold;
+}
+
+.text-bold {
+    font-weight: bold;
+    font-family: $font-family-Regular;
+}
+
+.table-card .table-card-left.flex-align-items-center {
+    cursor: default;
+    font-family: $font-family-Regular;
+}

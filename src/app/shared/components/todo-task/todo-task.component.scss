@@ -1,0 +1,86 @@
+@import '~styles/variables';
+
+.hr {
+    margin-top: 80px;
+    border-bottom: 1px solid #ececec;
+    font-family: $font-family-Bold;
+    color: #cccccc;
+}
+.hr-title {
+    font-family: $font-family-Bold;
+    color: #325992;
+}
+.inner-addon {
+    position: relative;
+}
+/* style icon */
+.inner-addon .glyphicon {
+    position: absolute;
+    padding: 10px;
+    pointer-events: none;
+}
+/* align icon */
+.left-addon .glyphicon {
+    left: 7px;
+    top: 24px;
+}
+.right-addon .glyphicon {
+    right: 0px;
+}
+/* add padding */
+.left-addon input {
+    padding-left: 40px;
+}
+.right-addon input {
+    padding-right: 30px;
+}
+
+input[type='text'],
+select {
+    width: 100%;
+    margin-top: 20px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+input[type='text']:focus {
+    outline-width: 0;
+}
+.todoList {
+    max-height: 180px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.todoList-item {
+    padding: 5px 15px 2px;
+    border-radius: 15px;
+    word-wrap: break-word;
+    flex: wrap;
+}
+
+.todoList-item:hover {
+    background-color: #f5f5f5;
+}
+
+.todoDelete {
+    padding: 3px 5px;
+    border-radius: 50px;
+}
+
+.todoDelete:hover {
+    cursor: pointer;
+    background-color: #c5c5c5;
+}
+
+.todoEditableItem {
+    border: none;
+    border-bottom: 1px solid #c5c5c5;
+    width: 40%;
+}
+.COMPLETED {
+    text-decoration: line-through;
+}

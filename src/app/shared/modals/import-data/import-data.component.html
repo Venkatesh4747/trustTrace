@@ -1,0 +1,137 @@
+<div class="import-data" *ngIf="!showStatus">
+    <div class="import-data-spinner" *ngIf="isUploading || isDownloading">
+        <mat-spinner diameter="25" class="spinner"></mat-spinner>
+    </div>
+    <div class="import-data-title">{{ data.texts.title | translate }}</div>
+    <div class="import-data-body-title">
+        <div class="import-data-download-data">{{ data.texts.subDownloadTitle | translate }}:</div>
+        <div class="import-data-or">
+            {{ '(Or)' | translate }}
+        </div>
+        <div class="import-data-upload">{{ data.texts.subUploadTitle | translate }}:</div>
+    </div>
+    <div class="import-data-body">
+        <div class="download-data">
+            <button type="button" class="download-data-btn" (click)="downloadData()">
+                {{ data.texts.downloadButton | translate }}
+            </button>
+        </div>
+        <div class="upload-data">
+            <div
+                class="tt-file-upload-ui-container"
+                (click)="isImporting ? $event.stopPropagation() : fileInput.click()"
+            >
+                <div class="tt-file-upload-ui-content">
+                    <ng-template [ngIf]="!isImporting" [ngIfElse]="uploadFileSpinner">
+                        <div class="spinner-wrapper">
+                            <img src="{{ env.IMG_URL }}images/icon-upload-grey.png" alt="Upload file" />
+                            <span class="description">{{ 'Choose file to upload' | translate }}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template #uploadFileSpinner>
+                        <div class="spinner-wrapper">
+                            <span class="description"> {{ 'Uploading File' | translate }} . . . </span>
+                            <mat-spinner [diameter]="14"></mat-spinner>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+            <input
+                type="file"
+                class="hidden"
+                #fileInput
+                (click)="$event.target.value = null"
+                (change)="uploadFile($event.target.files)"
+                [hidden]="true"
+                [disabled]="isImporting"
+            />
+            <div class="file-list-container" *ngIf="uploadedFile">
+                <span class="filename tt-font font-regular">{{ uploadedFile.name }}</span>
+                <span class="delete-icon" (click)="deleteFile()"
+                    ><img src="{{ env.IMG_URL }}images/questionaire-del.png" alt="Delete Icon"
+                /></span>
+            </div>
+            <div class="upload-data-buttons">
+                <button class="cancel-btn" (click)="closeDialog(actions[0])">
+                    {{ actions[0] | translate }}
+                </button>
+                <button class="upload-btn" (click)="uploadDataFile()">
+                    {{ actions[1] | translate }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="import-data-status import-successfull-dialog-close" *ngIf="showStatus && showSuccessStatus">
+    <div class="import-data-status-title">{{ 'Upload Success' | translate }}!</div>
+    <div class="import-data-status-body">
+        {{ data.texts.uploadSuccess | translate }}
+    </div>
+    <div class="import-data-status-button">
+        <button class="close-btn" (click)="closeDialog('Close')">
+            {{ 'Close' | translate }}
+        </button>
+    </div>
+</div>
+
+<div class="import-data-status import-data-status-errors" *ngIf="showStatus && !showSuccessStatus">
+    <div class="import-data-status-title">{{ 'Error' | translate }}!</div>
+    <div class="import-data-status-body">
+        <div>
+            {{
+                'Following error(s) has been found in the excel sheet uploaded by you. Kindly fix errors and import again.'
+                    | translate
+            }}
+        </div>
+        <div class="import-data-status-error-details" *ngIf="importStatus">
+            <div class="common-striped-table common-model-popup-table">
+                <div class="table">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th *ngIf="doesSheetNameExists">{{ 'Sheet Name' | translate }}</th>
+                                <th class="table-error-row-no">{{ 'Row No' | translate }}.</th>
+                                <th>
+                                    <div class="table-header-section">
+                                        <span class="table-error-field">{{ 'Field' | translate }}</span>
+                                        <span class="table-error-message">{{ 'Error' | translate }}</span>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="!errors && errors.length === 0">
+                                {{
+                                    'Not available' | translate
+                                }}
+                            </tr>
+                            <tr *ngFor="let status of importStatus">
+                                <td *ngIf="status.sheetName">{{ status.sheetName }}</td>
+                                <td class="error-row-no">{{ status.row || '--' }}</td>
+                                <td *ngIf="status.errors">
+                                    <div class="tbody-section-inner-block" *ngFor="let error of status.errors">
+                                        <div class="error-field error-field-value">
+                                            {{ error.columnName || ('Not available' | translate) }}
+                                        </div>
+                                        <div class="error-field error-field-message">
+                                            {{ error.suggestionMsg || ('Not available' | translate) }}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="import-data-status-button">
+        <span class="more-errors-count" *ngIf="importStatus && importStatus.length > data.numberOfErrorsToBeShown">
+            {{ importStatus.length - data.numberOfErrorsToBeShown }}{{ ' more errors found' | translate }}!
+        </span>
+        <button class="close-btn" (click)="showStatus = false">
+            {{ 'Close' | translate }}
+        </button>
+    </div>
+</div>

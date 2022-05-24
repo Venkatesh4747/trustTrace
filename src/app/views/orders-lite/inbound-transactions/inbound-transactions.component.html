@@ -1,0 +1,215 @@
+<div id="record-transactions-categories">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div id="inbound-transactions">
+        <div class="row pb-2 pr-2">
+            <div class="hr">
+                <span class="hr-title">{{ 'Inbound' | translate }} </span>
+            </div>
+        </div>
+        <div class="row pt-1" *ngIf="!pageLoading">
+            <form #createInboundForm="ngForm">
+                <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 form-align">
+                    <div class="row">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ 'Style/ML Name & Number' | translate }}:"
+                                    name="Style/ML"
+                                    [(ngModel)]="soaUniqueName"
+                                    (blur)="validateSelectedStyle()"
+                                    matInput
+                                    [matAutocomplete]="soaSearch"
+                                    (keyup)="searchStyleOrArticle($event)"
+                                    required
+                                />
+                                <mat-hint #soaSearchHint [ngStyle]="{ color: hintColor }">{{
+                                    'Type at least 3 characters to search' | translate
+                                }}</mat-hint>
+                                <mat-autocomplete
+                                    #soaSearch="matAutocomplete"
+                                    [displayWith]="getSOAName"
+                                    (optionSelected)="onSOASelection($event.option.value)"
+                                >
+                                    <mat-option *ngFor="let item of searchData" [value]="item">
+                                        {{ item.unique_search }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <!-- <input matInput [matDatepicker]="picker" [name]="value" [(ngModel)]="value" placeholder="Date" readonly> -->
+                                <input
+                                    class="input"
+                                    matInput
+                                    [matDatepicker]="picker"
+                                    placeholder="{{ 'Date' | translate }}:"
+                                    name="date"
+                                    [(ngModel)]="payload.event.date"
+                                    readonly
+                                    (click)="picker.open()"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="number"
+                                    placeholder="{{ 'Quantity' | translate }}(Kg):"
+                                    name="Qty"
+                                    [(ngModel)]="payload.event.quantity.quantity"
+                                    required
+                                />
+                            </mat-form-field>
+                        </div>
+
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <app-supplier-list-element
+                                [listData]="suppliers"
+                                [(ngModel)]="payload.event.supplier"
+                                (valueChanges)="updateSupplier($event)"
+                                [options]="supplierListOptions"
+                                name="supplier"
+                                required
+                                unInvitedTooltip="Uninvited Supplier - Inbound Transaction can be created but no further transactions can be traced for this Supplier "
+                            >
+                            </app-supplier-list-element>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ 'Reference No.' | translate }}:"
+                                    name="ReferenceNumber"
+                                    [(ngModel)]="payload.event.referenceId"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2 mb-2">
+                        <div class="col-md-12">
+                            <div class="hr text-center">
+                                <span class="hr-title text-muted">{{ 'Attachments' | translate }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <div
+                                class="certificate-container"
+                                *ngFor="let certificateToUpload of data.certificates_to_collect"
+                            >
+                                <div class="title">Upload {{ certificateToUpload.value }}:</div>
+                                <div class="clearfix"></div>
+                                <div class="file-list-container">
+                                    <ul class="list-unstyled">
+                                        <li
+                                            *ngFor="
+                                                let file of uploadFiles[certificateToUpload.id].files;
+                                                let index = index
+                                            "
+                                        >
+                                            <span class="filename tt-font font-regular">{{
+                                                file.displayFileName
+                                            }}</span>
+                                            <span
+                                                class="delete-icon"
+                                                (click)="removeFile(certificateToUpload.id, index)"
+                                                ><img
+                                                    src="{{ env.IMG_URL }}images/questionaire-del.png"
+                                                    alt="Delete Icon"
+                                            /></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div
+                                    class="tt-file-upload-ui-container"
+                                    (click)="
+                                        isUploading[certificateToUpload.id]
+                                            ? $event.stopPropagation()
+                                            : fileInput.click()
+                                    "
+                                >
+                                    <div class="tt-file-upload-ui-content">
+                                        <ng-template
+                                            [ngIf]="!isUploading[certificateToUpload.id]"
+                                            [ngIfElse]="uploadFileSpinner"
+                                        >
+                                            <div class="spinner-wrapper">
+                                                <img
+                                                    src="{{ env.IMG_URL }}images/icon-upload-grey.png"
+                                                    alt="Upload file"
+                                                    class=""
+                                                />
+                                                <h5 class="description tt-font tt-font-regular text-muted">
+                                                    {{ 'Click here to upload file' | translate }}
+                                                </h5>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #uploadFileSpinner>
+                                            <div class="spinner-wrapper">
+                                                <h5 class="tt-font tt-font-regular tt-font-muted">
+                                                    {{ 'Uploading File' | translate }} . . .
+                                                </h5>
+                                                <mat-spinner [diameter]="14"></mat-spinner>
+                                            </div>
+                                        </ng-template>
+                                    </div>
+                                </div>
+                                <input
+                                    type="file"
+                                    class="hidden"
+                                    #fileInput
+                                    (change)="uploadFile($event.target.files, certificateToUpload.id)"
+                                    [hidden]="true"
+                                    [disabled]="isUploading[certificateToUpload.id]"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3 mb-3 pt-3">
+                        <div class="col-md-12 talign-right">
+                            <button
+                                id="order-create-btn"
+                                type="button"
+                                class="btn btn-gray create-btn btn-align mr-2"
+                                (click)="save()"
+                                [disabled]="!createInboundForm.valid || !referenceIdIsUnique"
+                            >
+                                {{ 'Save' | translate }}
+                            </button>
+                            <!--                            <button-->
+                            <!--                                id="order-create-btn"-->
+                            <!--                                type="button"-->
+                            <!--                                class="btn btn-gray create-btn btn-align"-->
+                            <!--                                (click)="saveAndPrint()"-->
+                            <!--                                [disabled]="!createInboundForm.valid"-->
+                            <!--                            >-->
+                            <!--                                {{ 'Save & Print' | translate }}-->
+                            <!--                            </button>-->
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div style="visibility:hidden" *ngIf="isPrintReady">
+    <app-generate-qr-code #printQRCodeComponent [qrId]="qrCodeToPrint" [qrCodeId]="'qrCodeSectionToPrint'">
+    </app-generate-qr-code>
+</div>

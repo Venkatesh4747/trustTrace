@@ -1,0 +1,125 @@
+<div class="row" id="login-container">
+    <div class="col-md-5 pd-0 hidden-sm hidden-xs">
+        <div class="section-wrap">
+            <div class="section-left-wrap">
+                <div id="login-logo-container">
+                    <a routerLink="/">
+                        <img src="{{ env.IMG_URL }}images/trustrace_logo_black.svg" alt="TrusTrace" />
+                    </a>
+                </div>
+                <div class="section-left-wrap-header">
+                    <h3 class="title">Trust Through Traceability</h3>
+                    <p class="description">
+                        {{
+                            'Transform your supply chain and product portfolio to align with your sustainability goals'
+                                | translate
+                        }}.
+                    </p>
+                </div>
+                <div class="signup-bg">
+                    <img src="{{ env.IMG_URL }}images/generic-login.png" alt="TrusTrace" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7 col-sm-12 col-xs-12 pd-0" id="login-form-inputs">
+        <!-- <div class="adidas-logo-block">
+            <img src="{{ env.IMG_URL }}svg/adidas-logo.svg" alt="Adidas" />
+        </div> -->
+        <div class="center-block-section">
+            <div class="center-block">
+                <div class="mobile-section-wrap">
+                    <div class="mobile-section-logo-wrap">
+                        <div id="login-logo-container">
+                            <a routerLink="/">
+                                <img src="{{ env.IMG_URL }}images/trustrace_logo_black.svg" alt="TrusTrace" />
+                            </a>
+                        </div>
+                        <div class="mobile-signup-bg">
+                            <img src="{{ env.IMG_URL }}images/generic-login.png" alt="TrusTrace" />
+                        </div>
+                    </div>
+                </div>
+                <form class="form-block" id="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+                    <mat-card class="example-card">
+                        <mat-card-content>
+                            <h4 class="login-title">{{ 'Sign in to TrusTrace' | translate }}</h4>
+                            <mat-form-field class="password-mat-form-field">
+                                <mat-label class="form-field-label"
+                                    >{{ 'Registered Email ID' | translate }} <span class="color-red">*</span>:
+                                </mat-label>
+                                <input
+                                    matInput
+                                    type="email"
+                                    formControlName="username"
+                                    placeholder="{{ 'Your email id here' | translate }}"
+                                />
+                            </mat-form-field>
+                            <mat-form-field class="password-mat-form-field password-text-field">
+                                <mat-label class="form-field-label password-form-field-label"
+                                    >{{ 'Password' | translate }} <span class="color-red">*</span>:
+                                </mat-label>
+                                <input
+                                    matInput
+                                    type="password"
+                                    formControlName="password"
+                                    placeholder="{{ 'Your password here' | translate }}"
+                                    [type]="hide ? 'password' : 'text'"
+                                />
+                                <span class="forgot-password">
+                                    <a
+                                        class="forgot-password-link"
+                                        (click)="analyticsForgotPasswordClicked()"
+                                        routerLink="forgot-password"
+                                        >{{ 'Forgot Password' | translate }}?</a
+                                    >
+                                </span>
+                                <button
+                                    mat-icon-button
+                                    matSuffix
+                                    type="button"
+                                    (click)="hide = !hide"
+                                    [attr.aria-label]="'Hide password'"
+                                    [attr.aria-pressed]="hide"
+                                >
+                                    <mat-icon [matTooltip]="(hide ? 'Show password' : 'Hide password') | translate">
+                                        {{ hide ? 'visibility' : 'visibility_off' }}
+                                    </mat-icon>
+                                </button>
+                            </mat-form-field>
+                            <div class="button-block" id="login-button-block">
+                                <div class="button-block-center">
+                                    <button
+                                        class="btn btn-gradient login-btn"
+                                        type="submit"
+                                        [disabled]="!loginForm.valid || processing"
+                                    >
+                                        {{ 'Login' | translate }}
+                                    </button>
+                                    <div *ngIf="processing" class="material-loader">
+                                        <mat-spinner class="material-spinner"></mat-spinner>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Button Block -->
+                        </mat-card-content>
+                    </mat-card>
+                </form>
+            </div>
+            <div id="footer-section">
+                <span class="trustrace-info">
+                    &copy; {{ currentYear }} TrusTrace.com
+                    <div>
+                        {{ 'For Help: Please contact' | translate }}
+                        <b>
+                            <a href="mailto:yoda@trustrace.com">
+                                yoda@trustrace.com
+                            </a>
+                        </b>
+                    </div>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,172 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="generate-reports-container" class="generate-container">
+            <div id="generate-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'On Demand Report' | translate }}</div>
+                        <div class="page-description">
+                            {{ 'Choose the date range to generate on demand report' | translate }}
+                        </div>
+                    </div>
+                    <div class="pr-0">
+                        <button class="go-back-button" (click)="commonServices.goBack(['/', 'reports'])">
+                            {{ 'Back' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="generate-report-body material-input-style-box-type">
+                <div class="material-input-style-box-type-inner dropdown-select-box-type">
+                    <form #generateReportForm="ngForm">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="choose-report-block">
+                                    <label>{{ 'Choose Report Type' | translate }} :</label>
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="modules"
+                                        placeholder="{{ 'Type to select Report Type' | translate }}"
+                                        name="generate-choose-report-type"
+                                        [(ngModel)]="config.reportType"
+                                        (selectionChange)="onChooseReportType($event)"
+                                        floatLabel="never"
+                                        [optionalParams]="reportTypeParams"
+                                        required
+                                    >
+                                    </app-tt-dropdown-search>
+                                    <div class="search-icon">
+                                        <span class="material-icons">
+                                            search
+                                        </span>
+                                    </div>
+                                    <div class="down-arrow">
+                                        <span class="material-icons">
+                                            keyboard_arrow_down
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- Chosse Report Type Block -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="choose-report-block">
+                                    <label>{{ 'Choose Report' | translate }} :</label>
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="reportConfigs"
+                                        placeholder="{{ 'Type to select Report' | translate }}"
+                                        [(ngModel)]="config.report"
+                                        name="generate-choose-report"
+                                        (selectionChange)="onChooseReport($event)"
+                                        floatLabel="never"
+                                        [optionalParams]="parameters"
+                                        required
+                                        [isReadonly]="!config.reportType"
+                                    >
+                                    </app-tt-dropdown-search>
+                                    <div class="search-icon">
+                                        <span class="material-icons">
+                                            search
+                                        </span>
+                                    </div>
+                                    <div class="down-arrow">
+                                        <span class="material-icons">
+                                            keyboard_arrow_down
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- Chosse Report Block -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!-- Row -->
+                        <div class="row" [ngClass]="{ 'opacity-5 pointer-none': !isDateFilterNeeded }">
+                            <div class="col-md-4">
+                                <div class="choose-report-block">
+                                    <label>{{ 'Choose Date Range' | translate }} :</label>
+                                    <app-tt-date-range-field
+                                        (selectionChange)="handleDateRangeSelection($event)"
+                                        required
+                                    >
+                                    </app-tt-date-range-field>
+                                    <!-- <app-tt-date-range-field-with-max-days
+                                        [maxDays]="reportMaxDays"
+                                        (selectionChange)="handleDateRangeSelection($event)"
+                                        [label]="isDateFilterNeeded ? 'Select date range' : 'Not Applicable'"
+                                        required
+                                    >
+                                    </app-tt-date-range-field-with-max-days> -->
+                                </div>
+                                <!-- Chosse Report Block -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+
+                        <div class="row" *ngIf="filterConfigs && config.report">
+                            <div class="col-md-4">
+                                <div *ngFor="let filter of filterConfigs | keys; let parentIndex = index">
+                                    <ng-container
+                                        *ngFor="let payload of generateReportPayload.filter; let childIndex = index"
+                                    >
+                                        <div class="choose-report-block" *ngIf="parentIndex === childIndex">
+                                            <label>{{ filter.key | translate }} :</label>
+                                            <app-filter-with-search
+                                                [(ngModel)]="payload.value"
+                                                name="choose-filter"
+                                                [options]="filter.value"
+                                                [label]="getPlaceHolder(filter.key)"
+                                                [showSelectAll]="true"
+                                                floatLabel="never"
+                                            >
+                                            </app-filter-with-search>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" *ngIf="dateFilters && config.report">
+                            <div class="col-md-4">
+                                <div *ngFor="let filter of dateFilters">
+                                    <div class="choose-report-block">
+                                        <label>{{ filter | translate }} :</label>
+                                        <app-tt-date-range-field-with-max-days
+                                            [maxDays]="reportMaxDays"
+                                            (selectionChange)="handleCustomDateRangeSelection($event, filter)"
+                                            required
+                                        >
+                                        </app-tt-date-range-field-with-max-days>
+                                    </div>
+                                </div>
+                                <!-- Chosse Report Block -->
+                            </div>
+                        </div>
+                        <!-- Row -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                    (click)="generateNewReport()"
+                                    [disabled]="!generateReportForm.valid || (isDateFilterNeeded && !selectedDateRange)"
+                                >
+                                    {{ 'Submit' | translate }}
+                                </button>
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!-- Row -->
+                    </form>
+                </div>
+            </div>
+            <!-- Generate Report Body -->
+        </div>
+        <!-- Generate Report Container -->
+    </div>
+    <!-- Container Fluid -->
+</div>
+<!--  View Container -->

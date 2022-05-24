@@ -1,0 +1,102 @@
+#ie-support {
+    display: none;
+    position: static;
+    width: 100%;
+    font-size: 16px;
+    font-family: 'Source Sans Pro', sans-serif;
+    color: #325992;
+}
+#ie-support .center-block {
+    display: inline-block;
+    position: absolute;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+}
+#ie-support .not-support-icon svg {
+    width: 70px;
+    height: 70px;
+}
+#ie-support .center-block .title {
+    font-size: 20px;
+    margin: 0;
+}
+#ie-support .center-block .description {
+    padding: 0px 130px;
+    font-size: 16px;
+    margin: 0;
+}
+#ie-support .center-block .description.pb-20 {
+    padding-bottom: 20px;
+}
+#ie-support .center-block .btn-primary {
+    border-radius: 20px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.16);
+    background-image: linear-gradient(to right, #3bd5fe 33%, #74ff86 72%);
+    color: #325992;
+    font-size: 16px;
+    padding: 10px 30px;
+    text-decoration: none;
+    display: block;
+    width: 100px;
+    align-items: center;
+    text-align: center;
+    margin: 0 auto;
+    font-weight: bold;
+}
+.browser-icon-block {
+    padding: 10px 15px 30px;
+    display: inline-block;
+}
+.browser-icon-block .browser-icon-block-inner {
+    display: block;
+    float: left;
+    padding: 0 20px;
+}
+.browser-icon-block img {
+    width: 50px;
+    margin-bottom: 10px;
+}
+.browser-icon-block a {
+    padding: 0 20px;
+    color: #325992;
+    font-weight: bold;
+    text-decoration: none;
+}
+.browser-icon-block .browser-name {
+    display: block;
+    margin-bottom: 0;
+    padding-left: 12px;
+    margin-top: 5px;
+    text-align: center;
+    width: 100%;
+}
+.browser-icon-block .firefox {
+    padding-top: 3px;
+}
+.not-support-icon {
+    margin-bottom: 30px;
+}
+.not-support-icon .material-icons {
+    color: #7b7b7b;
+    font-size: 66px;
+}
+.contact-us a {
+    font-weight: 600;
+    font-style: italic;
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.button-no-styles {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+}

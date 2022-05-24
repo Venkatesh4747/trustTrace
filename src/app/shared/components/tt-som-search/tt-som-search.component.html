@@ -1,0 +1,21 @@
+<mat-form-field>
+    <mat-label class="tt-input-label">{{ type | translate }}:</mat-label>
+    <input
+        class="input"
+        type="text"
+        [placeholder]="'Type at least 3 characters to search' | translate"
+        name="Article/Style"
+        [(ngModel)]="value"
+        matInput
+        [matAutocomplete]="styleSearch"
+        (keyup)="searchStyleName($event)"
+        data-cy="ttrace-test-item"
+        required
+    />
+    <i class="fa fa-search"></i>
+    <mat-autocomplete #styleSearch="matAutocomplete" [displayWith]="getStyleName">
+        <mat-option *ngFor="let item of searchData" [value]="item" (click)="handleClick(item)">
+            {{ item.unique_search }}
+        </mat-option>
+    </mat-autocomplete>
+</mat-form-field>

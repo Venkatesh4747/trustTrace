@@ -1,0 +1,16 @@
+<div class="certification-required" provide-parent-form>
+    <fieldset class="form-group">
+        <label for="certifications" class="bmd-label-static"
+            >{{ 'Choose the required certificates' | translate }} :</label
+        >
+        <app-chip-input
+            [placeholderText]="''"
+            [showPlus]="true"
+            [isRemovable]="true"
+            [chipItems]="selectedCertifications"
+            [autoCompleteList]="certificationAutoCompleteList"
+            (valueChange)="updateCertifications($event)"
+            data_cy="choose-the-required-certificates"
+        ></app-chip-input>
+    </fieldset>
+</div>

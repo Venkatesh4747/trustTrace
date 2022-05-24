@@ -1,0 +1,97 @@
+<div class="response-management-container text-left" *ngIf="responseManagementService.isCommentWindowOpen">
+  <div class="container-fluid response-management-content">
+    <div class="row response-management-header">
+      <img class="comments-box-icon" src="{{env.IMG_URL}}images/chat.png" />
+
+      <span class="navigate-icon" (click)="responseManagementService.previousComment();activeQuestionIdChanged()">
+        <i class="fa fa-caret-left"></i>
+      </span>
+      <span>{{'Comments' | translate}} ({{responseManagementService.navigateIndex}}/{{responseManagementService.questionWithComments.length}})</span>
+      <span class="navigate-icon" (click)="responseManagementService.nextComment();activeQuestionIdChanged()">
+        <i class="fa fa-caret-right"></i>
+      </span>
+
+      <button (click)="responseManagementService.toggleCommentWindow()" class="close pull-right">
+        <img class="sni" src="{{env.IMG_URL}}images/close.png">
+      </button>
+    </div>
+
+    <div class="row response-management-qs response-management-thin-border">
+      <select class="form-control" 
+              [(ngModel)]="responseManagementService.activeQuestionId"
+              (ngModelChange)="responseManagementService.fetchCommentsByQuestion();responseManagementService.setNavigateIndex();activeQuestionIdChanged()">
+        <option value="default" disabled>{{'Select Questions' | translate}}</option>
+        <option [value]="questionId" *ngFor="let questionId of responseManagementService.questionWithComments">
+          {{responseManagementService.getSlicedQuestionTextForId(questionId)}}
+        </option>
+      </select>
+    </div>
+    <!-- question selection section -->
+
+    <div class="row response-management-qp">
+      <div><b>{{'Question' | translate}}</b></div>
+      <div class="question-preview-text"
+           *ngIf="!responseManagementService?.activeQuestionId || responseManagementService?.activeQuestionId==='default'">
+           {{'Question Preview' | translate}}
+      </div>
+      <div *ngIf="responseManagementService.activeQuestionId!=='default'">
+        {{responseManagementService.getQuestionTextForId(responseManagementService.activeQuestionId)}}
+      </div>
+    </div>
+    <!-- question preview -->
+
+    <div class="row response-management-thick-border">
+      <span style="line-height: 30px;">
+        <b>{{'Threads' | translate}}</b>
+      </span>
+      <button class="f-right resolve pull-right" (click)="responseManagementService.resolveQuestionById()" *ngIf="launcherCompanyId===user.companyId">
+        <i class="fa fa-check-circle"></i> {{'Resolve' | translate}}
+      </button>
+    </div>
+
+    <div class="row response-management-cs">
+      <ul class="comment-li">
+        <li *ngFor="let threadId of responseManagementService.commentsToShow | keys ">
+          <ul class="comment-li">
+            <li class="comment-item response-management-thin-border" *ngFor="let comment of threadId.value"
+                [ngClass]="{'thread-start': threadId.key === comment['id']}">
+              <div [ngClass]="{'text-right': user.companyId === comment['companyId'],
+                                'pr-15': user.companyId === comment['companyId'],
+                                'pl-15': user.companyId !== comment['companyId']}">
+                {{comment['comment']}}
+              </div>
+              <div class="comment-date" [ngClass]="{'text-right': user.companyId === comment['companyId'], 'pr-15': user.companyId === comment['companyId'], 'pl-15': user.companyId !== comment['companyId']}">
+                {{comment['createTs'] | date: COMMENT_DATE_FORMAT }}
+              </div>
+              <div class="text-right reply-button" *ngIf="!comment['parentId']">
+                <span class="thread-reply" (click)="responseManagementService.toggleTextBox(threadId.key);">
+                  <i class="fa fa-reply"></i>
+                </span>
+              </div>
+            </li>
+            <li class="comment-item comment-reply response-management-thin-border" *ngIf="responseManagementService.textBoxOpen===true && responseManagementService.activeThreadId === threadId.key">
+              <div class="response-management-reply-box text-right">
+                <label>
+                <textarea #targetThreadCommentBox id="targetThreadCommentBox" name="replyCommentTextArea"
+                          [(ngModel)]="responseManagementService.newCommentList[threadId.key]"
+                          class="textarea pull-right "
+                          (keydown.enter)="responseManagementService.addCommentToThread();false "></textarea>
+                </label>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+
+    <div class="row response-management-text-box">
+      <textarea #commentTextBox id="commentTextBox" name="newCommentTextArea "
+                [(ngModel)]="responseManagementService.newComment "
+                class="textarea pull-right "
+                (keydown.enter)="responseManagementService.addComment();false"
+                [disabled]="responseManagementService.activeQuestionId==='default'"></textarea>
+    </div>
+    <!-- response-management-text-box -->
+  </div>
+</div>

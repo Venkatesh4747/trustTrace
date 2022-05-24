@@ -1,0 +1,9 @@
+<ng-container *ngIf="!cached">
+    <img *ngIf="!error" [hidden]="!loaded" [src]="src" [alt]="alt" (load)="onLoad()" (error)="onError()" />
+    <img *ngIf="default && (error || !loaded)" [src]="default" [alt]="alt" />
+</ng-container>
+
+<ng-container *ngIf="cached">
+    <img *ngIf="!error" [src]="src" [alt]="alt" (error)="onError()" />
+    <img *ngIf="default && error" [src]="default" [alt]="alt" />
+</ng-container>

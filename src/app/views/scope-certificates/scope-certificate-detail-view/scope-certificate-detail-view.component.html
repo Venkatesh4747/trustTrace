@@ -1,0 +1,327 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="scope-certificate-view-container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="scope-certificate-view-transaction-header">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="page-title">
+                            <div>{{ 'Detail Scope Certificate view' | translate }}</div>
+                            <div class="page-description">
+                                {{ 'View Scope Certificate information' | translate }}
+                            </div>
+                        </div>
+                        <!-- Page Title -->
+                        <div class="close-icon-block text-right">
+                            <a (click)="closeDialog()" *ngIf="showClose">
+                                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+                            </a>
+                        </div>
+                        <!-- Close Icon Block -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!-- Row -->
+            </div>
+            <!-- Scope Certificate Transaction Header -->
+        </div>
+        <!-- Column -->
+    </div>
+    <!-- Row -->
+    <div class="scope-certificate-view-container-block">
+        <div class="row">
+            <div class="col-md-5">
+                <!--  Row -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="scope-certificate-view-transaction-certificate-block">
+                            <div class="scope-certificate-view-extraction-title">
+                                <h4 class="title">{{ extractionStatus }}</h4>
+                            </div>
+                            <!-- Scope Certificate Extraction Title -->
+                            <div class="scope-certificate-view-certificate-section">
+                                <div class="scope-certificate-viewed-source-file-loader" *ngIf="isFetchingFile">
+                                    <app-spinner [small]="true"></app-spinner>
+                                </div>
+                                <ngx-extended-pdf-viewer
+                                    [src]="uploadedFile"
+                                    [height]="'80vh'"
+                                    [useBrowserLocale]="true"
+                                    [showBookmarkButton]="false"
+                                    [showDownloadButton]="false"
+                                    [showOpenFileButton]="false"
+                                    [showPrintButton]="false"
+                                    [showPropertiesButton]="false"
+                                    *ngIf="uploadedFile && !isFetchingFile"
+                                >
+                                    <!-- [showSecondaryToolbarButton]='false' -->
+                                </ngx-extended-pdf-viewer>
+                            </div>
+                            <!-- Scope Certificate Certificate Section -->
+                            <div
+                                class="scope-certificate-view-certificate-document"
+                                *ngIf="uploadedFile && !isFetchingFile"
+                                [ngClass]="{ 'disabled-opacity-5': isFetchingFile }"
+                            >
+                                <div class="scope-certificate-view-file-name-block">
+                                    <p>
+                                        <span>{{ 'File Name ' | translate }}:</span>{{ fileName }}
+                                    </p>
+                                    <a
+                                        [ngClass]="{ 'disabled-opacity-5': isFetchingFile }"
+                                        (click)="downloadScopeCertificate(certId, fileName)"
+                                    >
+                                        <img
+                                            tooltip="Download"
+                                            container="body"
+                                            src="{{ env.IMG_URL }}images/file-download.png"
+                                            alt="Download"
+                                        />
+                                    </a>
+                                </div>
+                                <!-- Scope Certificate Certificate Document -->
+                            </div>
+                            <!-- Scope Certificate File Document -->
+                        </div>
+                        <!-- Scope Certificate Transaction Certificate Block -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!--  Row -->
+            </div>
+            <!-- Column -->
+            <div class="col-md-7">
+                <div class="scope-certificate-view-transaction-field ">
+                    <!-- Mandatory Title -->
+                    <div class="material-input-style-box-type scope-certificate-form-controls">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="table custom-table normal-style-table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ 'Certificate Number' | translate }}</th>
+                                                    <th>{{ 'Certification Standard' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{ scopeCertificateData.certificateNumber }}
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{ scopeCertificateData.certificateStandard }}
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="table custom-table normal-style-table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ 'Valid from' | translate }}</th>
+                                                    <th>{{ 'Valid until' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{ scopeCertificateData.validFrom }}
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{ scopeCertificateData.validUntil }}
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="table custom-table normal-style-table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ 'Certification Body' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{ scopeCertificateData.certificateBody }}
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="table custom-table normal-style-table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ 'Name of Certified Company' | translate }}</th>
+                                                    <th>{{ 'Supplier code' | translate }}</th>
+                                                    <th>{{ 'Supplier Name' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{
+                                                                scopeCertificateData.supplierInfo &&
+                                                                scopeCertificateData.supplierInfo.value !== null
+                                                                    ? scopeCertificateData.supplierInfo.value
+                                                                    : ('Not Available' | translate)
+                                                            }}
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{
+                                                                scopeCertificateData.supplierInfo &&
+                                                                scopeCertificateData.supplierInfo.matchedData &&
+                                                                scopeCertificateData.supplierInfo.matchedData.code !==
+                                                                    null
+                                                                    ? scopeCertificateData.supplierInfo.matchedData.code
+                                                                    : ('Not Available' | translate)
+                                                            }}
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{
+                                                                scopeCertificateData.supplierInfo &&
+                                                                scopeCertificateData.supplierInfo.matchedData !== null
+                                                                    ? scopeCertificateData.supplierInfo.matchedData
+                                                                          .value
+                                                                    : ('Not Available' | translate)
+                                                            }}
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="table custom-table scope-certificate-view-table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ 'Name of Unit/Facility' | translate }}</th>
+                                                    <th>{{ 'Processing steps / Activities' | translate }}</th>
+                                                    <th>{{ 'Facility Code' | translate }}</th>
+                                                    <th>{{ 'Facility Name' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr
+                                                    *ngFor="
+                                                        let facilityInfo of scopeCertificateData.facilityInfo;
+                                                        let ind = index
+                                                    "
+                                                >
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{ facilityInfo.nameOfUnit }}
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{ facilityInfo.processes }}
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{
+                                                                facilityInfo.matchedData !== null
+                                                                    ? facilityInfo.matchedData.code !== null
+                                                                        ? facilityInfo.matchedData.code
+                                                                        : 'Not Available'
+                                                                    : ('Not Available' | translate)
+                                                            }}
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="view-form-value">
+                                                            {{
+                                                                facilityInfo.matchedData !== null
+                                                                    ? facilityInfo.matchedData['value']
+                                                                    : ('Not Available' | translate)
+                                                            }}
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+                    </div>
+                    <!-- Scope Certificate Form Controls-->
+                </div>
+                <!-- Scope Certificate Transaction Field-->
+            </div>
+            <!-- Column -->
+        </div>
+        <!--  Row -->
+    </div>
+    <!-- Scope Certificate Container Block -->
+</div>
+<!-- Scope Certificate Container -->

@@ -1,0 +1,31 @@
+<div class="row entity-table-view-container m-0">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 p-0 pt-3 pb-2 entity-article-name" *ngIf="showEntityTitle">
+        <mat-label class="tt-input-label font-regular">
+            {{ localeService.getDisplayText(entity.supplyChainArticle.articleTypeId) }}:
+            <span class="font-bold">{{ entity.supplyChainArticle.internalArticleName }}</span>
+            <span *ngIf="entity.metaData && entity.metaData.isAgentNode">({{ 'Agent' | translate }})</span>
+        </mat-label>
+    </div>
+    <div
+        class="col-xs-12 col-sm-12 col-md-12 col-lg-12 entity-article"
+        *ngFor="let productSupplyChainList of entity.productSupplyChainList; let ind = index"
+    >
+        <app-entity-article-row
+            [article]="productSupplyChainList"
+            [index]="ind"
+            [entityArticleName]="entity.supplyChainArticle.internalArticleName"
+        >
+        </app-entity-article-row>
+    </div>
+</div>
+<div *ngFor="let productSupplyChain of entity.productSupplyChainList">
+    <div class="position-relative" *ngIf="productSupplyChain.productSupplyChainList">
+        <app-entity-table-view
+            [entity]="productSupplyChain"
+            [showEntityTitle]="
+                productSupplyChain.productSupplyChainList && productSupplyChain.productSupplyChainList.length > 0
+            "
+        >
+        </app-entity-table-view>
+    </div>
+</div>

@@ -1,0 +1,95 @@
+<div class="certificate-renewal-container">
+    <div class="certificate-renewal-spinner" *ngIf="isUploading || isSubmitting">
+        <mat-spinner diameter="25" class="spinner"></mat-spinner>
+    </div>
+
+    <div class="certificate-renewal-left-container">
+        <div class="certificate-renewal-title">{{ data.texts.titleL | translate }}</div>
+        <div class="certificate-renewal-subtitle">{{ data.texts.subTitleL | translate }}</div>
+        <div class="upload-certificate">
+            <button type="button" class="secondary-btn" (click)="uploadCertificate()">
+                {{ 'Upload' | translate }}
+            </button>
+        </div>
+        <div class="brand-comments" *ngIf="data.comments">
+            <h3>{{ 'Comments' | translate }}:</h3>
+            <p *ngFor="let comment of data.comments.selectedComments">{{ comment }}</p>
+            <p *ngIf="data.comments.otherComments">{{ data.comments.otherComments }}</p>
+        </div>
+    </div>
+
+    <div class="certificate-renewal-center-container">
+        <div class="certificate-renewal-or">{{ '(Or)' | translate }}</div>
+    </div>
+
+    <div class="certificate-renewal-right-container">
+        <div class="certificate-renewal-title">{{ data.texts.titleR | translate }}</div>
+        <div class="certificate-renewal-delay-options material-input-style-box-type">
+            <!-- <mat-radio-group name="delay-reasons" [(ngModel)]="delayReason">
+                <mat-radio-button name="delay-reason" *ngFor="let option of data.options" [value]="option">
+                    <span>{{ option.name }}</span>
+                </mat-radio-button>
+                <mat-radio-button name="delay-reason" *ngIf="data.showOtherOption" value="other">
+                    <mat-label class="mat-input-label">Others:</mat-label>
+                    <mat-form-field>
+                        <input
+                            matInput
+                            [(ngModel)]="otherComments"
+                            name="delay-reason-other"
+                            (ngModelChange)="delayReason = 'other'"
+                        />
+                    </mat-form-field>
+                </mat-radio-button>
+            </mat-radio-group> -->
+            <div class="approval-status-reasons" *ngFor="let reason of data.options; let reasonInd = index">
+                <mat-checkbox
+                    [checked]="reason.checked"
+                    [(ngModel)]="reason.checked"
+                    name="reason-{{ reasonInd }}"
+                    (ngModelChange)="changeDelayReason()"
+                    >{{ reason.name | translate }}</mat-checkbox
+                >
+                <mat-form-field *ngIf="reason.name === 'Other' && reason.checked">
+                    <input matInput [(ngModel)]="otherComments" name="delay-reason-other" required />
+                </mat-form-field>
+            </div>
+
+            <!-- Resolution Date -->
+            <div *ngIf="data.isDateEnabled" class="approval-status-reasons resolution-date-picker">
+                <h3 class="resolution-date-picker-label">
+                    {{ 'Estimated Scope Certificate Release Date' | translate }}<span class="color-red">*</span>
+                </h3>
+                <mat-form-field [floatLabel]="'never'">
+                    <input
+                        class="input"
+                        matInput
+                        [matDatepicker]="resolutionDatePicker"
+                        name="resolutionDate"
+                        [(ngModel)]="resolutionDate"
+                        readonly
+                        required
+                        (click)="resolutionDatePicker.open()"
+                        data-cy="inbound-po-date"
+                        [min]="minDate"
+                    />
+                    <mat-datepicker-toggle matSuffix [for]="resolutionDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #resolutionDatePicker></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="submit-delay-reason">
+            <button
+                type="button"
+                class="secondary-btn"
+                (click)="handleSubmitClick()"
+                [disabled]="
+                    !delayReason ||
+                    (delayReason === 'Other' && !otherComments) ||
+                    (data.isDateEnabled && !resolutionDate)
+                "
+            >
+                {{ 'Submit' | translate }}
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,92 @@
+<button
+    mat-button
+    attr.data-count="{{ value && value.length }}"
+    (click)="filterSelect.open()"
+    [ngClass]="{ showDataCount: value && value.length !== 0 }"
+    class="button-badge"
+    [attr.data-cy]="data_cy"
+>
+    <mat-select
+        panelClass="filter-group-multi-select-container"
+        [placeholder]="label | titlecase | translate"
+        (selectionChange)="selectionChanges()"
+        [(ngModel)]="value"
+        [formControl]="selectFormControl"
+        multiple
+        #filterSelect
+        disableOptionCentering="true"
+        (openedChange)="openedChange($event)"
+    >
+        <mat-select-trigger class="multi-select-label">{{ label | titlecase | translate }} </mat-select-trigger>
+        <div class="select-container">
+            <div class="form-group sticky-search">
+                <mat-icon class="search-icon" aria-hidden="false" aria-label="Search">search</mat-icon>
+                <input
+                    class="form-control"
+                    #search
+                    placeholder="{{ 'Search' | translate }}"
+                    [formControl]="searchTextboxControl"
+                    type="search"
+                    data-cy="dropdown-options-search"
+                />
+            </div>
+            <button
+                class="clear-search"
+                [disableRipple]="true"
+                *ngIf="search.value"
+                matSuffix
+                mat-icon-button
+                aria-label="Clear"
+                (click)="clearSearch()"
+            >
+                <mat-icon>close</mat-icon>
+            </button>
+            <div class="options-list">
+                <mat-accordion displayMode="flat">
+                    <mat-expansion-panel
+                        *ngFor="let group of filteredOptions | async; let panelInd = index"
+                        (opened)="setStep(panelInd)"
+                        [expanded]="step === panelInd"
+                    >
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                {{ group.value }}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <mat-option
+                            (onSelectionChange)="onSelectionChange($event)"
+                            *ngFor="let option of group['group-data']"
+                            [value]="option[optionsParam.groupKey]"
+                            [attr.data-cy]="removeSpace(option[optionsParam.groupValue])"
+                        >
+                            {{ option[optionsParam.groupValue] }}
+                        </mat-option>
+                    </mat-expansion-panel>
+                </mat-accordion>
+                <mat-option *ngIf="(filteredOptions | async)?.length === 0" selected disabled>
+                    {{ 'No options found' | translate }}!
+                </mat-option>
+            </div>
+            <div class="sticky">
+                <button
+                    mat-button
+                    [disabled]="isClearAllButtonDisabled()"
+                    class="btn-group btn-bordered"
+                    (click)="clearAll()"
+                    data-cy="dropdown-clear-all-btn"
+                >
+                    {{ 'Clear All' | translate }}
+                </button>
+                <button
+                    mat-button
+                    [disabled]="isSelectAllButtonDisabled()"
+                    class="btn-group btn-secondary-green"
+                    (click)="selectAll(value)"
+                    data-cy="dropdown-select-all-btn"
+                >
+                    {{ 'Select All' | translate }}
+                </button>
+            </div>
+        </div>
+    </mat-select>
+</button>

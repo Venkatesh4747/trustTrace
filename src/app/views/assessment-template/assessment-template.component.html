@@ -1,0 +1,965 @@
+<div class="view-container">
+    <div class="container-fluid questionnaire-outer">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header no-border">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                <div class="page-title">
+                    <div>
+                        {{ 'Assessment Template' | translate }}
+                    </div>
+                    <div class="page-description font-color-primary">
+                        {{ 'Create Assessments to assess your suppliers and your own facilities' | translate }}
+                    </div>
+                </div>
+                <div class="header-search">
+                    <div class="title-right-search">
+                        <input
+                            type="text"
+                            class="search"
+                            placeholder="{{ 'Search' | translate }}"
+                            [(ngModel)]="searchText"
+                            data-cy="assessments-template-search"
+                        />
+                        <i class="fa fa-search"></i>
+                    </div>
+                    <button
+                        class="btn btn-lg btn-blue pull-right btn-gradient cq-btn"
+                        (click)="openCreateQuestionnaireModel()"
+                    >
+                        <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" /> {{ 'Create Template' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- col -->
+        </div>
+        <!-- row -->
+
+        <div class="row questionnaire-statistics-outer" *ngIf="questionnaire_status && questionnaire_status_enabled">
+            <div class="col-md-12 questionnaire-statistics-inner">
+                <!-- <ul class="statistics questionnaire-statistics list-unstyled table-filter">
+                    <li class="standard">
+                        <p class="number">{{ questionnaire_status.standard }}</p>
+                        <p class="title table-filter-options">{{ 'Standard' | translate }}</p>
+                    </li>
+                    <li class="material">
+                        <p class="number">{{ questionnaire_status.material }}</p>
+                        <p class="title table-filter-options">{{ 'Material' | translate }}</p>
+                    </li>
+                    <li class="vp">
+                        <p class="number">{{ questionnaire_status.valueProcess }}</p>
+                        <p class="title table-filter-options">{{ 'VP' | translate }}</p>
+                    </li>
+                    <li class="group">
+                        <p class="number">{{ questionnaire_status.group }}</p>
+                        <p class="title table-filter-options">{{ 'Group' | translate }}</p>
+                    </li>
+                    <li class="difficult-level">
+                        <p class="number">{{ questionnaire_status.level }}</p>
+                        <p class="title table-filter-options">{{ 'Difficulty Level' | translate }}</p>
+                    </li>
+
+                </ul> -->
+            </div>
+            <!-- col -->
+        </div>
+        <!-- row -->
+
+        <div
+            class="row assessments-table"
+            [ngClass]="{ 'band-disabled': !questionnaire_status_enabled }"
+            *ngIf="questionnaires && questionnaires.length >= 0"
+        >
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="no-assessments" *ngIf="questionnaires.length === 0">
+                    {{ 'No Templates' | translate }}
+                </div>
+                <div class="table-responsive" *ngIf="questionnaires.length > 0">
+                    <div
+                        class="table-card"
+                        *ngFor="
+                            let questionnaire of questionnaires
+                                | searchFilter: { name: searchText, description: searchText }
+                        "
+                    >
+                        <div class="table-card-left" (click)="openShowQuestionsModal(questionnaire.id)">
+                            <div class="title">
+                                <span style="font-weight: 500">
+                                    {{ questionnaire?.name }}
+                                </span>
+                                <app-spinner *ngIf="templateLoading[questionnaire.id]" [small]="true"></app-spinner>
+                            </div>
+                            <div class="desc">
+                                {{ 'Description' | translate }}: {{ questionnaire.descriptionShort
+                                }}{{ questionnaire.description?.length > 30 ? '...' : '' }}
+                            </div>
+                            <div class="desc">
+                                {{ 'Number of Questions' | translate }}: {{ questionnaire.totalQuestions }}
+                            </div>
+                            <div class="desc">
+                                {{ 'Number of Launches' | translate }}: {{ questionnaire.launchCount }}
+                            </div>
+                            <div class="desc">
+                                {{ 'Created on' | translate }}: {{ questionnaire.createTs | date: 'shortDate' }}
+                            </div>
+                        </div>
+                        <div class="table-card-right flex-column">
+                            <div class="action-item flex-end">
+                                <a
+                                    *ngIf="questionnaire.launchCount === 0"
+                                    class="tooltip-bottom"
+                                    tooltip="{{ 'Edit' | translate }}"
+                                    (click)="openCreateQuestionnaireModel(false, questionnaire)"
+                                    data-placement="bottom"
+                                >
+                                    <img src="{{ env.IMG_URL }}images/edit.png" alt="Edit" />
+                                </a>
+                                <a
+                                    class="tooltip-bottom"
+                                    tooltip="Info"
+                                    (click)="openTemplateInfoModal(questionnaire)"
+                                    data-placement="bottom"
+                                >
+                                    <img src="{{ env.IMG_URL }}images/questionaire-info.png" />
+                                </a>
+                                <a
+                                    class="tooltip-bottom"
+                                    tooltip="{{ 'Delete' | translate }}"
+                                    (click)="deleteQuestionnaire(questionnaire)"
+                                    data-placement="bottom"
+                                >
+                                    <img src="{{ env.IMG_URL }}images/questionaire-del.png" />
+                                </a>
+                            </div>
+                            <div class="action-item">
+                                <a class="card-button" (click)="openLaunchQuestionnaireModal(questionnaire)">
+                                    <img src="{{ env.IMG_URL }}images/send_remainder.png" />
+                                    {{ 'Send' | translate }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <table class="table table-striped">
+            <thead>
+            <tr style="border-bottom: 2px solid #999;">
+              <th>{{'Name' | translate}}</th>
+              <th>{{'Description' | translate}}</th>
+              <th>{{'Number of Questions' | translate}}</th>
+              <th>{{'Number of Launches' | translate}}</th>
+              <th class="text-center">{{'Action' | translate}}</th>
+            </tr>
+            </thead>
+            <tbody class="check_box_group">
+            <tr *ngFor="let questionnaire of questionnaires | searchFilter : {name:searchText, description:searchText}">
+              <td [tooltip]="questionnaire.name"
+                  container="body"
+                  data-placement="top">
+                <a style="font-weight: 500"
+                   (click)="openShowQuestionsModal(questionnaire.id)">
+                  {{questionnaire?.nameShort}}{{questionnaire.name.length > 25 ? '...' : ''}}
+                </a>
+                <app-spinner *ngIf="templateLoading[questionnaire.id]" [small]="true"></app-spinner>
+              </td>
+              <td [tooltip]="questionnaire.description" container="body" data-placement="top">
+                {{questionnaire.descriptionShort}}{{questionnaire.description?.length > 30 ? '...' : ''}}
+              </td>
+              <td>{{questionnaire.totalQuestions}}</td>
+              <td>{{questionnaire.launchCount}}</td>
+              <td class="actions">
+                <a (click)="openLaunchQuestionnaireModal(questionnaire)"
+                   [tooltip]="'Launch'"
+                   data-placement="top">
+                  <img src="../../../assets/images/share.svg" alt="Launch Questionnaire"
+                       class="launch-questionnaire-icon">
+                </a>
+                <a (click)="openTemplateInfoModal(questionnaire)"><i class="material-icons edit" [tooltip]="'Info'"
+                                                                     data-placement="top">info_outline</i></a>
+                <a (click)="deleteQuestionnaire(questionnaire)" [tooltip]="'Delete'"><i class="material-icons edit">delete</i></a>
+                <div style="margin-left: 30px;" hidden>
+                  <app-spinner [small]="true"></app-spinner>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table> -->
+                </div>
+                <!-- table-responsive -->
+            </div>
+            <!-- col -->
+        </div>
+        <!-- row -->
+    </div>
+    <!-- container-fluid questionnaire-outer -->
+</div>
+<!-- view-container -->
+
+<div
+    bsModal
+    #viewQuestionsModal="bs-modal"
+    class="surveyModal viewQuestionsModal modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="viewQuestionsModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" *ngIf="surveyDataReady">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">
+                    {{ 'Assessment Template' | translate }}
+                    {{ response['questionnaire_name'] ? '-' + response['questionnaire_name'] : '' }}
+                </h4>
+                <button
+                    *ngIf="allowDeleteQuestions"
+                    type="button"
+                    class="close pull-right"
+                    (click)="
+                        isOpenViewQuestionsModal = false; viewQuestionsModal.hide(); createQuestionnaireModal.show()
+                    "
+                    aria-label="Close"
+                >
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+                <button
+                    *ngIf="!allowDeleteQuestions"
+                    type="button"
+                    class="close pull-right"
+                    (click)="isOpenViewQuestionsModal = false; viewQuestionsModal.hide()"
+                    aria-label="Close"
+                >
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+                <div id="launch" class="selected_questions pull-right col-md-4 text-right">
+                    {{ 'Selected Questions' | translate }}:
+                    {{ selectedQuestions - (deletedQuestions.length - excludedQuestions.length) }}
+                    <!--<div class="progress col-md-10 pl-0">-->
+                    <!--<div class="progress-bar"-->
+                    <!--[style.width]="(survey_groups_1.total.answered / survey_groups_1.total.question) * 100 + '%'"></div>-->
+                    <!--</div>-->
+                    <!--<span class="percent">{{((survey_groups_1.total.answered / survey_groups_1.total.question) * 100).toFixed(0)}} %</span>-->
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 survey-group-container">
+                            <ul class="list-unstyled survey-group-list">
+                                <li
+                                    class="survey-group-item"
+                                    (click)="changeSurveyGroupTab(i, group.key)"
+                                    [ngClass]="{ active: selectedSurveyGroupTab === i }"
+                                    *ngFor="let group of survey_groups_1 | keys; let i = index"
+                                >
+                                    <div class="question-icon">
+                                        <app-img
+                                            [src]="getImage(group.key)"
+                                            [alt]="group.key"
+                                            [default]="defaultSrc"
+                                            class="group-icon"
+                                        ></app-img>
+                                    </div>
+                                    <div class="question-name">
+                                        <p class="tab-name">{{ localizationService.getDisplayText(group.key) }}</p>
+                                        <p class="complete-question">
+                                            {{ group.value.total.question }} {{ 'Questions' | translate }}
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- col -->
+                        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                            <div class="survey-group-title">
+                                {{ localizationService.getDisplayText(survey_groups[selectedSurveyGroupTab]) }}
+                            </div>
+
+                            <div dragScroll="true">
+                                <ul class="survey-sub-groups-menu" dragScroll="true">
+                                    <li
+                                        [ngClass]="{ current: selectedSubGroupTab[selectedSurveyGroupTab] === i }"
+                                        (click)="changeSubGroupTab(i, survey_sub_groups[selectedSurveyGroupTab][i])"
+                                        *ngFor="
+                                            let sub_group of survey_sub_groups[selectedSurveyGroupTab];
+                                            let i = index
+                                        "
+                                    >
+                                        {{ localizationService.getDisplayText(sub_group) }}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="survey-questions-container" tabindex="-1" #surveyQuestionContainer>
+                                <app-survey-questions
+                                    *ngIf="isOpenViewQuestionsModal"
+                                    [questions]="survey"
+                                    [groupName]="selectedGroupName"
+                                    [subGroupName]="selectedTabName"
+                                    [responses]="[]"
+                                    [answered]="[]"
+                                    [isSubQuestion]="false"
+                                    [deletedQuestions]="surveyDeletedQuestions"
+                                    [mandatoryQuestionsList]="mandatoryQuestions"
+                                    [mandatoryQuestions]="surveyMandatoryQuestions"
+                                    [allowDeleteQuestions]="allowDeleteQuestions"
+                                    (questionDeleted)="onDeleteQuestion($event)"
+                                    (questionMarkedMandatory)="onQuestionMarkedMandatory($event)"
+                                >
+                                </app-survey-questions>
+                            </div>
+                            <!-- survey-questions-container -->
+                        </div>
+                        <!-- col -->
+                    </div>
+                    <!-- row -->
+                </div>
+                <!-- container-fluid -->
+            </div>
+
+            <div class="modal-footer">
+                <div class="col-md-6 text-left"></div>
+                <div class="col-md-6">
+                    <!--<button type="button" class="btn" [ngClass]="{'btn-blue': previewDataReady}" (click)="openPreviewModal(assessment.id)">-->
+                    <!--<span *ngIf="previewDataReady">Preview</span>-->
+                    <!--<span *ngIf="!previewDataReady">-->
+                    <!--<app-spinner [small]="true"></app-spinner>-->
+                    <!--</span>-->
+                    <!--</button>-->
+
+                    <button
+                        type="button"
+                        class="btn btn-blue"
+                        data-dismiss="modal"
+                        *ngIf="allowDeleteQuestions"
+                        (click)="viewQuestionsModal.hide(); createQuestionnaireModal.show()"
+                    >
+                        {{ 'Cancel' | translate }}
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-gray"
+                        *ngIf="allowDeleteQuestions"
+                        (click)="viewQuestionsModal.hide(); createQuestionnaireModal.show()"
+                    >
+                        <span>{{ 'Ok' | translate }}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-blue"
+                        data-dismiss="modal"
+                        *ngIf="!allowDeleteQuestions"
+                        (click)="viewQuestionsModal.hide()"
+                    >
+                        {{ 'Close' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- survey-modal-->
+
+<div
+    bsModal
+    #createQuestionnaireModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="createQuestionnaireModal"
+    aria-hidden="true"
+    *ngIf="questionnaireModalReady"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left" *ngIf="isCreateQuestionnaire === 'create'">
+                    {{ 'Create Template' | translate }}
+                </h4>
+                <h4 class="modal-title pull-left" *ngIf="isCreateQuestionnaire === 'edit'">
+                    {{ 'Edit Template' | translate }}
+                </h4>
+                <h4 class="modal-title pull-left" *ngIf="isCreateQuestionnaire === 'launch'">
+                    {{ 'Launch Template' | translate }}
+                </h4>
+                <button
+                    type="button"
+                    class="close pull-right"
+                    (click)="createQuestionnaireModal.hide()"
+                    aria-label="Close"
+                >
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <form>
+                        <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 cq-left">
+                            <div class="form-group">
+                                <label for="questionnaire_name">{{ 'Template Name' | translate }}</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="questionnaire_name"
+                                    [disabled]="isCreateQuestionnaire === 'launch'"
+                                    name="questionnaire_name"
+                                    [(ngModel)]="response['questionnaire_name']"
+                                />
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="form-group">
+                                <label for="question_description">{{ 'Template Description' | translate }}</label>
+                                <textarea
+                                    name="question_description"
+                                    id="question_description"
+                                    cols="30"
+                                    rows="10"
+                                    [disabled]="isCreateQuestionnaire === 'launch'"
+                                    [(ngModel)]="response['questionnaire_description']"
+                                    class="form-control"
+                                ></textarea>
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="form-group">
+                                <label for="filter_questions">{{ 'Question Filter' | translate }}</label>
+                                <span
+                                    class="pull-right"
+                                    style="cursor: pointer"
+                                    (click)="resetFilter()"
+                                    container="body"
+                                    tooltip="Reset Filter"
+                                    data-placement="top"
+                                >
+                                    <i class="material-icons">refresh</i>
+                                </span>
+                                <div class="clearfix"></div>
+                                <div id="filter_questions">
+                                    <div class="filterHeaderBar">
+                                        <span class="heading">{{
+                                            filterQuestionsHeading[filterStep].value | titlecase | translate
+                                        }}</span>
+                                        <!--<span class="left-arrow" (click)="filterCount('left', isCreateQuestionnaire)"><i-->
+                                        <!--class="fa fa-caret-left"></i></span>-->
+                                        <span
+                                            class="right-arrow"
+                                            (click)="filterCount('right', isCreateQuestionnaire)"
+                                            *ngIf="this.filterStep < this.filterQuestionsHeading.length - 1"
+                                        >
+                                            <i class="fa fa-caret-right"></i
+                                        ></span>
+                                    </div>
+
+                                    <div class="filterContent" tabindex="-1">
+                                        <div class="row">
+                                            <app-spinner
+                                                class="Absolute-Center"
+                                                [small]="true"
+                                                *ngIf="
+                                                    !options[filterQuestionsHeading[filterStep].id] ||
+                                                    options[filterQuestionsHeading[filterStep].id].length <= 0
+                                                "
+                                            ></app-spinner>
+                                            <div class="col-md-12 select-all-option">
+                                                <span class="check_box_group">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="selectAll"
+                                                        name="selectAll"
+                                                        [checked]="allSelected[filterQuestionsHeading[filterStep].id]"
+                                                        [disabled]="isCreateQuestionnaire === 'launch'"
+                                                        (change)="
+                                                            checkFilter($event, filterQuestionsHeading[filterStep].id)
+                                                        "
+                                                    />
+                                                    <label for="selectAll" style="padding-bottom: 0; margin-bottom: 0">
+                                                        <span>{{ 'Select All' | translate }}</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                            <div
+                                                class="col-md-6"
+                                                *ngFor="
+                                                    let option of options[filterQuestionsHeading[filterStep].id]
+                                                        | sortByFilter
+                                                "
+                                            >
+                                                <span class="check_box_group">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="{{ option }}"
+                                                        name="{{ option }}"
+                                                        [disabled]="isCreateQuestionnaire === 'launch'"
+                                                        [(ngModel)]="response[option]"
+                                                        (change)="
+                                                            checkFilter(
+                                                                $event,
+                                                                filterQuestionsHeading[filterStep].id,
+                                                                option
+                                                            )
+                                                        "
+                                                    />
+                                                    <label
+                                                        for="{{ option }}"
+                                                        style="padding-bottom: 0; margin-bottom: 0"
+                                                    >
+                                                        <span>{{ localizationService.getDisplayText(option) }}</span>
+                                                    </label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- filterContent -->
+                                </div>
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label style="padding-top: 17px;">{{ 'Selected Questions' | translate }}</label>
+                                    </div>
+                                    <div class="col-md-7" style="font-size: 35px; color: #27c7e5;">
+                                        <span *ngIf="!selectedQuestionsLoading">{{
+                                            selectedQuestions - (deletedQuestions.length - excludedQuestions.length)
+                                        }}</span>
+                                        <app-spinner [small]="true" *ngIf="selectedQuestionsLoading"></app-spinner>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- col -->
+
+                        <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 cq-right filter-selection-container">
+                            <div class="filter-selection-content">
+                                <ul class="list-unstyled">
+                                    <li *ngFor="let section of filterQuestionsHeading">
+                                        <p class="filter-title">{{ section.value | translate }}</p>
+
+                                        <ul class="list-unstyled list-inline selected-suppliers-facilities-list">
+                                            <li
+                                                class="selected-suppliers-facilities-item"
+                                                *ngFor="
+                                                    let item of selectedFilters[toCamelCase(section.type)];
+                                                    let last = last
+                                                "
+                                            >
+                                                {{ localizationService.getDisplayText(item) }}
+                                                <span
+                                                    (click)="
+                                                        response[item] = false; checkFilter($event, section.type, item)
+                                                    "
+                                                    *ngIf="
+                                                        filterQuestionsHeading[filterStep].type === section.type &&
+                                                        isCreateQuestionnaire !== 'edit'
+                                                    "
+                                                    data-role="remove"
+                                                ></span>
+                                            </li>
+                                        </ul>
+
+                                        <div
+                                            class="disabled-text"
+                                            *ngIf="
+                                                !selectedFilters[toCamelCase(section.type)] ||
+                                                selectedFilters[toCamelCase(section.type)]?.length === 0
+                                            "
+                                        >
+                                            {{ 'No options selected' | translate }}
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- col -->
+                    </form>
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer">
+                <div class="col-md-6 text-left">
+                    <button type="button" *ngIf="!viewQuestionsLoading" class="btn btn-blue" (click)="viewQuestions()">
+                        {{ 'View Questions' | translate }}
+                    </button>
+                    <span
+                        style="display: inline-block; padding-right: 40px; width: 200px; text-align: center"
+                        *ngIf="viewQuestionsLoading"
+                    >
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                    <!--<p class="pt-1">Total Questions: <span class="text-blue total-q"><b>{{assessment.totalQuestion}}</b></span>-->
+                    <!--</p>-->
+                </div>
+                <div class="col-md-6">
+                    <button
+                        type="button"
+                        class="btn btn-white"
+                        [disabled]="modalSavingBusy"
+                        *ngIf="!modalLaunchingBusy"
+                        (click)="onSaveQuestionnaire(response, currentQuestionnaireId, true)"
+                    >
+                        <span>{{ 'Save' | translate }} & {{ 'Launch' | translate }}</span>
+                    </button>
+                    <span style="padding-right: 40px;" *ngIf="modalLaunchingBusy">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                    <button
+                        type="button"
+                        class="btn btn-blue"
+                        data-dismiss="modal"
+                        (click)="createQuestionnaireModal.hide()"
+                    >
+                        {{ 'Cancel' | translate }}
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-gray"
+                        *ngIf="!modalSavingBusy && isCreateQuestionnaire !== 'launch'"
+                        (click)="onSaveQuestionnaire(response, currentQuestionnaireId, false)"
+                    >
+                        <span>{{ 'Save' | translate }}</span>
+                    </button>
+                    <span style="padding-right: 40px;" *ngIf="modalSavingBusy">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->
+
+<div
+    bsModal
+    #launchQuestionnaireModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="launchQuestionnaireModal"
+    aria-hidden="true"
+    *ngIf="questionnaireModalReady"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left" *ngIf="isCreateQuestionnaire === 'create'">
+                    {{ 'Create Questionnaire' | translate }}
+                </h4>
+                <h4 class="modal-title pull-left" *ngIf="isCreateQuestionnaire === 'edit'">
+                    {{ 'Edit Questionnaire' | translate }}
+                </h4>
+                <h4 class="modal-title pull-left" *ngIf="isCreateQuestionnaire === 'launch'">
+                    {{ 'Launch' | translate }} - {{ response['questionnaire_name'] }}
+                </h4>
+                <button
+                    type="button"
+                    class="close pull-right"
+                    (click)="launchQuestionnaireModal.hide()"
+                    aria-label="Close"
+                >
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <form>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="border-right: 1px solid #ccc">
+                            <div class="form-group">
+                                <h5>{{ 'Suppliers' | translate }} & {{ 'Facilities' | translate }}</h5>
+
+                                <div class="selected-suppliers-facilities-container">
+                                    <div class="selected-suppliers-facilities-content">
+                                        <ul class="list-unstyled list-inline selected-suppliers-facilities-list">
+                                            <li
+                                                class="selected-suppliers-facilities-item"
+                                                *ngFor="let supplier of selectedSuppliers"
+                                            >
+                                                {{ supplier.supplier_name }}
+                                                <span
+                                                    (click)="onSelectSupplier(this, $event, supplier.supplier_id, true)"
+                                                    data-role="remove"
+                                                ></span>
+                                            </li>
+
+                                            <li
+                                                class="selected-suppliers-facilities-item"
+                                                *ngFor="let facility of selectedFacilities"
+                                            >
+                                                {{ facility.name }}
+                                                <span
+                                                    (click)="onSelectFacility(this, $event, facility.id, true)"
+                                                    data-role="remove"
+                                                ></span>
+                                            </li>
+                                        </ul>
+                                        <!-- selected-suppliers-facilities-list -->
+                                    </div>
+                                    <!-- selected-suppliers-facilities-content -->
+                                </div>
+                                <!-- selected-suppliers-facilities-container -->
+
+                                <div class="search-suppliers-facilities-container container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-6" style="padding-left: 0;">
+                                            <h5>{{ 'My Suppliers' | translate }}</h5>
+                                            <div class="search-suppliers-facilities">
+                                                <div class="search-box">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="{{ 'Search' | translate }}"
+                                                        name="searchSupplierTerm"
+                                                        [(ngModel)]="searchSupplierTerm"
+                                                        (keyup)="onSupplierSearch($event.target.value)"
+                                                    />
+                                                </div>
+                                                <div class="supplier-state">
+                                                    <app-spinner [small]="true" *ngIf="supplierListIsLoading">
+                                                    </app-spinner>
+                                                    <span *ngIf="!supplierListIsLoading && suppliers?.length === 0">
+                                                        {{ 'No suppliers' | translate }}
+                                                    </span>
+                                                </div>
+                                                <ul
+                                                    *ngIf="!supplierListIsLoading"
+                                                    class="search-suppliers-facilities-list list-unstyled"
+                                                >
+                                                    <li
+                                                        class="search-suppliers-facilities-item"
+                                                        [ngClass]="{
+                                                            selected: !!markedSuppliers[supplier.supplier_id]
+                                                        }"
+                                                        *ngFor="
+                                                            let supplier of suppliers | sortByFilter: 'supplier_name';
+                                                            let i = index
+                                                        "
+                                                        (click)="triggerCheckbox('ss', i)"
+                                                    >
+                                                        <span class="title">{{ supplier.supplier_name }}</span>
+                                                        <span class="pull-right">
+                                                            <app-supplier-status
+                                                                [customStyle]="supplierStatusCustomImgStyle"
+                                                                [status]="supplier?.supplier_association_status?.id"
+                                                                unAcceptedTooltip="Unaccepted Supplier - Assessments can be launched but will only be viewed by the Supplier after he accepts your invite"
+                                                            >
+                                                            </app-supplier-status>
+                                                            <span class="check_box_group">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    name="ssf-{{ i }}"
+                                                                    id="ss-{{ i }}"
+                                                                    (change)="onSelectSupplier(this, $event, supplier.supplier_id, false)"
+                                                                    [checked]="markedSuppliers[supplier.supplier_id]"
+                                                                />
+
+                                                                <label
+                                                                    for="ss-{{ i }}"
+                                                                    (click)="triggerCheckbox('ss', i)"
+                                                                    ><span></span
+                                                                ></label>
+                                                            </span>
+                                                        </span>
+
+                                                        <div class="clearfix"></div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!-- col -->
+                                        <div class="col-md-6" style="padding-right: 0;">
+                                            <h5>{{ 'My Facilities' | translate }}</h5>
+                                            <div class="search-suppliers-facilities">
+                                                <div class="search-box">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="{{ 'Search' | translate }}"
+                                                        name="searchFacilityTerm"
+                                                        [(ngModel)]="searchFacilityTerm"
+                                                    />
+                                                </div>
+
+                                                <ul class="search-suppliers-facilities-list list-unstyled">
+                                                    <li
+                                                        class="search-suppliers-facilities-item"
+                                                        [ngClass]="{ selected: !!markedFacilities[facility.id] }"
+                                                        *ngFor="
+                                                            let facility of facilities
+                                                                | filter: searchFacilityTerm
+                                                                | sortByFilter: 'name';
+                                                            let i = index
+                                                        "
+                                                        (click)="triggerCheckbox('sf', i)"
+                                                    >
+                                                        <span class="title">{{ facility.name }}</span>
+                                                        <span class="check_box_group pull-right">
+                                                            <input
+                                                                type="checkbox"
+                                                                id="sf-{{ i }}"
+                                                                (change)="onSelectFacility(this, $event, facility.id, false)"
+                                                                [checked]="markedFacilities[facility.id]"
+                                                            />
+                                                            <label for="sf-{{ i }}" (click)="triggerCheckbox('sf', i)"
+                                                                ><span></span
+                                                            ></label>
+                                                        </span>
+                                                        <div class="clearfix"></div>
+                                                    </li>
+                                                    <li *ngIf="!facilities || facilities.length === 0">
+                                                        <span class="title">{{
+                                                            'No Facilities Available' | translate
+                                                        }}</span>
+                                                    </li>
+                                                </ul>
+                                                <!-- search-suppliers-facilities-list -->
+                                            </div>
+                                        </div>
+                                        <!-- col -->
+                                    </div>
+                                    <!-- row -->
+                                </div>
+                                <!-- search-suppliers-facilities-container -->
+                            </div>
+                            <!-- form-group -->
+
+                            <div class="material-input-style-box-type material-date-picker">
+                                <mat-label>{{ 'Target Date' | translate }}</mat-label>
+                                <mat-form-field>
+                                    <input
+                                        matInput
+                                        [(ngModel)]="response['target_date']"
+                                        [matDatepicker]="pick_date"
+                                        (focus)="pick_date.open()"
+                                        (click)="pick_date.open()"
+                                        name="target_date"
+                                        [min]="minDate"
+                                        readonly
+                                    />
+                                    <mat-datepicker #pick_date></mat-datepicker>
+                                    <mat-datepicker-toggle matSuffix [for]="pick_date"></mat-datepicker-toggle>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <!-- col -->
+                    </form>
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer">
+                <div class="col-md-6 text-left">
+                    <!--<p class="pt-1">Total Questions: <span class="text-blue total-q"><b>{{assessment.totalQuestion}}</b></span>-->
+                    <!--</p>-->
+                </div>
+                <div class="col-md-6">
+                    <button
+                        type="button"
+                        class="btn btn-white"
+                        [disabled]="modalSavingBusy"
+                        *ngIf="!modalLaunchingBusy"
+                        (click)="launchQuestionnaire()"
+                    >
+                        <span>{{ 'Launch' | translate }}</span>
+                    </button>
+                    <span style="padding-right: 40px;" *ngIf="modalLaunchingBusy">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                    <span style="padding-right: 40px;" *ngIf="modalSavingBusy">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                    <button
+                        type="button"
+                        class="btn btn-gray"
+                        data-dismiss="modal"
+                        (click)="launchQuestionnaireModal.hide()"
+                    >
+                        {{ 'Cancel' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->
+
+<div
+    bsModal
+    #templateInfoModal="bs-modal"
+    class="templateInfoModal modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="templateInfoModal"
+    aria-hidden="true"
+    *ngIf="questionnaireModalReady"
+>
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">{{ currentQuestionnaire?.name }}</h4>
+                <button type="button" class="close pull-right" (click)="templateInfoModal.hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <form>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 filter-selection-container">
+                            <div class="filter-selection-content">
+                                <ul class="list-unstyled">
+                                    <li *ngFor="let section of filterQuestionsHeading">
+                                        <p class="filter-title">{{ section.value | translate }}</p>
+
+                                        <ul class="list-unstyled list-inline selected-suppliers-facilities-list">
+                                            <li
+                                                class="selected-suppliers-facilities-item"
+                                                *ngFor="
+                                                    let item of localizationService.getDisplayTextForList(
+                                                        selectedFilters[toCamelCase(section.type)]
+                                                    ) | sortByFilter
+                                                "
+                                            >
+                                                {{ item }}
+                                            </li>
+                                        </ul>
+
+                                        <div
+                                            class="disabled-text"
+                                            *ngIf="
+                                                !selectedFilters[toCamelCase(section.type)] ||
+                                                selectedFilters[toCamelCase(section.type)]?.length === 0
+                                            "
+                                        >
+                                            {{ 'No options selected' | translate }}
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- col -->
+                    </form>
+                </div>
+                <!-- row -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-gray" data-dismiss="modal" (click)="templateInfoModal.hide()">
+                    {{ 'Close' | translate }}
+                </button>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->

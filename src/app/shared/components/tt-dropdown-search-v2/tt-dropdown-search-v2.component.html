@@ -1,0 +1,35 @@
+<div class="v2-dropdown-search-container" [ngStyle]="customStyle">
+    <mat-form-field [floatLabel]="float" [class]="requiredSymbolRemove ? 'req-symbol-remove' : ''">
+        <mat-label *ngIf="inputLabel"> {{ inputLabel | translate }}</mat-label>
+        <input
+            type="text"
+            [formControl]="control"
+            [placeholder]="placeholder ? placeholder : ''"
+            formSubmittedSync
+            matInput
+            [matAutocomplete]="autoComplete"
+            [readonly]="isDisabled"
+            [disabled]="isDisabled"
+            [required]="isRequired"
+            (keyup)="update('text')"
+            matTooltipPosition="below"
+            [matTooltip]="isDisabled ? customEditNotAllowedTooltip : ''"
+            [attr.data-cy]="data_cy"
+        />
+        <mat-autocomplete #autoComplete="matAutocomplete" [displayWith]="displayValue.bind(this)">
+            <ng-container *ngFor="let item of filterdList | sortByFilter: optionDisplayTextKey">
+                <mat-option [value]="item" (click)="update('selection')" *ngIf="customValidate(item)">
+                    {{ displayValue(item) }}
+                </mat-option>
+            </ng-container>
+
+            <mat-option disabled *ngIf="filterdList.length === 0">
+                {{ 'No options found!' | translate }}
+            </mat-option>
+        </mat-autocomplete>
+
+        <mat-error *ngIf="errorMessage" class="error">
+            {{ errorMessage | translate }}
+        </mat-error>
+    </mat-form-field>
+</div>

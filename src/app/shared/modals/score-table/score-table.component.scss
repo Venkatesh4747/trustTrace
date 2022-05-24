@@ -1,0 +1,398 @@
+@import '~styles/variables';
+@import '~styles/mixins';
+
+.modal {
+    &-page {
+        font-family: $font-family-Regular;
+        color: $text-color-primary;
+        font-size: 14px;
+    }
+    &-header {
+        background-image: inherit !important;
+        border: 0;
+        padding: 10px 15px 30px 5px;
+    }
+    &-title {
+        font-weight: 600;
+        font-family: $font-family-Bold;
+        font-size: 18px;
+    }
+    &-description {
+        font-size: 14px;
+        padding: 5px 0 15px 0;
+        strong {
+            font-weight: bold;
+        }
+    }
+}
+
+.button-block {
+    display: block;
+    text-align: right;
+    margin-top: 25px;
+    position: absolute;
+    bottom: 15px;
+    right: 45px;
+    .btn {
+        font-size: 14px;
+        font-weight: 600;
+        text-align: center;
+        color: #4b4b4b;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
+    .btn-bordered {
+        border: solid 1px #8e8e8e;
+        margin-right: 15px;
+        background: #ffffff;
+    }
+    .btn-secondary {
+        background-color: #7affad;
+        margin-right: 0px;
+    }
+}
+
+.score-history-table {
+    position: relative;
+    top: 15px;
+    max-height: calc(100vh - 15em);
+    overflow: auto;
+    &.score-history-view-table {
+        max-height: calc(100vh - 18em);
+    }
+    th,
+    td {
+        vertical-align: middle;
+    }
+    th {
+        &:first-child {
+            min-width: 180px;
+            text-align: left;
+            span {
+                position: relative;
+                left: 20px;
+            }
+            @media screen and (max-width: 1366px) {
+                min-width: 160px;
+            }
+            @media screen and (min-width: 1600px) {
+                min-width: 220px;
+            }
+        }
+        &:last-child {
+            min-width: 250px;
+            width: 25%;
+        }
+    }
+    td {
+        &:first-child {
+            min-width: 180px;
+            text-align: left;
+            span {
+                position: relative;
+                font-size: 14px;
+                left: 20px;
+                width: 100px;
+                min-width: 85%;
+                display: inline-block;
+            }
+            @media screen and (max-width: 1366px) {
+                min-width: 160px;
+            }
+            @media screen and (min-width: 1600px) {
+                min-width: 220px;
+            }
+        }
+    }
+    td.td-last-child-width {
+        width: 25%;
+        min-width: 250px;
+    }
+    th.second-row-thead {
+        text-align: center;
+        span {
+            position: relative;
+            left: 0;
+        }
+        &:first-child {
+            min-width: auto;
+        }
+        &:last-child {
+            min-width: auto;
+            width: auto;
+        }
+    }
+}
+
+.table,
+th,
+td {
+    font-size: 14px !important;
+    border-collapse: collapse;
+    padding: 10px 6px;
+    text-align: center;
+}
+table {
+    table-layout: auto;
+    width: 100%;
+}
+
+.icon {
+    width: 25px;
+    height: 25px;
+    margin-left: 30px;
+    margin-top: -26px;
+    float: right;
+    margin-right: -19px;
+}
+
+.content-red {
+    color: #325992;
+    background-color: #ffd6d6;
+}
+
+.document {
+    display: block;
+    margin-top: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    margin-bottom: 12px;
+}
+
+td[rowspan] {
+    vertical-align: top !important;
+    padding-top: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    background-color: white;
+}
+
+tbody > tr:nth-child(odd) {
+    background-color: #e6fbff;
+}
+
+.no-document {
+    max-height: 400px !important;
+}
+
+.align-left {
+    display: block;
+    text-align: justify;
+    font-size: 14px;
+    line-height: 1.6;
+    font-family: $font-family-Regular;
+    max-height: 280px;
+    padding-right: 0.8em;
+    overflow-y: hidden;
+    &:hover {
+        overflow-y: auto;
+    }
+}
+.textarea {
+    border: 1px solid #747474;
+    width: 100%;
+    border-radius: 4px;
+    outline: none;
+    resize: none;
+    color: #325992;
+    &:focus {
+        box-shadow: none;
+    }
+}
+/* Placeholder text white */
+::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #b1b1b1 !important;
+    opacity: 1; /* Firefox */
+}
+.score-table-input {
+    text-align: center;
+    outline: none;
+    border-radius: 4px;
+    border: 1px solid #747474;
+    padding-left: 15px;
+    &:focus {
+        outline: none;
+    }
+}
+.filename {
+    display: block;
+    text-align: left;
+    margin-top: 3px;
+    line-height: 1.8;
+    word-break: break-all;
+    user-select: none;
+    font-family: $font-family-Regular;
+    font-size: 14px;
+}
+.font-bold {
+    font-size: 14px;
+    font-family: $font-family-Bold;
+}
+.font-semi-bold {
+    font-family: $font-family-Semibold;
+    font-size: 14px;
+    font-weight: 600;
+    font-style: normal;
+}
+.font-regular {
+    font-size: 14px;
+    font-weight: 200;
+}
+.upload-document {
+    margin-top: 33px;
+    display: block;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.tt-file-upload-ui-container {
+    width: 80%;
+    border: 1px dashed #9d9d9d;
+    padding: 15px;
+    cursor: pointer;
+}
+
+.tt-file-upload-ui-content {
+    text-align: center;
+    width: 100%;
+    @media screen and (min-width: 1600px) {
+        width: auto;
+    }
+    .description {
+        color: #939393;
+        font-family: $font-family-Regular;
+        font-size: 14px;
+    }
+    .spinner-wrapper {
+        margin: 0 auto;
+        display: inline-flex;
+        .upload-icon {
+            width: 12px;
+            margin-right: 15px;
+        }
+    }
+}
+
+.tt-uploaded-file-list-container {
+    .tt-uploaded-file {
+        cursor: auto;
+        padding-top: 15px;
+        width: 80%;
+        display: flex;
+        text-align: left;
+        align-items: center;
+        word-break: break-all;
+        line-height: 1.4;
+        .fileName {
+            font-family: $font-family-Semibold;
+            font-size: 14px;
+            color: $text-color-primary;
+        }
+    }
+
+    .tt-remove-uploaded-file {
+        margin-left: 10px;
+        cursor: pointer;
+    }
+
+    .fa-fa-download .download-btn::before {
+        cursor: pointer;
+        margin-left: 12px;
+    }
+}
+
+.align-image {
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    margin-bottom: -7px;
+}
+.ng-touched.ng-invalid {
+    border: 1px solid #f44336;
+}
+
+.align-center {
+    margin-left: 30px;
+}
+
+.content-grey {
+    color: #a8a8a8;
+}
+
+.content-blue {
+    display: block;
+    color: #6599e5;
+    text-align: center;
+    margin-top: 70%;
+    font-weight: 600;
+    font-family: $font-family-Semibold;
+    line-height: 1.9;
+}
+
+::ng-deep .version-history-option {
+    max-height: 382.2px !important;
+    margin-top: 42px !important;
+    box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.22) !important;
+    border: solid 1px #dededf;
+}
+
+.mat-option {
+    height: 100% !important;
+    width: 100%;
+    display: block;
+    padding: 15px 15px 0;
+    .list {
+        font-family: $font-family-Semibold;
+        font-size: 14px;
+        line-height: 23px;
+        display: block;
+        font-weight: 600;
+        padding-left: 0.6em;
+        color: #6599e5;
+        &:first-child {
+            color: #325992;
+        }
+    }
+}
+.version-selected-details {
+    display: inline-flex;
+    width: 100%;
+    padding-left: 5px;
+    padding-top: 15px;
+    .version-inner {
+        width: 100%;
+        padding-right: 10px;
+        mat-form-field {
+            width: 100%;
+        }
+    }
+}
+
+.version-selected-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: $font-family-Semibold;
+    padding-left: 5px;
+    padding-top: 10px;
+}
+
+.last-edit-text {
+    font-size: 12px;
+    color: #4b4b4b;
+    margin-left: 10px;
+    line-height: 1.5;
+    p {
+        margin-bottom: 0;
+    }
+}
+
+.color-change {
+    font-family: $font-family-Regular;
+    font-size: 14px;
+    line-height: 1.29;
+    color: #4b4b4b;
+}

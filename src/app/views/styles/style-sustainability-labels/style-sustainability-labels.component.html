@@ -1,0 +1,14 @@
+<div class="sustainability-labels" provide-parent-form>
+    <fieldset class="form-group">
+        <label for="colors" class="bmd-label-static">{{ 'Choose the sustainability labels' | translate }} :</label>
+        <app-chip-input
+            [placeholderText]="''"
+            [showPlus]="true"
+            [isRemovable]="true"
+            [chipItems]="selectedSustainabilityLabels"
+            [autoCompleteList]="autoCompleteList"
+            (valueChange)="updateCertifications()"
+            data_cy="choose-the-sustainability-labels"
+        ></app-chip-input>
+    </fieldset>
+</div>

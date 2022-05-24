@@ -1,0 +1,43 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="no-assessments" *ngIf="suppliers.length === 0">
+        {{ 'No supplier conflicts' | translate }}
+    </div>
+    <div *ngIf="suppliers.length > 0">
+        <div class="supplier-details">
+            <mat-icon class="icon-rotate-360">error_outline</mat-icon>
+            <span>
+                {{
+                    'A similar company has been found on our platform and is being reviewed by TrusTrace Admin. This
+                supplier will be available to use on the platform in not more than 7 Days.'
+                        | translate
+                }}
+            </span>
+        </div>
+        <div class="table-responsive">
+            <div class="table-card" *ngFor="let supplier of suppliers; let i = index">
+                <div class="table-card-left flex-align-items-center">
+                    <div class="table-card-logo">
+                        <img
+                            class="img-responsive"
+                            src="{{ supplier.supplier_logo || env.IMG_URL + 'images/nologo.png' }}"
+                            alt="Supplier Logo"
+                        />
+                    </div>
+                    <div class="table-card-desc">
+                        <div class="supplier-title">
+                            {{ supplier.name }}
+                        </div>
+                        <div class="desc text-bold">
+                            {{ 'Location' | translate }} :
+                            <span>{{ displayLocation(supplier) || ('Not Available' | translate) }}</span>
+                        </div>
+                        <div class="desc text-bold">
+                            {{ 'Email ID' | translate }} :
+                            <span>{{ supplier?.contactInfo.email || ('Not Available' | translate) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

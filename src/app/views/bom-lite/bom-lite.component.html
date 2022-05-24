@@ -1,0 +1,321 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="bom-management-container" class="bom-management-container">
+            <div id="bom-management-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Product Library management' | translate }}</div>
+                        <div class="page-description">
+                            {{ 'Detailed view of the product associated.' | translate }}
+                        </div>
+                    </div>
+                    <div class="header-search" *ngIf="isBomAvailable && bomFilters">
+                        <div class="title-right-search">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Type and press enter to search' | translate }}"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchBom($event)"
+                                data-cy="bom-management-search"
+                            />
+                            <span class="fa fa-search"></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row -->
+
+            <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="isBomAvailable && bomFilters">
+                <div class="col-md-12">
+                    <ul class="filter-bar-container">
+                        <li *ngFor="let filter of bomFilters | keys; let filterInd = index">
+                            <app-tt-multi-select-search
+                                (selectionChange)="handleFilterSelection()"
+                                (refreshFilter)="refreshFilter()"
+                                [label]="filter.key"
+                                [options]="filter.value"
+                                [filter_session]="filter_session"
+                                [optionsParam]="optionsParam"
+                                *ngIf="!isAGroup(filter.value)"
+                                [data_cy]="removeSpace(filter.key)"
+                            >
+                            </app-tt-multi-select-search>
+                        </li>
+                        <li class="reset-filters">
+                            <button
+                                class="button-badge mat-button btn btn-gray"
+                                (click)="resetAllFilters()"
+                                data-cy="bom-management-reset-all-filters"
+                            >
+                                {{ 'Reset all filters' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                    <div class="row">
+                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 total-count">
+                            <div class="float-l" *ngIf="bomItems.length > 0 || totalCountFlag">
+                                <card-pagination
+                                    [paginationStart]="pagination.from + 1"
+                                    [fetchSize]="pagination.size"
+                                    [totalItemsCount]="totalCount"
+                                    [moduleName]="'Bill of Materials'"
+                                    (previous)="onScroll('back')"
+                                    (next)="onScroll('next')"
+                                ></card-pagination>
+                            </div>
+                        </div>
+                        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                            <div dropdown class="dropdown sort-dropdown">
+                                <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                    <span class="sort-name"
+                                        >{{ 'Sort By' | translate }}
+                                        <span class="fa fa-angle-down"></span>
+                                    </span>
+                                </a>
+                                <ul *dropdownMenu class="dropdown-menu">
+                                    <li>
+                                        <mat-radio-group
+                                            [(ngModel)]="sortByFilter.sortBy"
+                                            (change)="handleSortBy($event)"
+                                        >
+                                            <mat-radio-button
+                                                *ngFor="let sortByValue of sortByValues; let ind = index"
+                                                [value]="sortByValues[ind].key"
+                                            >
+                                                {{ sortByValue.value | translate }}
+                                            </mat-radio-button>
+                                        </mat-radio-group>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Sort Dropdown -->
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+
+            <div class="row bom-management-table">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table custom-table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="action-space pl-1">
+                                            {{ 'Article Number' | translate }}
+                                        </th>
+                                        <th scope="col">{{ 'T1 Facility code' | translate }}</th>
+                                        <th scope="col">{{ 'Material' | translate }}</th>
+                                        <th scope="col">{{'T2 Facility code' | translate}</th>
+                                        <th scope="col">{{ 'Season' | translate }}</th>
+                                        <th scope="col">{{ 'Year' | translate }}</th>
+                                        <th scope="col">{{ 'Part' | translate }}</th>
+                                        <th scope="col">{{ 'Yield' | translate }}</th>
+                                        <th scope="col">{{ 'Traceability Tags' | translate }}</th>
+                                        <th scope="col" *ngFor="let field of customFieldDisplayList">
+                                            {{ field.name }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody [ngClass]="{ 'tbody-max-height': userSelectedBom.length > 0 }">
+                                    <tr *ngIf="!fetchingBomData && bomItems.length === 0">
+                                        <p class="content-center">
+                                            {{ 'No Bom available!' | translate }}
+                                        </p>
+                                    </tr>
+                                    <tr *ngIf="fetchingBomData">
+                                        <p class="content-center">
+                                            <app-spinner [small]="true"></app-spinner>
+                                        </p>
+                                    </tr>
+                                    <tr
+                                        *ngFor="let bom of bomItems; let bomInd = index"
+                                        (click)="navigateToDetailPage(bom)"
+                                        class="bom-detail-row"
+                                    >
+                                        <td *ngIf="bom.product && bom.product.code; else notAvailable">
+                                            {{ bom.product.code }}
+                                        </td>
+                                        <td *ngIf="bom.product && bom.product.facility_code; else notAvailable">
+                                            {{ bom.product.facility_code }}
+                                        </td>
+                                        <td *ngIf="bom.material && bom.material.code; else notAvailable">
+                                            {{ bom.material.code }}
+                                        </td>
+                                        <td *ngIf="bom.material && bom.material.facility_code; else notAvailable">
+                                            {{ bom.material.facility_code }}
+                                        </td>
+                                        <td *ngIf="bom.season; else notAvailable">
+                                            {{ bom.season }}
+                                        </td>
+                                        <td *ngIf="bom.year; else notAvailable">
+                                            {{ bom.year }}
+                                        </td>
+                                        <td *ngIf="bom.part && bom.part.name; else notAvailable">
+                                            {{ bom.part.name }}
+                                        </td>
+                                        <td
+                                            *ngIf="
+                                                bom.yield &&
+                                                    bom.yield.value &&
+                                                    bom.yield.value !== '0.0' &&
+                                                    bom.yield.value !== '0' &&
+                                                    bom.yield.value !== 'null';
+                                                else notAvailable
+                                            "
+                                        >
+                                            {{ bom.yield.value }} &nbsp;
+                                            <span *ngIf="checkYieldValues(['uom_width', 'uom_width_unit'], bomInd)">
+                                                {{ bom.yield.uom_width }} {{ bom.yield.uom_width_unit }}
+                                            </span>
+                                            <span
+                                                *ngIf="
+                                                    checkYieldValues(
+                                                        [
+                                                            'uom_width',
+                                                            'uom_width_unit',
+                                                            'uom_length',
+                                                            'uom_length_unit'
+                                                        ],
+                                                        bomInd
+                                                    )
+                                                "
+                                            >
+                                                X
+                                            </span>
+                                            <span *ngIf="checkYieldValues(['uom_length', 'uom_length_unit'], bomInd)">
+                                                {{ bom.yield.uom_length }} {{ bom.yield.uom_length_unit }}
+                                            </span>
+                                            <span
+                                                *ngIf="
+                                                    checkYieldValues(
+                                                        [
+                                                            'uom_length',
+                                                            'uom_length_unit',
+                                                            'uom_quantity',
+                                                            'uom_quantity_unit'
+                                                        ],
+                                                        bomInd
+                                                    )
+                                                "
+                                            >
+                                                X
+                                            </span>
+                                            <span
+                                                *ngIf="checkYieldValues(['uom_quantity', 'uom_quantity_unit'], bomInd)"
+                                            >
+                                                {{ bom.yield.uom_quantity }} {{ bom.yield.uom_quantity_unit }}
+                                            </span>
+                                            <span
+                                                *ngIf="
+                                                    checkYieldValues(
+                                                        [
+                                                            'uom_weight',
+                                                            'uom_weight_unit',
+                                                            'uom_quantity',
+                                                            'uom_quantity_unit'
+                                                        ],
+                                                        bomInd
+                                                    )
+                                                "
+                                            >
+                                                X
+                                            </span>
+                                            <span *ngIf="checkYieldValues(['uom_weight', 'uom_weight_unit'], bomInd)">
+                                                {{ bom.yield.uom_weight }} {{ bom.yield.uom_weight_unit }}
+                                            </span>
+                                            <span
+                                                *ngIf="
+                                                    checkYieldValues(
+                                                        [
+                                                            'uom_weight',
+                                                            'uom_weight_unit',
+                                                            'uom_thickness',
+                                                            'uom_thickness_unit'
+                                                        ],
+                                                        bomInd
+                                                    )
+                                                "
+                                            >
+                                                X
+                                            </span>
+                                            <span
+                                                *ngIf="
+                                                    checkYieldValues(['uom_thickness', 'uom_thickness_unit'], bomInd)
+                                                "
+                                            >
+                                                {{ bom.yield.uom_thickness }} {{ bom.yield.uom_thickness_unit }}
+                                            </span>
+                                        </td>
+                                        <td
+                                            *ngIf="
+                                                bom.identifier_tags && bom.identifier_tags.length > 0;
+                                                else notAvailable
+                                            "
+                                        >
+                                            <span *ngFor="let tag of bom.identifier_tags; let isLast = last">
+                                                {{ tag }}{{ isLast ? '' : ', ' }}
+                                            </span>
+                                        </td>
+                                        <td *ngFor="let customField of customFieldDisplayList">
+                                            {{
+                                                bom['custom_fields'] && bom['custom_fields'][customField.id]
+                                                    ? bom['custom_fields'][customField.id]
+                                                    : 'Not Available'
+                                            }}
+                                        </td>
+                                        <ng-template #notAvailable>
+                                            <td class="content-grey">
+                                                {{ 'Not Available' | translate }}
+                                            </td>
+                                        </ng-template>
+                                    </tr>
+                                </tbody>
+                                <tfoot *ngIf="userSelectedBom.length > 0">
+                                    <tr>
+                                        <td>
+                                            <div class="table-footer-block">
+                                                <ul class="table-footer-block-inner">
+                                                    <li class="table-footer-block-inner-left"></li>
+                                                    <li class="table-footer-block-inner-right">
+                                                        <div class="bom-management-button-block">
+                                                            <button
+                                                                class="btn cancel-btn"
+                                                                type="button"
+                                                                (click)="handleCancelClick()"
+                                                            >
+                                                                {{ 'Cancel' | translate }}
+                                                            </button>
+                                                            <button
+                                                                class="btn submit-btn"
+                                                                type="button"
+                                                                (click)="submitBom()"
+                                                            >
+                                                                {{ 'Submit' | translate }}
+                                                            </button>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<router-outlet></router-outlet>

@@ -1,0 +1,259 @@
+@import '~styles/variables';
+
+.parent-container {
+    padding: 0;
+}
+
+.title {
+    font-family: $font-family-Bold;
+    color: #325992;
+    font-size: 18px;
+    margin-left: 10px;
+    float: left;
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+    margin-left: 30px;
+    float: right;
+}
+
+.del-message {
+    margin-top: 22px;
+    font-family: 'Source Sans Pro-Regular';
+    font-size: 19px;
+    color: #325992;
+    text-align: center;
+    margin-left: 60px;
+    margin-right: 60px;
+}
+
+.centreButtons {
+    display: inline-block;
+    margin-top: 0px;
+    margin-bottom: 20px;
+}
+
+.primary-btn {
+    background: #71eeff;
+    color: #474747;
+    border-radius: 5px;
+    font-family: 'Source Sans Pro-Semibold';
+    // margin-right: 20px; added in inline style with logic
+    height: 36px;
+    min-width: 120px;
+    outline: none;
+    border: none;
+    padding: 0 10px;
+}
+
+.secondary-btn {
+    background: #7effbe;
+    color: #474747;
+    border-radius: 5px;
+    padding: 0 15px;
+    font-family: 'Source Sans Pro-Semibold';
+    margin-right: 2px;
+    height: 36px;
+    min-width: 120px;
+    outline: none;
+    border: none;
+}
+.input {
+    color: $text-color-primary;
+}
+
+.margin-lr-reset {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+#t-trace-confirmation-modal-popup-block {
+    .title & {
+        font-size: 14px;
+    }
+    .del-message & {
+        margin-top: 10px;
+        font-size: 14px;
+    }
+    .primary-btn {
+        color: #8e8e8e;
+        border-radius: 4px;
+        border: solid 1px #8e8e8e;
+        background: #ffffff;
+    }
+    .secondary-btn {
+        border-radius: 4px;
+        background-color: #ff5f5f;
+        padding-left: 15px;
+        padding-right: 15px;
+        color: #ffffff;
+    }
+}
+
+.t-trace-modal-dialog-block,
+.supplier-archive-modal-dialog-block,
+.bg-red-btn-delete-modal-dialog-block {
+    .parent-container {
+        font-size: 14px;
+    }
+
+    .title {
+        font-size: 14px;
+    }
+
+    .del-message {
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    .primary-btn {
+        color: #8e8e8e;
+        font-family: 'Source Sans Pro-Semibold';
+        // margin-right: 20px; added in inline style with logic
+        height: 36px;
+        min-width: 120px;
+        outline: none;
+        padding: 0 10px;
+        border-radius: 4px;
+        border: solid 1px #8e8e8e;
+        background: #ffffff;
+    }
+
+    .secondary-btn {
+        color: #ffffff;
+        font-family: 'Source Sans Pro-Semibold';
+        margin-right: 2px;
+        height: 36px;
+        min-width: 120px;
+        outline: none;
+        border: none;
+        border-radius: 4px;
+        background-color: #ff5f5f;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    .input {
+        color: $text-color-primary;
+    }
+
+    .margin-lr-reset {
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+}
+
+.proceed-prompt {
+    .del-message {
+        margin-top: 0.5em;
+        font-family: 'Source Sans Pro-Regular';
+        font-size: 16px;
+        color: #325992;
+        text-align: center;
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+
+    .primary-btn {
+        border: solid 1px #8e8e8e;
+        transition: background-color 0.2s;
+        background-color: transparent;
+        &:hover {
+            background-color: #f5f5f5;
+        }
+    }
+}
+
+.tc-approval-reject-dialog {
+    display: block;
+    .title {
+        font-size: 16px;
+    }
+    .del-message {
+        text-align: left;
+        margin: 0px 0 30px 0;
+        font-size: 15px;
+    }
+    .primary-btn {
+        border-radius: 4px;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.04);
+        background-color: #7affad;
+    }
+}
+
+.delete-confirmation-draft-transaction,
+.confirmation-dialog {
+    .title {
+        text-align: center;
+        float: none;
+    }
+    .primary-btn {
+        border-radius: 4px;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.04);
+        border: 1px solid #cbcbcb;
+        margin-right: 15px;
+        background: #fff;
+    }
+    .secondary-btn {
+        background: #4dff9e;
+    }
+}
+
+.delete-confirmation-evidence {
+    .del-message {
+        font-size: 16px;
+    }
+    .title {
+        text-align: center;
+        float: none;
+    }
+    .primary-btn {
+        border-radius: 4px;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.04);
+        border: 1px solid #cbcbcb;
+        margin-right: 15px;
+        background: #fff;
+    }
+    .secondary-btn {
+        background: #4dff9e;
+    }
+}
+
+.upload-evidence-buyer-confirmation-modal {
+    .title {
+        text-align: center;
+        float: none;
+    }
+}
+
+.po-management-confirm-dialog {
+    .title {
+        float: none;
+        text-align: center;
+    }
+    .primary-btn {
+        border-radius: 4px;
+        box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.04);
+        border: 1px solid #cbcbcb;
+        margin-right: 15px;
+        background: #fff;
+    }
+}
+
+.supplier-archive-modal-dialog {
+    .icon {
+        width: 22px;
+        height: 22px;
+        margin: 0px;
+    }
+    .title {
+        margin: 20px 0px 0px 80px;
+    }
+    .del-message {
+        margin: 10px 10px 0px 10px;
+    }
+    .centreButtons {
+        margin-bottom: 0px;
+    }
+}

@@ -1,0 +1,91 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="chart-detail-view-inner">
+    <div class="row" *ngIf="!pageLoading">
+        <div id="chart-back-download-options" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="chart-favourites-download-block">
+                <div class="chart-favourites-download-block-inner">
+                    <div class="favorite-icon">
+                        <label
+                            aria-label="1 star"
+                            class="star-rating"
+                            for="rating-1"
+                            (click)="clickEvent(chartConfig)"
+                            [ngClass]="status ? 'success' : 'fav-icon--active'"
+                        >
+                            <span class="fa fa-star"></span>
+                        </label>
+                    </div>
+                    <div class="file-download-block">
+                        <button mat-icon-button [matMenuTriggerFor]="menu" class="download-icon-btn">
+                            <img class="download-icon" src="{{ env.IMG_URL }}images/file-download.png" alt="Download" />
+                        </button>
+                        <mat-menu
+                            #menu="matMenu"
+                            [overlapTrigger]="false"
+                            class="chart-download-icon"
+                            yPosition="below"
+                            xPosition="before"
+                        >
+                            <button
+                                mat-menu-item
+                                data-cy="chart-test-export-btn"
+                                *ngFor="let option of menuOptions"
+                                (click)="onMenuSelect(option.name)"
+                                [disabled]="!option.enabled"
+                            >
+                                <!-- <mat-icon>dialpad</mat-icon> -->
+                                <span>{{ option.name | translate }}</span>
+                            </button>
+                        </mat-menu>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div
+            id="container"
+            class="chart-detail-container"
+            *ngIf="!showNoDataChart && chartConfig.chartType !== 'TABLE'"
+        ></div>
+        <div
+            id="table-container"
+            class="chart-detail-container chart-detail-table-container"
+            *ngIf="!showNoDataChart && chartConfig.chartType === 'TABLE'"
+        >
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="chart-details-table">
+                        <div class="table-responsive">
+                            <table [ngClass]="getTableClassName()">
+                                <thead>
+                                    <tr>
+                                        <th
+                                            *ngFor="let header of chartOptions.headers; let isLast = last"
+                                            [ngClass]="{ 'talign-center': isLast }"
+                                        >
+                                            {{ header }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let rowData of chartOptions.columnData; let rowInd = index">
+                                        <td *ngFor="let columnData of chartOptions.columnData[rowInd]['data']">
+                                            {{ columnData }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Table Responsive -->
+                    </div>
+                </div>
+                <!-- Column -->
+            </div>
+        </div>
+        <div class="no-data-chart" *ngIf="!pageLoading && showNoDataChart">
+            <img src="{{ env.IMG_URL }}images/no-data-chart.png" alt="Download" />
+            <p>{{ 'No Data Available' | translate }}</p>
+        </div>
+    </div>
+</div>

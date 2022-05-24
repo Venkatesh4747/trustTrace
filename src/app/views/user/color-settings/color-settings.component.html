@@ -1,0 +1,88 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+<div class="row card-input-single-container" id="color-specifications">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="hr">
+            <span class="hr-title">{{ 'Product Color Information' | translate }}: </span>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="row">
+            <form #productColorForm="ngForm">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 display-flex">
+                    <div class="card-input">
+                        <mat-form-field [floatLabel]="'auto'">
+                            <input
+                                matInput
+                                placeholder="{{ 'Name of the color' | translate }}"
+                                [(ngModel)]="inputData.name"
+                                name="colorName"
+                                required
+                            />
+                        </mat-form-field>
+                        <mat-form-field class="color-picker-input" [floatLabel]="'auto'">
+                            <input
+                                matInput
+                                placeholder="{{
+                                    'Hex code of the color (Eg., #FFFFFF, #ECECEC, #727272 etc)' | translate
+                                }}"
+                                [(colorPicker)]="inputData.code[0].value"
+                                [value]="inputData.code[0].value"
+                                [(ngModel)]="inputData.code[0].value"
+                                name="colorCode"
+                            />
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="pt-2 col-xs-12 col-sm-12 col-md-12 col-lg-12 display-flex-justify-flex-end">
+                    <button
+                        type="button"
+                        class="btn btn-blue save-btn custom-margin mr-1"
+                        data-dismiss="modal"
+                        (click)="clearForm()"
+                    >
+                        {{ 'Clear' | translate }}
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-gray save-btn"
+                        data-dismiss="modal"
+                        (click)="onSave(inputData)"
+                        [disabled]="!productColorForm.valid"
+                        *ngIf="!isEditing"
+                    >
+                        {{ 'Save' | translate }}
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-gray save-btn"
+                        data-dismiss="modal"
+                        (click)="onSave(inputData)"
+                        [disabled]="!productColorForm.valid"
+                        *ngIf="isEditing"
+                    >
+                        {{ 'Update' | translate }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-35 mb-15">
+        <div class="hr">
+            <span class="hr-title">{{ 'Your list of Colors' | translate }}: </span>
+        </div>
+    </div>
+    <!-- Chip Card -->
+    <div class="chip-card-wrapper">
+        <div *ngFor="let color of colors; let colorIndex = index">
+            <div class="chip-card-container" *ngIf="color.status === 'ACTIVE'">
+                {{ color.name }}
+                {{ color.code[0].value && color.code[0].value.length > 0 ? ',' + color.code[0].value : '' }}
+                <div class="chip-card-actions">
+                    <i class="fa fa-pencil" (click)="onEdit(colorIndex)"></i>
+                    <i class="fa fa-trash" (click)="onDelete(colorIndex)"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

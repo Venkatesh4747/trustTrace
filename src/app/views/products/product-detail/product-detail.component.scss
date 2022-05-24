@@ -1,0 +1,203 @@
+@import '../../../../styles/variables';
+ul.product-detail-list {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+    li {
+        font-size: 17px;
+        color: $text-color-primary;
+        margin-top: 0.25em;
+        strong {
+            font-family: $font-family-Bold;
+            font-weight: bold;
+        }
+        span {
+            font-family: $font-family-Regular;
+        }
+    }
+}
+
+.paginate-btn-group {
+    float: right;
+    padding-right: 1em;
+    mat-icon {
+        color: #444444;
+    }
+    button {
+        color: $text-color-primary;
+        font-size: 17px;
+        font-family: $font-family-Bold;
+        background: transparent;
+        &:nth-last-child(1) {
+            padding-right: 0px;
+            mat-icon {
+                margin-left: 0.25em;
+            }
+        }
+
+        &:disabled {
+            opacity: 0.5;
+        }
+    }
+}
+.product-ec {
+    margin-left: -30px;
+    padding-top: 0em;
+}
+.score-btn {
+    padding: 10px 20px;
+    float: right;
+    margin-top: 15px;
+    margin-right: 12px;
+    color: $text-color-primary;
+    font-size: 17px;
+    font-family: $font-family-Bold;
+    background: transparent;
+    border: none;
+    outline: none;
+    user-select: none;
+    .mat-icon {
+        color: #444444;
+    }
+    &:hover {
+        background-color: #e6fbff;
+        padding: 10px 20px;
+        border-radius: 4px;
+    }
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        background-color: #ffffff;
+    }
+}
+
+.align-icon {
+    vertical-align: middle;
+    margin-right: 9px;
+    margin-bottom: 4px;
+    user-select: none;
+}
+
+.edit-score {
+    height: 24px;
+    width: 20px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    filter: brightness(0.1);
+}
+
+::ng-deep .edit-menu-list {
+    .mat-menu-item {
+        color: $text-color-primary;
+        font-family: $font-family-Regular;
+        font-weight: 600;
+    }
+
+    .mat-menu-item[disabled] {
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+}
+
+.declaration-container {
+    margin-top: 1.5em;
+    margin-left: -30px;
+}
+
+.button-group {
+    float: right;
+    margin-right: 3em;
+    button {
+        width: 151px;
+        font-family: $font-family-Regular;
+        font-size: 16px;
+        font-weight: 600;
+        color: #4b4b4b;
+        border-radius: 4px;
+        border: solid 1px #8e8e8e;
+        &:last-child {
+            background-color: #7affad;
+            border: none;
+            margin-left: 1em;
+        }
+    }
+}
+
+.score-info-unordered {
+    ul {
+        display: inline-block;
+        list-style-type: disc !important;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 20px;
+        width: 300px;
+        li {
+            font-size: 20px;
+            width: 50% !important;
+            line-height: 22px !important;
+            margin-left: 10px;
+            color: #325992;
+            vertical-align: top;
+            width: 240px !important;
+            span {
+                font-size: 12px !important;
+                vertical-align: top;
+                font-family: $font-family-Semibold !important;
+                text-align: left;
+                font-weight: 600;
+            }
+            &.line-gap {
+                margin-top: 15px !important;
+            }
+        }
+    }
+}
+
+.score-checkbox {
+    color: #325992;
+    display: inline-flex;
+    font-size: 17px;
+    font-family: $font-family-Bold;
+    float: right;
+    padding-right: 1em;
+}
+.info-button {
+    background: none;
+    border: none;
+    user-select: none;
+    cursor: pointer;
+    outline: none;
+    color: #325992;
+    padding-top: 4px;
+    padding-left: 15px;
+}
+.score-enabled {
+    padding-top: 5px;
+    color: #325992;
+    user-select: none;
+}
+
+mat-checkbox {
+    padding-top: 6px;
+    padding-right: 15px;
+}
+
+.popover {
+    border-radius: 7px;
+    box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.16);
+    background: #fff;
+}
+
+.loading {
+    mat-icon {
+        animation: rotate 2s linear infinite;
+    }
+    &:active {
+        text-decoration: none !important;
+    }
+}
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}

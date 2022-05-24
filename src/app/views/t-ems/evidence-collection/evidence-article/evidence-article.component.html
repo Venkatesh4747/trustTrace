@@ -1,0 +1,107 @@
+<div
+    class="row m-0 entity-article-row"
+    [ngClass]="{
+        'odd-row': listIndex % 2 === 0,
+        'even-row': listIndex % 2 === 1
+    }"
+>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+        {{ localizationService.getDisplayText(item.certId) }}
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+        <div *ngIf="!item.categories">
+            <div class="category-name" [ngSwitch]="item.category">
+                <span *ngSwitchCase="'PRODUCT'">{{ 'Transaction Certificate' | translate }}</span>
+                <span *ngSwitchCase="'FACILITY'">{{ 'Scope Certificate' | translate }}</span>
+                <span *ngSwitchDefault>{{ item.category | titlecase }}</span>
+            </div>
+        </div>
+        <div *ngIf="item.categories">
+            <mat-form-field [floatLabel]="'never'">
+                <mat-label>{{ 'Eg., Transaction Certificate, Scope Certificate' | translate }}</mat-label>
+                <mat-select disableOptionCentering>
+                    <mat-option
+                        *ngFor="let category of item.categories"
+                        [value]="category.changeCategoriesName"
+                        (click)="onSelectingCategory(category.key)"
+                    >
+                        {{ category.changeCategoriesName }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <mat-form-field class="input" [floatLabel]="'never'">
+            <input
+                class="input-element"
+                matInput
+                name="certifcation-name-{{ unique_id }}"
+                [(ngModel)]="item.ttCertificate.body"
+                placeholder="{{ 'Eg.Control Union' | translate }}"
+                #updateBodyInput
+            />
+        </mat-form-field>
+    </div>
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <mat-form-field class="input" [floatLabel]="'never'">
+            <input
+                matInput
+                [matDatepicker]="unique_id"
+                placeholder="{{ 'Date' | translate }}"
+                readonly
+                (click)="unique_id.open()"
+                [(ngModel)]="item.ttCertificate.expiryDate"
+                (dateChange)="updateCertificate()"
+            />
+            <mat-datepicker-toggle matSuffix [for]="unique_id"></mat-datepicker-toggle>
+            <mat-datepicker #unique_id></mat-datepicker>
+        </mat-form-field>
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-3 col-lg-2">
+        <div class="uploaded-files-container">
+            <div
+                class="drag-file-upload"
+                *ngIf="!item.ttCertificate.uploadedFiles || item.ttCertificate.uploadedFiles.length === 0"
+                (click)="fileInput.click()"
+            >
+                <span *ngIf="!isUploading[unique_id]" class="drag-file-upload-icon"
+                    ><mat-icon>arrow_upward</mat-icon></span
+                >
+                <span *ngIf="!isUploading[unique_id]" class="pl-1">{{
+                    'Click to upload certificate' | translate
+                }}</span>
+                <span *ngIf="isUploading[unique_id]" class="margin-0-auto">
+                    <app-spinner [small]="true"></app-spinner>
+                </span>
+                <input
+                    type="file"
+                    class="hidden"
+                    #fileInput
+                    name="{{ fileInput }}"
+                    (change)="uploadFile($event.target.files, unique_id)"
+                    [hidden]="true"
+                    [disabled]="isUploading[unique_id]"
+                />
+            </div>
+            <div class="uploaded-files-container" (click)="onEdit()">
+                <div *ngIf="item.ttCertificate.uploadedFiles && item.ttCertificate.uploadedFiles.length > 0">
+                    <span class="uploaded-file-count" *ngIf="item.ttCertificate.uploadedFiles.length === 1">{{
+                        'Uploaded 1 file' | translate
+                    }}</span>
+                    <span class="uploaded-file-count" *ngIf="item.ttCertificate.uploadedFiles.length > 1">
+                        {{ 'Uploaded' | translate }} {{ item.ttCertificate.uploadedFiles.length }} files</span
+                    >
+                    <span><i class="fa fa-pencil action-icon"></i></span>
+                </div>
+            </div>
+            <div>
+                <i
+                    class="action-icons-small fa fa-trash"
+                    (click)="onDelete(item)"
+                    [ngClass]="{ 'hide-delete': item.creationType && item.creationType === 'SYSTEM' }"
+                ></i>
+            </div>
+        </div>
+    </div>
+</div>

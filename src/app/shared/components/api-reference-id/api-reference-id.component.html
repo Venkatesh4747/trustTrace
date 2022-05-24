@@ -1,0 +1,8 @@
+<div class="ref-id-container" *ngIf="referenceId">
+    <button class="edit-styled-btn" (click)="copyUrl(refIdElement)">
+        <span> <i class="fa fa-cog" aria-hidden="true"></i> {{ referenceId }} </span>
+    </button>
+    <input type="text" value="{{ referenceId }}" #refIdElement readonly style="position: absolute;opacity: 0;" />
+
+    <p class="copy-hint">{{ 'Click above to copy the API Reference ID' | translate }}</p>
+</div>

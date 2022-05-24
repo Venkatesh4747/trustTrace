@@ -1,0 +1,41 @@
+<div class="draft-submit-status draft-submit-status-errors">
+    <div class="draft-submit-status-title">{{ 'Error' | translate }}!</div>
+    <div class="draft-submit-status-body">
+        <div class="draft-submit-status-error-details">
+            <div class="common-striped-table common-model-popup-table">
+                <div class="table">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="table-error-row-no">{{ 'Lot ID' | translate }}.</th>
+                                <th class="table-error-row-no">{{ 'Error' | translate }}.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="!errors && errors.length === 0">
+                                {{
+                                    'Not available' | translate
+                                }}
+                            </tr>
+                            <tr *ngFor="let error of errors; let ind = index">
+                                <td class="error-row-no">{{ error.lotId || '--' }}</td>
+                                <td>
+                                    <div class="tbody-section-inner-block">
+                                        <div class="error-field error-field-message">
+                                            {{ error.errorMsg || ('Not available' | translate) }}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="draft-submit-status-button">
+        <button class="close-btn" (click)="closeDialog()">
+            {{ 'Close' | translate }}
+        </button>
+    </div>
+</div>

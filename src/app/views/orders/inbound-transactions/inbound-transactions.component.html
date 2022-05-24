@@ -1,0 +1,278 @@
+<div id="record-transactions-categories">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div id="inbound-transactions">
+        <div class="row pb-2 pr-2">
+            <div class="hr">
+                <span class="hr-title">{{ 'Inbound' | translate }} </span>
+            </div>
+        </div>
+        <div class="row pt-2" *ngIf="!pageLoading">
+            <form #createInboundForm="ngForm">
+                <div class="pt-3 col-xs-8 col-sm-8 col-md-8 col-lg-8 form-align">
+                    <div class="row">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label mb-2">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ 'New Reference Id' | translate }}:"
+                                    name="NewReferenceId"
+                                    #referenceId
+                                    [(ngModel)]="payload.lot.externalId"
+                                    (blur)="checkIfReferenceIdIsUnique()"
+                                    matInput
+                                    required
+                                    data-cy="inbound-transaction-new-reference-id"
+                                />
+                            </mat-form-field>
+                            <div class="error" *ngIf="!referenceIdIsUnique">
+                                {{ 'A lot with this reference ID already exists' | translate }}!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="{{ 'Article/Style Name & Number' | industry | translate }}:"
+                                    name="Article/Style"
+                                    [(ngModel)]="soaUniqueName"
+                                    (blur)="validateSelectedStyle()"
+                                    matInput
+                                    [matAutocomplete]="soaSearch"
+                                    (keyup)="searchStyleOrArticle($event)"
+                                    required
+                                    data-cy="inbound-transaction-article-style-name-number"
+                                />
+                                <mat-hint #soaSearchHint [ngStyle]="{ color: hintColor }">{{
+                                    'Type at least 3 characters to search' | translate
+                                }}</mat-hint>
+                                <mat-autocomplete
+                                    #soaSearch="matAutocomplete"
+                                    [displayWith]="getSOAName"
+                                    (optionSelected)="onSOASelection($event.option.value)"
+                                >
+                                    <mat-option *ngFor="let item of searchData" [value]="item">
+                                        {{ item.unique_search }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <!-- <input matInput [matDatepicker]="picker" [name]="value" [(ngModel)]="value" placeholder="Date" readonly> -->
+                                <input
+                                    class="input"
+                                    matInput
+                                    [matDatepicker]="picker"
+                                    placeholder="{{ 'Date' | translate }}:"
+                                    name="date"
+                                    [(ngModel)]="payload.lot.date"
+                                    readonly
+                                    (click)="picker.open()"
+                                    data-cy="inbound-transaction-date"
+                                />
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    type="number"
+                                    placeholder="{{ 'Inbound Quantity' | translate }}:"
+                                    name="Qty"
+                                    [(ngModel)]="payload.lot.quantity.quantity"
+                                    required
+                                    data-cy="inbound-transaction-quantity"
+                                />
+                            </mat-form-field>
+                        </div>
+
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <app-tt-dropdown-search
+                                [searchOptions]="units"
+                                [(ngModel)]="payload.lot.quantity.unit"
+                                [selectedItem]="selectedUnit"
+                                [dontCheckString]="true"
+                                (selectionChange)="setDefaultUnitSelection($event)"
+                                [placeholder]="'Units' | translate"
+                                name="qty"
+                                [isRequired]="isRequired"
+                                required
+                                [data_cy]="'inbound-transaction-units'"
+                            >
+                            </app-tt-dropdown-search>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <app-supplier-list-element
+                                [listData]="suppliers"
+                                [(ngModel)]="payload.lot.inboundData.supplier"
+                                (valueChanges)="updateSupplier($event)"
+                                [options]="supplierListOptions"
+                                name="supplier"
+                                required
+                                unInvitedTooltip="Uninvited Supplier - Inbound Transaction can be created but no further transactions can be traced for this Supplier "
+                                [data_cy]="'inbound-transaction-suppliers'"
+                            >
+                            </app-supplier-list-element>
+                        </div>
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <app-tt-multi-dropdown-search
+                                [(ngModel)]="payload.lot.facilities"
+                                name="facilities"
+                                [placeholder]="'Associated Facility:' | translate"
+                                [options]="associatedFacility"
+                                required
+                                [data_cy]="'inbound-transaction-associated-facility'"
+                            >
+                            </app-tt-multi-dropdown-search>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <mat-form-field>
+                                <input
+                                    class="input"
+                                    matInput
+                                    placeholder="{{ 'Purchase Order No.' | translate }}:"
+                                    name="PurchaseOrerNumber"
+                                    [(ngModel)]="payload.lot.inboundData.poNumber"
+                                    required
+                                    data-cy="inbound-transaction-purchase-order-no"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2 mb-2">
+                        <div class="col-md-12">
+                            <div class="hr text-center">
+                                <span class="hr-title text-muted">{{ 'Attachments' | translate }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row pt-2">
+                        <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                            <div
+                                class="certificate-container"
+                                *ngFor="let certificateToUpload of data.certificates_to_collect"
+                            >
+                                <div class="title">{{ 'Upload' | translate }} {{ certificateToUpload.value }}:</div>
+                                <div class="clearfix"></div>
+                                <div class="file-list-container">
+                                    <ul class="list-unstyled">
+                                        <li
+                                            *ngFor="
+                                                let file of uploadFiles[certificateToUpload.id].files;
+                                                let index = index
+                                            "
+                                        >
+                                            <span class="filename tt-font font-regular">{{
+                                                file.displayFileName
+                                            }}</span>
+                                            <span
+                                                class="delete-icon"
+                                                (click)="removeFile(certificateToUpload.id, index)"
+                                                ><img
+                                                    src="{{ env.IMG_URL }}images/questionaire-del.png"
+                                                    alt="Delete Icon"
+                                            /></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div
+                                    class="tt-file-upload-ui-container"
+                                    (click)="
+                                        isUploading[certificateToUpload.id]
+                                            ? $event.stopPropagation()
+                                            : fileInput.click()
+                                    "
+                                    data-cy="inbound-transaction-file-upload"
+                                >
+                                    <div class="tt-file-upload-ui-content">
+                                        <ng-template
+                                            [ngIf]="!isUploading[certificateToUpload.id]"
+                                            [ngIfElse]="uploadFileSpinner"
+                                        >
+                                            <div class="spinner-wrapper">
+                                                <img
+                                                    src="{{ env.IMG_URL }}images/icon-upload-grey.png"
+                                                    alt="Upload file"
+                                                    class=""
+                                                />
+                                                <h5 class="description tt-font tt-font-regular text-muted">
+                                                    {{ 'Click here to upload file' | translate }}
+                                                </h5>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #uploadFileSpinner>
+                                            <div class="spinner-wrapper">
+                                                <h5 class="tt-font tt-font-regular tt-font-muted">
+                                                    {{ 'Uploading File' | translate }} . . .
+                                                </h5>
+                                                <mat-spinner [diameter]="14"></mat-spinner>
+                                            </div>
+                                        </ng-template>
+                                    </div>
+                                </div>
+                                <input
+                                    type="file"
+                                    class="hidden"
+                                    #fileInput
+                                    (change)="uploadFile($event.target.files, certificateToUpload.id)"
+                                    [hidden]="true"
+                                    [disabled]="isUploading[certificateToUpload.id]"
+                                    data-cy="inbound-transaction-input-file-upload"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3 mb-3 pt-3">
+                        <div class="col-md-12 talign-right">
+                            <button
+                                id="order-create-btn"
+                                type="button"
+                                class="btn btn-gray create-btn btn-align mr-2"
+                                (click)="save()"
+                                [disabled]="!createInboundForm.valid || !referenceIdIsUnique"
+                            >
+                                {{ 'Save' | translate }}
+                            </button>
+                            <!--                            <button-->
+                            <!--                                id="order-create-btn"-->
+                            <!--                                type="button"-->
+                            <!--                                class="btn btn-gray create-btn btn-align"-->
+                            <!--                                (click)="saveAndPrint()"-->
+                            <!--                                [disabled]="!createInboundForm.valid"-->
+                            <!--                            >-->
+                            <!--                                {{ 'Save & Print' | translate }}-->
+                            <!--                            </button>-->
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div
+                class="col-xs-4 col-sm-4 col-md-4 col-lg-4 text-center"
+                *ngIf="authService.haveAccess('ADIDAS_DEMO_READ')"
+            >
+                <app-qr-code (response)="handleQRResponse($event)"></app-qr-code>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="visibility:hidden" *ngIf="isPrintReady">
+    <app-generate-qr-code #printQRCodeComponent [qrId]="qrCodeToPrint" [qrCodeId]="'qrCodeSectionToPrint'">
+    </app-generate-qr-code>
+</div>

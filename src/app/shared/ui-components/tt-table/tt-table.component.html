@@ -1,0 +1,30 @@
+<table class="table custom-table table-striped">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">{{ 'EAN' | translate }}</th>
+            <th scope="col">{{ 'Product' | translate }}</th>
+            <th scope="col">{{ 'Category' | translate }}</th>
+            <th scope="col">{{ 'Sub Category' | translate }}</th>
+            <th scope="col">{{ 'Brand / Supplier' | translate }}</th>
+            <th scope="col">
+                {{ 'Country of packing / manufacturing' | translate }}
+            </th>
+            <th scope="col">{{ 'Ingredients' | translate }}</th>
+            <th scope="col">{{ 'Labels' | translate }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let item of [1, 1, 1, 1, 1, 1]" [routerLink]="[1]">
+            <td>{{ 'status' | translate }}</td>
+            <td>5879462581</td>
+            <td>{{ 'Coffee' | translate }}</td>
+            <td>{{ 'Drink' | translate }}</td>
+            <td>{{ 'Flavoured Drink' | translate }}</td>
+            <td>{{ 'Supplier' | translate }}</td>
+            <td>{{ 'India' | translate }}</td>
+            <td>{{ 'Coffee1, coffee2' | translate }}</td>
+            <td>{{ 'EKO' | translate }}</td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,101 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header no-border">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pb-1">
+                <div class="page-title">
+                    <div>{{ 'Initiate Evidence Collection' | translate }}</div>
+                    <div class="page-description font-color-primary">
+                        {{ 'Collect relevant certificates from your supply chain' | translate }}.
+                    </div>
+                </div>
+                <div class="pr-0">
+                    <button class="go-back-button" (click)="commonServices.goBack(['/', 't-ems'])">
+                        {{ 'Back' | translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row createTRFormClass">
+            <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10">
+                <form [formGroup]="createTRForm" class="pl-1">
+                    <div class="row pt-2 pl-1">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <tt-radio-group
+                                formControlName="type"
+                                name="Style/Material"
+                                [title]="'Select style/material to collect the evidences'"
+                                [items]="trTypes"
+                                (handleTypeChange)="resetForm()"
+                                [toShowInRow]="false"
+                            ></tt-radio-group>
+                        </div>
+                    </div>
+                    <div class="row pt-2 pl-1">
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                            <tt-som-search
+                                formControlName="style"
+                                name="StyleSearch"
+                                [type]="createTRForm.controls.type.value.value"
+                                (handleSelect)="checkForTraceable($event)"
+                            >
+                            </tt-som-search>
+                        </div>
+                    </div>
+                    <div class="row pt-2 pl-1">
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 po-number">
+                            <app-tt-supplier-search
+                                [placeholder]="'Supplier' | translate"
+                                (selectionChange)="onSelectingSupplier($event)"
+                                origin="T-ems"
+                                [showLabel]="true"
+                                [required]="true"
+                                [options]="{ CANNOT_DISCLOSE: false }"
+                                unInvitedTooltip="Uninvited Supplier - T-EMS will not be launched since this supplier was not invited to the platform"
+                                unAcceptedTooltip="Unaccepted Supplier - Requests can be sent but will only be viewed by the Supplier after he accepts your invitation"
+                            >
+                            </app-tt-supplier-search>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 po-number">
+                            <mat-form-field>
+                                <mat-label class="tt-input-label">{{ 'Purchase Order Number' | translate }}:</mat-label>
+                                <input
+                                    (keydown.space)="$event.preventDefault()"
+                                    class="text-uppercase tranform-none-placeholder"
+                                    matInput
+                                    name="ponumber"
+                                    formControlName="poNumber"
+                                    placeholder="{{ 'Enter Purchase Order No.' | translate }}"
+                                />
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row pt-2 pl-25">
+                        <mat-checkbox
+                            class="text-blue font-regular"
+                            formControlName="actionType"
+                            (change)="analyticsEnterByYourselfChanged()"
+                        >
+                            {{ 'Choose if you can provide some evidence for this request' | translate }}
+                        </mat-checkbox>
+                    </div>
+                    <div class="row mb-5 pl-1">
+                        <div class="col-xs-5 col-sm-5 col-md-3 col-lg-3 mt-2">
+                            <button
+                                type="button"
+                                mat-button
+                                class="btn tt-btn tt-btn-primary mt-2"
+                                [disabled]="!createTRForm.valid"
+                                (click)="analyticsLaunchRequestClicked(); createTr()"
+                            >
+                                {{ 'Launch Request' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

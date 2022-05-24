@@ -1,0 +1,107 @@
+<div class="hr">
+    <span class="hr-title">{{ 'LOCATION' | translate }}</span>
+</div>
+<div class="location-section">
+    <!-- OPEN CONTAINER: TO SHOW THE LOCATION DETAILS -->
+    <div class="show-location-details" *ngIf="!editAddress">
+        <div class="edit-btn-container" *ngIf="editVisible">
+            <a (click)="showSaveAddressForm()">
+                <img class="edit-img" src="{{ cdnImage('edit-model.png') }}" alt="edit-model" />
+            </a>
+        </div>
+        <div *ngIf="address; else showNoAddress">
+            <p>{{ address.addressLine1 }}</p>
+            <p *ngIf="address.addressLine2">{{ address.addressLine2 }}</p>
+            <p>{{ address.country }}</p>
+            <p>{{ address.state }}</p>
+            <p>
+                {{ address.city }} <span> {{ address.zip ? '-' : '' }} {{ address.zip }}</span>
+            </p>
+        </div>
+        <ng-template #showNoAddress>
+            {{ 'No Address Found' | translate }}
+        </ng-template>
+    </div>
+
+    <!-- OPEN CONTAINER: TO ENTER THE LOCATION DETAILS -->
+    <div class="add-location-container" *ngIf="editAddress">
+        <form class="location-form" (keydown.enter)="saveAddress()">
+            <!-- Address1 -->
+            <mat-form-field class="location-input">
+                <input
+                    matInput
+                    placeholder="{{ 'Address Line' | translate }} 1"
+                    name="addressLine1"
+                    [(ngModel)]="addressData.address.addressLine1"
+                    required
+                />
+            </mat-form-field>
+
+            <!-- Address2 -->
+            <mat-form-field class="location-input">
+                <input
+                    matInput
+                    placeholder="{{ 'Address Line' | translate }} 2"
+                    name="addressLine2"
+                    [(ngModel)]="addressData.address.addressLine2"
+                />
+            </mat-form-field>
+
+            <app-tt-dropdown-search
+                [searchOptions]="countries"
+                placeholder="{{ 'Country' | translate }}"
+                [(ngModel)]="addressData.address.country"
+                (selectionChange)="getStates($event); unsetStateOnCountrySelection(); unsetCityOnStateSelection()"
+                [ngModelOptions]="{ standalone: true }"
+                floatLabel="never"
+                [optionalParams]="parameters"
+                [isRequired]="isRequired"
+                [dontCheckString]="true"
+            ></app-tt-dropdown-search>
+
+            <app-tt-dropdown-search
+                [searchOptions]="states"
+                placeholder="{{ 'State' | translate }}"
+                [(ngModel)]="addressData.address.state"
+                (selectionChange)="getCities($event); unsetCityOnStateSelection()"
+                [ngModelOptions]="{ standalone: true }"
+                floatLabel="never"
+                [optionalParams]="parameters"
+                [isRequired]="isRequired"
+                [dontCheckString]="true"
+            ></app-tt-dropdown-search>
+
+            <app-tt-dropdown-search
+                [searchOptions]="cities"
+                placeholder="{{ 'City' | translate }}"
+                [(ngModel)]="addressData.address.city"
+                [ngModelOptions]="{ standalone: true }"
+                floatLabel="never"
+                [optionalParams]="parameters"
+                [isRequired]="isRequired"
+                required
+                [dontCheckString]="true"
+            >
+            </app-tt-dropdown-search>
+
+            <!-- Zipcode -->
+            <mat-form-field class="location-input">
+                <input
+                    matInput
+                    placeholder="{{ 'Zipcode' | translate }}"
+                    name="zip"
+                    type="text"
+                    [(ngModel)]="addressData.address.zip"
+                    required
+                />
+            </mat-form-field>
+
+            <div class="btn-container display-flex-justify-flex-end">
+                <button mat-button class="cancel-btn" (click)="showAddressBlock()">{{ 'Cancel' | translate }}</button>
+                <button mat-button class="save-btn" (click)="saveAddress()">{{ 'Save' | translate }}</button>
+            </div>
+        </form>
+    </div>
+    <!-- END OF LOCATION CONTAINER -->
+</div>
+<!-- END OF LOCATION SECTION -->

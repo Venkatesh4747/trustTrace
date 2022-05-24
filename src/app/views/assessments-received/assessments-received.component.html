@@ -1,0 +1,1199 @@
+<div class="view-container">
+    <div class="container-fluid assessments-outer">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header no-border">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                <div class="page-title">
+                    <div>
+                        {{ 'Assessments Received' | translate }}
+                    </div>
+                    <div class="page-description font-color-primary">
+                        {{ 'View and Answer Assessments from your Brands' | translate }}
+                    </div>
+                </div>
+
+                <div class="header-search">
+                    <div class="title-right-search">
+                        <input
+                            type="text"
+                            class="search"
+                            placeholder="{{ 'Type and press enter to search' | translate }}"
+                            (keyup)="searchAssessment($event)"
+                            [(ngModel)]="searchText"
+                            data-cy="assessments-received-search"
+                        />
+                        <i class="fa fa-search"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- col -->
+        </div>
+        <!-- row -->
+
+        <!-- Filter Bar and sort -->
+        <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="assessmentFilter">
+            <div class="col-md-12">
+                <ul class="filter-bar-container">
+                    <li *ngFor="let filter of assessmentFilter | keys">
+                        <app-tt-multi-select-search
+                            (selectionChange)="handleFilterSelection()"
+                            (refreshFilter)="refreshFilter()"
+                            [label]="filter.key"
+                            [options]="filter.value"
+                            [filter_session]="filter_session"
+                            [optionsParam]="optionsParam"
+                            [data_cy]="removeSpace(filter.key)"
+                        >
+                        </app-tt-multi-select-search>
+                    </li>
+                    <li class="reset-filters">
+                        <button
+                            class="button-badge mat-button btn btn-gray"
+                            (click)="resetAllFilters()"
+                            data-cy="assessment-launched-reset-all-filters"
+                        >
+                            {{ 'Reset all filters' | translate }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                <div class="row">
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 total-count">
+                        <div class="float-l" *ngIf="assessments.length > 0 || totalCountFlag">
+                            <span data-cy="assessment-received-total-count">
+                                {{ 'Total No. of Assessments' | translate }}:&nbsp;<span class="font-bold">{{
+                                    totalCount
+                                }}</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                        <div dropdown class="dropdown sort-dropdown">
+                            <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                <span class="sort-name"
+                                    >{{ 'Sort By' | translate }}
+                                    <span class="fa fa-angle-down"></span>
+                                </span>
+                            </a>
+                            <ul *dropdownMenu class="dropdown-menu">
+                                <li>
+                                    <mat-radio-group [(ngModel)]="sortByFilter.sortBy" (change)="handleSortBy()">
+                                        <mat-radio-button value="name">{{
+                                            'Alphabetical Order' | translate
+                                        }}</mat-radio-button>
+                                        <mat-radio-button value="create_ts">{{
+                                            'Newly Added' | translate
+                                        }}</mat-radio-button>
+                                    </mat-radio-group>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Sort Dropdown -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!-- Row -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- <div class="row assessment-statistics-outer">
+            <div id="filter-bar-wrapper" class="row filter-bar-wrapper">
+                <div class="col-md-12">
+                    <ul class="filter-bar-container">
+                        <li>
+                            <button mat-button class="button-badge" (click)="filterSelect.open()"
+                                [ngClass]="{ showDataCount: value && value.length !== 0 }"
+                                data-cy="assessment-received-filter-btn">
+                                <mat-select panelClass="multi-select-container" placeholder="{{ 'Status' | translate }}"
+                                    [(ngModel)]="value" name="filter-{{ value }}" #filterSelect
+                                    disableOptionCentering="true">
+                                    <mat-select-trigger class="multi-select-label">{{ 'Status' | translate }}
+                                    </mat-select-trigger>
+                                    <div class="select-container">
+                                        <div class="options-list">
+                                            <mat-option value="'unaccepted'" (click)="filterAssessments('unaccepted')"
+                                                data-cy="assessment-received-UnAccepted">
+                                                {{ 'UnAccepted' | translate }}
+                                            </mat-option>
+                                            <mat-option value="'inprogress'" (click)="filterAssessments('inprogress')"
+                                                data-cy="assessment-received-InProgress">
+                                                {{ 'InProgress' | translate }}
+                                            </mat-option>
+                                            <mat-option value="'closed'" (click)="filterAssessments('closed')"
+                                                data-cy="assessment-received-Closed">
+                                                {{ 'Closed' | translate }}
+                                            </mat-option>
+                                            <mat-option value="'inreview'" (click)="filterAssessments('inreview')"
+                                                data-cy="assessment-received-InReview">
+                                                {{ 'InReview' | translate }}
+                                            </mat-option>
+                                        </div>
+                                    </div>
+                                </mat-select>
+                            </button>
+                        </li>
+                        <li class="reset-filters">
+                            <button class="mat-button btn btn-gray" (click)="filterAssessments('all')"
+                                data-cy="assessment-received-reset-all-filters">
+                                {{ 'Reset all filters' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div> -->
+        <!-- row -->
+        <div id="card">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 total-count">
+                <div class="float-l" *ngIf="assessments.length > 0 || totalCountFlag">
+                    <app-card-pagination
+                        [paginationStart]="pagination.from + 1"
+                        [fetchSize]="pagination.size"
+                        [totalItemsCount]="totalCount"
+                        moduleName="Assessment"
+                        (previous)="onScroll('back')"
+                        (next)="onScroll('next')"
+                    ></app-card-pagination>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="no-assessments" *ngIf="assessments.length === 0">
+                    {{ 'No Assessments' | translate }}
+                </div>
+                <div class="table-responsive" *ngIf="assessments.length > 0">
+                    <div
+                        class="table-card"
+                        *ngFor="
+                            let assessment of assessments | searchFilter: { name: searchText, companyName: searchText };
+                            let i = index
+                        "
+                    >
+                        <div
+                            class="table-card-left"
+                            (click)="
+                                currentAssessmentId = assessment.id;
+                                openAssessmentModal(assessment.status, i, assessment.id, assessment)
+                            "
+                        >
+                            <div class="title">
+                                <span> {{ assessment.name }} </span>
+                                <span class="card-status">
+                                    <i
+                                        class="fa fa-circle"
+                                        [ngClass]="{
+                                            UnOpened: assessment.status === 'UnOpened',
+                                            UnAccepted: assessment.status === 'UNACCEPTED',
+                                            InProgress: assessment.status === 'IN_PROGRESS',
+                                            Closed: assessment.status === 'CLOSED',
+                                            InReview: assessment.status === 'IN_REVIEW'
+                                        }"
+                                    >
+                                    </i>
+                                </span>
+                            </div>
+                            <div class="desc">{{ 'Launched by' | translate }}: {{ assessment.companyName }}</div>
+                            <div class="desc">
+                                {{ 'Containing Questions' | translate }}: {{ assessment.totalQuestion }}
+                            </div>
+                            <div class="desc">
+                                {{ 'Number of Launches' | translate }}: x{{ assessment.noOfLaunches }}
+                            </div>
+                            <div class="desc">{{ 'Launched on' | translate }}: {{ assessment.launchDate }}</div>
+                            <div class="desc">{{ 'Due' | translate }}: {{ assessment.dueDate }}</div>
+                        </div>
+                        <div class="table-card-right flex-column">
+                            <ng-template [ngIf]="assessment.notificationCount > 0">
+                                <a
+                                    class="notification cursor-default"
+                                    (click)="currentNotificationAssessmentId = assessment.id; openNotificationsModal(i)"
+                                    *ngIf="!notificationModalLoading[assessment.id]"
+                                    container="body"
+                                >
+                                    <i class="material-icons bell">notifications</i>
+                                    <span class="badge notificationCount">{{ assessment.notificationCount }}</span>
+                                </a>
+                                <app-spinner [small]="true" *ngIf="notificationModalLoading[assessment.id]">
+                                </app-spinner>
+                            </ng-template>
+
+                            <ng-template [ngIf]="!assessment.notificationCount || assessment.notificationCount === 0">
+                                <a class="notification cursor-default" container="body">
+                                    <i class="material-icons bell">notifications_none</i>
+                                </a>
+                            </ng-template>
+
+                            <div class="action-item">
+                                <a
+                                    class="card-button"
+                                    container="body"
+                                    (click)="remindAssessment(assessment)"
+                                    [tooltip]="
+                                        assessment.supplierAssociationStatus === 20
+                                            ? ('Send Reminder' | translate)
+                                            : ('Not Allowed' | translate)
+                                    "
+                                    *ngIf="!sendingReminder[assessment.id]"
+                                >
+                                    <img src="{{ env.IMG_URL }}images/send_remainder.png" />
+                                    {{ 'Send Reminder' | translate }}
+                                </a>
+                                <app-spinner [small]="true" *ngIf="sendingReminder[assessment.id]"></app-spinner>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <table class="table table-striped">
+            <thead>
+              <tr style="border-bottom: 2px solid #999;">
+                <th>{{'Name' | translate}}</th>
+                <th>{{'Questions' | translate}}</th>
+                <th>{{'Launched by' | translate}}</th>
+                <th>{{'Number of Launches' | translate}}</th>
+                <th>{{'Launch Date' | translate}}</th>
+                <th>{{'Due Date' | translate}}</th>
+                <th class="text-center">{{'Status' | translate}}</th>
+                <th class="text-center">{{'Action' | translate}}</th>
+              </tr>
+            </thead>
+            <tbody class="check_box_group">
+              <tr *ngFor="let assessment of assessments | searchFilter : {name:searchText, companyName:searchText}; let i = index">
+                <td style="width: 240px;" [tooltip]="assessment.name" container="body" data-placement="top">
+                  <a style="cursor: pointer"
+                     (click)="currentAssessmentId = assessment.id;
+                              openAssessmentModal(assessment.status, i, assessment.id, assessment)">
+                    <b>{{assessment.nameShort}}{{assessment.name.length > 25 ? '...' : ''}}</b>
+                  </a>
+                </td>
+                <td>
+                  <b>{{assessment.totalQuestion}}</b>
+                </td>
+                <td>
+                  <b>{{assessment.companyName}}</b>
+                </td>
+                <td>x{{assessment.noOfLaunches}}</td>
+                <td>{{assessment.launchDate}}</td>
+                <td>{{assessment.dueDate}}</td>
+                <td class="status text-center">
+                  <div class="statusText center-block"
+                       [ngClass]="{ 'UnOpened': assessment.status === 'UnOpened',
+                                  'UnAccepted': assessment.status === 'UNACCEPTED',
+                                  'InProgress': assessment.status === 'IN_PROGRESS',
+                                  'Closed': assessment.status === 'CLOSED',
+                                  'InReview': assessment.status === 'IN_REVIEW'}">
+                    {{assessment.statusText | translate}}
+                  </div>
+                </td>
+
+                <td class="actions" *ngIf="assessment.status === 'UNACCEPTED'">
+                  <button *ngIf="assessment.status === 'UNACCEPTED' && !assessmentAccepting[assessment.id]" (click)="openSupplierFacilityModal(i)"
+                          class="btn accept"> {{'Accept' | translate}}
+                  </button>
+                </td>
+
+                <td class="actions" *ngIf="assessment.status !== 'UNACCEPTED'">
+                  <a style="cursor: pointer; margin-right: 10px;"
+                     tooltip="Send Reminder" (click)="remindAssessment(assessment)"
+                     container="body"
+                     *ngIf="!sendingReminder[assessment.id]" data-placement="top">
+                    <i class="material-icons time">alarm_on</i>
+                  </a>
+                  <app-spinner [small]="true" *ngIf="sendingReminder[assessment.id]"></app-spinner>
+                  <ng-template [ngIf]="assessment.notificationCount > 0">
+                    <a style="position: relative; cursor: pointer;"
+                       (click)="currentNotificationAssessmentId = assessment.id; openNotificationsModal(i)"
+                       *ngIf="!notificationModalLoading[assessment.id]"
+                       tooltip="Notifications"
+                       container="body"
+                       data-placement="top">
+                      <i class="material-icons bell">notifications</i>
+                      <span class="badge notificationCount">{{assessment.notificationCount}}</span>
+                    </a>
+                    <app-spinner [small]="true" *ngIf="notificationModalLoading[assessment.id]"></app-spinner>
+                  </ng-template>
+
+                  <ng-template [ngIf]="!assessment.notificationCount || assessment.notificationCount === 0">
+                    <a style="position: relative; cursor: pointer;"
+                       tooltip="Notifications"
+                       container="body"
+                       data-placement="top">
+                      <i class="material-icons bell"
+                         *ngIf="!assessment.notificationCount || assessment.notificationCount === 0">notifications_none</i>
+                    </a>
+                  </ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table> -->
+                </div>
+            </div>
+            <!-- col -->
+        </div>
+
+        <!-- row -->
+        <div class="clearfix"></div>
+    </div>
+    <!-- container-fluid -->
+</div>
+
+<div
+    bsModal
+    #subAssessmentsModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="subAssessmentsModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head" *ngIf="subAssessmentsModalDataReady">
+                <h4 class="modal-title pull-left">{{ currentAssessment.name }}</h4>
+                <button type="button" class="close pull-right" (click)="subAssessmentsModal.hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body" *ngIf="subAssessmentsModalDataReady">
+                <div class="no-assessments" style="padding-bottom: 30px;" *ngIf="currentSubAssessments.length === 0">
+                    {{ 'No Assessments' | translate }}
+                </div>
+                <div class="table-responsive" *ngIf="currentSubAssessments.length > 0">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #999;">
+                                <th>{{ 'Assessment Name' | translate }}</th>
+                                <th>{{ 'Company' | translate }}</th>
+                                <th>{{ 'Facility Name' | translate }}</th>
+                                <th>{{ 'Company VPs' | translate }}</th>
+                                <th>{{ 'Number of Questions' | translate }}</th>
+                                <!--<th>Subgroups</th>-->
+                                <!--<th>Score</th>-->
+                                <th width="190">{{ 'Completion' | translate }}</th>
+                                <th class="text-center">{{ 'Action' | translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="check_box_group">
+                            <tr *ngFor="let assessment of currentSubAssessments; let i = index">
+                                <td [tooltip]="assessment.name" container="body" data-placement="top">
+                                    <a
+                                        style="cursor: pointer"
+                                        (click)="
+                                            currentAssessmentId = assessment.id;
+                                            openSubAssessmentModal(assessment.id, assessment)
+                                        "
+                                    >
+                                        <b>{{ assessment.name }}{{ assessment.name.length > 25 ? '...' : '' }}</b>
+                                    </a>
+                                    <app-spinner *ngIf="!!SubAssessmentModalLoading[assessment.id]" [small]="true">
+                                    </app-spinner>
+                                </td>
+                                <td>
+                                    <b>{{ assessment.companyName }}</b>
+                                </td>
+                                <td>
+                                    <b>{{ assessment.facilityName }}</b>
+                                </td>
+                                <td [tooltip]="assessment.valueProcessFullText" container="body">
+                                    {{ assessment.valueProcessText }}
+                                </td>
+                                <td>
+                                    <b>{{ assessment.totalQuestion }}</b>
+                                </td>
+                                <!--<td>-->
+                                <!--<span class="big" [tooltip]="assessment.yourScore + '/' + assessment.maxScore">-->
+                                <!--{{assessment.yourScore === 0 ? 0 : (assessment.yourScore / assessment.maxScore)}} %-->
+                                <!--</span>-->
+                                <!--</td>-->
+                                <td class="status">
+                                    <div
+                                        class="progress"
+                                        [ngClass]="{
+                                            UnAccepted: assessment.status === 'UNACCEPTED',
+                                            InProgress: assessment.status === 'IN_PROGRESS',
+                                            Closed: assessment.status === 'CLOSED',
+                                            InReview: assessment.status === 'IN_REVIEW'
+                                        }"
+                                        [tooltip]="assessment.statusText | translate"
+                                    >
+                                        <div class="progress-bar-container">
+                                            <div
+                                                class="progress-bar dark-text"
+                                                role="progressbar"
+                                                [attr.aria-valuenow]="assessment.statusPercent"
+                                                aria-valuemin="0"
+                                                aria-valuemax="100"
+                                                [style.width]="assessment.statusPercent + '%'"
+                                            >
+                                                <span>{{ assessment.statusPercentActual.toFixed(0) }}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="actions" *ngIf="auth.user.companyId === assessment.companyId">
+                                    <button
+                                        *ngIf="
+                                            assessment.status === 'UNACCEPTED' && !assessmentAccepting[assessment.id]
+                                        "
+                                        (click)="openSupplierFacilityModal(i)"
+                                        class="btn accept"
+                                    >
+                                        {{ 'Accept' | translate }}
+                                    </button>
+                                    <button
+                                        *ngIf="assessment.status === 'UNOPENED' && !assessmentStarting[assessment.id]"
+                                        (click)="openSurveyModal(assessment.id, assessment)"
+                                        class="btn start"
+                                    >
+                                        {{ 'Start' | translate }}
+                                    </button>
+                                    <button
+                                        *ngIf="
+                                            assessment.status === 'IN_PROGRESS' && !assessmentResuming[assessment.id]
+                                        "
+                                        (click)="openSurveyModal(assessment.id, assessment)"
+                                        class="btn resume InProgress"
+                                    >
+                                        {{ 'Resume' | translate }}
+                                    </button>
+                                    <button *ngIf="assessment.status === 'CLOSED'" class="btn closed">
+                                        {{ 'Closed' | translate }}
+                                    </button>
+                                    <button *ngIf="assessment.status === 'IN_REVIEW'" class="btn review InReview">
+                                        {{ 'InReview' | translate }}
+                                    </button>
+                                    <div
+                                        style="margin-left: 30px;"
+                                        *ngIf="
+                                            assessmentResuming[assessment.id] ||
+                                            assessmentAccepting[assessment.id] ||
+                                            assessmentStarting[assessment.id]
+                                        "
+                                    >
+                                        <app-spinner [small]="true"></app-spinner>
+                                    </div>
+                                </td>
+
+                                <td class="actions" *ngIf="auth.user.companyId !== assessment.companyId">
+                                    <a
+                                        style="cursor: pointer;"
+                                        (click)="
+                                            currentAssessmentId = assessment.id;
+                                            openSubAssessmentModal(assessment.id, assessment)
+                                        "
+                                        tooltip="View Responses"
+                                        container="body"
+                                        data-placement="top"
+                                        *ngIf="!previewDataLoading[assessment.id]"
+                                    >
+                                        <!--<i style="margin-top: -2px;" class="fa fa-eye" *ngIf="!previewDataLoading[assessment.id]"></i>-->
+                                        <i class="material-icons eye">visibility</i>
+                                    </a>
+                                    <app-spinner [small]="true" *ngIf="previewDataLoading[assessment.id]"></app-spinner>
+                                    <a
+                                        style="cursor: pointer; margin-right: 10px;"
+                                        [tooltip]="
+                                            assessment.supplierAssociationStatus === 20
+                                                ? ('Send Reminder' | translate)
+                                                : ('Not Allowed' | translate)
+                                        "
+                                        (click)="remindAssessment(assessment)"
+                                        container="body"
+                                        *ngIf="!sendingReminder[assessment.id]"
+                                        data-placement="top"
+                                    >
+                                        <!-- Having icons from different libraries causes the tooltip
+                       to be misaligned. Using material icons to keep the
+                       tooltip aligned.
+                 -->
+                                        <!-- <i class="fa fa-clock-o"></i> -->
+                                        <i class="material-icons time">alarm_on</i>
+                                    </a>
+                                    <app-spinner [small]="true" *ngIf="sendingReminder[assessment.id]"></app-spinner>
+                                    <a
+                                        style="cursor: pointer;"
+                                        tooltip="{{ 'Notifications' | translate }}"
+                                        container="body"
+                                        data-placement="top"
+                                    >
+                                        <i class="material-icons bell">notifications_none</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- modal-body -->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- sub-assessments-modal-->
+
+<div
+    bsModal
+    #supplierFacilityModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="suppliersFacilityModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-xlg">
+        <div class="modal-content">
+            <div class="modal-header blue-head">
+                <h4 class="modal-title pull-left">
+                    {{ 'Select Suppliers and Facility' | translate }} - {{ currentAssessment?.name }}
+                </h4>
+                <button
+                    type="button"
+                    class="close pull-right"
+                    (click)="supplierFacilityModal.hide()"
+                    aria-label="Close"
+                >
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid" *ngIf="supplierFacilityModalReady">
+                    <div class="row">
+                        <div class="col-md-2 col-lg-2 selected-vps-container">
+                            <h5 class="selected-vps-title">{{ 'Selected VPs' | translate }}</h5>
+                            <ul class="list-unstyled selected-vps-list">
+                                <li
+                                    class="selected-vps-item"
+                                    [ngClass]="{
+                                        active: selectedVP === vp,
+                                        complete:
+                                            (selectedSuppliers[vp] && selectedSuppliers[vp].length > 0) ||
+                                            (selectedFacilities[vp] && selectedFacilities[vp].length > 0)
+                                    }"
+                                    *ngFor="let vp of assessment.vp | sortByFilter"
+                                    (click)="onSelectVP($event, vp)"
+                                >
+                                    {{ localeService.getDisplayText(vp) }}
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- col -->
+                        <div class="col-md-10 col-lg-10 suppliers-facilities-container">
+                            <h5>{{ 'Suppliers' | translate }} & {{ 'Facilities' | translate }}</h5>
+
+                            <div class="selected-suppliers-facilities-container">
+                                <div class="selected-suppliers-facilities-content">
+                                    <ul class="list-unstyled list-inline selected-suppliers-facilities-list">
+                                        <li
+                                            class="selected-suppliers-facilities-item"
+                                            *ngFor="let supplier of selectedSuppliers[selectedVP]"
+                                        >
+                                            {{ supplier.supplier_name }}
+                                            <span
+                                                (click)="onSelectSupplier(this, $event, supplier.supplier_id, true)"
+                                                data-role="remove"
+                                            ></span>
+                                        </li>
+
+                                        <li
+                                            class="selected-suppliers-facilities-item"
+                                            *ngFor="let facility of selectedFacilities[selectedVP]"
+                                        >
+                                            {{ facility.name }}
+                                            <span
+                                                (click)="onSelectFacility(this, $event, facility.id, true)"
+                                                data-role="remove"
+                                            ></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- selected-suppliers-facilities-container -->
+
+                            <div class="search-suppliers-facilities-container container-fluid">
+                                <div class="row">
+                                    <div class="col-md-6" style="padding-left: 0;">
+                                        <h5>{{ 'My Suppliers' | translate }}</h5>
+                                        <div class="search-suppliers-facilities">
+                                            <div class="search-box">
+                                                <input
+                                                    type="text"
+                                                    placeholder="{{ 'Search' | translate }}"
+                                                    [(ngModel)]="searchSupplierTerm"
+                                                    (keyup)="onSupplierSearch($event.target.value)"
+                                                />
+                                            </div>
+                                            <div class="supplier-state">
+                                                <app-spinner [small]="true" *ngIf="supplierListIsLoading"></app-spinner>
+                                                <span *ngIf="!supplierListIsLoading && suppliers?.length === 0">
+                                                    {{ 'No suppliers' | translate }}
+                                                </span>
+                                            </div>
+                                            <ul
+                                                *ngIf="!supplierListIsLoading"
+                                                class="search-suppliers-facilities-list list-unstyled"
+                                            >
+                                                <li
+                                                    class="search-suppliers-facilities-item"
+                                                    [ngClass]="{
+                                                        selected: !!markedSuppliers[selectedVP][supplier.supplier_id]
+                                                    }"
+                                                    *ngFor="
+                                                        let supplier of suppliers | sortByFilter: 'supplier_name';
+                                                        let i = index
+                                                    "
+                                                    (click)="triggerCheckbox('ss', i)"
+                                                >
+                                                    <span class="title">{{ supplier.supplier_name }}</span>
+                                                    <span class="pull-right">
+                                                        <app-supplier-status
+                                                            [customStyle]="supplierStatusCustomImgStyle"
+                                                            [status]="supplier?.supplier_association_status?.id"
+                                                            unAcceptedTooltip="Unaccepted Supplier - Assessments can be launched but will only be viewed by the Supplier after he accepts your invite"
+                                                        >
+                                                        </app-supplier-status>
+                                                        <span class="check_box_group">
+                                                            <input
+                                                                type="checkbox"
+                                                                name="ssf-{{ i }}"
+                                                                id="ss-{{ i }}"
+                                                                (change)="onSelectSupplier(this, $event, supplier.supplier_id, false)"
+                                                                [checked]="
+                                                                    markedSuppliers[selectedVP][supplier.supplier_id]
+                                                                "
+                                                            />
+
+                                                            <label for="ss-{{ i }}" (click)="triggerCheckbox('ss', i)">
+                                                                <span></span>
+                                                            </label>
+                                                        </span>
+                                                    </span>
+
+                                                    <div class="clearfix"></div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <!-- col -->
+                                    <div class="col-md-6" style="padding-right: 0;">
+                                        <h5>{{ 'My Facilities' | translate }}</h5>
+                                        <div class="search-suppliers-facilities">
+                                            <div class="search-box">
+                                                <input
+                                                    type="text"
+                                                    placeholder="{{ 'Search' | translate }}"
+                                                    [(ngModel)]="searchFacilityTerm"
+                                                />
+                                            </div>
+
+                                            <ul class="search-suppliers-facilities-list list-unstyled">
+                                                <li
+                                                    class="search-suppliers-facilities-item"
+                                                    [ngClass]="{
+                                                        selected: !!markedFacilities[selectedVP][facility.id]
+                                                    }"
+                                                    *ngFor="
+                                                        let facility of facilities
+                                                            | filter: searchFacilityTerm
+                                                            | sortByFilter: 'name';
+                                                        let i = index
+                                                    "
+                                                    (click)="triggerCheckbox('sf', i)"
+                                                >
+                                                    <span class="title">{{ facility.name }}</span>
+                                                    <span class="check_box_group pull-right">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="sf-{{ i }}"
+                                                            (change)="onSelectFacility(this, $event, facility.id, false)"
+                                                            [checked]="markedFacilities[selectedVP][facility.id]"
+                                                        />
+                                                        <label for="sf-{{ i }}" (click)="triggerCheckbox('sf', i)">
+                                                            <span></span>
+                                                        </label>
+                                                    </span>
+                                                    <div class="clearfix"></div>
+                                                </li>
+                                                <li *ngIf="!facilities || facilities.length === 0">
+                                                    <span class="title">
+                                                        {{ 'No Facilities Available' | translate }}
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                            <!-- search-suppliers-facilities-list -->
+                                        </div>
+                                    </div>
+                                    <!-- col -->
+                                </div>
+                                <!-- row -->
+                            </div>
+                            <!-- search-suppliers-facilities-container -->
+                        </div>
+                        <!-- col -->
+                    </div>
+                    <!-- row -->
+                </div>
+                <!-- container-fluid -->
+            </div>
+
+            <div class="modal-footer">
+                <div class="col-md-6 text-left">
+                    <!--<p class="pt-1">Total Questions: <span class="text-blue total-q"><b>{{assessment.totalQuestion}}</b></span>-->
+                    <!--</p>-->
+                </div>
+                <div class="col-md-6">
+                    <button
+                        type="button"
+                        class="btn btn-blue"
+                        (click)="onLaunchAssessment()"
+                        *ngIf="!processingLaunchAssessment"
+                        [disabled]="processingLaunchAssessment"
+                    >
+                        <span>{{ 'Accept' | translate }}</span>
+                    </button>
+                    <span style="padding-right: 40px;" *ngIf="processingLaunchAssessment">
+                        <app-spinner [small]="true"></app-spinner>
+                    </span>
+                    <button
+                        type="button"
+                        class="btn btn-gray"
+                        data-dismiss="modal"
+                        (click)="supplierFacilityModal.hide()"
+                    >
+                        {{ 'Cancel' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- bs-modal-->
+
+<div
+    bsModal
+    #surveyModal="bs-modal"
+    class="surveyModal modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="surveyModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header blue-head" *ngIf="surveyDataReady">
+                <h4 class="modal-title pull-left">{{ currentAssessment.name }}</h4>
+                <button type="button" class="close pull-right" (click)="surveyModal.hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+                <div id="launch" class="pull-right col-md-4 mt-1">
+                    <div class="progress col-md-10 pl-0">
+                        <div
+                            class="progress-bar"
+                            [style.width]="
+                                (survey_groups_1.total.answered / survey_groups_1.total.question) * 100 + '%'
+                            "
+                        ></div>
+                    </div>
+                    <span class="percent"
+                        >{{
+                            ((survey_groups_1.total.answered / survey_groups_1.total.question) * 100).toFixed(0)
+                        }}
+                        %</span
+                    >
+                </div>
+            </div>
+            <div class="modal-body" *ngIf="surveyDataReady">
+                <app-response-management
+                    *ngIf="isCommentWindowValid"
+                    [questions]="survey"
+                    [launcheeCompanyId]="currentAssessment.companyId"
+                    [launcherCompanyId]="currentAssessment.fromCompanyId"
+                    [assessmentId]="currentAssessmentId"
+                    (activeQuestion)="setActiveQuestionInRM($event)"
+                ></app-response-management>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 survey-group-container">
+                            <ul class="list-unstyled survey-group-list">
+                                <li
+                                    *ngIf="instructionUrl"
+                                    class="survey-group-item"
+                                    (click)="showIntroductionDoc()"
+                                    [ngClass]="{ active: showIntroduction }"
+                                >
+                                    <div class="question-icon pt-0">
+                                        <img
+                                            class="group-icon"
+                                            src="{{ utilService.getGroupImageUrl('gr_introduction') }}"
+                                        />
+                                    </div>
+                                    <div class="question-name pt-07">
+                                        <p class="tab-name">{{ 'Introduction' | translate }}</p>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </li>
+                                <li
+                                    class="survey-group-item"
+                                    (click)="changeSurveyGroupTab(i, group.key)"
+                                    [ngClass]="{ active: selectedSurveyGroupTab === i && !showIntroduction }"
+                                    *ngFor="let group of survey_groups_1 | keys; let i = index"
+                                >
+                                    <div class="question-icon">
+                                        <app-img
+                                            [src]="getImage(group.key)"
+                                            [alt]="group.key"
+                                            [default]="defaultSrc"
+                                            class="group-icon"
+                                        ></app-img>
+                                    </div>
+                                    <div class="question-name">
+                                        <p class="tab-name">{{ localeService.getDisplayText(group.key) }}</p>
+                                        <p class="complete-question">
+                                            ({{ group.value.total.answered }} / {{ group.value.total.question }}
+                                            {{ 'Completed' | translate }})
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- col -->
+                        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                            <!-- <div class="survey-group-title">
+                                {{ localeService.getDisplayText(survey_groups[selectedSurveyGroupTab]) }}
+                            </div> -->
+
+                            <div dragScroll="true">
+                                <ul class="survey-sub-groups-menu" dragScroll="true" *ngIf="showIntroduction">
+                                    <li [ngClass]="{ current: showIntroduction }">
+                                        {{ 'Introduction' | translate }}
+                                    </li>
+                                </ul>
+                                <ul class="survey-sub-groups-menu" dragScroll="true" *ngIf="!showIntroduction">
+                                    <li
+                                        [ngClass]="{ current: selectedSubGroupTab[selectedSurveyGroupTab] === i }"
+                                        (click)="changeSubGroupTab(i, survey_sub_groups[selectedSurveyGroupTab][i])"
+                                        *ngFor="
+                                            let sub_group of survey_sub_groups[selectedSurveyGroupTab];
+                                            let i = index
+                                        "
+                                    >
+                                        {{ localeService.getDisplayText(sub_group) }}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="survey-questions-container" tabindex="-1" #surveyQuestionContainer>
+                                <div *ngIf="showIntroduction">
+                                    <iframe
+                                        id="iframe-wrapper"
+                                        class="embed-responsive-item"
+                                        [src]="instructionUrl | safe"
+                                    >
+                                    </iframe>
+                                </div>
+                                <app-survey-questions
+                                    [isCommentWindowValid]="isCommentWindowValid"
+                                    [questions]="survey"
+                                    [groupName]="selectedGroupName"
+                                    [subGroupName]="selectedTabName"
+                                    [answered]="answered"
+                                    [responses]="responses"
+                                    [unansweredMandatoryQuestions]="unansweredMandatoryQuestions"
+                                    [facilityId]="currentFacilityId"
+                                    [assessmentId]="currentAssessmentId"
+                                    [surveySubmitted]="surveySubmitted"
+                                    (saved)="updateStatus()"
+                                    [isSubQuestion]="false"
+                                    *ngIf="!showIntroduction"
+                                >
+                                </app-survey-questions>
+                            </div>
+                            <!-- survey-questions-container -->
+                        </div>
+                        <!-- col -->
+                    </div>
+                    <!-- row -->
+                </div>
+                <!-- container-fluid -->
+            </div>
+
+            <div class="modal-footer">
+                <div class="col-md-6 text-left" *ngIf="!showIntroduction">
+                    <button
+                        type="button"
+                        class="btn btn-blue"
+                        (click)="rmService.toggleCommentWindow()"
+                        *ngIf="isCommentWindowValid"
+                    >
+                        {{ 'Comments' | translate }}
+                    </button>
+                    <span class="clar-count" *ngIf="isCommentWindowValid">{{
+                        rmService.questionWithComments.length
+                    }}</span>
+                </div>
+                <div class="col-md-6" *ngIf="!showIntroduction">
+                    <button
+                        mat-button
+                        type="button"
+                        class="btn"
+                        [ngClass]="{ 'btn-white': previewDataReady }"
+                        (click)="openPreviewModal(currentAssessmentId, currentAssessment)"
+                    >
+                        <span *ngIf="previewDataReady">{{ 'Preview' | translate }}</span>
+                        <span *ngIf="!previewDataReady">
+                            <app-spinner [small]="true"></app-spinner>
+                        </span>
+                    </button>
+                    <button type="button" class="btn btn-blue" (click)="goPrevious()" *ngIf="showPreviousButton">
+                        <span>{{ 'Previous' | translate }}</span>
+                    </button>
+                    <button *ngIf="isNext" type="button" class="btn btn-blue" (click)="goNext()">
+                        <span>{{ 'Next' | translate }}</span>
+                    </button>
+                    <button
+                        *ngIf="!isNext"
+                        type="button"
+                        class="btn"
+                        [ngClass]="{ 'btn-blue': !processingSurvey }"
+                        (click)="onSubmitSurvey('SURVEY_MODEL')"
+                        [disabled]="processingSurvey"
+                    >
+                        <span *ngIf="!processingSurvey">{{ 'Submit' | translate }}</span>
+                        <span *ngIf="processingSurvey">
+                            <app-spinner [small]="true"></app-spinner>
+                        </span>
+                    </button>
+                    <!--<button type="button" class="btn btn-gray" data-dismiss="modal" (click)="surveyModal.hide()">-->
+                    <!--Cancel-->
+                    <!--</button>-->
+                </div>
+                <div class="col-md-6 col-md-offset-6" *ngIf="showIntroduction">
+                    <button type="button" class="btn btn-blue" (click)="changeSurveyGroupTab(0, survey_groups[0])">
+                        <span>{{ 'Next' | translate }}</span>
+                    </button>
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- survey-modal-->
+
+<div
+    bsModal
+    #previewModal="bs-modal"
+    class="surveyModal modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="surveyModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header blue-head" *ngIf="previewDataReady">
+                <h4 class="modal-title pull-left">{{ 'Preview Response' | translate }}</h4>
+                <button type="button" class="close pull-right" (click)="previewModal.hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body" *ngIf="previewDataReady">
+                <app-response-management
+                    *ngIf="isCommentWindowValid"
+                    [questions]="previewQuestions"
+                    [launcheeCompanyId]="currentAssessment.companyId"
+                    (activeQuestion)="setActiveQuestionInPreview($event)"
+                    [launcherCompanyId]="currentAssessment.fromCompanyId"
+                    [assessmentId]="currentAssessmentId"
+                >
+                </app-response-management>
+                <div class="container-fluid">
+                    <div class="row preview-stats-container">
+                        <div
+                            class="col-md-3 stat-item  previewGroup-{{ i }}"
+                            *ngFor="let stat of previewDataStats | keys; let i = index"
+                        >
+                            <p class="stat-percent">
+                                {{ computePercentage(stat.value.total.obtained, stat.value.total.max) }}
+                                <span
+                                    *ngIf="computePercentage(stat.value.total.obtained, stat.value.total.max) !== 'NA'"
+                                    >%</span
+                                >
+                                <span class="pull-right">{{ 'Score' | translate }}</span>
+                            </p>
+                            <p class="stat-score">
+                                {{
+                                    computePercentage(
+                                        previewCompletionStat[stat.key].total.answered,
+                                        previewCompletionStat[stat.key].total.question
+                                    )
+                                }}
+                                <span
+                                    *ngIf="
+                                        computePercentage(
+                                            previewCompletionStat[stat.key].total.answered,
+                                            previewCompletionStat[stat.key].total.question
+                                        ) !== 'NA'
+                                    "
+                                    >%</span
+                                >
+                                <span class="pull-right">{{ 'Completion' | translate }}</span>
+                            </p>
+                            <span class="filter_dropdown" dropdown>
+                                <a
+                                    class="stat-name"
+                                    href
+                                    id="basic-link"
+                                    dropdownToggle
+                                    (click)="(false)"
+                                    aria-controls="basic-link-dropdown"
+                                >
+                                    {{ localeService.getDisplayText(stat.key) }}
+                                    <i class="fa fa-caret-down pull-right" style="padding-left: 5px"></i>
+                                </a>
+                                <ul
+                                    id="basic-link-dropdown"
+                                    *dropdownMenu
+                                    class="dropdown-menu"
+                                    (click)="preventClose($event)"
+                                    role="menu"
+                                    aria-labelledby="basic-link"
+                                >
+                                    <li *ngFor="let sub_group of stat.value | keys">
+                                        <a
+                                            class="dropdown-item"
+                                            [ngClass]="{ active: false, 'not-active': false }"
+                                            (click)="scrollToGroup(sub_group.key)"
+                                            >{{ localeService.getDisplayText(sub_group.key) }}</a
+                                        >
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- preview-stats-container -->
+
+                    <div class="preview-questions-container" tabindex="-1" #previewQuestionContainer>
+                        <app-preview-questions
+                            *ngIf="previewDataReady"
+                            [isCommentWindowValid]="isCommentWindowValid"
+                            [assessmentId]="currentAssessmentId"
+                            [facilityId]="currentFacilityId"
+                            [questions]="previewQuestions"
+                            [responses]="responses"
+                            [answered]="previewResponses"
+                            [isSubQuestion]="false"
+                        ></app-preview-questions>
+                    </div>
+                    <!-- survey-questions-container -->
+                </div>
+                <!-- container-fluid -->
+            </div>
+            <!-- modal-body -->
+
+            <div class="modal-footer">
+                <div class="col-md-6 text-left">
+                    <button
+                        type="button"
+                        class="btn btn-blue"
+                        (click)="rmService.toggleCommentWindow()"
+                        *ngIf="isCommentWindowValid"
+                    >
+                        {{ 'Comments' | translate }}
+                    </button>
+                    <span class="clar-count" *ngIf="isCommentWindowValid">{{
+                        rmService.questionWithComments.length
+                    }}</span>
+                </div>
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-blue" (click)="previewModal.hide()" *ngIf="canSubmit()">
+                        {{ 'Edit Response' | translate }}
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-blue"
+                        (click)="onSubmitSurvey('PREVIEW_MODEL')"
+                        [disabled]="processingSurvey"
+                        *ngIf="canSubmit()"
+                    >
+                        <span *ngIf="!processingSurvey">{{ 'Submit' | translate }}</span>
+                        <span *ngIf="processingSurvey">{{ 'Loading' | translate }}</span>
+                    </button>
+                    <!--<button type="button" class="btn btn-gray" data-dismiss="modal" (click)="previewModal.hide()">-->
+                    <!--Cancel-->
+                    <!--</button>-->
+                </div>
+            </div>
+            <!-- modal-footer-->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- preview-modal-->
+
+<div
+    bsModal
+    #notificationsModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="notificationsModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header blue-head" *ngIf="notificationsModalDataReady">
+                <h4 class="modal-title pull-left">{{ 'Notifications' | translate }}</h4>
+                <button type="button" class="close pull-right" (click)="notificationsModal.hide()" aria-label="Close">
+                    <img class="sni" src="{{ env.IMG_URL }}images/close.png" />
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 0" *ngIf="notificationsModalDataReady">
+                <div class="no-assessments" style="padding-bottom: 30px;" *ngIf="currentSubAssessments.length === 0">
+                    {{ 'No Assessments' | translate }}
+                </div>
+                <div class="table-responsive" *ngIf="currentSubAssessments.length > 0">
+                    <table class="table table-striped" style="margin-bottom: 0;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #999;">
+                                <th>{{ 'Assessment Name' | translate }}</th>
+                                <th>{{ 'Company' | translate }}</th>
+                                <th>{{ 'Number of Comments' | translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let assessment of currentSubAssessments; let i = index">
+                                <td [tooltip]="assessment.name" container="body" data-placement="top">
+                                    <a
+                                        style="cursor: pointer"
+                                        (click)="
+                                            currentAssessmentId = assessment.id;
+                                            openSubAssessmentModal(assessment.id, assessment)
+                                        "
+                                    >
+                                        <b>{{ assessment.nameShort }}{{ assessment.name.length > 25 ? '...' : '' }}</b>
+                                    </a>
+                                    <app-spinner *ngIf="!!SubAssessmentModalLoading[assessment.id]" [small]="true">
+                                    </app-spinner>
+                                </td>
+                                <td style="min-width: 140px;">
+                                    <b>{{ assessment.companyName }}</b>
+                                </td>
+                                <td>
+                                    <b>{{ assessment.notificationCount }} Comments</b>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- modal-body -->
+        </div>
+        <!-- modal-content-->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- sub-assessments-modal-->

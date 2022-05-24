@@ -1,0 +1,127 @@
+<div id="top-navigation" class="top-navigation-outer">
+    <div class="container-fluid top-navigation-inner">
+        <div class="row">
+            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                <div class="logo-container">
+                    <a [routerLink]="getDefaultLandingLink()">
+                        <img src="{{ env.IMG_URL }}images/trustrace_logo_black.svg" alt="" />
+                    </a>
+                </div>
+                <!-- logo-container -->
+            </div>
+            <!-- col -->
+
+            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                <!--<div class="main-search"><input type="text" class="search" placeholder="Search"></div>-->
+            </div>
+            <!-- col -->
+
+            <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                <div class="top-right-navigation pull-right">
+                    <div dropdown class="dropdown top-right-user-menu">
+                        <!-- user login dropdown start-->
+                        <a dropdownToggle data-toggle="dropdown" class="user-menu-container dropdown-toggle">
+                            <div class="company-icon">
+                                <img
+                                    src="{{ userCompanyDetails?.logoUrl || getcdnImage('no-company-logo-found.png') }}"
+                                    alt="company-logo"
+                                />
+                            </div>
+                            <span class="username"
+                                >{{ user.firstName }}
+                                <i class="fa fa-angle-down"></i>
+                            </span>
+                            <div class="user-icon">
+                                <img alt="User Avatar" src="{{ user.profileImage }}" />
+                            </div>
+                        </a>
+                        <ul *dropdownMenu class="dropdown-menu extended logout">
+                            <ng-container *ngIf="menus?.length > 0; else defaultMenu">
+                                <ng-container *ngFor="let menu of menus">
+                                    <li *ngIf="checkAuthority(menu.authorities)">
+                                        <a [routerLink]="menu.route_url" (click)="onMenuClick(menu.title)">
+                                            <img
+                                                class="arrow-icon"
+                                                [src]="env.IMG_URL + 'images/' + menu.icon"
+                                                [alt]="menu.title"
+                                            />
+                                            {{ menu.title | translate }}
+                                        </a>
+                                    </li>
+                                </ng-container>
+                            </ng-container>
+                            <ng-template #defaultMenu>
+                                <li>
+                                    <a routerLink="logout" (click)="onMenuClick('Logout')">
+                                        <img class="arrow-icon" src="{{ env.IMG_URL }}images/logout_icon.svg" />{{
+                                            'Log Out' | translate
+                                        }}</a
+                                    >
+                                </li>
+                            </ng-template>
+                        </ul>
+                        <!-- user login dropdown end -->
+                    </div>
+                </div>
+                <!-- top-right-navigation -->
+                <div class="top-right-admin" *ngIf="isAdmin">
+                    <a
+                        style="color: white;"
+                        class="btn tt-btn tt-btn-primary"
+                        routerLink="/admin"
+                        (click)="onMenuClick('Admin')"
+                        >{{ 'Admin' | translate }}</a
+                    >
+                </div>
+                <!-- <div class="top-right-search">
+          <input type="text" class="search" placeholder="{{'Search' | translate}}" />
+          <i class="fa fa-search"></i>
+        </div> -->
+            </div>
+            <!-- col -->
+        </div>
+        <!-- row -->
+    </div>
+    <!-- top-navigation-inner -->
+</div>
+<!-- top-navigation-outer -->
+
+<!-- user consent model begins-->
+<div
+    bsModal
+    #userConsentModal="bs-modal"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="userConsentModal"
+    aria-hidden="true"
+    [config]="{ backdrop: 'static' }"
+>
+    <div class="vertical-alignment-helper">
+        <div class="modal-dialog modal-dialog-centered vertical-align-center" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="userConsentModal">{{ 'Terms and Conditions' | translate }}</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        {{
+                            'This site uses cookies and third - party services to enhance your experience. By using our site, you acknowledge that you have read and understood our'
+                                | translate
+                        }}
+                        <a href="https://www.trustrace.com/terms-of-use" target="_blank">{{
+                            'privacy policy' | translate
+                        }}</a
+                        >.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-blue" (click)="saveConsent()" [disabled]="isSaving">
+                        {{ 'Ok,Thanks' | translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- user consent model ends-->

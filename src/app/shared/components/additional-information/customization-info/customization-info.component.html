@@ -1,0 +1,117 @@
+<div class="show-managers-details" *ngIf="!editCustomizationInfo">
+    <div class="edit-btn-container" *ngIf="showEditIcon">
+        <a (click)="showSaveCustomizationInfoForm()">
+            <img class="edit-img" alt="edit-img" src="{{ imgUrl('edit-model.png') }}" />
+        </a>
+    </div>
+    <!-- Edit Button Container -->
+    <div class="additional-info-detail" *ngIf="customizationInfo">
+        <div *ngFor="let info of customizationInfo; trackBy: trackById">
+            <div
+                class="information-details"
+                *ngIf="
+                    info.displayConfig.visible &&
+                    info.displayConfig.type !== 'TABLE' &&
+                    info.displayConfig.type !== 'SPIDER_WEB' &&
+                    ((info.behaviourConfig &&
+                        info.behaviourConfig.displayType === displayType.normal &&
+                        !info.behaviourConfig.compoundFields) ||
+                        !info.behaviourConfig)
+                "
+            >
+                <div class="information-details-block">
+                    <div class="information-details-block-inner-left">
+                        <span class="information-details-list" *ngIf="!info.displayConfig.hideLabel">{{
+                            info.displayConfig.name | translate
+                        }}</span>
+                        <span class="information-details-list" *ngIf="!info.displayConfig.hideLabel"
+                            >:&nbsp;&nbsp;&nbsp;</span
+                        >
+                    </div>
+                    <div class="information-details-block-inner-right">
+                        <span class="information-details-value">
+                            <app-entity-customization-fields [fieldData]="info" [responseValues]="fieldResponse">
+                            </app-entity-customization-fields>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- Information Details -->
+
+            <div
+                class="information-details"
+                *ngIf="
+                    info.displayConfig.visible &&
+                    info.displayConfig.type !== 'TABLE' &&
+                    info.displayConfig.type !== 'SPIDER_WEB' &&
+                    info.behaviourConfig &&
+                    info.behaviourConfig.displayType === displayType.normal &&
+                    info.behaviourConfig.compoundFields
+                "
+            >
+                <div class="information-details-block">
+                    <div class="information-details-block-inner-left">
+                        <span class="information-details-list" *ngIf="!info.displayConfig.hideLabel">
+                            {{ info.displayConfig.name | translate }}
+                        </span>
+                        <span class="information-details-list" *ngIf="!info.displayConfig.hideLabel"
+                            >:&nbsp;&nbsp;&nbsp;</span
+                        >
+                    </div>
+                    <div class="information-details-block-inner-right">
+                        <span class="information-details-value">
+                            <app-entity-customization-fields [fieldData]="info" [responseValues]="fieldResponse">
+                            </app-entity-customization-fields>
+                        </span>
+                        <span
+                            class="information-details-value"
+                            *ngFor="let fieldId of info.behaviourConfig.compoundFields; let isLast = last"
+                        >
+                            <span class="detail-list-pipe" *ngIf="getFieldWithFieldId(fieldId)">{{ ' | ' }}</span>
+                            <div class="detail-list-value" *ngIf="getFieldWithFieldId(fieldId)">
+                                <app-entity-customization-fields
+                                    [fieldData]="getFieldWithFieldId(fieldId)"
+                                    [responseValues]="fieldResponse"
+                                >
+                                </app-entity-customization-fields>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table display type -->
+            <div
+                class="information-details"
+                *ngIf="
+                    info.displayConfig.visible &&
+                    (info.displayConfig.type === 'TABLE' || info.displayConfig.type === 'SPIDER_WEB')
+                "
+            >
+                <div [ngClass]="{ 'information-details-chart': info.displayConfig.type === 'SPIDER_WEB' }">
+                    <div class="information-details-block">
+                        <app-entity-customization-fields [fieldData]="info" [responseValues]="fieldResponse">
+                        </app-entity-customization-fields>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Additional Info Details -->
+    <p *ngIf="!customizationInfo">
+        {{ 'No details available. Click the edit button to add.' | translate }}
+    </p>
+</div>
+<!-- Show Managers Details -->
+
+<div *ngIf="editCustomizationInfo">
+    <app-edit-customization-info
+        [infoData]="customizationInfo"
+        (onCustomizationValueChange)="saveCustomizationForm($event)"
+        [formEditMode]="editCustomizationInfo"
+        (onShowCustomizationValueChange)="showCustomizationInfoBlock($event)"
+        [responseFields]="fieldResponse"
+    >
+    </app-edit-customization-info>
+</div>
+<!-- Add Managers Container -->

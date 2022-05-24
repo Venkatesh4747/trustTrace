@@ -1,0 +1,11 @@
+.transaction-tree {
+    overflow: auto;
+    position: absolute;
+    bottom: 0;
+    top: 200px;
+    left: 15px;
+    right: 0;
+    overflow: auto;
+    width: 100%;
+    max-height: calc(100vh - 19em);
+}

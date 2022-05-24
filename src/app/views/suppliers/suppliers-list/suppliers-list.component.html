@@ -1,0 +1,185 @@
+<app-full-page-loader *ngIf="pageLoaded"></app-full-page-loader>
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="no-assessments" *ngIf="suppliers.length === 0">
+        {{ 'No Suppliers' | translate }}
+    </div>
+    <div class="table-responsive" *ngIf="suppliers.length > 0">
+        <div class="table-card" *ngFor="let supplier of suppliers; let i = index">
+            <div class="table-card-left flex-align-items-center" (click)="navigateToSupplierProfile(supplier)">
+                <div class="table-card-logo">
+                    <img
+                        class="img-responsive"
+                        [src]="supplier.supplier_logo || getImage('nologo.png')"
+                        alt="Supplier Logo"
+                    />
+                </div>
+                <div class="table-card-desc">
+                    <div class="supplier-title">
+                        <a>
+                            {{ supplier.name }}
+                        </a>
+                    </div>
+                    <div class="desc" *ngIf="supplier.reference_id">
+                        {{ 'Vendor Code' | translate }} :
+                        <span>{{ supplier.reference_id || ('Not Available' | translate) }}</span>
+                    </div>
+                    <div class="desc">
+                        {{ 'Location' | translate }} :
+                        <span>{{ displayLocation(supplier) || ('Not Available' | translate) }}</span>
+                    </div>
+                    <div class="desc" *ngIf="activeTab !== tabs.SUB_SUPPLIERS">
+                        {{ 'Supplier UID' | translate }} :
+                        <span>{{ supplier?.supplier_uid || ('Not Available' | translate) }}</span>
+                    </div>
+                    <div class="desc">
+                        {{ 'Email ID' | translate }} :
+                        <span>{{ supplier?.contact_email || ('Not Available' | translate) }}</span>
+                    </div>
+                    <div class="desc">
+                        {{ 'Facilities' | translate }} :
+                        <span>{{ supplier?.facility_count || ('None' | translate) }}</span>
+                    </div>
+                    <div *ngIf="!supplier.is_sub_supplier">
+                        <div class="desc">
+                            {{ 'Styles' | industry | translate }} :
+                            <span *ngIf="isNotFoodIndustry">{{ supplier?.style_count || ('None' | translate) }}</span>
+                            <span *ngIf="!isNotFoodIndustry">{{
+                                supplier?.product_count || ('None' | translate)
+                            }}</span>
+                        </div>
+                        <div class="desc">
+                            {{ 'Raw Materials' | industry | translate }} :
+                            <span *ngIf="isNotFoodIndustry">{{
+                                supplier?.raw_material_count || ('None' | translate)
+                            }}</span>
+                            <span *ngIf="!isNotFoodIndustry">{{
+                                supplier?.ingredient_count || ('None' | translate)
+                            }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="table-card-right"
+                [ngClass]="{ 'flex-column': supplier.grade_score !== null && supplier.grade_score !== undefiend }"
+            >
+                <div
+                    *ngIf="supplier.grade_score !== null && supplier.grade_score !== undefiend"
+                    class="action-item align-self-flex-end overallScore"
+                >
+                    {{ 'Overall Score' | translate }} :
+                    <strong>
+                        {{ supplier.grade_score }}
+                    </strong>
+                </div>
+                <div
+                    class="action-item align-self-flex-end archive-button"
+                    *ngIf="isBrand && activeTab === null && (isAdmin || hasAdminGroup)"
+                >
+                    <button class="action-btn" (click)="archiveSupplier(supplier.id, supplier.name)">
+                        <span class="fa fa-archive ml-0 pr-1"></span>
+                        {{ 'Archive Supplier' | translate }}
+                    </button>
+                </div>
+                <!-- <div class="action-item align-self-flex-end"
+                    *ngIf="hasAdminGroup() && showTerminateButton(supplier.status) && checkAccess('SUPPLIER_UPDATE')">
+                    <ng-container>
+                        <button class="action-terminate-btn" (click)="confirmTerminateSupplier(supplier, i)">
+                            <ng-container>
+                                {{
+                                terminateButton.text[i]
+                                ? terminateButton.text[i]
+                                : (terminateButton.values[0] | translate)
+                                }}
+                            </ng-container>
+                        </button>
+                    </ng-container>
+                </div> -->
+                <ng-container [ngSwitch]="supplier.status">
+                    <ng-container *ngSwitchCase="15">
+                        <div class="unaccepted-group" *ngIf="isNotFoodIndustry">
+                            <div class="action-item edit-invite">
+                                <div *ngIf="!supplier.is_sub_supplier">
+                                    <input class="hide-invite-url" type="text" value="" #findurl readonly />
+                                    <a class="link-image pr-1" (click)="copySupplierInviteUrlToClipBoard(findurl, i)">
+                                        <img
+                                            [src]="getImage('copy-link.png')"
+                                            alt="{{ 'Copy Invite Link' | translate }}"
+                                            matTooltip="{{ 'Copy Invite Link' | translate }}"
+                                        />
+                                    </a>
+                                    <a (click)="editSupplierInvite(supplier, i)">
+                                        <img
+                                            [src]="getImage('edit_email.png')"
+                                            alt="Edit invite email"
+                                            *ngIf="checkAccess('SUPPLIER_UPDATE')"
+                                            matTooltip="{{ 'Edit Invite' | translate }}"
+                                            [attr.data-cy]="'supplier_edit_invite_email'"
+                                        />
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="action-item align-self-flex-end flex-container">
+                                <div class="unaccepted mb-1">
+                                    {{ 'Unaccepted Supplier' | translate }}
+                                </div>
+                                <button
+                                    class="action-btn"
+                                    (click)="remainToAccept(supplier)"
+                                    *ngIf="!supplier.is_sub_supplier"
+                                >
+                                    <ng-container *ngIf="!reminderProgressIndividualState[supplier.id]; else spinner">
+                                        <img
+                                            class="remainder-icon"
+                                            [src]="getImage('reminder_icon.png')"
+                                            alt="remainder"
+                                        />
+                                        {{ 'Remind to Accept' | translate }}
+                                    </ng-container>
+                                    <ng-template #spinner>
+                                        <app-spinner [small]="true"></app-spinner>
+                                    </ng-template>
+                                </button>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="10">
+                        <div class="action-item align-self-flex-end">
+                            <div class="unaccepted mb-1" *ngIf="supplier.is_sub_supplier">
+                                {{ 'Uninvited Supplier' | translate }}
+                            </div>
+                            <button class="action-btn" (click)="inviteSupplier(supplier)" *ngIf="false">
+                                <img
+                                    class="remainder-email-icon"
+                                    [src]="getImage('send_remainder_email.png')"
+                                    alt="invite"
+                                />
+                                <span>
+                                    {{ 'Invite Supplier' | translate }}
+                                </span>
+                            </button>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="20">
+                        <div *ngIf="isBrand && checkAccess('SUPPLIER_UPDATE')" class="action-item align-self-flex-end">
+                            <button
+                                class="action-btn"
+                                (click)="openLaunchAssessmentModal(supplier)"
+                                *ngIf="!launchAssessmentModalLoading[supplier.id] && !supplier.is_sub_supplier"
+                            >
+                                <img [src]="getImage('send_remainder.png')" alt="Launch Questionnaire" />{{
+                                    'Launch Assessment' | translate
+                                }}
+                            </button>
+                            <div class="ml-3" *ngIf="launchAssessmentModalLoading[supplier.id]">
+                                <app-spinner class="card-button-big" [small]="true"></app-spinner>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchDefault></ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>

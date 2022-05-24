@@ -1,0 +1,47 @@
+<div class="parent-container">
+    <div class="row close-btn-section" *ngIf="data.showClose">
+        <div class="close-btn" (click)="onCancel()">
+            <span class="fa fa-close close-icon"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="modal-body text-center pd-35">
+                <div class="modal-section">
+                    <h5 class="title">{{ data.title | translate }}</h5>
+                    <p class="description" *ngIf="checkIsString(data.description); else descArrayContainer">
+                        {{ data.description | translate }}
+                    </p>
+                </div>
+                <div class="button-block">
+                    <div class="pull-center">
+                        <button
+                            type="button"
+                            class="btn btn-blue"
+                            mat-button
+                            (click)="onCancel()"
+                            *ngIf="data.isEnable"
+                        >
+                            {{ 'Cancel' | translate }}
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-gray"
+                            mat-button
+                            cdkFocusInitial
+                            (click)="handleDeleteFun(data.groupId)"
+                        >
+                            {{ data.buttonName | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #descArrayContainer>
+    <p class="description" *ngFor="let description of data.description">
+        {{ description | translate }}
+    </p>
+</ng-template>

@@ -1,0 +1,44 @@
+.content-container {
+    padding-left: 35px;
+}
+
+.float-buttons {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    z-index: 103;
+}
+
+.absolute-buttons {
+    position: absolute;
+    top: 20px;
+    right: 15px;
+    z-index: 103;
+}
+
+.absolute-buttons > button {
+    font-family: 'Source Sans Pro-Semibold', serif;
+    font-size: 15px;
+    width: 102px;
+    height: 40px;
+    color: #325992;
+    background-color: #fff;
+    border: 2px solid #0fc5e4;
+    border-radius: 6px;
+    margin-top: 10px;
+    margin-right: 15px;
+    &:focus {
+        outline: none;
+    }
+}
+
+.mat-error {
+    &.tt-search-block-error {
+        font-size: 12px;
+        position: absolute;
+        bottom: 12px;
+        @media screen and (max-width: 991px) {
+            bottom: 0;
+        }
+    }
+}

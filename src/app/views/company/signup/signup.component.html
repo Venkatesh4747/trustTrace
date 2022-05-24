@@ -1,0 +1,337 @@
+<div class="bg-section">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-5 pd-0 hidden-sm hidden-xs">
+                <div class="section-wrap">
+                    <div class="section-left-wrap">
+                        <div id="login-logo-container">
+                            <a routerLink="/">
+                                <img src="{{ env.IMG_URL }}images/trustrace_logo_black.svg" alt="TrusTrace" />
+                            </a>
+                        </div>
+                        <div class="section-left-wrap-header">
+                            <h3 class="title">Trust Through Traceability</h3>
+                            <p class="description">
+                                {{
+                                    'Transform your supply chain and product portfolio to align with your sustainability goals'
+                                        | translate
+                                }}.
+                            </p>
+                        </div>
+                        <div class="signup-bg">
+                            <img src="{{ env.IMG_URL }}images/generic-login.png" alt="TrusTrace" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7 col-sm-12 col-xs-12 pd-0">
+                <!-- Page Left Wrap -->
+                <div class="page-wrap">
+                    <div class="mobile-section-wrap">
+                        <div class="mobile-section-logo-wrap">
+                            <div id="login-logo-container">
+                                <a routerLink="/">
+                                    <img src="{{ env.IMG_URL }}images/trustrace_logo_black.svg" alt="TrusTrace" />
+                                </a>
+                            </div>
+                            <div class="mobile-signup-bg">
+                                <img src="{{ env.IMG_URL }}images/generic-login.png" alt="TrusTrace" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="center-block-section pd-t-0">
+                        <div class="center-block-section-inner" *ngIf="!showSignUpConfirmation">
+                            <ng-container [ngSwitch]="invalidSignUpToken">
+                                <div *ngSwitchCase="true" class="invalid-token">
+                                    <h1>
+                                        <mat-icon class="link_off">link_off</mat-icon>
+                                    </h1>
+                                    <h3>{{ 'Signup link is invalid' | translate }}</h3>
+                                    <p>
+                                        {{ 'This means you are using an outdated / invalid' | translate }} <br />
+                                        {{ '"Signup Instructions" email link' | translate }}
+                                    </p>
+                                    <div>
+                                        <button [routerLink]="['/']">
+                                            {{ 'Continue' | translate }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <ng-container *ngSwitchCase="false">
+                                    <form
+                                        class="form-block"
+                                        *ngIf="pageReady"
+                                        [formGroup]="signUpForm"
+                                        (ngSubmit)="onSignUp()"
+                                    >
+                                        <h3 class="right-side-title">{{ 'Create your account' | translate }}</h3>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <mat-form-field class="signup-mat-form-field">
+                                                    <mat-label class="form-field-label"
+                                                        >{{ 'First Name' | translate }}
+                                                        <span class="color-red">*</span>:</mat-label
+                                                    >
+                                                    <input
+                                                        matInput
+                                                        placeholder="E.g. John"
+                                                        formControlName="firstName"
+                                                        type="text"
+                                                    />
+                                                    <mat-error *ngIf="hasError('required', 'firstName')">
+                                                        {{ 'Please enter first name' | translate }}
+                                                    </mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <mat-form-field class="signup-mat-form-field">
+                                                    <mat-label class="form-field-label"
+                                                        >{{ 'Last Name' | translate }}
+                                                        <span class="color-red">*</span>:</mat-label
+                                                    >
+                                                    <input matInput placeholder="E.g. Doe" formControlName="lastName" />
+                                                    <mat-error *ngIf="hasError('required', 'lastName')">
+                                                        {{ 'Please enter last name' | translate }}
+                                                    </mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <!-- Column -->
+                                        </div>
+                                        <!-- Row -->
+
+                                        <mat-form-field class="signup-mat-form-field">
+                                            <mat-label class="form-field-label"
+                                                >{{ 'Email ID' | translate }}<span class="color-red">*</span>:
+                                            </mat-label>
+                                            <input
+                                                matInput
+                                                placeholder="E.g. johndoe@email.com"
+                                                formControlName="email"
+                                            />
+                                            <mat-error *ngIf="hasError('required', 'email')">
+                                                {{ 'Please enter email ID' | translate }}
+                                            </mat-error>
+                                            <mat-error *ngIf="hasError('email', 'email')">
+                                                {{ 'Please enter a valid email ID' | translate }}
+                                            </mat-error>
+                                        </mat-form-field>
+                                        <mat-form-field class="signup-mat-form-field">
+                                            <mat-label class="form-field-label"
+                                                >{{ 'Your Company Name' | translate }} <span class="color-red">*</span>:
+                                            </mat-label>
+                                            <input
+                                                matInput
+                                                placeholder="E.g. Green Organics"
+                                                id="companyName"
+                                                name="companyName"
+                                                formControlName="companyName"
+                                                required
+                                            />
+                                            <mat-error *ngIf="hasError('required', 'companyName')">
+                                                {{ 'Please enter Company Name' | translate }}
+                                            </mat-error>
+                                        </mat-form-field>
+
+                                        <div formGroupName="passwords">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <mat-form-field class="signup-mat-form-field">
+                                                        <mat-label class="form-field-label"
+                                                            >{{ 'Password' | translate }}
+                                                            <span class="color-red">*</span>:</mat-label
+                                                        >
+                                                        <input
+                                                            matInput
+                                                            placeholder="Your new password"
+                                                            formControlName="password"
+                                                            [type]="toggleHideShow.password ? 'password' : 'text'"
+                                                            [popover]="passwordRules"
+                                                            placement="left"
+                                                            triggers="focus:focusout"
+                                                        />
+                                                        <mat-error
+                                                            *ngIf="hasError('required', 'password', 'passwords')"
+                                                        >
+                                                            {{ 'Please enter password' | translate }}
+                                                        </mat-error>
+                                                        <mat-icon
+                                                            matSuffix
+                                                            (click)="toggleHideShow.password = !toggleHideShow.password"
+                                                            [matTooltip]="
+                                                                toggleHideShow.password
+                                                                    ? 'Show password'
+                                                                    : 'Hide password'
+                                                            "
+                                                        >
+                                                            {{
+                                                                toggleHideShow.password
+                                                                    ? 'visibility'
+                                                                    : 'visibility_off'
+                                                            }}</mat-icon
+                                                        >
+                                                    </mat-form-field>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <mat-form-field class="signup-mat-form-field">
+                                                        <mat-label class="form-field-label"
+                                                            >{{ 'Confirm Password' | translate }}
+                                                            <span class="color-red">*</span>:</mat-label
+                                                        >
+                                                        <input
+                                                            matInput
+                                                            placeholder="Retype Password"
+                                                            formControlName="confirmPassword"
+                                                            [type]="
+                                                                toggleHideShow.confirmPassword ? 'password' : 'text'
+                                                            "
+                                                            [popover]="confirmPasswordRule"
+                                                            placement="left"
+                                                            triggers="focus:focusout"
+                                                        />
+                                                        <mat-error
+                                                            *ngIf="hasError('required', 'confirmPassword', 'passwords')"
+                                                        >
+                                                            {{ 'Please retype your password' | translate }}
+                                                        </mat-error>
+                                                        <mat-icon
+                                                            matSuffix
+                                                            (click)="
+                                                                toggleHideShow.confirmPassword = !toggleHideShow.confirmPassword
+                                                            "
+                                                            [matTooltip]="
+                                                                toggleHideShow.confirmPassword
+                                                                    ? 'Show password'
+                                                                    : 'Hide password'
+                                                            "
+                                                        >
+                                                            {{
+                                                                toggleHideShow.confirmPassword
+                                                                    ? 'visibility'
+                                                                    : 'visibility_off'
+                                                            }}</mat-icon
+                                                        >
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="button-block">
+                                            <mat-checkbox formControlName="acceptTerms">
+                                                <div class="accept">
+                                                    {{ 'I accept the' | translate
+                                                    }}<a
+                                                        href="https://www.trustrace.com/terms-of-use"
+                                                        target="_blank"
+                                                        rel="noopener"
+                                                    >
+                                                        {{ 'Terms and Conditions' | translate }}</a
+                                                    >
+                                                </div>
+                                            </mat-checkbox>
+                                            <mat-error
+                                                class="mat-error-left"
+                                                *ngIf="
+                                                    !formControl('acceptTerms').value &&
+                                                    formControl('acceptTerms').touched
+                                                "
+                                            >
+                                                {{ 'Please accept the Terms and Conditions' | translate }}
+                                            </mat-error>
+                                            <button
+                                                type="submit"
+                                                [disabled]="formProcessing"
+                                                class="btn btn-blue signup-btn"
+                                            >
+                                                {{ 'Create your account' | translate }}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </ng-container>
+
+                                <div *ngSwitchDefault class="validating-token">
+                                    <mat-spinner diameter="14"></mat-spinner>
+                                    <strong>{{ 'Please wait' | translate }} . . . </strong>
+                                </div>
+                            </ng-container>
+
+                            <div class="page-wrap-bottom-section">
+                                <div class="bottom-block-section">
+                                    <p>© 2020 TrusTrace.com</p>
+                                    <p>
+                                        {{ 'For Help: Please contact' | translate }}
+                                        <a href="mailto:yoda@trustrace.com"> &nbsp;yoda@trustrace.com</a>
+                                    </p>
+                                </div>
+                                <!-- Bottom Block Section -->
+                            </div>
+                        </div>
+                        <div *ngIf="showSignUpConfirmation">
+                            <div class="success-block-section">
+                                <div class="success-block">
+                                    <div class="success-icon">
+                                        <mat-icon>done</mat-icon>
+                                    </div>
+                                    <div class="success-details">
+                                        <h3 class="success-title">
+                                            {{ 'Your account has been created successfully' | translate }}!
+                                        </h3>
+                                        <p class="success-description">
+                                            {{ 'Use your registered email id' | translate }}
+                                            <span>{{ signupTemplate.email }}</span> {{ 'to login' | translate }}.
+                                        </p>
+                                    </div>
+                                    <button (click)="navigateToLogin()" class="btn success-login-btn">
+                                        {{ 'Login' | translate }}
+                                    </button>
+                                    <div class="success-bottom-section">
+                                        <div class="success-bottom-block-section">
+                                            <p>© {{ currentYear }} TrusTrace.com</p>
+                                            <p>
+                                                {{ 'For Help: Please contact' | translate }}
+                                                <a href="mailto:yoda@trustrace.com"> &nbsp;yoda@trustrace.com</a>
+                                            </p>
+                                        </div>
+                                        <!-- Bottom Block Section -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #passwordRules>
+    <div
+        class="password-rules"
+        appPasswordValidator
+        [password]="signUpForm.value.passwords.password"
+        (isValid)="validatePassword($event)"
+    ></div>
+</ng-template>
+<ng-template #confirmPasswordRule>
+    <div class="password-rules">
+        <div>
+            <h4 class="password-rules--title">
+                <img [src]="env.IMG_URL + 'images/info.png'" alt="info" />{{ 'Password Rule' | translate }}
+            </h4>
+            <div class="password-rules--content" style="margin-top: 26px;">
+                <ul class="list-unstyled" style="padding-left: 6px;">
+                    <li>
+                        <span
+                            class="fa {{
+                                signUpForm.value.passwords.password === signUpForm.value.passwords.confirmPassword
+                                    ? 'green fa-check'
+                                    : 'red fa-times'
+                            }}"
+                        ></span>
+                        {{ 'Confirm password should match password' | translate }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</ng-template>

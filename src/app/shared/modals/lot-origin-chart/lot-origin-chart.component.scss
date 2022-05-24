@@ -1,0 +1,107 @@
+@import '~styles/variables';
+
+#main-dialog-container {
+    padding: 10px;
+}
+.title {
+    font-family: $font-family-Bold;
+    color: #325992;
+    font-size: 18px;
+    float: left;
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+    margin-left: 30px;
+    float: right;
+}
+
+.cancel-btn {
+    width: 100%;
+    background: #71eeff;
+    color: #474747;
+    border-radius: 5px;
+    font-family: $font-family-Semibold;
+    height: 35px;
+    outline: none;
+}
+
+.btn-container {
+    margin-top: 15px;
+    float: right;
+}
+.supply-chain-heading {
+    height: 70px;
+    font-size: 16px;
+    margin-top: 10px;
+    font-family: $font-family-Regular;
+    color: #325992;
+    .blue-title {
+        font-family: $font-family-Bold;
+    }
+}
+.supply-chain-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 575px;
+    min-height: 575px;
+}
+img.product-type-image {
+    border: 2px dotted #235ea4;
+    height: 95px;
+    width: 95px;
+    border-radius: 80px;
+    text-align: center;
+}
+.product-type-image-container {
+    .vertical-line-bottom {
+        height: 45px;
+        border-left: 2px solid #325992;
+        position: absolute;
+        left: 50%;
+        margin-left: 12px;
+        top: 94px;
+        color: #325992;
+    }
+    .vertical-line-top {
+        height: 45px;
+        border-left: 2px solid #325992;
+        position: absolute;
+        left: 50%;
+        margin-left: 12px;
+        bottom: 94px;
+        color: #325992;
+    }
+}
+.product-type-heading {
+    font-size: 15px;
+    font-family: $font-family-Semibold;
+    color: #325992;
+    margin-bottom: 10px;
+}
+.supply-chain-detail-container {
+    overflow: auto;
+    max-height: 110px;
+    width: 105%;
+    cursor: pointer;
+}
+.supply-chain-details {
+    overflow-wrap: break-word;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    font-family: $font-family-Regular;
+    color: #325992;
+}
+.no-supply-chain {
+    width: 100%;
+    height: 500px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    img {
+        width: 75px;
+    }
+}

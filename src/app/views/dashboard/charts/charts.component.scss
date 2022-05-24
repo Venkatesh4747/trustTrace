@@ -1,0 +1,30 @@
+@import '~styles/variables';
+
+.col-md-3,
+.col-lg-3 {
+    width: 24%;
+}
+
+.chart-details-view {
+    padding: 15px;
+    border-radius: 5px;
+    border: solid 1px #c5c5c5;
+    background-color: #ffffff;
+    height: 100%;
+    width: 100%;
+    display: inline-block;
+}
+
+.chart-thumbnail-wrapper {
+    margin: 20px 10px 20px 0;
+    box-shadow: 0 0 4px #ccc;
+    border-radius: 10px;
+    height: 350px;
+    cursor: pointer;
+}
+
+.chart-title {
+    font-family: $font-family-Semibold;
+    font-size: 18px;
+    color: $text-color-primary;
+}

@@ -1,0 +1,371 @@
+<ng-template [ngIf]="!isSubQuestion">
+    <ol class="question">
+        <li style="position: relative;" *ngFor="let question of questions[groupName][subGroupName]">
+            <span class="question-title">{{ question.question }}</span>
+            <span *ngIf="question.mandatory" style="font-size: 20px; padding: 0 7px; color: red">*</span>
+            <div class="row" *ngIf="question.type === 'SINGLE_SELECT'">
+                <div class="col-md-6 question-radio-container" *ngFor="let option of question.options | keys">
+                    <input
+                        type="radio"
+                        id="{{ question.id }}-{{ option.key }}"
+                        name="{{ question.id }}"
+                        [value]="option.key"
+                        [(ngModel)]="responses[question.id]"
+                        (change)="saveSingleInput(question.id)"
+                        disabled
+                    />
+                    <label for="{{ question.id }}-{{ option.key }}">{{ option.value }}</label>
+                </div>
+            </div>
+
+            <div class="row check_box_group" *ngIf="question.type === 'MULTI_SELECT'">
+                <div class="col-md-6" *ngFor="let option of question.options | keys; let optionIndex = index">
+                    <input
+                        type="checkbox"
+                        id="{{ question.id }}-{{ optionIndex }}"
+                        name="{{ question.id }}-{{ optionIndex }}"
+                        [value]="option.key"
+                        [(ngModel)]="responses[question.id][optionIndex]"
+                        (change)="
+                            saveCheckbox($event, question.id, option.key); saveSingleInput(question.id, question.type)
+                        "
+                        disabled
+                    />
+                    <label for="{{ question.id }}-{{ optionIndex }}"
+                        ><span>{{ option.value }}</span></label
+                    >
+                </div>
+            </div>
+
+            <div class="row" *ngIf="question.type === 'TEXT'">
+                <div class="col-md-6">
+                    <textarea
+                        rows="4"
+                        cols="100"
+                        maxlength="800"
+                        id="{{ question.id }}"
+                        name="{{ question.id }}"
+                        [(ngModel)]="responses[question.id]"
+                        (blur)="saveSingleInput(question.id)"
+                        disabled
+                    ></textarea>
+                </div>
+            </div>
+
+            <div *ngIf="question['evidenceRequired'] && question['evidenceRequired'].length > 0">
+                <div class="form-group row" id="upload">
+                    <ng-template ngFor let-evidence [ngForOf]="question['evidenceRequired']" let-oi="index">
+                        <div class="col-md-6" *ngIf="evidence.id">
+                            <p>{{ evidence.name }}</p>
+                            <a
+                                class="upload-file-button"
+                                (click)="
+                                    invokeEvidenceUpload(question.id + '-' + evidence.id, question.id, evidence.id)
+                                "
+                                *ngIf="!evidenceUploading[question.id + evidence.id]"
+                                ><b>{{ 'Upload file' | translate }}</b
+                                ><i class="fa fa-upload"></i
+                            ></a>
+                            <a class="upload-file-button" *ngIf="evidenceUploading[question.id + evidence.id]"
+                                ><b>{{ 'Uploading file' | translate }} </b>
+                                <app-spinner [small]="true"></app-spinner>
+                            </a>
+                            <ul
+                                class="fileInputList"
+                                *ngIf="
+                                    evidenceFiles &&
+                                    evidenceFiles[question.id] &&
+                                    evidenceFiles[question.id][evidence.id] &&
+                                    evidenceFiles[question.id][evidence.id]['files']
+                                "
+                            >
+                                <li
+                                    class="files"
+                                    *ngFor="let file of evidenceFiles[question.id][evidence.id]['files']"
+                                    [tooltip]="file"
+                                    data-placement="right"
+                                >
+                                    <span
+                                        class="download"
+                                        (click)="
+                                            getEvidenceFile(evidenceFiles[question.id][evidence.id]['evidenceId'], file)
+                                        "
+                                        ><i class="fa fa-download"></i>
+                                        <span class="fileName">{{ file }}</span>
+                                    </span>
+                                    <span
+                                        class="delete pull-right"
+                                        (click)="
+                                            removeFile(
+                                                evidenceFiles[question.id][evidence.id]['evidenceId'],
+                                                file,
+                                                question.id,
+                                                evidence.id
+                                            )
+                                        "
+                                        ><i class="fa fa-close"></i
+                                    ></span>
+                                </li>
+                            </ul>
+                            <input
+                                type="file"
+                                id="{{ question.id }}-{{ evidence.id }}"
+                                name="{{ question.id }}-{{ evidence.id }}"
+                                [(ngModel)]="responses[evidence.id]"
+                                (change)="uploadEvidence($event.target.files, question.id, evidence.id)"
+                                disabled
+                            />
+                            <ng-template [ngIf]="answered[evidence.id]">
+                                <i class="material-icons">close</i>
+                            </ng-template>
+                        </div>
+                    </ng-template>
+                </div>
+                <!-- form-group -->
+            </div>
+            <!-- File -->
+
+            <ng-template [ngIf]="question['subQuestion'] && question['options']">
+                <ng-template ngFor let-option [ngForOf]="question.options | keys" let-optionIndex="index">
+                    <app-survey-questions
+                        *ngIf="question['subQuestion'][option]"
+                        [responses]="responses"
+                        [parentQuestionId]="question.id"
+                        [optionIndex]="optionIndex"
+                        [subQuestionForOption]="option.key"
+                        [answered]="answered"
+                        [questions]="question['subQuestion'][option.key]"
+                        [assessmentId]="assessmentId"
+                        [facilityId]="facilityId"
+                        [isSubQuestion]="true"
+                    ></app-survey-questions>
+                </ng-template>
+            </ng-template>
+
+            <div
+                class="text-center"
+                *ngIf="allowDeleteQuestions"
+                style="position: absolute; top: 10px; right: 0px; cursor: pointer"
+                (click)="deleteQuestion(question.id)"
+            >
+                <span *ngIf="!deletedQuestions[question.id]"
+                    ><i
+                        style="color: white; padding: 8px; background-color: #d16b72; border-radius: 4px;"
+                        class="fa fa-trash"
+                    ></i
+                ></span>
+                <span *ngIf="deletedQuestions[question.id]"
+                    ><i
+                        style="color: white; padding: 8px; background-color: #27c7e5; border-radius: 4px;"
+                        class="fa fa-plus"
+                    ></i
+                ></span>
+            </div>
+
+            <div
+                class="text-center check_box_group"
+                *ngIf="allowDeleteQuestions"
+                style="position: absolute; bottom: 10px; right: 0px; cursor: pointer"
+            >
+                <input
+                    type="checkbox"
+                    (change)="mandatoryQuestion(question.id)"
+                    [checked]="mandatoryQuestions[question.id]"
+                    id="mandatory-{{ question.id }}"
+                />
+                <label for="mandatory-{{ question.id }}"><span></span>{{ 'Mandatory' | translate }}</label>
+            </div>
+        </li>
+    </ol>
+</ng-template>
+
+<ng-template [ngIf]="isSubQuestion">
+    <ol
+        class="subQuestion"
+        *ngIf="
+            responses[parentQuestionId] &&
+            (responses[parentQuestionId] === subQuestionForOption ||
+                (responses[parentQuestionId] !== null &&
+                    responses[parentQuestionId][optionIndex] &&
+                    responses[parentQuestionId][optionIndex] === true))
+        "
+    >
+        <li *ngFor="let question of questions">
+            <!--<div class="parentOption">-->
+            <!--{{subQuestionForOption}}-->
+            <!--</div>-->
+            <span class="question-title">{{ question.question }}</span>
+            <div class="row" *ngIf="question.type === 'SINGLE_SELECT'">
+                <div class="col-md-6 question-radio-container" *ngFor="let option of question.options | keys">
+                    <input
+                        type="radio"
+                        id="{{ question.id }}-{{ option.key }}"
+                        name="{{ question.id }}"
+                        [value]="option.key"
+                        [(ngModel)]="responses[question.id]"
+                        (change)="saveSingleInput(question.id)"
+                        disabled
+                    />
+                    <label for="{{ question.id }}-{{ option.key }}">{{ option.value }}</label>
+                </div>
+            </div>
+
+            <div class="row check_box_group" *ngIf="question.type === 'MULTI_SELECT'">
+                <div class="col-md-6" *ngFor="let option of question.options | keys; let optionIndex = index">
+                    <input
+                        type="checkbox"
+                        id="{{ question.id }}-{{ optionIndex }}"
+                        name="{{ question.id }}-{{ optionIndex }}"
+                        [value]="option.key"
+                        [(ngModel)]="responses[question.id][optionIndex]"
+                        (change)="
+                            saveCheckbox($event, question.id, option.key); saveSingleInput(question.id, question.type)
+                        "
+                        disabled
+                    />
+                    <label for="{{ question.id }}-{{ optionIndex }}"
+                        ><span>{{ option.key }}</span></label
+                    >
+                </div>
+            </div>
+
+            <div class="row" *ngIf="question.type === 'TEXT'">
+                <div class="col-md-6">
+                    <textarea
+                        rows="4"
+                        cols="100"
+                        maxlength="800"
+                        id="{{ question.id }}"
+                        name="{{ question.id }}"
+                        [(ngModel)]="responses[question.id]"
+                        (blur)="saveSingleInput(question.id)"
+                        disabled
+                    ></textarea>
+                </div>
+            </div>
+
+            <div *ngIf="question['evidenceRequired'] && question['evidenceRequired'].length > 0">
+                <div class="form-group row" id="upload">
+                    <ng-template ngFor let-evidence [ngForOf]="question['evidenceRequired']" let-oi="index">
+                        <div class="col-md-6" *ngIf="evidence.id">
+                            <p>{{ evidence.name }}</p>
+                            <a
+                                (click)="
+                                    invokeEvidenceUpload(question.id + '-' + evidence.id, question.id, evidence.id)
+                                "
+                                *ngIf="!evidenceUploading[question.id + evidence.id]"
+                                ><b>{{ 'Upload file' | translate }} </b><i class="fa fa-upload"></i
+                            ></a>
+                            <a class="upload-file-button" *ngIf="evidenceUploading[question.id + evidence.id]"
+                                ><b>{{ 'Uploading file' | translate }} </b>
+                                <app-spinner [small]="true"></app-spinner>
+                            </a>
+                            <ul
+                                class="fileInputList"
+                                *ngIf="
+                                    evidenceFiles &&
+                                    evidenceFiles[question.id] &&
+                                    evidenceFiles[question.id][evidence.id] &&
+                                    evidenceFiles[question.id][evidence.id]['files']
+                                "
+                            >
+                                <li
+                                    class="files"
+                                    *ngFor="let file of evidenceFiles[question.id][evidence.id]['files']"
+                                    [tooltip]="file"
+                                    data-placement="right"
+                                >
+                                    <span
+                                        class="download"
+                                        (click)="
+                                            getEvidenceFile(evidenceFiles[question.id][evidence.id]['evidenceId'], file)
+                                        "
+                                    >
+                                        <i class="fa fa-download"></i>
+                                        <span class="fileName">{{ file }}</span>
+                                    </span>
+                                    <span
+                                        class="delete pull-right"
+                                        (click)="
+                                            removeFile(
+                                                evidenceFiles[question.id][evidence.id]['evidenceId'],
+                                                file,
+                                                question.id,
+                                                evidence.id
+                                            )
+                                        "
+                                        ><i class="fa fa-close"></i
+                                    ></span>
+                                </li>
+                            </ul>
+                            <input
+                                type="file"
+                                id="{{ question.id }}-{{ evidence.id }}"
+                                name="{{ question.id }}-{{ evidence.id }}"
+                                [(ngModel)]="responses[evidence.id]"
+                                (change)="uploadEvidence($event.target.files, question.id, evidence.id)"
+                                disabled
+                            />
+                            <ng-template [ngIf]="answered[evidence.id]">
+                                <i class="material-icons">close</i>
+                            </ng-template>
+                        </div>
+                    </ng-template>
+                </div>
+                <!-- form-group -->
+            </div>
+            <!-- File -->
+
+            <div
+                class="text-center"
+                *ngIf="allowDeleteQuestions"
+                style="position: absolute; top: 10px; right: 0px; cursor: pointer"
+                (click)="deleteQuestion(question.id)"
+            >
+                <span *ngIf="!deletedQuestions[question.id]"
+                    ><i
+                        style="color: white; padding: 8px; background-color: #d16b72; border-radius: 4px;"
+                        class="fa fa-trash"
+                    ></i
+                ></span>
+                <span *ngIf="deletedQuestions[question.id]"
+                    ><i
+                        style="color: white; padding: 8px; background-color: #27c7e5; border-radius: 4px;"
+                        class="fa fa-plus"
+                    ></i
+                ></span>
+            </div>
+
+            <div
+                class="text-center check_box_group"
+                *ngIf="allowDeleteQuestions"
+                style="position: absolute; bottom: 10px; right: 0px; cursor: pointer"
+            >
+                <input
+                    type="checkbox"
+                    (change)="mandatoryQuestion(question.id)"
+                    [checked]="mandatoryQuestions[question.id]"
+                    id="mandatory-{{ question.id }}"
+                />
+                <label for="mandatory-{{ question.id }}"><span></span>{{ 'Mandatory' | translate }}</label>
+            </div>
+
+            <ng-template [ngIf]="question['subQuestion'] && question['options']">
+                <ng-template ngFor let-option [ngForOf]="question.options | keys" let-optionIndex="index">
+                    <app-survey-questions
+                        *ngIf="question['subQuestion'][option]"
+                        [responses]="responses"
+                        [parentQuestionId]="question.id"
+                        [optionIndex]="optionIndex"
+                        [subQuestionForOption]="option.key"
+                        [answered]="answered"
+                        [questions]="question['subQuestion'][option.key]"
+                        [assessmentId]="assessmentId"
+                        [facilityId]="facilityId"
+                        [isSubQuestion]="true"
+                    ></app-survey-questions>
+                </ng-template>
+            </ng-template>
+        </li>
+    </ol>
+</ng-template>

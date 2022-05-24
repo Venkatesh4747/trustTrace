@@ -1,0 +1,742 @@
+<div class="bom-validation-section">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="header-section">
+                <h5 class="title">
+                    {{
+                        title
+                            ? title
+                            : tier === tiers[0]
+                            ? ('BOM validation failed' | translate)
+                            : ('Tier 2 Facility/ Supplier not match with MLM' | translate)
+                    }}
+                </h5>
+                <p class="description">
+                    {{ 'Check the transaction request to Approve or Reject' | translate }}
+                </p>
+            </div>
+            <div class="close-icon-block text-right">
+                <a (click)="closeDialog()" *ngIf="showClose">
+                    <img class="icon" alt="Close Model" [src]="getImage('close-model.png')" />
+                </a>
+            </div>
+            <!-- Close Icon Block -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            <div class="bom-validation-block">
+                <div class="bom-validation-details">
+                    <h3 class="bom-details-title">
+                        {{ 'Production' | translate }}
+                    </h3>
+                    <!-- Tier 1 Production -->
+                    <ul class="bom-info" *ngIf="tier === tiers[0]">
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Article No' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ task.productionDataView.outputProductName }} -
+                                {{ task.productionDataView.outputProductNumber }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Production Date(T1)' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ commonServices.convertToDate(task.date) || ('Not available' | translate) }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Output Quantity' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    task.productionDataView.sellerUOMQuantity &&
+                                    task.productionDataView.sellerUOMQuantity !== null
+                                        ? task.productionDataView.sellerUOMQuantity
+                                        : 'Not Available'
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Units (Pieces, Pairs, Set)' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    task.productionDataView.sellerUOMUnit &&
+                                    task.productionDataView.sellerUOMUnit !== null
+                                        ? task.productionDataView.sellerUOMUnit
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'T1 Facility code / T1 Facility Name' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ task.facilityCode }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'T1 Prod No' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ task.productionDataView.outputLotId }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Year' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ task.productionDataView.year || ('Not Available' | translate) }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Season' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ task.productionDataView.season || ('Not Available' | translate) }}
+                            </span>
+                        </li>
+                    </ul>
+
+                    <!-- Tier 2 Production  -->
+                    <ul class="bom-info" *ngIf="tier === tiers[1]">
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'MLM ID' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ task.productionDataView.outputProductNumber }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'T2 Facility ID / T2 Facility Name' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ task.facilityCode }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Material Composition' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span
+                                class="bom-value"
+                                *ngIf="
+                                    task.productionDataView.outputMaterialCompositions &&
+                                    task.productionDataView.outputMaterialCompositions.length > 0
+                                "
+                            >
+                                <span
+                                    *ngFor="
+                                        let materialComp of task.productionDataView.outputMaterialCompositions;
+                                        let isLast = last
+                                    "
+                                >
+                                    {{ materialComp.value }}% {{ materialComp.id }} {{ isLast ? '' : ',' }}
+                                </span>
+                            </span>
+                            <span
+                                class="bom-value"
+                                *ngIf="
+                                    !task.productionDataView.outputMaterialCompositions ||
+                                    task.productionDataView.outputMaterialCompositions.length === 0
+                                "
+                            >
+                                {{ 'Not Available' | translate }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'T2 Prod. No: ' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ task.productionDataView.outputLotId }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Production Date(T2)' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ commonServices.convertToDate(task.date) || ('Not available' | translate) }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Output Quantity (In Kgs)' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    task.productionDataView.outputQuantity &&
+                                    task.productionDataView.outputQuantity !== null
+                                        ? task.productionDataView.outputQuantity
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Output Quantity (UOM)' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    task.productionDataView.sellerUOMQuantity &&
+                                    task.productionDataView.sellerUOMQuantity !== null
+                                        ? task.productionDataView.sellerUOMQuantity
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Units (UOM)' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    task.productionDataView.sellerUOMUnit &&
+                                    task.productionDataView.sellerUOMUnit !== null
+                                        ? task.productionDataView.sellerUOMUnit
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Sustainable Input Lots -->
+                <div
+                    class="bom-validation-details"
+                    *ngFor="let inputLot of task.productionDataView.sustainableInputLots; let sustainableInd = index"
+                >
+                    <h3 class="bom-details-title">
+                        {{ 'Sustainable Materials' | translate }} {{ sustainableInd + 1 }}
+                    </h3>
+
+                    <!-- Tier 1 Sustainable Input Lots -->
+                    <ul class="bom-info" *ngIf="tier === tiers[0]">
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'MLM ID' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    inputLot.productItemNumber && inputLot.productItemNumber !== null
+                                        ? inputLot.productItemNumber
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Material Composition' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span
+                                class="bom-value"
+                                *ngIf="inputLot.materialCompositions && inputLot.materialCompositions.length > 0"
+                            >
+                                <span *ngFor="let comp of inputLot.materialCompositions; let isLast = last">
+                                    {{ comp.value }}% {{ comp.id }} {{ isLast ? '' : ',' }}
+                                </span>
+                            </span>
+                            <span
+                                class="bom-value"
+                                *ngIf="!inputLot.materialCompositions || inputLot.materialCompositions.length === 0"
+                            >
+                                {{ 'Not Available' | translate }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'T3 Invoice No.' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    inputLot.poNumber && inputLot.poNumber !== null
+                                        ? inputLot.poNumber
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'T2 Prod. No' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ inputLot.lotId && inputLot.lotId !== null ? inputLot.lotId : 'Not Available' }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Quantity used (In Kgs)' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    inputLot.quantity && inputLot.quantity !== null
+                                        ? inputLot.quantity
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'T2 Facility ID / Facility Name' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    inputLot.facilityName && inputLot.facilityName !== null
+                                        ? inputLot.facilityName
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Input Quantity used in UOM' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    inputLot.supplierUOMQuantity && inputLot.supplierUOMQuantity !== null
+                                        ? inputLot.supplierUOMQuantity
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Input Units in UOM' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    inputLot.supplierUOMUnit && inputLot.supplierUOMUnit !== null
+                                        ? inputLot.supplierUOMUnit
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                    </ul>
+
+                    <!-- Tier 2 Sustainable Input Lots -->
+                    <ul class="bom-info" *ngIf="tier === tiers[1]">
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Input Raw Material Lot Number' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ inputLot.lotId || ('Not Available' | translate) }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'T3 Invoice No.' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    inputLot.poNumber && inputLot.poNumber !== null
+                                        ? inputLot.poNumber
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Input Raw Material Composition' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                <span *ngFor="let comp of inputLot.materialCompositions; let isLast = last">
+                                    {{ comp.value }}% {{ comp.id }} {{ isLast ? '' : ',' }}
+                                </span>
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Input Raw Material Name' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    inputLot.productItemName && inputLot.productItemName !== null
+                                        ? inputLot.productItemName
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'Quantity Used (In Kgs): ' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{ inputLot.quantity || ('Not Available' | translate) }}
+                            </span>
+                        </li>
+                        <li class="bom-list">
+                            <span class="bom-label">
+                                {{ 'T3 Name' | translate }}
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    inputLot.facilityName && inputLot.facilityName !== null
+                                        ? inputLot.facilityName
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tier 2 Non Sustainable Input Lots -->
+                <div
+                    class="bom-validation-details"
+                    *ngIf="
+                        tier === tiers[1] &&
+                        task.productionDataView.nonSustainableInputLots &&
+                        task.productionDataView.nonSustainableInputLots.length > 0
+                    "
+                >
+                    <h3 class="bom-details-title">{{ 'Non sustainable Materials' | translate }}</h3>
+                    <ul
+                        class="bom-info"
+                        *ngFor="
+                            let nonSustainableInputLot of task.productionDataView.nonSustainableInputLots;
+                            let nonSustainableInd = index
+                        "
+                    >
+                        <li class="bom-list">
+                            <span class="bom-label text-bold">
+                                Quantity Used (In Kgs)
+                            </span>
+                            <span class="bom-colon">:</span>
+                            <span class="bom-value">
+                                {{
+                                    nonSustainableInputLot.quantityUsed && nonSustainableInputLot.quantityUsed !== null
+                                        ? nonSustainableInputLot.quantityUsed
+                                        : ('Not Available' | translate)
+                                }}
+                            </span>
+                        </li>
+                        <ng-container *ngFor="let comp of nonSustainableInputLot.materialCompositions">
+                            <li class="bom-list">
+                                <span class="bom-label">
+                                    {{ 'Input Raw Material Name' | translate }}
+                                </span>
+                                <span class="bom-colon">:</span>
+                                <span class="bom-value">
+                                    {{ comp.id }}
+                                </span>
+                            </li>
+
+                            <li class="bom-list">
+                                <span class="bom-label">
+                                    {{ 'Material Composition (%)' | translate }}
+                                </span>
+                                <span class="bom-colon">:</span>
+                                <span class="bom-value">
+                                    {{ comp.value }}
+                                </span>
+                            </li>
+                        </ng-container>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="bom-validation-block">
+                <div class="row" *ngIf="tier === tiers[1]">
+                    <div class="col-md-6">
+                        <div class="bom-validation-details">
+                            <h3 class="bom-details-title">
+                                {{ 'Data recorded in Transaction' | translate }}
+                            </h3>
+                            <ul class="bom-info">
+                                <li class="bom-list" *ngIf="task.facilityCode && task.facilityCode !== null">
+                                    <span class="bom-label">
+                                        {{ 'Facility code' | translate }}
+                                    </span>
+                                    <span class="bom-colon">:</span>
+                                    <span class="bom-value">
+                                        {{ task.facilityCode }}
+                                    </span>
+                                </li>
+                                <li
+                                    class="bom-list"
+                                    *ngIf="
+                                        task.productionDataView.realT2Code &&
+                                        task.productionDataView.realT2Code !== null
+                                    "
+                                >
+                                    <span class="bom-label">
+                                        {{ 'Real T2 code' | translate }}
+                                    </span>
+                                    <span class="bom-colon">:</span>
+                                    <span class="bom-value">
+                                        {{ task.productionDataView.realT2Code }}
+                                    </span>
+                                </li>
+                                <li
+                                    class="bom-list"
+                                    *ngIf="
+                                        task.productionDataView.umbrellaCode &&
+                                        task.productionDataView.umbrellaCode !== null
+                                    "
+                                >
+                                    <span class="bom-label">
+                                        {{ 'Umbrella code' | translate }}
+                                    </span>
+                                    <span class="bom-colon">:</span>
+                                    <span class="bom-value">
+                                        {{ task.productionDataView.umbrellaCode }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bom-validation-details">
+                            <h3 class="bom-details-title">
+                                {{ 'Data in MLM' | translate }}
+                            </h3>
+                            <ul class="bom-info">
+                                <li class="bom-list">
+                                    <span class="bom-label">
+                                        {{ 'Facility code' | translate }}
+                                    </span>
+                                    <span class="bom-colon">:</span>
+                                    <span class="bom-value">
+                                        <li
+                                            class="bom-list"
+                                            *ngFor="let factoryCode of task.productionDataView.materialFactoryCode"
+                                        >
+                                            {{ factoryCode }}
+                                        </li>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bom-validation-details">
+                            <h3 class="bom-details-title">
+                                {{ 'Quantity recorded in Transaction' | translate }}
+                            </h3>
+                            <ul class="bom-info">
+                                <li class="bom-list">
+                                    <span class="bom-label">
+                                        {{ 'Output Quantity (In Kgs)' | translate }}
+                                    </span>
+                                    <span class="bom-colon">:</span>
+                                    <span class="bom-value">
+                                        {{
+                                            task.productionDataView.outputQuantity &&
+                                            task.productionDataView.outputQuantity !== null
+                                                ? task.productionDataView.outputQuantity
+                                                : ('Not Available' | translate)
+                                        }}
+                                    </span>
+                                </li>
+                                <li class="bom-list">
+                                    <span class="bom-label">
+                                        {{ 'Total Input Quantity (In Kgs)' | translate }}
+                                    </span>
+                                    <span class="bom-colon">:</span>
+                                    <span class="bom-value">
+                                        {{
+                                            task.productionDataView.totalInpQuantity &&
+                                            task.productionDataView.totalInpQuantity !== null
+                                                ? task.productionDataView.totalInpQuantity
+                                                : ('Not Available' | translate)
+                                        }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bom Validation Table for Tier1 -->
+                <div class="row" *ngIf="tier === tiers[0]">
+                    <div class="col-md-12">
+                        <div class="bom-table-section">
+                            <p class="bom-table-article-number">
+                                <span class="bom-article-lable">
+                                    Article Number:
+                                </span>
+                                <span class="bom-article-number">{{
+                                    task.productionDataView.outputProductNumber
+                                }}</span>
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table custom-table table-striped" aria-describedby="bom-validation">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">{{ 'BOM from PLM/PDM' | translate }}</th>
+                                            <th scope="col">{{ 'T2 code in BOM' | translate }}</th>
+                                            <th scope="col">{{ 'Real T2 code in BOM' | translate }}</th>
+                                            <th scope="col">{{ 'Supplier input BOM' | translate }}</th>
+                                            <th scope="col">{{ 'Facility code' | translate }}</th>
+                                            <th scope="col">{{ 'Umbrella code' | translate }}</th>
+                                            <th scope="col">{{ 'Variance' | translate }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            *ngIf="
+                                                !task.productionDataView.bomValidationData ||
+                                                !task.productionDataView.bomValidationData.bomTableData ||
+                                                task.productionDataView.bomValidationData.bomTableData.length == 0
+                                            "
+                                        >
+                                            <p class="content-center">
+                                                {{ 'No BOM validation available!' | translate }}
+                                            </p>
+                                        </tr>
+                                        <tr
+                                            *ngFor="
+                                                let bomData of task.productionDataView.bomValidationData.bomTableData;
+                                                let bomInd = index
+                                            "
+                                        >
+                                            <td *ngIf="bomData.bomMaterialCode; else notAvailable">
+                                                {{ bomData.bomMaterialCode }}
+                                            </td>
+                                            <td *ngIf="bomData.bomFacilityCode; else notAvailable">
+                                                {{ bomData.bomFacilityCode }}
+                                            </td>
+                                            <td *ngIf="bomData.realT2Code; else notApplicable">
+                                                {{ bomData.realT2Code }}
+                                            </td>
+                                            <td *ngIf="bomData.supplierMaterialCode; else notAvailable">
+                                                {{ bomData.supplierMaterialCode }}
+                                            </td>
+                                            <td *ngIf="bomData.supplierFacilityCode; else notAvailable">
+                                                {{ bomData.supplierFacilityCode }}
+                                            </td>
+                                            <td *ngIf="bomData.umbrellaCode; else notApplicable">
+                                                {{ bomData.umbrellaCode }}
+                                            </td>
+                                            <td
+                                                *ngIf="
+                                                    bomData.variance !== null && bomData.variance !== undefined;
+                                                    else notAvailable
+                                                "
+                                            >
+                                                {{ bomData.variance }}%
+                                            </td>
+                                            <ng-template #notAvailable>
+                                                <td class="content-grey">
+                                                    {{ 'Not Available' | translate }}
+                                                </td>
+                                            </ng-template>
+                                            <ng-template #notApplicable>
+                                                <td class="content-grey">
+                                                    {{ 'Not Applicable' | translate }}
+                                                </td>
+                                            </ng-template>
+                                        </tr>
+                                        <ng-container *ngIf="task.productionDataView.bomValidationData.additionalData">
+                                            <tr>
+                                                <td colspan="7" class="text-center">
+                                                    <strong>
+                                                        {{ 'Additional BOM from supplier input' | translate }}
+                                                    </strong>
+                                                </td>
+                                            </tr>
+                                            <tr
+                                                *ngFor="
+                                                    let additionalData of task.productionDataView.bomValidationData
+                                                        .additionalData
+                                                "
+                                            >
+                                                <td colspan="3" class="text-center">
+                                                    {{
+                                                        additionalData.supplierMaterialCode ||
+                                                            ('Not Available' | translate)
+                                                    }}
+                                                    -
+                                                    {{
+                                                        additionalData.supplierFacilityCode ||
+                                                            ('Not Available' | translate)
+                                                    }}
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bom-reject-reason" *ngIf="actionType === 'View' && task.comments && task.comments !== null">
+                    <h5 class="bom-comments-title">{{ 'Rejected reason' | translate }}:</h5>
+                    <p class="yellow-box">{{ task.comments }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="button-block">
+        <div class="row" *ngIf="showActionButtons">
+            <div class="col-md-12">
+                <div class="alignment-right">
+                    <button mat-button class="reject-btn" (click)="handleRejectClick()">
+                        {{ 'Reject' | translate }}
+                    </button>
+
+                    <button mat-button class="approve-btn" (click)="handleApproveClick()">
+                        {{ 'Approve' | translate }}
+                    </button>
+                </div>
+                <!-- Alignment Right -->
+            </div>
+        </div>
+    </div>
+
+    <div class="button-block">
+        <div class="row" *ngIf="showCloseButton">
+            <div class="col-md-12">
+                <div class="alignment-right">
+                    <button mat-button class="close-btn" (click)="closeDialog()">
+                        {{ 'Close' | translate }}
+                    </button>
+                </div>
+                <!-- Alignment Right -->
+            </div>
+        </div>
+    </div>
+</div>

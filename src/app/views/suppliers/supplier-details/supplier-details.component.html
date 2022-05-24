@@ -1,0 +1,637 @@
+<div class="view-container" *ngIf="supplierProfile">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="main-container" *ngIf="!pageLoading">
+            <!-- ****** LEFT DIV ******* -->
+            <div class="row">
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 max-width-300-px">
+                    <img
+                        class="thumbnail"
+                        src="{{ supplierProfile.logoUrl || utilService.getcdnImage('no-company-logo-found.png') }}"
+                    />
+                </div>
+                <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                    <div class="row">
+                        <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                            <div class="supplier-heading" *ngIf="supplierProfile.name">
+                                {{ supplierProfile.name
+                                }}<span *ngIf="supplierProfile.referenceId">{{
+                                    '-' + supplierProfile.referenceId
+                                }}</span>
+                            </div>
+                            <div class="supplier-title pt-1" *ngIf="supplierProfile.supplierUid">
+                                {{ supplierProfile.supplierUid }}
+                            </div>
+                            <div class="description pt-2" *ngIf="checkAccess('SUPPLIER_UPDATE')">
+                                <app-inline-edit
+                                    (valueChange)="onValueChange()"
+                                    [(ngModel)]="supplierProfile.description"
+                                    [disabled]="!canEditSupplierProfile"
+                                    type="textarea"
+                                    class="supplier-description"
+                                ></app-inline-edit>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                            <div class="back-button-div">
+                                <div class="pr-0">
+                                    <a>
+                                        <button (click)="commonServices.goBack()" class="go-back-button">
+                                            {{ 'Back' | translate }}
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="star-rating">
+                                <!-- STAR RATING -->
+                                <p class="rating-heading">{{ 'Sustainability Rating' | translate }}</p>
+                                <span class="rating" *ngFor="let star of ratings">
+                                    <span
+                                        *ngIf="star === 5"
+                                        [attr.title]="env.star_rating['5']"
+                                        class="fa fa-star checked"
+                                    ></span>
+                                    <span
+                                        *ngIf="star === 4"
+                                        [attr.title]="env.star_rating['4']"
+                                        class="fa fa-star checked"
+                                    ></span>
+                                    <span
+                                        *ngIf="star === 3"
+                                        [attr.title]="env.star_rating['3']"
+                                        class="fa fa-star checked"
+                                    ></span>
+                                    <span
+                                        *ngIf="star === 2"
+                                        [attr.title]="env.star_rating['2']"
+                                        class="fa fa-star checked"
+                                    ></span>
+                                    <span
+                                        *ngIf="star === 1"
+                                        [attr.title]="env.star_rating['1']"
+                                        class="fa fa-star checked"
+                                    ></span>
+                                    <span *ngIf="star === 0" class="fa fa-star not-checked"></span>
+                                </span>
+                            </div>
+                            <!---->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-1">
+                            <div class="supplier-stats">
+                                <div class="flex-container">
+                                    <div class="male">
+                                        <p class="male-numbers">{{ supplierProfile.employeeCount.men || 0 }}</p>
+                                        <p class="male-title">{{ 'Male Employees' | translate }}</p>
+                                    </div>
+                                    <div class="female">
+                                        <p class="female-numbers">{{ supplierProfile.employeeCount.women || 0 }}</p>
+                                        <p class="female-title">{{ 'Female Employees' | translate }}</p>
+                                    </div>
+                                    <div class="years of">
+                                        <p class="yor-numbers" *ngIf="supplierProfile.associatedSince; else noData">
+                                            {{ supplierProfile.associatedSince | date: 'yyyy' }}
+                                        </p>
+                                        <ng-template #noData>
+                                            <p class="yor-numbers">{{ 'No Data' | translate }}</p>
+                                        </ng-template>
+                                        <p class="yor-title">{{ 'Supplier since' | translate }}</p>
+                                    </div>
+                                    <div class="assessments">
+                                        <p class="assessment-numbers">{{ supplierProfile.numberOfAssessments || 0 }}</p>
+                                        <p class="assessment-title">{{ 'Assessments' | translate }}</p>
+                                    </div>
+                                    <!-- <div class="orders placed">
+                                        <p class="op-numbers">{{ supplierProfile.numberOfOrders || 0 }}</p>
+                                        <p class="op-title">{{ 'Orders Placed' | translate }}</p>
+                                    </div>
+                                    <div class="styles">
+                                        <p class="style-numbers">{{ supplierProfile.numberOfStyles || 0 }}</p>
+                                        <p class="style-title">{{ 'Styles' | translate }}</p>
+                                    </div> -->
+                                    <div class="traceability">
+                                        <p class="traceability-numbers">{{ supplierProfile.numberOfTRs || 0 }}</p>
+                                        <p class="traceability-title">{{ 'Traceability' | translate }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <div class="row pl-1">
+                <form class="toby">
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-2">
+                        <div
+                            class="form-group bottom cursor-default"
+                            [ngClass]="{ selected: supplierProfileType === supplierProfileTypes[0] }"
+                            (click)="changeSupplierProfileType(supplierProfileTypes[0])"
+                        >
+                            <label class="cursor-pointer">
+                                <div>{{ supplierProfileTypes[0] | translate }}</div>
+                                <div [ngClass]="{ selected: supplierProfileType === supplierProfileTypes[0] }"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-3" *ngIf="!pageLoading && additionalInfo.length > 0">
+                        <div
+                            class="form-group bottom cursor-default"
+                            [ngClass]="{ selected: supplierProfileType === supplierProfileTypes[1] }"
+                            (click)="changeSupplierProfileType(supplierProfileTypes[1])"
+                        >
+                            <label class="cursor-pointer">
+                                <div>{{ supplierProfileTypes[1] | translate }}</div>
+                                <div [ngClass]="{ selected: supplierProfileType === supplierProfileTypes[1] }"></div>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div> -->
+
+            <div class="row pl-2 tab-group-wrapper mat-tab-view-page">
+                <mat-tab-group mat-stretch-tabs class="toby">
+                    <mat-tab class="col-xs-3 col-sm-3 col-md-3 col-lg-2" *ngFor="let tab of supplierProfileTypes">
+                        <ng-template mat-tab-label>
+                            <div
+                                class="form-group bottom cursor-default"
+                                [ngClass]="{ selected: supplierProfileType === tab }"
+                                (click)="changeSupplierProfileType(tab)"
+                            >
+                                <label class="cursor-pointer">{{ tab | translate }}</label>
+                                <div [ngClass]="{ selected: supplierProfileType === tab }"></div>
+                            </div>
+                        </ng-template>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+
+            <div class="row text-color-primary" *ngIf="supplierProfileType === supplierProfileTypes[0]">
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    <!-- LOCATION DETAILS -->
+                    <app-address [address]="address" [formMode]="editAddress" [editVisible]="editVisible"></app-address>
+
+                    <!-- LOCATION DETAILS ENDS -->
+
+                    <!-- CONTACT DETAILS SECTION -->
+                    <app-contact-info
+                        [contact]="contact"
+                        (contactValueChange)="onValueChange($event, 'CONTACT')"
+                        [formMode]="editContactInfo"
+                        [showEditIcon]="auth.haveAccess('SUPPLIER_UPDATE')"
+                    >
+                    </app-contact-info>
+                    <!-- CONTACT DETAILS ENDS -->
+
+                    <!-- **USER DIV** -->
+                    <!-- <div class="hr-container" *ngIf="checkAccess('USER_LIST_READ')">
+                        <div class="hr">
+                            <span class="hr-title">{{ 'USERS' | translate }} ({{ userCount }})</span>
+                        </div>
+                    </div> 
+                    <div class="users-lists" *ngIf="checkAccess('USER_LIST_READ')">
+                        <div class="facilities-div" *ngFor="let user of users">
+                            <div class="table-card cursorp">
+                                <div class="table-card-left ">
+                                    <div class="supplier-name">{{ user.first_name }} {{ user.last_name }}</div>
+                                    <div>{{ user.email }}</div>
+                                    <strong *ngFor="let group of user.groups; let isLast = last">
+                                        {{ group.name }}{{ isLast ? '' : ',' }}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="noFacilitesData" *ngIf="!users || users.length === 0">
+                            <p>
+                                {{ 'No Users Available' | translate }}
+                            </p>
+                        </div>
+                    </div>-->
+                    <!-- **USER DIV ENDS** -->
+
+                    <!-- **FACILITIES DIV** -->
+                    <div class="hr-container">
+                        <div class="hr">
+                            <span class="hr-title">{{ 'FACILITIES' | translate }} ({{ facilityCount }})</span>
+                        </div>
+                    </div>
+                    <div class="facilities-lists">
+                        <div class="facilities-div" *ngFor="let facility of supplierProfile.facilities">
+                            <div
+                                class="table-card cursorp"
+                                (click)="canEditSupplierProfile && navigateToFacilitiesView(facility.id)"
+                            >
+                                <div class="table-card-left ">
+                                    <p class="supplier-name">
+                                        {{ facility.name
+                                        }}<span *ngIf="facility.referenceId">{{ '-' + facility.referenceId }}</span>
+                                    </p>
+                                    <p>
+                                        <span
+                                            >{{ 'Production Capacity' | translate }}:
+                                            {{ facility.productionCapacity || ('Not Available' | translate) }}</span
+                                        >
+                                    </p>
+                                    <p>{{ facility.address?.country }}</p>
+                                </div>
+                                <div class="table-card-right flex-column talign-right" *ngIf="facility.address">
+                                    <div
+                                        class="flag-icon flag-icon-{{
+                                            getCountryCode(facility.address.country)
+                                        }} action-item align-self-flex-end"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="noFacilitesData"
+                            *ngIf="supplierProfile.facilities === undefined || supplierProfile.facilities.length === 0"
+                        >
+                            <p>
+                                {{ 'No Facilities Available' | translate }}
+                            </p>
+                        </div>
+                        <!-- **FACILITIES DIV ENDS** -->
+                    </div>
+
+                    <!-- **SUB-SUPPLIER DIV** -->
+                    <div class="hr-container" *ngIf="auth.haveAccess('SUB_SUPPLIER_READ')">
+                        <div class="hr">
+                            <span class="hr-title">{{ 'SUB-SUPPLIERS' | translate }} ({{ subsupplierCount }})</span>
+                        </div>
+                    </div>
+                    <div class="facilities-lists sub-supliers-lists" *ngIf="auth.haveAccess('SUB_SUPPLIER_READ')">
+                        <div class="sub-suppliers-div" *ngFor="let supplier of subsupplierList">
+                            <div class="table-card cursorp" [routerLink]="['/', 'suppliers', supplier.id]">
+                                <div class="table-card-left ">
+                                    <p class="supplier-name">
+                                        {{ supplier.name }}
+                                    </p>
+                                    <p>
+                                        <span> {{ supplier?.contact_email }}</span>
+                                    </p>
+                                    <p>{{ supplier?.contact_phone_no }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="noFacilitesData"
+                            *ngIf="supplierProfile.facilities === undefined || supplierProfile.facilities.length === 0"
+                        >
+                            <p>
+                                {{ 'No Facilities Available' | translate }}
+                            </p>
+                        </div>
+                        <!-- **FACILITIES DIV ENDS** -->
+                    </div>
+                </div>
+                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ml-3">
+                    <!-- **VALUE PROCESS DIV** -->
+                    <div class="vp-mt-cert-container">
+                        <!-- VP DETAILS -->
+                        <div class="hr">
+                            <span class="hr-title">{{ 'VALUE PROCESS' | translate }}</span>
+                        </div>
+                        <!-- VP EDITABLE INPUT -->
+                        <div class="no-vp-mat-data" *ngIf="supplierProfile.valueProcess.length === 0">
+                            <p>{{ 'No Value Process Available' | translate }}</p>
+                        </div>
+                        <div class="mt-3" id="profile-chip-list">
+                            <mat-chip-list>
+                                <mat-chip
+                                    class="chip-style"
+                                    *ngFor="
+                                        let vp of localeService.getDisplayTextForList(supplierProfile.valueProcess)
+                                            | sortByFilter
+                                    "
+                                    >{{ vp }}</mat-chip
+                                >
+                            </mat-chip-list>
+                        </div>
+                        <!-- VP DETAILS ENDS -->
+
+                        <!-- MATERIALS DETAILS -->
+                        <div class="materials-container">
+                            <div class="hr">
+                                <span class="hr-title">{{ 'MATERIALS' | industry | translate }}</span>
+                            </div>
+                            <!-- MT EDITABLE INPUT -->
+                            <div class="mt-3" id="profile-chip-list">
+                                <div class="no-vp-mat-data" *ngIf="supplierProfile.materials.length === 0">
+                                    <p>{{ 'No Materials Available' | industry | translate }}</p>
+                                </div>
+                                <mat-chip-list>
+                                    <mat-chip
+                                        class="chip-style"
+                                        *ngFor="
+                                            let material of localeService.getDisplayTextForList(
+                                                supplierProfile.materials
+                                            ) | sortByFilter
+                                        "
+                                        >{{ material }}</mat-chip
+                                    >
+                                </mat-chip-list>
+                            </div>
+                        </div>
+                        <!-- MATERIALS DETAILS ENDS -->
+                        <div class="article-container">
+                            <div class="hr">
+                                <span class="hr-title">{{ 'ARTICLES ASSOCIATED' | industry | translate }}</span>
+                            </div>
+                            <div class="mt-3" id="profile-chip-list">
+                                <div class="no-vp-mat-data" *ngIf="supplierProfile.articlesAssociated.length === 0">
+                                    <p>{{ 'No Articles Available' | translate }}</p>
+                                </div>
+                                <mat-chip-list>
+                                    <mat-chip
+                                        class="chip-style"
+                                        *ngFor="let articleId of supplierProfile.articlesAssociated"
+                                    >
+                                        {{ localeService.getDisplayText(articleId) }}</mat-chip
+                                    >
+                                </mat-chip-list>
+                            </div>
+                        </div>
+
+                        <!-- CERT DETAILS -->
+                        <div class="certifications-container">
+                            <div class="hr">
+                                <span class="hr-title">{{ 'CERTIFICATIONS' | translate }}</span>
+                            </div>
+                            <div class="standardsContainer" style="border:none;">
+                                <p class="noMaterials pt-1" *ngIf="standards?.length <= 0">
+                                    {{ 'No Standards' | translate }} &amp;
+                                    {{ 'Certifications' | translate }}
+                                </p>
+                                <div class="row" *ngIf="standards?.length > 0">
+                                    <div
+                                        class="col-md-2 standardsImageContainer"
+                                        *ngFor="let standard of standards; let i = index"
+                                    >
+                                        <div
+                                            class="certificate-item"
+                                            [tooltip]="certificateTooltipContent"
+                                            data-placement="top"
+                                            (click)="
+                                                canEditSupplierProfile &&
+                                                    downloadCertificate(standard.id, standard.uploadedFiles[0])
+                                            "
+                                            containerClass="certificateTooltip"
+                                            container="body"
+                                        >
+                                            <img
+                                                src="{{ utilService.getStandardImageUrl(standard.typeId) }}"
+                                                (error)="utilService.getDefaultCertificateImage($event.target)"
+                                                alt="Certificate Image"
+                                            />
+                                            <div class="overlay-download-icon">
+                                                <img
+                                                    src="{{ env.IMG_URL }}images/icon-download-white.png"
+                                                    alt="Download Certificate"
+                                                />
+                                            </div>
+                                            <div class="download-icon placement-bottom-right">
+                                                <img
+                                                    src="{{ env.IMG_URL }}images/icon-download-grey.png"
+                                                    alt="Download Certificate"
+                                                />
+                                            </div>
+                                        </div>
+                                        <ng-template #certificateTooltipContent>
+                                            <div
+                                                class="text-left"
+                                                style="background-color: #fff; border: 1px solid #f5f5f5;"
+                                            >
+                                                <h5 class="tt-font">{{ getCertificateNameById(standard.typeId) }}</h5>
+                                                <h5 class="tt-font tt-font-regular" *ngIf="standard.expiryDate">
+                                                    {{ 'Validity' | translate }}:
+                                                    <span style="font-weight: bold !important;">{{
+                                                        standard.expiryDate | date
+                                                    }}</span>
+                                                </h5>
+                                                <h5 class="tt-font tt-font-regular" *ngIf="standard.body">
+                                                    {{ 'Certification Body' | translate }}:
+                                                    <span style="font-weight: bold !important;">{{
+                                                        standard.body
+                                                    }}</span>
+                                                </h5>
+                                                <h5 class="tt-font tt-font-regular" *ngIf="standard.facilityName">
+                                                    {{ 'Facility Name' | translate }}:
+                                                    <span style="font-weight: bold !important;">{{
+                                                        standard.facilityName
+                                                    }}</span>
+                                                </h5>
+                                            </div>
+                                        </ng-template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- CERT DETAILS ENDS -->
+
+                        <!-- 3P - API - Reference key -->
+                        <div class="article-container" *ngIf="false">
+                            <div class="hr">
+                                <span class="hr-title">{{ 'API Reference ID' | translate }}:</span>
+                            </div>
+                            <div class="mt-1">
+                                <app-ref-id [apiReferenceId]="refId"></app-ref-id>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- **TODO DIV** -->
+                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ml-3">
+                    <div class="todo-list-div">
+                        <app-todo-task
+                            *ngIf="checkAccess('SUPPLIER_UPDATE')"
+                            [todoTask]="todoTask"
+                            [supplierId]="supplierId"
+                            [analyticsPageOrigin]="analyticsPageOrigin"
+                            [canEditSupplierProfile]="canEditSupplierProfile"
+                        ></app-todo-task>
+                    </div>
+                    <!-- **TODO DIV ENDS** -->
+                </div>
+                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ml-3">
+                    <div class="style-associated-container">
+                        <div class="hr">
+                            <span class="hr-title"
+                                >{{ 'Styles Associated' | industry | translate }} ({{ styleCount }})</span
+                            >
+                        </div>
+                        <div class="no-vp-mat-data" *ngIf="productsList.length === 0">
+                            {{ 'No Styles Available' | industry | translate }}
+                        </div>
+                        <div
+                            class="table-responsive"
+                            infiniteScroll
+                            [infiniteScrollDistance]="0"
+                            (scrolled)="onAssociatedStyleScroll()"
+                            [scrollWindow]="false"
+                            [infiniteScrollDisabled]="disableStyleInfiniteScroll"
+                        >
+                            <div
+                                class="table-card cursorp"
+                                *ngFor="let style of productsList"
+                                (click)="
+                                    canEditSupplierProfile &&
+                                        commonServices.navigateToUrlWithLocationBack(['/', 'styles', style.id])
+                                "
+                            >
+                                <div class="table-card-left flex-column width-percentage-50">
+                                    <div>
+                                        <div class="title blue-title">
+                                            {{ style.name }}
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ style.season.value }} &nbsp; {{ style.year }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-card-right flex-column width-percentage-50">
+                                    <div class="desc blue-desc talign-right">
+                                        {{ 'Material Composition' | industry | translate }}:
+                                    </div>
+                                    <div class="title blue-title align-self-flex-end talign-right">
+                                        <span *ngFor="let pdt of style.material_composition; let isLast = last">
+                                            {{ pdt.value }}&nbsp;{{ pdt.composition + '%' }}{{ isLast ? '' : ' + ' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="raw-material-container">
+                        <div class="hr">
+                            <span class="hr-title">{{ 'RAW-MATERIALS' | industry | translate }} ({{ mlCount }})</span>
+                        </div>
+                        <div class="no-vp-mat-data" *ngIf="materialsList.length === 0">
+                            {{ 'No Raw-Materials Available' | translate }}
+                        </div>
+                        <div
+                            class="table-responsive"
+                            infiniteScroll
+                            [infiniteScrollDistance]="0"
+                            (scrolled)="onAssociatedMLScroll()"
+                            [scrollWindow]="false"
+                            [infiniteScrollDisabled]="disableMLInfiniteScroll"
+                        >
+                            <div
+                                class="table-card cursorp"
+                                *ngFor="let mlList of materialsList"
+                                (click)="
+                                    canEditSupplierProfile &&
+                                        commonServices.navigateToUrlWithLocationBack([
+                                            '/',
+                                            'material-library',
+                                            mlList.id
+                                        ])
+                                "
+                            >
+                                <div class="table-card-left flex-column width-percentage-50">
+                                    <div class="desc blue-desc">
+                                        {{ 'Name' | translate }} & {{ 'Number' | translate }}:
+                                        <span class="title blue-title">
+                                            {{ mlList.internal_article_name }}{{ mlList.internal_article_number }}
+                                        </span>
+                                    </div>
+                                    <div class="desc blue-desc">
+                                        {{ 'Season' | translate }} & {{ 'Year' | translate }}:
+                                        <span class="title blue-title">
+                                            {{ mlList.season.value }}-{{ mlList.year }}
+                                        </span>
+                                    </div>
+                                    <div class="desc blue-desc">
+                                        {{ 'Type' | translate }}:
+                                        <span class="title blue-title">{{ mlList.product_type.value }}</span>
+                                    </div>
+                                </div>
+                                <div class="table-card-right flex-column width-percentage-50">
+                                    <div class="desc blue-desc talign-right">
+                                        {{ 'Material Composition' | industry | translate }}:
+                                    </div>
+                                    <div class="title blue-title align-self-flex-end talign-right">
+                                        <span *ngFor="let comp of mlList.material_composition; let isLast = last"
+                                            >{{ comp.value }} {{ comp.composition }}%<span *ngIf="!isLast"
+                                                >,</span
+                                            ></span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="audit-container">
+                        <div class="hr">
+                            <span class="hr-title">{{ 'AUDITS' | translate }} ({{ auditCount }})</span>
+                        </div>
+                        <div class="no-data" *ngIf="audits.length === 0">
+                            {{ 'No Audit Available' | translate }}
+                        </div>
+                    </div>
+                    <div class="audit-table">
+                        <div
+                            class="table-card cursorp"
+                            *ngFor="let audit of audits"
+                            (click)="
+                                canEditSupplierProfile &&
+                                    commonServices.navigateToUrlWithLocationBack([
+                                        '/',
+                                        'assessment-audit',
+                                        audit.auditId
+                                    ])
+                            "
+                        >
+                            <div class="table-card-left">
+                                <div class="desc blue-desc">
+                                    <span class="title blue-title">
+                                        {{ audit.auditName }}
+                                    </span>
+                                </div>
+                                <div class="desc blue-desc">
+                                    {{ 'Audit Standard' | translate }}:
+                                    <span class="title blue-title">
+                                        {{ audit.auditStandard }}
+                                    </span>
+                                </div>
+                                <div class="desc blue-desc">
+                                    {{ 'Validity' | translate }}:
+                                    <span class="title blue-title">{{
+                                        moment(audit.validity).format('DD MMM YYYY')
+                                    }}</span>
+                                </div>
+                                <div class="desc blue-desc">
+                                    {{ 'Facility' | translate }}:
+                                    <span class="title blue-title">{{ audit.facilityName }}</span>
+                                </div>
+                            </div>
+                            <div class="table-card-left flex-column"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row text-color-primary" *ngIf="supplierProfileType !== supplierProfileTypes[0]">
+                <div class="col-md-12" *ngIf="!isFetchingAdditionalInfo">
+                    <div class="supplier-additional-info">
+                        <app-additional-information
+                            [entityId]="supplierId"
+                            [entity]="entity"
+                            [entityData]="additionalInfo"
+                            [fieldResponse]="fieldResponse"
+                            [canShowEditIcon]="canEditSupplierProfile && checkAccess('SUPPLIER_UPDATE')"
+                            (saveAdditionalInfo)="onSaveAdditionalInfo($event)"
+                        >
+                        </app-additional-information>
+                    </div>
+                </div>
+                <!-- <i class="fa fa-spinner fa-spin ec-loader" *ngIf="isFetchingAdditionalInfo"></i> -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,267 @@
+<ng-container [formGroup]="productForm" *ngIf="isLoaded">
+    <td>
+        <app-tt-icon-image [status]="product.status"></app-tt-icon-image>
+    </td>
+
+    <td>
+        <mat-checkbox
+            *ngIf="!this.isSimulation"
+            formControlName="isSelected"
+            matTooltip="{{ (product.status === 'SUBMITTED' ? 'Already submitted' : '') | translate }}"
+            (change)="trackProductSelection()"
+            [ngClass]="{ 'opacity-5': product.status === 'SUBMITTED' }"
+            (click)="productSelect()"
+            [attr.data-cy]="index + '-check-box'"
+        >
+        </mat-checkbox>
+        <span
+            class="view-icon"
+            *ngIf="isBrandSupplier && !this.isSimulation"
+            [attr.data-cy]="index + '-view-score-button'"
+            (click)="navigateToProductDetailPage(product.productId, product.productName)"
+        >
+            <img
+                src="{{ env.IMG_URL }}images/view-document.png"
+                alt="view_Score"
+                matTooltip="{{ 'View score' | translate }}"
+            />
+        </span>
+        <span
+            class="score-unavailable-api-icon"
+            *ngIf="!product.showApiScore && !this.isSimulation"
+            [attr.data-cy]="index + '-score-deactivated'"
+        >
+            <img
+                src="{{ env.IMG_URL }}images/score-deactivated.png"
+                alt="Score-deactivated"
+                matTooltip="{{ 'Scoring unavailable for API' | translate }}"
+            />
+        </span>
+    </td>
+
+    <td>
+        <div class="product-details">
+            <div class="product-details-item">
+                <p>{{ product.productName }}</p>
+                <p class="product-detail-block">
+                    <span *ngIf="product?.productNumber">{{ 'EAN' | translate }}:</span>
+                    <span *ngIf="product?.productNumber" class="{{ product?.productNumber ? '' : 'content-grey' }}">
+                        {{ (product?.productNumber ? product?.productNumber : 'Not Available') | translate }}
+                    </span>
+                </p>
+                <p class="product-detail-block">
+                    <span *ngIf="product?.itemNumber">{{ 'Item No.' | translate }} :</span>
+                    <span *ngIf="product?.itemNumber" class="{{ product?.itemNumber ? '' : 'content-grey' }}">
+                        {{ (product?.itemNumber ? product?.itemNumber : 'Not Available') | translate }}
+                    </span>
+                </p>
+                <p class="product-detail-block">
+                    <span *ngIf="product?.pluNumber">{{ 'PLU' | translate }}:</span>
+                    <span *ngIf="product?.pluNumber" class="{{ product?.pluNumber ? '' : 'content-grey' }}">
+                        {{ (product?.pluNumber ? product?.pluNumber : 'Not Available') | translate }}
+                    </span>
+                </p>
+                <p class="product-detail-block" *ngFor="let customField of customFieldDisplayList">
+                    <span *ngIf="isCustomFieldValueExists(product, customField.id)"
+                        >{{ customField.name | translate }}:</span
+                    >
+                    <span *ngIf="isCustomFieldValueExists(product, customField.id)">
+                        {{ product.customFields[customField.id][0] }}
+                    </span>
+                </p>
+                <span class="text-gray product-detail-block" *ngIf="!isSimulation">
+                    {{ 'Last Modified by' | translate }} {{ product.lastModifiedBy }} on
+                    {{ product.updateTs | date: 'dd MMM, yyyy' }}
+                </span>
+            </div>
+        </div>
+    </td>
+
+    <ng-container *ngFor="let formControl of product.productTaskViewData">
+        <ng-container [ngSwitch]="formControl.fieldTypeInfo">
+            <ng-container *ngSwitchCase="'FORM_CONTROL'">
+                <td *ngIf="formControl.fieldType">
+                    <div class="table-body-filter" [attr.data-cy]="index + '-' + formControl.id">
+                        <app-product-template
+                            class="application-product-template"
+                            [inputType]="formControl.fieldType"
+                            [control]="formControl"
+                            [isInValid]="
+                                !(
+                                    !(this.productForm.getRawValue().isSelected || isSimulation) ||
+                                    !isHavingError([formControl.id])
+                                )
+                            "
+                            [formControlName]="formControl.id"
+                            (click)="selectedFieldPath = { formControl: formControl.id }"
+                        >
+                        </app-product-template>
+                        <mat-error *ngIf="!(!this.productForm.value.isSelected || !isHavingError([formControl.id]))">{{
+                            formControl.label + ('is required' | translate)
+                        }}</mat-error>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'FORM_ARRAY'">
+                <!-- ARRAY -->
+
+                <td colspan="4" class="split-group">
+                    <div class="table-body-filter-block">
+                        <div
+                            class="row mb-2"
+                            [ngClass]="{ noFormArrayData: !formControl?.productTaskMetaData?.length }"
+                        >
+                            <div class="col-md-{{ !formControl?.productTaskMetaData?.length ? 12 : 9 }}">
+                                <div class="instructions-text">
+                                    <button
+                                        [attr.data-cy]="index + '-instruction-text'"
+                                        class="button-no-styles text-center width-20-px"
+                                        (click)="openInstructionModal()"
+                                    >
+                                        <i class="fa fa-info-circle text-color-primary" aria-hidden="true"></i>
+                                    </button>
+                                    <span
+                                        [ngClass]="{
+                                            'color-red':
+                                                formControl?.productTaskMetaData?.length === 0 &&
+                                                (this.productForm.getRawValue().isSelected || isSimulation)
+                                        }"
+                                        >{{ getHintText(formControl?.productTaskMetaData?.length) | translate }}</span
+                                    >
+                                </div>
+                            </div>
+                            <div
+                                [attr.data-cy]="index + '-add-ingredient'"
+                                class="col-md-{{
+                                    !formControl?.productTaskMetaData?.length ? 12 : 3
+                                }} addNewFormArrayItemBtn"
+                            >
+                                <button class="button-no-styles" (click)="addIngredient(formControl.id)">
+                                    <span class="fa fa-plus mr-1"></span>
+                                    <span class="text-color-primary"
+                                        >{{ 'Add new ingredient' | translate
+                                        }}<span
+                                            *ngIf="this.productForm.get(formControl.id).controls.length === 0"
+                                            class="color-red"
+                                        >
+                                            *</span
+                                        ></span
+                                    >
+                                </button>
+                            </div>
+                        </div>
+                        <tbody>
+                            <tr
+                                *ngFor="let arrayGroup of this.productForm.get(formControl.id)?.controls; let i = index"
+                                [formGroup]="arrayGroup"
+                            >
+                                <td class="width-auto">
+                                    <div
+                                        [attr.data-cy]="index + '-' + i + '-rearrange-ingredient'"
+                                        class="move-icon"
+                                        (click)="
+                                            reArrangeIngredientOrder(
+                                                i,
+                                                i - 1 < 0
+                                                    ? this.productForm.get(formControl.id)?.controls.length - 1
+                                                    : i - 1,
+                                                formControl.id
+                                            )
+                                        "
+                                        matTooltip="{{
+                                            getOrderValue(
+                                                i - 1 < 0 ? this.productForm.get(formControl.id)?.controls.length : i
+                                            ) | translate
+                                        }} "
+                                    >
+                                        <mat-icon>arrow_upward</mat-icon>
+                                    </div>
+                                </td>
+                                <!-- GROUP -->
+                                <td
+                                    *ngFor="let fg_item of formControl.productTaskMetaData[i]?.productTaskMetaData"
+                                    [formGroupName]="formControl.productTaskMetaData[i]?.id"
+                                >
+                                    <!-- control -->
+
+                                    <div
+                                        class="table-body-filter"
+                                        *ngIf="!fg_item?.displayValueAlone; else display_value"
+                                        [attr.data-cy]="index + '-' + i + '-' + fg_item.label"
+                                    >
+                                        <app-product-template
+                                            class="application-product-template"
+                                            [inputType]="fg_item?.fieldType"
+                                            [control]="fg_item"
+                                            [isInValid]="
+                                                !(
+                                                    !(this.productForm.getRawValue().isSelected || isSimulation) ||
+                                                    !isHavingError([
+                                                        formControl.id,
+                                                        i.toString(),
+                                                        formControl.productTaskMetaData[i].id,
+                                                        fg_item.id
+                                                    ])
+                                                )
+                                            "
+                                            [formControlName]="fg_item.id"
+                                            (inputModelClosed)="onOpenDuplicatePrompt($event)"
+                                            [disableSelection]="
+                                                isUnknownIngredient(
+                                                    formControl.id,
+                                                    formControl.productTaskMetaData[i].id,
+                                                    fg_item.id
+                                                )
+                                            "
+                                            disabledMessage="Please select Ingredient first!"
+                                            (click)="
+                                                selectedFieldPath = {
+                                                    formControl: formControl.id,
+                                                    index: i,
+                                                    groupId: formControl.productTaskMetaData[i].id,
+                                                    g_formControl: fg_item.id,
+                                                    isDuplicated: formControl.productTaskMetaData[i].duplicated
+                                                }
+                                            "
+                                        >
+                                        </app-product-template>
+
+                                        <mat-error
+                                            *ngIf="
+                                                !(
+                                                    !this.productForm.value.isSelected ||
+                                                    !this.isHavingError([
+                                                        formControl.id,
+                                                        i.toString(),
+                                                        formControl.productTaskMetaData[i].id,
+                                                        fg_item.id
+                                                    ])
+                                                )
+                                            "
+                                            >{{ fg_item.label + ' is required' }}</mat-error
+                                        >
+                                    </div>
+                                    <ng-template #display_value>
+                                        <p class="product-value">{{ fg_item?.label | translate }}</p>
+                                    </ng-template>
+                                </td>
+                                <td>
+                                    <div
+                                        matTooltip="{{ 'Delete' | translate }}"
+                                        class="delete-icon"
+                                        [attr.data-cy]="index + '-' + i + '-delete-ingredient'"
+                                        (click)="deleteIngredient(i, formControl.id)"
+                                    >
+                                        <img src="{{ env.IMG_URL }}images/delete-icon.png" alt="Delete Ingredient" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </div>
+                </td>
+            </ng-container>
+            <div *ngSwitchDefault>{{ 'Invalid control type' | translate }}</div>
+        </ng-container>
+    </ng-container>
+</ng-container>

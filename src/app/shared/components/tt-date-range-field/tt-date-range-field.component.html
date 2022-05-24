@@ -1,0 +1,97 @@
+<div class="tt-date-filter-container">
+    <button ngClass="menu-filter-item-button" type="button" mat-button (click)="dateSelect.open()">
+        <strong class="menu-filter-item-title" *ngIf="!selectedValue">{{ label }}</strong>
+        <strong class="menu-filter-item-title" *ngIf="selectedValue">
+            {{ startDate | date: 'dd-MMM-yyyy' }} {{ 'to' | translate }} {{ endDate | date: 'dd-MMM-yyyy' }}
+        </strong>
+        <mat-icon>keyboard_arrow_down</mat-icon>
+    </button>
+    <form [formGroup]="dateFormGroup">
+        <mat-select #dateSelect multiple (openedChange)="handleDropdownToggle($event)">
+            <div class="tt-date-filter-section">
+                <div class="options-list">
+                    <mat-option class="mat-option-date-filter-section">
+                        <div class="radio-block">
+                            <mat-radio-group
+                                aria-label="Select an option"
+                                [(ngModel)]="selectedValue"
+                                formControlName="selectedValue"
+                                (change)="handleDateFilterTypeChange($event)"
+                                name="choose-date-range"
+                                required
+                            >
+                                <mat-radio-button
+                                    *ngFor="let dateRange of dateRanges; let ind = index"
+                                    [value]="dateRanges[ind]"
+                                    [disabled]="disableInputFields"
+                                >
+                                    {{ dateRanges[ind].value }}
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                        <!-- Radio Block -->
+                    </mat-option>
+                    <mat-option class="mat-option-date-filter-section">
+                        <div class="start-date">
+                            <mat-label class="mat-label">{{ 'Start Date' | translate }}</mat-label>
+                            <input
+                                matInput
+                                [matDatepicker]="startDateCtrl"
+                                [placeholder]="'Enter Start Date' | translate"
+                                [(ngModel)]="startDate"
+                                name="choose-start-date-range"
+                                [disabled]="disableInputFields"
+                                formControlName="startDate"
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="startDateCtrl" [disabled]="disableInputFields">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #startDateCtrl [disabled]="disableInputFields"></mat-datepicker>
+                        </div>
+                        <!-- Start Date -->
+                    </mat-option>
+                    <mat-option class="mat-option-date-filter-section">
+                        <div class="end-date">
+                            <mat-label class="mat-label">{{ 'End Date' | translate }}</mat-label>
+                            <input
+                                matInput
+                                [matDatepicker]="endDateCtrl"
+                                [placeholder]="'Enter End Date' | translate"
+                                [(ngModel)]="endDate"
+                                name="choose-end-date-range"
+                                [disabled]="disableInputFields"
+                                formControlName="endDate"
+                            />
+                            <mat-datepicker-toggle matSuffix [for]="endDateCtrl" [disabled]="disableInputFields">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #endDateCtrl [disabled]="disableInputFields"></mat-datepicker>
+                        </div>
+                        <!-- End Date -->
+                    </mat-option>
+                </div>
+                <!-- Options List -->
+                <div class="button-block">
+                    <button
+                        mat-button
+                        class="btn-group btn-bordered"
+                        data-cy="dropdown-clear-all-btn"
+                        *ngIf="showClearAll"
+                    >
+                        {{ 'Clear All' | translate }}
+                    </button>
+                    <button
+                        mat-button
+                        class="btn-group btn-secondary-green"
+                        data-cy="dropdown-select-all-btn"
+                        [disabled]="disableApply()"
+                        (click)="dateSelect.close()"
+                    >
+                        {{ 'Apply' | translate }}
+                    </button>
+                </div>
+                <!-- Button Block -->
+            </div>
+            <!-- TT Date Filter Section -->
+        </mat-select>
+    </form>
+</div>
+<!-- TT Date Filter Container -->

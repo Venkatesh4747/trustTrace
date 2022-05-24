@@ -1,0 +1,287 @@
+<div id="record-transactions-categories-v2" class="material-input-style-box-type">
+    <div id="production-transactions">
+        <div class="row pb-2">
+            <div class="hr mr-2">
+                <span class="hr-title">{{ 'Production' | translate }} </span>
+            </div>
+        </div>
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div *ngIf="!pageLoading">
+            <form #createProductionForm="ngForm" class="material-form-input">
+                <div class="row">
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 pr-2">
+                        <div class="row">
+                            <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{ 'Style Name & Number' | translate }}:"
+                                        name="StyleNameNumber"
+                                        [(ngModel)]="styleSearchText"
+                                        (keyup)="searchStyle($event)"
+                                        (blur)="validateSelectedStyle()"
+                                        matInput
+                                        [matAutocomplete]="stylesAuto"
+                                        required
+                                        data-cy="production-transaction-style-name-number"
+                                    />
+                                    <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                        soaSearchHintText | translate
+                                    }}</mat-hint>
+
+                                    <mat-autocomplete
+                                        #stylesAuto="matAutocomplete"
+                                        [displayWith]="getSOADisplayName"
+                                        (optionSelected)="onStyleSelection($event.option.value)"
+                                    >
+                                        <mat-option *ngFor="let item of config.SOA_search" [value]="item">
+                                            {{ item?.code }}-{{ item?.name }}-{{ item?.year }}-{{ item?.season?.value }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="row pt-2">
+                            <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="{{ 'Production Lot ID' | translate }}:"
+                                        name="NewReferenceId"
+                                        #referenceId
+                                        [(ngModel)]="transaction.productionData.outputLotId"
+                                        matInput
+                                        required
+                                        data-cy="production-transaction-new-reference-id"
+                                    />
+                                </mat-form-field>
+                            </div>
+                            <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        matInput
+                                        type="number"
+                                        name="outputQuantity"
+                                        placeholder="{{ 'Production Quantity (in Kgs)' | translate }}:"
+                                        [(ngModel)]="transaction.productionData.outputQuantity.quantity"
+                                        required
+                                        data-cy="production-transaction-quantity-produced"
+                                    />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="row pt-2">
+                            <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                                <mat-form-field>
+                                    <input
+                                        class="input"
+                                        matInput
+                                        [matDatepicker]="picker"
+                                        name="transactionDate"
+                                        [(ngModel)]="transaction.date"
+                                        placeholder="{{ 'Production Date' | translate }}:"
+                                        readonly
+                                        (click)="picker.open()"
+                                        data-cy="production-transaction-date"
+                                        required
+                                    />
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div class="pl-0 col-md-6 col-xs-6 col-lg-6 col-sm-6 label">
+                                <app-tt-dropdown-search
+                                    [(ngModel)]="transaction.facilityId"
+                                    name="facilities"
+                                    [placeholder]="'Production Facility:'"
+                                    [searchOptions]="config.facilities"
+                                    [data_cy]="'production-transaction-facilities'"
+                                    [isRequired]="false"
+                                >
+                                </app-tt-dropdown-search>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mb-2">
+                    <div class="col-md-12">
+                        <div class="hr text-center">
+                            <span class="hr-title text-muted">{{ 'Input Lots' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-xs-12 col-lg-12 col-sm-12">
+                        <div
+                            *ngFor="
+                                let inputMaterial of transaction.productionData.productionInputLots;
+                                let isLast = last;
+                                let i = index
+                            "
+                        >
+                            <div class="row pt-2">
+                                <div class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label">
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            type="text"
+                                            placeholder="{{ 'Style Name & Number' | translate }}:"
+                                            name="articles-{{
+                                                transaction.productionData.productionInputLots[i].fieldName
+                                            }}"
+                                            [(ngModel)]="transaction.productionData.productionInputLots[i]['articleId']"
+                                            matInput
+                                            [matAutocomplete]="articlesAuto"
+                                            (keyup)="searchArticle($event, i)"
+                                            [required]="!isLast"
+                                            data-cy="production-transaction-article"
+                                        />
+                                        <mat-hint [ngStyle]="{ color: articleHintColor }">{{
+                                            articleSearchHintText | translate
+                                        }}</mat-hint>
+                                        <mat-autocomplete
+                                            #articlesAuto="matAutocomplete"
+                                            [displayWith]="getLotDisplayName"
+                                            (optionSelected)="onArticleSelection($event.option.value)"
+                                        >
+                                            <mat-option *ngFor="let item of config.article_search" [value]="item">
+                                                {{ item.product_name }}-{{ item.product_number }}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </div>
+                                <div class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label">
+                                    <app-tt-dropdown-search
+                                        [searchOptions]="config.lots"
+                                        (selectionChange)="inputLotChanged($event, i)"
+                                        [(ngModel)]="transaction.productionData.productionInputLots[i].lotId"
+                                        [placeholder]="'Input Lot ID'"
+                                        name="ReferenceId-{{
+                                            transaction.productionData.productionInputLots[i].fieldName
+                                        }}"
+                                        [optionalParams]="optional"
+                                        [selectedItem]="transaction.productionData.productionInputLots"
+                                        [required]="!isLast"
+                                        [isRequired]="!isLast"
+                                        [data_cy]="'production-transaction-reference-id'"
+                                    >
+                                    </app-tt-dropdown-search>
+                                </div>
+                                <div class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label">
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            type="number"
+                                            placeholder="{{ 'Quantity Used' | translate }}:"
+                                            name="inputQty-{{
+                                                transaction.productionData.productionInputLots[i].fieldName
+                                            }}"
+                                            [(ngModel)]="
+                                                transaction.productionData.productionInputLots[i].quantity.quantity
+                                            "
+                                            (ngModelChange)="checkQuantityEntered($event, i)"
+                                            [required]="!isLast"
+                                            data-cy="production-transaction-quantity-used"
+                                        />
+                                    </mat-form-field>
+                                </div>
+                                <div class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label">
+                                    <app-tt-dropdown-search
+                                        *ngIf="
+                                            transaction.productionData.productionInputLots[i].txType !==
+                                            TxType.production
+                                        "
+                                        [searchOptions]="config.suppliers"
+                                        (selectionChange)="updateSupplier($event, i)"
+                                        [(ngModel)]="transaction.productionData.productionInputLots[i].supplierId"
+                                        [placeholder]="'Supplier'"
+                                        name="supplier-{{
+                                            transaction.productionData.productionInputLots[i].fieldName
+                                        }}"
+                                        [optionalParams]="supplierOptional"
+                                        [selectedItem]="transaction.productionData.productionInputLots"
+                                        [required]="!isLast"
+                                        [isRequired]="!isLast"
+                                        [data_cy]="'inbound-transaction-suppliers'"
+                                    >
+                                    </app-tt-dropdown-search>
+
+                                    <mat-form-field
+                                        *ngIf="
+                                            transaction.productionData.productionInputLots[i].txType ===
+                                            TxType.production
+                                        "
+                                    >
+                                        <input
+                                            class="input self-supplier"
+                                            matInput
+                                            type="text"
+                                            placeholder="{{ 'Supplier' | translate }}"
+                                            name="supplier-{{
+                                                transaction.productionData.productionInputLots[i].fieldName
+                                            }}"
+                                            value="{{ authService.userCompanyDetails.name }}"
+                                            data-cy="inbound-transaction-suppliers"
+                                            readonly
+                                        />
+                                    </mat-form-field>
+                                </div>
+                                <div class="pl-0 col-md-2 col-xs-2 col-lg-2 col-sm-2 label">
+                                    <mat-form-field>
+                                        <input
+                                            class="input"
+                                            matInput
+                                            [matDatepicker]="inputLotDatePicker"
+                                            placeholder="{{ 'Input Lot Creation Date' | translate }}:"
+                                            name="lotCreationDate-{{
+                                                transaction.productionData.productionInputLots[i].fieldName
+                                            }}"
+                                            [(ngModel)]="transaction.productionData.productionInputLots[i].inputTxDate"
+                                            readonly
+                                            (click)="inputLotDatePicker.open()"
+                                            data-cy="input-lot-creation-date"
+                                        />
+                                        <mat-datepicker-toggle matSuffix [for]="inputLotDatePicker">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #inputLotDatePicker></mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+                                <div *ngIf="isLast" class="col-md-1 col-xs-1 col-lg-1 col-sm-1 pt-1">
+                                    <div class="input-material-btn cursor-pointer" (click)="addInputMaterial()">
+                                        <span class="action-icons-big fa fa-plus"></span>
+                                    </div>
+                                </div>
+                                <div *ngIf="!isLast" class="col-md-1 col-xs-1 col-lg-1 col-sm-1 pt-1">
+                                    <span class="action-icons-big fa fa-trash" (click)="deleteInputMaterial(i)"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row pt-2 mb-3">
+                    <div class="col-md-offset-6 col-xs-offset-6 col-lg-offset-6 col-sm-offset-6">
+                        <button
+                            id="order-create-btn"
+                            type="button"
+                            class="btn btn-gray create-btn btn-align mr-2"
+                            (click)="save()"
+                            [disabled]="
+                                !createProductionForm.valid ||
+                                transaction.productionData.productionInputLots.length <= 1
+                            "
+                        >
+                            {{ 'Save' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

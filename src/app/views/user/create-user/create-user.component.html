@@ -1,0 +1,222 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="view-container">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header-section fix-header-block">
+                    <div class="page-header-section-inner">
+                        <div class="page-title">
+                            <h4 class="title">
+                                {{ (mode === 'edit' ? 'Update a User' : 'Create New User') | translate }}
+                            </h4>
+                            <h5 class="sub-title">
+                                {{
+                                    (mode === 'edit'
+                                        ? 'Update a user to add into a group'
+                                        : 'Create a user to add to your company'
+                                    ) | translate
+                                }}
+                            </h5>
+                        </div>
+                        <!-- Page Title -->
+                    </div>
+                    <!-- Page Header Section Inner -->
+                    <div class="page-header-section-inner alignment-right">
+                        <button class="go-back-button" (click)="goBack()">{{ 'Back' | translate }}</button>
+                        <!-- Title Right Search -->
+                    </div>
+                    <!-- Page Header Section Inner Alignment Right -->
+                </div>
+                <!-- Page Header Section -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+
+        <div class="page-body-section body-section-top-space" *ngIf="!pageLoading">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-page-section">
+                        <div class="form-page-inner">
+                            <form [formGroup]="createUserForm" (ngSubmit)="onSave()" #createUserFormFGD="ngForm">
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <mat-form-field [floatLabel]="'never'">
+                                                    <input
+                                                        maxlength="75"
+                                                        matInput
+                                                        placeholder="{{ 'First Name' | translate }}"
+                                                        name="fn-ln firstName"
+                                                        formControlName="firstName"
+                                                        required
+                                                    />
+                                                </mat-form-field>
+                                            </div>
+                                            <!-- Column -->
+                                            <div class="col-md-6">
+                                                <mat-form-field [floatLabel]="'never'">
+                                                    <input
+                                                        maxlength="75"
+                                                        matInput
+                                                        placeholder="{{ 'Last Name' | translate }}"
+                                                        name="fn-ln lastName"
+                                                        formControlName="lastName"
+                                                        required
+                                                    />
+                                                </mat-form-field>
+                                            </div>
+                                            <!-- Column-->
+                                        </div>
+                                        <!-- Row -->
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-6">
+                                        <mat-form-field [floatLabel]="'never'">
+                                            <input
+                                                maxlength="75"
+                                                matInput
+                                                placeholder="{{ 'Email ID' | translate }}"
+                                                type="email"
+                                                name="fn-ln emailId"
+                                                formControlName="emailId"
+                                                required
+                                            />
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row" *ngIf="isBrand">
+                                    <div class="col-md-12">
+                                        <ul class="select-mandatory">
+                                            <li>
+                                                <mat-checkbox formControlName="enableEmailNotification"
+                                                    >{{ 'Enabled for Email Notifications' | translate }}
+                                                </mat-checkbox>
+                                            </li>
+                                            <li>
+                                                <span
+                                                    tooltip="Operation not allowed"
+                                                    [tooltipEnable]="!createUserForm.get('primaryContact').value"
+                                                >
+                                                    <mat-checkbox formControlName="primaryContact">{{
+                                                        'Make this user as Primary Contact' | translate
+                                                    }}</mat-checkbox>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row" *ngIf="isBrand">
+                                    <div class="col-md-4 col-sm-6 mb-20">
+                                        <div class="form-page-inner-select">
+                                            <h5 class="mat-title">
+                                                {{ 'Associated Facility' | translate }} :
+                                                <!-- <span class="color-red">*</span> -->
+                                            </h5>
+
+                                            <app-tt-table-with-checkbox
+                                                (handleSelection)="onFacilityChange($event)"
+                                                [data]="config.facilities"
+                                                [selectedValues]="user.facilitiesAssociated"
+                                            >
+                                            </app-tt-table-with-checkbox>
+                                        </div>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row" *ngIf="isBrand || isRetailer">
+                                    <div class="col-md-4 col-sm-6 mb-20">
+                                        <div class="form-page-inner-select">
+                                            <h5 class="mat-title">
+                                                {{ 'Select Groups to add' | translate }} :
+                                                <span class="color-red">*</span>
+                                            </h5>
+
+                                            <app-tt-table-with-checkbox
+                                                (handleSelection)="onGroupsChange($event)"
+                                                [data]="config.groups"
+                                                [selectedValues]="user.groups"
+                                            >
+                                            </app-tt-table-with-checkbox>
+                                        </div>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+
+                                <!-- Row OU  -->
+                                <ng-container *ngIf="isBrand && config.ouAttribute && enableOuInputs">
+                                    <div class="row" *ngFor="let ouAttributeData of config.ouAttribute">
+                                        <div class="col-md-4 col-sm-6 mb-20">
+                                            <div class="form-page-inner-select">
+                                                <h5 class="mat-title">
+                                                    {{
+                                                        'Select ' + ouAttributeData.OuAttribute + ' to add' | translate
+                                                    }}
+                                                    :
+                                                    <span class="color-red">*</span>
+                                                </h5>
+                                                <app-tt-table-with-checkbox
+                                                    (handleSelection)="onOUSelect($event, ouAttributeData.id)"
+                                                    [data]="ouAttributeData.value"
+                                                    [selectedValues]="getSelectedOUById(ouAttributeData.id)"
+                                                >
+                                                </app-tt-table-with-checkbox>
+                                            </div>
+                                        </div>
+                                        <!-- Column -->
+                                    </div>
+                                </ng-container>
+
+                                <!-- Row -->
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="button-block">
+                                            <div class="pull-right">
+                                                <button
+                                                    class="btn btn-blue btn-md cancel-btn"
+                                                    type="button"
+                                                    (click)="goBack()"
+                                                >
+                                                    {{ 'Cancel' | translate }}
+                                                </button>
+                                                <button
+                                                    class="btn btn-gray btn-md"
+                                                    (click)="onSave()"
+                                                    [disabled]="formProcessing || formIsInvalid()"
+                                                    type="button"
+                                                >
+                                                    {{ (mode === 'edit' ? 'Update User' : 'Create User') | translate }}
+                                                </button>
+                                            </div>
+                                            <!-- Pull Left -->
+                                        </div>
+                                        <!-- Butto Block -->
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                            </form>
+                        </div>
+                        <!-- Column -->
+                        <!-- Form Page Inner -->
+                    </div>
+                    <!-- Form Page Section -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+        <!-- Page Body Section -->
+    </div>
+    <!--  Container Fluid -->
+</div>
+<!--  View Container -->

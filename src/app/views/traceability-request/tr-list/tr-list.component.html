@@ -1,0 +1,303 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div id="tr-container pl-22" class="tr-container">
+            <div id="tr-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'T-Trace: Supply Chain Traceability' | translate }}</div>
+                        <div class="page-description">
+                            {{
+                                'Identify and visualise suppliers associated with your styles and materials'
+                                    | industry
+                                    | translate
+                            }}
+                        </div>
+                    </div>
+                    <div class="header-search">
+                        <div class="title-right-search">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Type and press enter to search' | translate }}"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchTR($event)"
+                                data-cy="tr-list-search"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <button
+                            class="btn btn-lg btn-blue pull-right btn-gradient cs-btn"
+                            (click)="analyticsNewTraceabilityRequestClicked()"
+                            [routerLink]="['/', 't-trace', 'product', 'create']"
+                            *ngIf="userData.subscriptionType !== 'SUPPLIER'"
+                        >
+                            <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" />
+                            {{ 'New Traceability Request' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="trsFilters">
+                <div class="col-md-12">
+                    <ul class="filter-bar-container">
+                        <li *ngFor="let filter of trsFilters | keys; let filterInd = index">
+                            <app-tt-multi-select-search
+                                (selectionChange)="handleFilterSelection(); analyticsFiltersClicked()"
+                                (refreshFilter)="refreshFilter()"
+                                [(ngModel)]="filterOptions[filter.key]"
+                                name="filter-{{ filter.key }}"
+                                [label]="filter.key"
+                                [options]="filter.value"
+                                [filter_session]="filter_session"
+                                [optionsParam]="optionsParam"
+                                [data_cy]="removeSpace(filter.key)"
+                            >
+                            </app-tt-multi-select-search>
+                        </li>
+                        <li class="reset-filters">
+                            <button
+                                class="button-badge mat-button btn btn-gray"
+                                (click)="resetAllFilters(); analyticsResetFiltersClicked()"
+                                data-cy="T-Trace-reset-all-filters"
+                            >
+                                {{ 'Reset all filters' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                    <div class="row">
+                        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 total-count">
+                            <div class="float-l" *ngIf="trList.length > 0 || totalCountFlag">
+                                <app-card-pagination
+                                    [paginationStart]="pagination.from + 1"
+                                    [fetchSize]="pagination.size"
+                                    [totalItemsCount]="totalCount"
+                                    moduleName="Materials"
+                                    (previous)="onScroll('back')"
+                                    (next)="onScroll('next')"
+                                ></app-card-pagination>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                            <div dropdown class="dropdown sort-dropdown">
+                                <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                    <span class="sort-name"
+                                        >{{ 'Sort By' | translate }}
+                                        <i class="fa fa-angle-down"></i>
+                                    </span>
+                                </a>
+                                <ul *dropdownMenu class="dropdown-menu">
+                                    <li>
+                                        <mat-radio-group [(ngModel)]="sortByFilter.sortBy" (change)="handleSortBy()">
+                                            <mat-radio-button value="entity_details.name">
+                                                {{ 'Alphabetical Order' | translate }}
+                                            </mat-radio-button>
+                                            <mat-radio-button value="create_ts">
+                                                {{ 'Newly Added' | translate }}
+                                            </mat-radio-button>
+                                            <mat-radio-button value="overall_supply_chain_tr_status">
+                                                {{ 'Unanswered' | translate }}
+                                            </mat-radio-button>
+                                        </mat-radio-group>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Sort Dropdown -->
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+            <div id="card">
+                <div class="row tr-table" [ngStyle]="{ 'top.px': height }" *ngIf="trList && trList.length >= 0">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="no-assessments" *ngIf="trList.length === 0">
+                            {{ 'No Traceability Requests' | translate }}
+                        </div>
+                        <div class="table-responsive" *ngIf="trList.length > 0">
+                            <div class="table-card" *ngFor="let tr of trList">
+                                <div
+                                    class="table-card-left flex-column"
+                                    style="width: 60%"
+                                    (click)="analyticsCardClicked(); navigateTo(tr)"
+                                >
+                                    <div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Product Type' | translate }}:&nbsp;
+                                            <span class="title blue-title">{{ tr.entity_type.value }}</span>
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Supplier Article Name & Number' | industry | translate }}:&nbsp;
+                                            <span class="title blue-title"
+                                                >{{ tr.supplier_article_name ? tr.supplier_article_name : 'NA' }}-{{
+                                                    tr.supplier_article_number ? tr.supplier_article_number : 'NA'
+                                                }}</span
+                                            >
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Style/Material Name & Number' | industry | translate }}:&nbsp;
+                                            <span class="title blue-title">
+                                                {{
+                                                    tr.entity_details.name +
+                                                        (tr?.product_trade_name ? ' / ' + tr?.product_trade_name : '') +
+                                                        (tr?.entity_details?.number
+                                                            ? ' - ' + tr.entity_details.number
+                                                            : '')
+                                                }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="desc blue-desc"
+                                            *ngIf="tr.entity_details.year && tr.entity_details.year !== '0'"
+                                        >
+                                            {{ 'Year & Season' | translate }}:&nbsp;
+                                            <span class="title blue-title"
+                                                >{{ tr.entity_details.year }} -
+                                                {{ tr.entity_details.season?.value }}</span
+                                            >
+                                        </div>
+                                        <!-- If the company Id is data provider and launched_by id then show supplier name -->
+                                        <div
+                                            class="desc blue-desc"
+                                            *ngIf="
+                                                userData.companyId === tr.data_provider.id &&
+                                                userData.companyId === tr.launched_by.id
+                                            "
+                                        >
+                                            {{ 'Supplier' | translate }}:&nbsp;
+                                            <span class="title blue-title">{{ tr.supplier.name }}</span>
+                                        </div>
+                                        <!-- If the company Id is data provider and launched_by id is not company is then it is launched by -->
+                                        <div
+                                            class="desc blue-desc"
+                                            *ngIf="
+                                                userData.companyId === tr.data_provider.id &&
+                                                userData.companyId !== tr.launched_by.id
+                                            "
+                                        >
+                                            {{ 'Launched By' | translate }}:&nbsp;
+                                            <span class="title blue-title">{{ tr.launched_by.name }}</span>
+                                        </div>
+                                        <!-- If the company Id is not data provider and launched_by id is company is then it is launched to -->
+                                        <div
+                                            class="desc blue-desc"
+                                            *ngIf="
+                                                userData.companyId !== tr.data_provider.id &&
+                                                userData.companyId === tr.launched_by.id
+                                            "
+                                        >
+                                            {{ 'Launched To' | translate }}:&nbsp;
+                                            <span class="title blue-title">{{ tr.supplier.name }}</span>
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Purchase Order No' | translate }}:&nbsp;
+                                            <span class="title blue-title">{{
+                                                tr.po_number || ('Not Available' | translate)
+                                            }}</span>
+                                        </div>
+                                        <div class="desc blue-desc">
+                                            {{ 'Launched Date' | translate }}:&nbsp;
+                                            <span class="title blue-title">{{
+                                                utilsService.getDateTime(tr.create_ts)
+                                            }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-card-right flex-column text-right">
+                                    <div class="desc blue-desc">
+                                        <div style="padding-bottom: 5px;" *ngIf="tr?.group_status?.length > 0">
+                                            {{ 'Traceability Status' | translate }}:
+                                        </div>
+                                        <ul class="list-unstyled list-inline">
+                                            <li *ngFor="let status of tr.group_status; let i = index">
+                                                <div class="circle red-circle margin-auto" *ngIf="status === 20"></div>
+                                                <div
+                                                    class="circle yellow-circle margin-auto"
+                                                    *ngIf="status === 30"
+                                                ></div>
+                                                <div
+                                                    class="circle green-circle margin-auto"
+                                                    *ngIf="status === 40"
+                                                ></div>
+                                                <div class="title blue-title">{{ 'Tier' | translate }} {{ i + 1 }}</div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- <div class="align-items-flex-end text-right">
+                                         <span
+                                            class="clickable cursor-pointer"
+                                            [routerLink]="['/', 't-trace', 'product', 'supplychain', tr.id, 'tree']"
+                                            (click)="analyticsTreeViewIconClicked()"
+                                        >
+                                            <img
+                                                class="materials-icon icon-at-start supply-chain-tree"
+                                                src="{{ env.IMG_URL }}images/tree-icon.png"
+                                            />
+                                        </span>
+                                    </div> -->
+                                    <div class="align-items-flex-end text-right">
+                                        <div
+                                            class="action-icons-small"
+                                            [matTooltip]="getIconTooltipText('archive', tr.preserve)"
+                                            [matTooltipDisabled]="userData.companyId === tr.launched_by.id"
+                                            matTooltipPosition="above"
+                                        >
+                                            <button
+                                                class="trace-archive"
+                                                mat-button
+                                                [matTooltip]="'Archive Request' | translate"
+                                                matTooltipPosition="above"
+                                                (click)="archiveRequest(tr.id)"
+                                                [disabled]="userData.companyId !== tr.launched_by.id"
+                                                data-cy="t-trace-test-archive-btn"
+                                            >
+                                                <span class="action-icons-small-disable fa fa-archive"></span>
+                                            </button>
+                                        </div>
+                                        <a
+                                            class="list-view-icons"
+                                            [matTooltip]="getIconTooltipText('lock', tr.preserve)"
+                                            matTooltipPosition="above"
+                                            (click)="
+                                                userData.subscriptionType === 'BRAND' &&
+                                                    lockOrUnlockEditRequest(tr.id, !tr.preserve)
+                                            "
+                                        >
+                                            <span
+                                                class="action-icons-small fa"
+                                                [ngClass]="{
+                                                    'fa-lock': tr.preserve,
+                                                    'fa-unlock': !tr.preserve,
+                                                    'grey-out-action': userData.subscriptionType !== 'BRAND'
+                                                }"
+                                            >
+                                            </span>
+                                        </a>
+                                        <a
+                                            class="list-view-icons"
+                                            (click)="navigateToEdit(tr.id, !tr.preserve)"
+                                            [matTooltip]="getIconTooltipText('edit', tr.preserve)"
+                                            matTooltipPosition="above"
+                                        >
+                                            <span
+                                                class="action-icons-small fa fa-pencil"
+                                                [ngClass]="{ 'grey-out-action': tr.preserve }"
+                                            ></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>

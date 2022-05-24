@@ -1,0 +1,25 @@
+<div class="tr-tree-view-modal">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div style="position: relative; height: 100%" *ngIf="!pageLoading">
+        <div class="tr-tree-view-modal-title">
+            <span class="tr-tree-view-modal-title">{{ 'Supply Chain' | translate }}</span>
+            <a (click)="closeDialog()">
+                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+            </a>
+        </div>
+        <div class="tr-tree-view-details">
+            <div class="article-name">
+                {{ 'Article Name / No' | industry | industry }}:
+                <span>{{ supplyChainData.supplyChainArticle.internalArticleName }}</span>
+            </div>
+            <div class="article-type">
+                {{ 'Article Type' | industry | industry }}:
+                <span>{{ localizationService.getDisplayText(supplyChainData.supplyChainArticle.articleTypeId) }}</span>
+            </div>
+            <div class="article-last-traced">
+                Last Traced: <span>{{ utilService.getDatebyFormat1(supplyChainData.createTs) }}</span>
+            </div>
+        </div>
+        <app-tree-view [items]="supplyChainData" [showDetails]="true" *ngIf="supplyChainData"></app-tree-view>
+    </div>
+</div>

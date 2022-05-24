@@ -1,0 +1,30 @@
+<div class="parent-container">
+    <div *ngFor="let item of dialogData">
+        <!-- TITLE BAR -->
+        <div id="title-container">
+            <p class="title">{{ item.title | translate }}</p>
+            <a (click)="closeDialog()" *ngIf="showClose" class="close-icon">
+                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+            </a>
+        </div>
+        <!-- END OF TITLE BAR -->
+
+        <!-- MAIN CONTAINER -->
+        <div id="main-dialog-container">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="value-details">
+                    <strong>{{ item.msg }}</strong>
+                </div>
+            </div>
+        </div>
+        <!-- END OF MAIN CONTAINER -->
+    </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center mt-3">
+        <div class="centreButtons">
+            <button class="primary-btn" (click)="closeDialog(buttonText)">
+                {{ buttonText | translate }}
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,215 @@
+<!-- This component is built for demo and not scalable, this is not easily scalable for new certificate types. deciding to live with this for now. plan is to create proper UI/UX then build this properly when adding new certificates -->
+<div
+    *ngIf="!(data['validationData'] | keyvalue)?.length && data['nodeRiskStatus'] === 'HIGH_RISK'"
+    class="validation-information-modal-title"
+>
+    {{ 'All Mandatory Certificates are not provided' | translate }}
+</div>
+<div
+    *ngIf="!(data['validationData'] | keyvalue)?.length && data['nodeRiskStatus'] === 'NO_RISK'"
+    class="validation-information-modal-title"
+>
+    {{ 'No Certificates Required' | translate }}
+</div>
+<div *ngIf="(data['validationData'] | keyvalue)?.length">
+    <div class="modal-size">
+        <tabset [justified]="true">
+            <tab *ngFor="let certificate of data['validationData'] | keyvalue">
+                <ng-template tabHeading>
+                    <div class="validation-information-modal-heading">
+                        {{ certificate.key }}
+                        <span *ngIf="certificate.value?.validityStatus === 'VALID'">
+                            <mat-icon>verified_user</mat-icon>
+                        </span>
+                        <span *ngIf="certificate.value?.validityStatus === 'INVALID'">
+                            <mat-icon>error</mat-icon>
+                        </span>
+                    </div>
+                </ng-template>
+                <div class="tab-content" style="min-height: 400px;">
+                    <div *ngIf="TRANSACTION_CERTIFICATES.includes(certificate.key)">
+                        <div class="validation-information-modal">
+                            <div class="validation-information-modal-heading">
+                                {{ 'Supplier Data' | translate }}:
+                                <span *ngIf="certificate.value?.supplier?.validityStatus === 'VALID'">
+                                    <mat-icon>verified_user</mat-icon>
+                                </span>
+                                <span *ngIf="certificate.value?.supplier?.validityStatus === 'INVALID'">
+                                    <mat-icon>error</mat-icon>
+                                </span>
+                            </div>
+                            <div class="validation-information-modal-sub-heading">
+                                <div>Given Name: {{ certificate.value?.supplier?.actualName }}</div>
+                                <div>Extracted Name: {{ certificate.value?.supplier?.extractedName }}</div>
+                                <div>Confidence: {{ certificate.value?.supplier?.score }} %</div>
+                            </div>
+                            <br />
+                            <div class="validation-information-modal-heading">
+                                {{ 'Buyer Data' | translate }}:
+                                <span *ngIf="certificate.value?.buyer?.validityStatus === 'VALID'">
+                                    <mat-icon>verified_user</mat-icon>
+                                </span>
+                                <span *ngIf="certificate.value?.buyer?.validityStatus === 'INVALID'">
+                                    <mat-icon style="width:10px;height:10px">error</mat-icon>
+                                </span>
+                            </div>
+                            <div class="validation-information-modal-sub-heading">
+                                <div>Given Name: {{ certificate.value?.buyer?.actualName }}</div>
+                                <div>Extracted Name: {{ certificate.value?.buyer?.extractedName }}</div>
+                                <div>Confidence: {{ certificate.value?.buyer?.score }} %</div>
+                            </div>
+                            <br />
+                            <div class="validation-information-modal-heading">
+                                {{ 'Product Name' | translate }}:
+                                <span *ngIf="certificate.value?.product?.validityStatus === 'VALID'">
+                                    <mat-icon>verified_user</mat-icon>
+                                </span>
+                                <span *ngIf="certificate.value?.product?.validityStatus === 'INVALID'">
+                                    <mat-icon style="width:10px;height:10px">error</mat-icon>
+                                </span>
+                            </div>
+                            <div class="validation-information-modal-sub-heading">
+                                <div>Given Name: {{ certificate.value?.product?.actualName }}</div>
+                                <div>Extracted Name: {{ certificate.value?.product?.extractedName }}</div>
+                                <div>Confidence: {{ certificate.value?.product?.score }} %</div>
+                            </div>
+                            <br />
+                            <div class="validation-information-modal-heading">{{ 'Lots' | translate }}:</div>
+                            <div
+                                class="validation-information-modal-sub-heading"
+                                *ngIf="
+                                    certificate.value?.product?.lots && certificate.value.product.lots.length > 0;
+                                    else dataNotAvailable
+                                "
+                            >
+                                <span *ngFor="let lot of certificate.value?.product?.lots; let isLast = last">
+                                    {{ lot }}<span *ngIf="!isLast">, </span>
+                                </span>
+                            </div>
+                            <ng-template #dataNotAvailable>
+                                {{ 'Not Available' | translate }}
+                            </ng-template>
+                        </div>
+                    </div>
+                    <div *ngIf="certificate.key === 'GRS-Scope'">
+                        <div
+                            *ngIf="certificate.value?.validityStatus === 'TEMPLATE_NOT_SUPPORTED'"
+                            class="validation-information-modal-heading"
+                        >
+                            {{ 'Template Not Configured' | translate }}
+                        </div>
+                        <div *ngIf="(certificate?.value?.expiryData | keyvalue)?.length">
+                            <div class="validation-information-modal-heading">
+                                ExpiryDate:
+                                <span *ngIf="certificate.value?.expiryData?.validityStatus === 'VALID'">
+                                    <mat-icon>verified_user</mat-icon>
+                                </span>
+                                <span *ngIf="certificate.value?.expiryData?.validityStatus === 'INVALID'">
+                                    <mat-icon style="width:10px;height:10px">error</mat-icon>
+                                </span>
+                            </div>
+                            <div class="validation-information-modal-sub-heading">
+                                {{ certificate.value.expiryData.expiryDate }}
+                            </div>
+                            <br />
+                            <div *ngIf="certificate.value.expiryData.validityStatus === 'VALID'">
+                                <div class="validation-information-modal-heading">
+                                    {{ 'Product Data' | translate }}:
+                                    <span *ngIf="certificate.value?.productData?.validityStatus === 'VALID'">
+                                        <mat-icon>verified_user</mat-icon>
+                                    </span>
+                                    <span *ngIf="certificate.value?.productData?.validityStatus === 'INVALID'">
+                                        <mat-icon style="width:10px;height:10px">error</mat-icon>
+                                    </span>
+                                </div>
+                                <div *ngIf="!(certificate?.value?.productData | keyvalue)?.length">
+                                    <div class="validation-information-modal-sub-heading">
+                                        {{ 'No Matching Products found' | translate }}
+                                    </div>
+                                </div>
+                                <div
+                                    *ngIf="(certificate?.value?.productData | keyvalue)?.length"
+                                    class="validation-information-modal-sub-heading"
+                                >
+                                    <div>Given Name: {{ certificate.value?.productData?.actualName }}</div>
+                                    <div>Extracted Name: {{ certificate.value?.productData?.extractedName }}</div>
+                                    <div>Confidence: {{ certificate.value?.productData?.score }} %</div>
+                                </div>
+                                <br />
+                                <div class="validation-information-modal-heading">
+                                    {{ 'Facility Data' | translate }}:
+                                    <span *ngIf="certificate.value?.facilityData?.validityStatus === 'VALID'">
+                                        <mat-icon>verified_user</mat-icon>
+                                    </span>
+                                    <span *ngIf="certificate.value?.facilityData?.validityStatus === 'INVALID'">
+                                        <mat-icon style="width:10px;height:10px">error</mat-icon>
+                                    </span>
+                                </div>
+                                <div *ngIf="!(certificate?.value?.facilityData | keyvalue)?.length">
+                                    <div class="validation-information-modal-sub-heading">
+                                        {{ 'No Matching Facilities found' | translate }}
+                                    </div>
+                                </div>
+                                <div
+                                    *ngFor="
+                                        let facility of certificate.value?.facilityData?.facilityData;
+                                        let i = index
+                                    "
+                                >
+                                    <div class="validation-information-modal-sub-heading-1">
+                                        {{ 'Facility' | translate }} - {{ i + 1 }}
+                                    </div>
+                                    <div class="grs-facility">
+                                        <div>Given Name: {{ facility.actualName }}</div>
+                                        <div>Extracted Name: {{ facility.extractedName }}</div>
+                                        <div>Confidence: {{ facility.score }} %</div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div *ngIf="certificate.value?.facilityData?.certifiedProcess">
+                                    <div class="validation-information-modal-heading">
+                                        {{ 'Certified Value Processes' | translate }}:
+                                    </div>
+                                    <div class="validation-information-modal-sub-heading">
+                                        {{ certificate.value?.facilityData?.certifiedProcess }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="certificate.key === 'CPSIA' && certificate.value">
+                        <div>
+                            <div class="validation-information-modal-heading">
+                                {{ 'Overall Result' | translate }}:
+                                <span *ngIf="certificate.value?.overallResult?.validityStatus === 'VALID'">
+                                    <mat-icon>verified_user</mat-icon>
+                                </span>
+                                <span *ngIf="certificate.value?.overallResult?.validityStatus === 'INVALID'">
+                                    <mat-icon style="width:10px;height:10px">error</mat-icon>
+                                </span>
+                            </div>
+                            <div class="validation-information-modal-sub-heading">
+                                {{ certificate.value.overallResult.extractedData }}
+                            </div>
+                            <br />
+                            <div class="validation-information-modal-heading">{{ 'Tests Performed' | translate }}:</div>
+                            <div class="cpsia-test-list" *ngFor="let section of certificate?.value?.sections">
+                                <div class="validation-information-modal-sub-heading">
+                                    <div>
+                                        Test :<span class="extracted-content">{{ section.label }}</span>
+                                    </div>
+                                    <div>
+                                        Result: <span class="extracted-content">{{ section.result }}</span>
+                                        <span *ngIf="section.result === 'FAIL'" class="cpsia-fail">
+                                            <mat-icon size="height:15px;width:15px">error</mat-icon>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </tab>
+        </tabset>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+@import '~styles/variables';
+
+.col-md-3,
+.col-lg-3 {
+    width: 24%;
+}
+
+.chart-thumbnail-wrapper {
+    margin: 20px 10px 20px 0;
+    box-shadow: 0 0 4px #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.chart-title {
+    font-family: $font-family-Semibold;
+    font-size: 14px;
+    color: $text-color-primary;
+}

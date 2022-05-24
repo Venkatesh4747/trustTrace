@@ -1,0 +1,75 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <div class="content-container">
+            <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pb-1 pl-0 pr-0">
+                    <div class="page-title">
+                        <div>{{ 'Create Traceability Request' | translate }}</div>
+                        <div class="page-description font-color-primary">
+                            {{ 'Create and launch TRs for your Styles and Materials' | translate }}.
+                        </div>
+                    </div>
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row -->
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2 mb-2 title-container">
+                    <h4 class="tt-font white-text">
+                        {{ 'Choose the suppliers to collect evidences from' | translate }}
+                    </h4>
+                </div>
+            </div>
+            <!-- row -->
+
+            <div class="row mt-2 mb-2">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <ng-template [ngIf]="supplyChainData.data['supply-chain'].length > 0">
+                        <mat-radio-group [(ngModel)]="selectedEntity" layout="row">
+                            <ng-template
+                                ngFor
+                                let-supplyChain
+                                [ngForOf]="supplyChainData.data['supply-chain']"
+                                let-i="index"
+                            >
+                                <mat-radio-button [value]="supplyChain">
+                                    <ul class="suppliers-list list-inline list-unstyled">
+                                        <ng-template ngFor let-supplier [ngForOf]="supplyChain['suppliers']">
+                                            <li>
+                                                <h5 class="tt-font">{{ supplier }}</h5>
+                                                <span
+                                                    *ngIf="supplyChain['suppliers'].length > 1"
+                                                    class="dotted-line"
+                                                ></span>
+                                            </li>
+                                        </ng-template>
+                                    </ul>
+                                </mat-radio-button>
+                            </ng-template>
+                        </mat-radio-group>
+                    </ng-template>
+
+                    <ng-template [ngIf]="(supplyChainData?.data)['supply-chain']?.length === 0">
+                        <h4 class="text-center tt-font tt-font-muted">{{ 'No supply chain data' | translate }}</h4>
+                    </ng-template>
+                </div>
+            </div>
+            <!-- row -->
+
+            <div class="row">
+                <div class="col-md-12 text-right">
+                    <button class="btn tt-btn tt-btn-primary" (click)="analyticsSubmitClicked(); onSubmit()">
+                        {{ 'Submit' | translate }}
+                    </button>
+                </div>
+            </div>
+            <!-- row: submit button -->
+        </div>
+        <!-- content-container -->
+    </div>
+    <!-- container-fluid -->
+</div>
+<!-- view-container -->

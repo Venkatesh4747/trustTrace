@@ -1,0 +1,181 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="integration-logs-container" class="integration-logs-container">
+            <div id="integration-logs-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Integration Logs' | translate }}</div>
+                        <div class="page-description">
+                            {{ 'Complete status of integration logs' | translate }}
+                        </div>
+                    </div>
+                    <div class="header-search" *ngIf="isLogsAvailable && logsFilters">
+                        <div class="title-right-search">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Search for logs using Object ID' | translate }}"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchIntegrationLogs($event)"
+                                data-cy="integration-logs-search"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row -->
+
+            <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="isLogsAvailable && logsFilters">
+                <div class="col-md-12">
+                    <ul class="filter-bar-container">
+                        <li *ngFor="let filter of logsFilters | keys; let filterInd = index">
+                            <app-tt-multi-select-search
+                                (selectionChange)="handleFilterSelection()"
+                                (refreshFilter)="refreshFilter()"
+                                [label]="filter.key"
+                                [options]="filter.value"
+                                [filter_session]="filter_session"
+                                [optionsParam]="optionsParam"
+                                *ngIf="!isAGroup(filter.value)"
+                                [data_cy]="removeSpace(filter.key)"
+                            >
+                            </app-tt-multi-select-search>
+                        </li>
+                        <li class="reset-filters">
+                            <button
+                                class="button-badge mat-button btn btn-gray"
+                                (click)="resetAllFilters()"
+                                data-cy="po-management-reset-all-filters"
+                            >
+                                {{ 'Reset all filters' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                    <div class="row">
+                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 total-count">
+                            <div class="float-l" *ngIf="logs.length > 0 || totalCountFlag">
+                                <card-pagination
+                                    [paginationStart]="pagination.from + 1"
+                                    [fetchSize]="pagination.size"
+                                    [totalItemsCount]="totalCount"
+                                    [moduleName]="'Logs'"
+                                    (previous)="onScroll('back')"
+                                    (next)="onScroll('next')"
+                                ></card-pagination>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+
+            <div class="row integration-logs-table">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table custom-table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{{ 'Source' | translate }}</th>
+                                        <th>{{ 'Code' | translate }}</th>
+                                        <th>{{ 'Status' | translate }}</th>
+                                        <th>{{ 'Division' | translate }}</th>
+                                        <th>{{ 'Time Stamp' | translate }}</th>
+                                        <th>{{ 'Error Details' | translate }}</th>
+                                        <th>{{ 'Download JSON' | translate }}</th>
+                                        <th>{{ 'Rerun Integration' | translate }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngIf="!fetchingLogs && logs.length === 0">
+                                        <p class="content-center">
+                                            {{ 'No Logs available!' | translate }}
+                                        </p>
+                                    </tr>
+                                    <tr *ngIf="fetchingLogs">
+                                        <p class="content-center">
+                                            <app-spinner [small]="true"></app-spinner>
+                                        </p>
+                                    </tr>
+                                    <tr *ngFor="let log of logs">
+                                        <td *ngIf="log.integrationSource.value; else notAvailable">
+                                            {{ log.integrationSource.value }}
+                                        </td>
+                                        <td *ngIf="log.integrationCode.value; else notAvailable">
+                                            {{ getIntegrationCode(log.integrationCode) }}
+                                        </td>
+                                        <td
+                                            *ngIf="log.status; else notAvailable"
+                                            [ngClass]="{
+                                                'text-red': log.status === 'FAILED' || log.status === 'Failed'
+                                            }"
+                                        >
+                                            {{ log.status }}
+                                        </td>
+                                        <td *ngIf="log.division; else notAvailable">{{ log.division }}</td>
+                                        <td *ngIf="log.updateTs; else notAvailable">
+                                            {{ log.updateTs | date: 'MMM d, y, hh:mm:ss' }}
+                                        </td>
+                                        <td
+                                            *ngIf="
+                                                log.integrationError && log.integrationError.exception;
+                                                else notApplicable
+                                            "
+                                            [ngClass]="{
+                                                'text-red': log.status === 'FAILED' || log.status === 'Failed'
+                                            }"
+                                        >
+                                            {{ log.integrationError.exception }}
+                                        </td>
+                                        <td class="text-center">
+                                            <span
+                                                class="download-icon"
+                                                tooltip="Download File"
+                                                (click)="downloadLogs(log.id)"
+                                            >
+                                                <img src="{{ env.IMG_URL }}images/file-download.png" alt="Download" />
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span
+                                                class="rerun-integration-icon"
+                                                tooltip="Rerun Integration"
+                                                (click)="rerunLogs(log.id)"
+                                            >
+                                                <img src="{{ env.IMG_URL }}images/rerun-integration.png" alt="Rerun" />
+                                            </span>
+                                        </td>
+                                        <ng-template #notApplicable>
+                                            <td class="content-grey">
+                                                {{ 'Not Applicable' | translate }}
+                                            </td>
+                                        </ng-template>
+                                        <ng-template #notAvailable>
+                                            <td class="content-grey">
+                                                {{ 'Not Available' | translate }}
+                                            </td>
+                                        </ng-template>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- table-responsive -->
+                    </div>
+                    <!-- table-container -->
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row integration-logs-table -->
+        </div>
+    </div>
+    <!--  container-fluid -->
+</div>
+<!--  view-container -->

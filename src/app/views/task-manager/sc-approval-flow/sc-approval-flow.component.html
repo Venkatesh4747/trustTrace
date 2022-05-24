@@ -1,0 +1,539 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="upload-container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="upload-transaction-header">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="page-title">
+                            <div>{{ 'Scope Certificate' | translate }}</div>
+                        </div>
+                        <!-- Page Title -->
+                        <div class="close-icon-block text-right">
+                            <a (click)="closeDialog()" *ngIf="showClose">
+                                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+                            </a>
+                        </div>
+                        <!-- Close Icon Block -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!-- Row -->
+            </div>
+            <!-- Upload Transaction Header -->
+        </div>
+        <!-- Column -->
+    </div>
+    <!-- Row -->
+    <div class="upload-container-block">
+        <div class="row">
+            <div class="col-md-5">
+                <!--  Row -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="certificate-view-transaction-certificate-block">
+                            <div class="certificate-view-extraction-title" *ngIf="isSCAvailable">
+                                <h4 class="title">{{ extractionStatus }}</h4>
+                            </div>
+                            <!-- Certificate Extraction Title -->
+                            <div
+                                [ngClass]="{ 'no-certificate': !isSCAvailable }"
+                                class="certificate-view-certificate-section"
+                            >
+                                <div class="certificate-viewed-source-file-loader" *ngIf="isFetchingFile">
+                                    <app-spinner [small]="true"></app-spinner>
+                                </div>
+                                <p *ngIf="!isSCAvailable">
+                                    {{ 'Scope certificate not uploaded!!' | translate }}
+                                </p>
+                                <ngx-extended-pdf-viewer
+                                    [src]="uploadedFile"
+                                    [height]="'80vh'"
+                                    [useBrowserLocale]="true"
+                                    [showBookmarkButton]="false"
+                                    [showDownloadButton]="false"
+                                    [showOpenFileButton]="false"
+                                    [showPrintButton]="false"
+                                    [showPropertiesButton]="false"
+                                    *ngIf="uploadedFile && !isFetchingFile && isSCAvailable"
+                                >
+                                    <!-- [showSecondaryToolbarButton]='false' -->
+                                </ngx-extended-pdf-viewer>
+                            </div>
+                            <!-- Certificate Section -->
+                            <div
+                                class="certificate-view-certificate-document"
+                                *ngIf="uploadedFile && !isFetchingFile"
+                                [ngClass]="{ 'disabled-opacity-5': isFetchingFile }"
+                            >
+                                <div class="certificate-view-file-name-block">
+                                    <p>
+                                        <span>{{ 'File Name ' | translate }}:</span>{{ fileName }}
+                                    </p>
+                                    <a
+                                        [ngClass]="{ 'disabled-opacity-5': isFetchingFile }"
+                                        (click)="downloadEvidence(certId, fileName)"
+                                    >
+                                        <img
+                                            tooltip="Download"
+                                            container="body"
+                                            src="{{ env.IMG_URL }}images/file-download.png"
+                                            alt="Download"
+                                        />
+                                    </a>
+                                </div>
+                                <!-- Certificate Certificate Document -->
+                            </div>
+                            <!-- Certificate File Document -->
+                        </div>
+                        <!-- Certificate Transaction Certificate Block -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!--  Row -->
+            </div>
+            <!-- Column -->
+            <div class="col-md-7">
+                <div class="upload-transaction-field ">
+                    <div class="mandatory-title">
+                        <h4 class="title">{{ 'Highlighted fields are edited by the supplier' | translate }}</h4>
+                    </div>
+                    <!-- Mandatory Title -->
+                    <form #scopeCertificateForm="ngForm" class="scope-certificate-form-controls">
+                        <div class="material-input-style-box-type">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table class="table custom-table normal-style-table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>{{ 'Certificate Number' | translate }}</th>
+                                                        <th>{{ 'Certification Standard' | translate }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <div>
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        changedData && changedData.referenceNumber
+                                                                            ? changedData.referenceNumber
+                                                                            : ('Not Available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        taskData && taskData.certStandard
+                                                                            ? taskData.certStandard
+                                                                            : ('Not Available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Table Responsive -->
+                                    </div>
+                                    <!-- Table Container -->
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!--  Row -->
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table class="table custom-table normal-style-table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>{{ 'Valid from' | translate }}</th>
+                                                        <th>{{ 'Valid until' | translate }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <div>
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        changedData && changedData.validFrom
+                                                                            ? changedData.validFrom
+                                                                            : ('Not Available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        changedData && changedData.validUntil
+                                                                            ? changedData.validUntil
+                                                                            : ('Not Available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Table Responsive -->
+                                    </div>
+                                    <!-- Table Container -->
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!--  Row -->
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table class="table custom-table normal-style-table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            {{ 'Certification Body' | translate }}
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <p class="view-form-value">
+                                                                {{
+                                                                    changedData && changedData.bodyIssuingCertificate
+                                                                        ? changedData.bodyIssuingCertificate
+                                                                        : ('Not Available' | translate)
+                                                                }}
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table class="table custom-table normal-style-table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>{{ 'Name of Certified Company' | translate }}</th>
+                                                        <th>{{ 'Supplier code' | translate }}</th>
+                                                        <th>{{ 'Supplier Name' | translate }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <div>
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        changedData &&
+                                                                        changedData.sellerOfProduct &&
+                                                                        changedData.sellerOfProduct['value']
+                                                                            ? changedData.sellerOfProduct['value']
+                                                                            : ('Not Available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        changedData &&
+                                                                        changedData.sellerOfProduct.matchedData &&
+                                                                        changedData.sellerOfProduct.matchedData['code']
+                                                                            ? changedData.sellerOfProduct.matchedData[
+                                                                                  'code'
+                                                                              ]
+                                                                            : ('Not Available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        changedData &&
+                                                                        changedData.sellerOfProduct.matchedData &&
+                                                                        changedData.sellerOfProduct.matchedData['value']
+                                                                            ? changedData.sellerOfProduct.matchedData[
+                                                                                  'value'
+                                                                              ]
+                                                                            : ('Not Available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Table Responsive -->
+                                    </div>
+                                    <!-- Table Container -->
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!--  Row -->
+
+                            <div class="row" *ngIf="facilityInfos && facilityInfos.length > 0">
+                                <div class="col-md-12">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table class="table custom-table sc-evidence-upload-table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>{{ 'Name of Unit/Facility' | translate }}</th>
+                                                        <th>{{ 'Processing steps / Activities' | translate }}</th>
+                                                        <th>{{ 'Facility Code' | translate }}</th>
+                                                        <th>{{ 'Facility Name' | translate }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let facility of facilityInfos; let ind = index">
+                                                        <td>
+                                                            <div>
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        changedData &&
+                                                                        changedData.facilityInfo &&
+                                                                        changedData.facilityInfo[ind]
+                                                                            ? changedData.facilityInfo[ind].nameOfUnit
+                                                                            : ('Not available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <div>
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        changedData &&
+                                                                        changedData.facilityInfo &&
+                                                                        changedData.facilityInfo[ind]
+                                                                            ? changedData.facilityInfo[ind].processes
+                                                                            : ('Not available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <mat-form-field
+                                                                [floatLabel]="'never'"
+                                                                class="mandatory"
+                                                                *ngIf="
+                                                                    changedData &&
+                                                                    changedData.facilityInfo &&
+                                                                    changedData.facilityInfo[ind] &&
+                                                                    changedData.facilityInfo[ind].matchedData &&
+                                                                    changedData.facilityInfo[ind].matchedData.value &&
+                                                                    changedData.facilityInfo[ind].matchedData.value ===
+                                                                        'Create new'
+                                                                "
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    matInput
+                                                                    maxlength="11"
+                                                                    placeholder="Enter Facility Code"
+                                                                    [(ngModel)]="
+                                                                        changedData.facilityInfo[ind].matchedData.code
+                                                                    "
+                                                                    (ngModelChange)="
+                                                                        changeUpperCase(
+                                                                            changedData.facilityInfo[ind].matchedData
+                                                                                .code,
+                                                                            ind
+                                                                        )
+                                                                    "
+                                                                    name="scope-certificate-fac-code{{ ind }}-{{ ind }}"
+                                                                    required
+                                                                />
+                                                            </mat-form-field>
+                                                            <div
+                                                                *ngIf="
+                                                                    changedData &&
+                                                                    changedData.facilityInfo &&
+                                                                    changedData.facilityInfo[ind] &&
+                                                                    changedData.facilityInfo[ind].matchedData &&
+                                                                    changedData.facilityInfo[ind].matchedData.value &&
+                                                                    changedData.facilityInfo[ind].matchedData.value !==
+                                                                        'Create new'
+                                                                "
+                                                            >
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        changedData &&
+                                                                        changedData.facilityInfo &&
+                                                                        changedData.facilityInfo[ind] &&
+                                                                        changedData.facilityInfo[ind].matchedData &&
+                                                                        changedData.facilityInfo[ind].matchedData.code
+                                                                            ? changedData.facilityInfo[ind].matchedData
+                                                                                  .code
+                                                                            : ('Not Available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div
+                                                                [ngClass]="{
+                                                                    'yellow-box':
+                                                                        !extractedData.facilityInfo ||
+                                                                        !changedData.facilityInfo ||
+                                                                        !extractedData.facilityInfo[ind] ||
+                                                                        !changedData.facilityInfo[ind] ||
+                                                                        !extractedData.facilityInfo[ind].matchedData ||
+                                                                        !changedData.facilityInfo[ind].matchedData ||
+                                                                        (extractedData.facilityInfo[ind].matchedData
+                                                                            .value !==
+                                                                            changedData.facilityInfo[ind].matchedData
+                                                                                .value &&
+                                                                            (workflowType ===
+                                                                                'SC_CERTIFICATE_APPROVAL' ||
+                                                                                workflowType === 'FACILITY_CREATION'))
+                                                                }"
+                                                            >
+                                                                <p class="view-form-value">
+                                                                    {{
+                                                                        changedData &&
+                                                                        changedData.facilityInfo &&
+                                                                        changedData.facilityInfo[ind] &&
+                                                                        changedData.facilityInfo[ind].matchedData &&
+                                                                        changedData.facilityInfo[ind].matchedData.value
+                                                                            ? changedData.facilityInfo[ind].matchedData
+                                                                                  .value
+                                                                            : ('Not available' | translate)
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Table Responsive -->
+                                    </div>
+                                    <!-- Table Container -->
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!--  Row -->
+
+                            <div class="approval-status-block">
+                                <div class="row" *ngIf="taskData && taskData.status">
+                                    <div class="col-md-12">
+                                        <p class="approval-status-reasons-title">
+                                            {{ 'Reason provided by supplier' | translate }}
+                                        </p>
+                                        <div *ngIf="comments; else notAvailable">
+                                            <div
+                                                class="approval-status-reasons"
+                                                *ngFor="let reason of comments.selectedComments; let reasonInd = index"
+                                            >
+                                                <p>{{ reason }}</p>
+                                            </div>
+                                            <div
+                                                class="approval-status-reasons"
+                                                *ngIf="comments && comments.otherComments"
+                                            >
+                                                <p>
+                                                    {{ 'Other ' | translate }}:{{ comments.otherComments | translate }}
+                                                </p>
+                                            </div>
+                                            <div
+                                                class="approval-status-reasons"
+                                                *ngIf="comments && comments.resolutionDate"
+                                            >
+                                                <p>
+                                                    {{ 'Estimated Scope Certificate Release Date: '
+                                                    }}{{ comments.resolutionDate }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <ng-template #notAvailable>
+                                            <p class="content-grey">
+                                                {{ 'Not Available' | translate }}
+                                            </p>
+                                        </ng-template>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <div class="approval-status-block" *ngIf="taskData && taskData.status">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <label class="other-reason-label">Remarks:</label>
+                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                            <input
+                                                type="text"
+                                                matInput
+                                                placeholder="Enter Remarks"
+                                                [(ngModel)]="this.remarks"
+                                                name="scope-certificate-remarks"
+                                            />
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </div>
+ -->
+                            <div class="row" *ngIf="showActionButtons">
+                                <div class="col-md-12">
+                                    <div class="upload-footer-block">
+                                        <div class="footer-button-block text-right">
+                                            <button
+                                                type="button"
+                                                class="btn btn-secondary"
+                                                (click)="handleRejectClick(taskData)"
+                                            >
+                                                {{ 'Reject' | translate }}
+                                            </button>
+                                            <button
+                                                [disabled]="!scopeCertificateForm.valid"
+                                                type="button"
+                                                class="btn btn-primary"
+                                                (click)="handleApproveClick(taskData)"
+                                            >
+                                                {{ 'Approve' | translate }}
+                                            </button>
+                                        </div>
+                                        <!-- Footer Button Block -->
+                                    </div>
+                                    <!-- Upload Footer Block -->
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!-- Row -->
+                        </div>
+                    </form>
+                    <!-- Material Input Style Box Type-->
+                </div>
+                <!-- Upload Transaction Field-->
+            </div>
+            <!-- Column -->
+        </div>
+        <!--  Row -->
+    </div>
+    <!-- Upload Container Block -->
+</div>
+<!-- Upload Container -->

@@ -1,0 +1,68 @@
+export interface IRenameKeys {
+    from: string;
+    to: string;
+}
+
+export const getFilterListItems = {
+    TASK_MANAGER: 'tasks_filters',
+    COMPLETED_TASK_MANAGER: 'completed_tasks_filters',
+    AUDITS: 'audits_filters',
+    BOM: 'bom_filters',
+    CHARTS: 'chart_filters',
+    EVIDENCE: 'evidences_filters',
+    FACILITY_PROFILE: 'facility_filters',
+    INTEGRATION_LOGS: 'integration_logs_filters',
+    MAP_SUPPLIER: 'map_suppliers_filters',
+    MATERIAL_LIBRARY: 'ml_filters',
+    RAW_MATERIAL: 'materials_filters',
+    ORDERS: 'orders_filters',
+    ORDERS_LITE: 'orders_lite_filters',
+    PO_MANAGEMENT: 'po_filters',
+    TR_LAUNCH: 'trLaunch_filters',
+    TR_RECEIVED: 'trReceived_filter',
+    PRODUCTS: 'products_filters',
+    SCOPE_CERTIFICATE: 'scopeCertificates_filters',
+    STYLE: 'styles_filters',
+    STYLE_LITE: 'styles_lite_filters',
+    T_EMS: 't_ems_filters',
+    T_TRACE: 't_trace_filters',
+    TRANSACTIONS: 'transactions_filters',
+    UM: 'um_users',
+    RETAILER_ASSORTMENT: 'retailer_assortment_filters',
+    PRODUCT_DECLARATION: 'product_declaration_filters',
+    SUPPLIER_PROFILE_INVITED: 'invited_supplier_filter',
+    SUPPLIER_PROFILE_UNINVITED: 'un_invited_supplier_filter',
+    SUPPLIER_PROFILE_TERMINATED: 'terminated_supplier_filter'
+};
+
+export const setFilterListItems = {
+    tasks_filters: 'TASK_MANAGER',
+    completed_tasks_filters: 'COMPLETED_TASK_MANAGER',
+    audits_filters: 'AUDITS',
+    bom_filters: 'BOM',
+    chart_filters: 'CHARTS',
+    evidences_filters: 'EVIDENCES',
+    facility_filters: 'FACILITY_PROFILE',
+    integration_logs_filters: 'INTEGRATION_LOGS',
+    map_suppliers_filters: 'MAP_SUPPLIER',
+    ml_filters: 'MATERIAL_LIBRARY',
+    materials_filters: 'RAW_MATERIAL',
+    orders_filters: 'ORDERS',
+    orders_lite_filters: 'ORDERS_LITE',
+    po_filters: 'PO_MANAGEMENT',
+    trLaunch_filters: 'TR_LAUNCH',
+    trReceived_filter: 'TR_RECEIVED',
+    products_filters: 'PRODUCTS',
+    scopeCertificates_filters: 'SCOPE_CERTIFICATE',
+    styles_filters: 'STYLE',
+    styles_lite_filters: 'STYLE_LITE',
+    t_ems_filters: 'T_EMS',
+    t_trace_filters: 'T_TRACE',
+    transactions_filters: 'TRANSACTIONS',
+    um_users: 'UM',
+    retailer_assortment_filters: 'RETAILER_ASSORTMENT',
+    product_declaration_filters: 'PRODUCT_DECLARATION',
+    invited_supplier_filter: 'SUPPLIER_PROFILE_INVITED',
+    un_invited_supplier_filter: 'SUPPLIER_PROFILE_UNINVITED',
+    terminated_supplier_filter: 'SUPPLIER_PROFILE_TERMINATED'
+};

@@ -1,0 +1,67 @@
+<button type="button" mat-button class="button-badge" [disabled]="isDisabled" [ngClass]="{ 'border-red': hasError }">
+    <mat-select
+        #select
+        panelClass="multi-select-container-with-search"
+        [placeholder]="(label ? label : '') | translate"
+        [multiple]="multiSelect"
+        disableOptionCentering="true"
+        [formControl]="formControl"
+        [disabled]="isDisabled"
+        (openedChange)="modelCloseOpen($event)"
+    >
+        <mat-select-trigger *ngIf="isFilter" class="multi-select-label">{{
+            this.label | translate
+        }}</mat-select-trigger>
+        <mat-select-trigger *ngIf="!isFilter" class="multi-select-label">
+            {{ formControl.value | arrayObjectsToString: options:'id':'value' }}
+        </mat-select-trigger>
+
+        <div class="select-container product-select-container">
+            <div class="input-group" *ngIf="showSearch">
+                <span class="search-icon">
+                    <span class="glyphicon glyphicon-search"></span>
+                </span>
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="{{ 'Search' + (control?.label ? ' ' + control?.label : '') | translate }}"
+                    aria-describedby="basic-addon1"
+                    [formControl]="filterControl"
+                    (keydown)="$event.stopPropagation()"
+                />
+            </div>
+            <div class="options-list">
+                <mat-option
+                    [disabled]="readOnly"
+                    *ngFor="let option of options"
+                    [value]="option?.id"
+                    [style.display]="filtered(option?.value) ? '' : 'none'"
+                    >{{ option?.value?.trim() | translate }}</mat-option
+                >
+                <mat-option disabled *ngIf="!options || options?.length === 0 || noOptions()"
+                    >{{ 'No options found!' | translate }}
+                </mat-option>
+            </div>
+            <div class="button-block" [ngClass]="!showSelectAll ? 'center-button' : ''">
+                <button
+                    [disabled]="disableClear || readOnly"
+                    mat-button
+                    class="btn btn-bordered"
+                    [ngClass]="!showSelectAll ? 'full-width' : ''"
+                    (click)="reset()"
+                >
+                    {{ (this.control?.fieldType === 'SINGLE_SELECT' ? 'Clear' : 'Clear All') | translate }}
+                </button>
+                <button
+                    mat-button
+                    class="btn btn-secondary"
+                    [disabled]="options.length === 0"
+                    *ngIf="showSelectAll"
+                    (click)="selectAll()"
+                >
+                    {{ 'Select All' | translate }}
+                </button>
+            </div>
+        </div>
+    </mat-select>
+</button>

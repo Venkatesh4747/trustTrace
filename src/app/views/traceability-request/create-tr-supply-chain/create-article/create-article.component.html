@@ -1,0 +1,118 @@
+<tr provide-parent-form>
+    <td>
+        <div
+            class="article-type cursor-pointer"
+            [ngClass]="{ 'cursor-pointer': isScrollingApplicable() }"
+            (click)="scrollToElement(article.supplyChainArticle.internalArticleName)"
+        >
+            {{ getArcticleName }}
+        </div>
+    </td>
+    <td>
+        <div class="article-name-no">
+            <mat-form-field [floatLabel]="'never'">
+                <input
+                    matInput
+                    placeholder="{{ getArcticleName | translate }} Name & No"
+                    [(ngModel)]="article.supplyChainArticle.internalArticleName"
+                    name="article-name-{{ unique_id }}"
+                    required
+                    [readonly]="isReadonly"
+                />
+            </mat-form-field>
+        </div>
+    </td>
+    <td>
+        <div class="article-name-no">
+            <mat-form-field [floatLabel]="'never'">
+                <input
+                    matInput
+                    placeholder="{{ 'Supplier Article Name' | industry | translate }}"
+                    [(ngModel)]="article.supplyChainArticle.productOtherInfo.tradeName"
+                    name="supplier-article-name-{{ unique_id }}"
+                />
+            </mat-form-field>
+        </div>
+    </td>
+    <td>
+        <div class="article-supplier">
+            <app-tt-supplier-search
+                origin="T-trace"
+                [existingValue]="getExisitingDataForSupplierSearch(article.supplyChainArticle)"
+                (selectionChange)="onSelectingSupplier($event)"
+                placeholder="{{ getArcticleName | translate }} Supplier"
+                [required]="true"
+                unInvitedTooltip="Uninvited Supplier - T-Trace will not be launched since this supplier was not invited to the platform"
+                unAcceptedTooltip="Unaccepted Supplier - Requests can be sent but will only be viewed by the Supplier after he accepts your invitation"
+            >
+            </app-tt-supplier-search>
+        </div>
+    </td>
+    <td *ngIf="showFacilityColumn">
+        <div class="article-facility" *ngIf="!isFetchingFacility">
+            <app-tt-dropdown-search
+                [searchOptions]="facilities"
+                [(ngModel)]="selectedFacility"
+                placeholder="{{ getArcticleName | translate }} Facility"
+                name="facility-name-{{ unique_id }}"
+                [optionalParams]="optional"
+                floatLabel="never"
+                [isRequired]="false"
+                (selectionChange)="onSelectingFacility($event)"
+                (onClearInput)="handleFacilityClearInput($event)"
+            >
+            </app-tt-dropdown-search>
+        </div>
+        <i class="fa fa-spinner fa-spin ec-loader" *ngIf="isFetchingFacility"></i>
+    </td>
+    <td>
+        <div class="ponumber">
+            <mat-form-field [floatLabel]="'never'">
+                <input
+                    matInput
+                    name="ponumber-{{ unique_id }}"
+                    [(ngModel)]="article['poNumber']"
+                    placeholder="PO No. for {{ getArcticleName | translate }}"
+                />
+            </mat-form-field>
+        </div>
+    </td>
+    <td>
+        <div class="article-data-collection">
+            <mat-checkbox
+                [disabled]="makeCreateToggleDisable()"
+                [labelPosition]="'after'"
+                [(ngModel)]="toggleValue"
+                name="toggle-{{ unique_id }}"
+                (change)="handleToggleChange($event)"
+            >
+                {{ 'Collect next tier data from supplier' | translate }}
+            </mat-checkbox>
+        </div>
+    </td>
+    <td>
+        <div class="delete-icon-block">
+            <span
+                class="mb-minus-5 delete-button-container"
+                *ngIf="disableDelete"
+                tooltip="At least one product must be listed"
+                placement="top"
+            >
+                <button type="button" class="action-icon-delete" (click)="deleteSupplyChain(article)" disabled>
+                    <img src="{{ env.IMG_URL }}images/delete-icon.png" alt="delete" />
+                </button>
+            </span>
+            <span class="mb-minus-5 delete-button-container" *ngIf="!disableDelete">
+                <button
+                    type="button"
+                    class="action-icon-delete"
+                    (click)="deleteSupplyChain(article)"
+                    [ngClass]="{ 'cursor-default': isReadonly }"
+                    [disabled]="isReadonly"
+                >
+                    <img src="{{ env.IMG_URL }}images/delete-icon.png" alt="delete" />
+                </button>
+            </span>
+        </div>
+    </td>
+</tr>

@@ -1,0 +1,60 @@
+@import '~styles/variables';
+
+.certificate-container {
+    height: auto;
+    padding-bottom: 10px;
+    //border-bottom: 1px solid #d4d4d4;
+}
+
+.certificate-file-names {
+    font-family: $font-family-Semibold;
+    color: $text-color-primary;
+    font-size: 17px;
+    text-align: left;
+    display: block;
+    justify-content: space-between;
+    align-items: center;
+    .certificate-file-name {
+        padding-bottom: 10px;
+        .name {
+            font-family: $font-family-Regular;
+        }
+    }
+    .file-name-actions {
+        color: $border-color-primary;
+        padding: 10px;
+        i {
+            cursor: pointer;
+            &:first-child {
+                padding-right: 5px;
+            }
+        }
+    }
+}
+
+.uploading-text {
+    color: $hover-color-primary;
+    font-family: $font-family-Semibold;
+    font-size: 13px;
+}
+
+.uploaded-text {
+    color: $color-tt-secondary;
+    font-family: $font-family-Semibold;
+    font-size: 13px;
+}
+.no-certificate-available {
+    width: 100%;
+    text-align: center;
+    margin-top: 5em;
+    img.no-certificate-image {
+        width: 75px;
+    }
+    div.page-heading {
+        font-family: $font-family-Bold;
+        color: $text-color-primary;
+        font-size: 14px;
+        padding-top: 5px;
+        text-align: center;
+    }
+}

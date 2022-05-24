@@ -1,0 +1,300 @@
+@import '~styles/variables';
+@import '~styles/mixins';
+
+/* Page header SCSS */
+.page {
+    &-title {
+        .title {
+            font-size: 18px;
+        }
+        .sub-title {
+            font-size: 14px;
+            color: $text-color-primary;
+            font-weight: normal;
+            font-family: 'Source Sans Pro-Regular';
+        }
+    }
+}
+/* Progress Bar SCSS */
+.progress {
+    width: 100%;
+    float: right;
+    //background-color: $color-secondary-gray;
+    //@include radius(0);
+    margin: 3px 0;
+    max-width: 20%;
+    height: 15px;
+    &-bar {
+        //background-color: $color-tt-secondary-dark;
+        //@include shadow(none);
+        &-details {
+            display: block;
+            position: relative;
+            width: 100%;
+            text-align: right;
+            float: right;
+            padding-right: 10px;
+            .progress-bar-description {
+                margin-bottom: 0;
+                font-weight: bold;
+                color: $text-color-primary;
+                b {
+                    padding: 0 5px;
+                }
+            }
+            .profile-url {
+                display: block;
+                text-decoration: none;
+                color: $text-color-primary;
+                font-weight: bold;
+                position: absolute;
+                bottom: -22px;
+                right: 10px;
+            }
+        }
+    }
+}
+
+/* Table SCSS */
+.table-cont {
+    /**make table can scroll**/
+    overflow: auto;
+    display: block;
+    width: 100%;
+    /** add some style**/
+    /*padding: 2px;*/
+    margin: 20px 10px;
+    /* box-shadow: 0 0 1px 3px #ddd; */
+}
+.table {
+    > thead {
+        > tr {
+            > th {
+                background: #ffffff;
+                z-index: 999;
+                vertical-align: middle;
+                color: $text-color-primary;
+                font-weight: bold;
+                padding: 0 5px 15px;
+                font-size: 16px;
+                &:first-child {
+                    width: 70px;
+                }
+                &:nth-child(2) {
+                    width: 220px;
+                    @media screen and (max-width: 1024px) {
+                        width: 300px;
+                    }
+                    @media screen and (min-width: 1366px) {
+                        width: 300px;
+                    }
+                }
+                &:last-child {
+                    padding-left: 15px;
+                }
+            }
+        }
+    }
+    > tbody {
+        max-height: calc(100vh - 22em);
+        > tr {
+            > td {
+                font-size: 14px;
+                vertical-align: middle;
+                color: $text-color-primary;
+                padding: 15px 5px;
+                word-break: break-word;
+                font-size: 16px;
+                &:first-child {
+                    width: 70px;
+                }
+                &:nth-child(2) {
+                    width: 220px;
+                    @media screen and (max-width: 1024px) {
+                        width: 300px;
+                    }
+                    @media screen and (min-width: 1366px) {
+                        width: 300px;
+                    }
+                }
+
+                .btn {
+                    &.btn-gray {
+                        border: 0;
+                        padding: 5px 15px;
+                        color: $text-color-primary;
+                        font-weight: bold;
+                        &:focus {
+                            outline: none;
+                            box-shadow: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .form {
+        &-group {
+            margin-bottom: 0;
+            .multiselect-native-select {
+                box-shadow: none;
+                //@include radius(0);
+                max-width: 300px;
+                .btn-group {
+                    width: auto;
+                    .multiselect {
+                        &.btn {
+                            border: 0;
+                            &:focus {
+                                outline: none;
+                                box-shadow: none;
+                            }
+                            .caret {
+                                right: -18px;
+                            }
+                        }
+                    }
+                    .multiselect-container {
+                        top: 20px !important;
+                        max-height: 200px;
+                        overflow: auto;
+                        &.dropdown-menu {
+                            min-width: 14rem;
+                        }
+                        li {
+                            padding: 0px 5px;
+                            &.multiselect-item {
+                                &.multiselect-filter {
+                                    .form-control {
+                                        &:focus {
+                                            box-shadow: none;
+                                            outline: none;
+                                            /*  border-color: $color_primary_gray; */
+                                        }
+                                    }
+                                }
+                            }
+                            a {
+                                label {
+                                    &.checkbox {
+                                        padding: 5px 15px !important;
+                                        font-size: 14px;
+                                        /* color: $color_primary_gray; */
+                                        display: block;
+                                        line-height: 1;
+                                        margin-bottom: 0;
+                                        input[type='checkbox'] {
+                                            width: 17px;
+                                            height: 17px;
+                                            vertical-align: middle;
+                                        }
+                                        &:focus {
+                                            outline: none;
+                                        }
+                                    }
+                                    &:focus {
+                                        outline: none;
+                                    }
+                                }
+                                &:hover {
+                                    text-decoration: none;
+                                }
+                                &:focus {
+                                    outline: none;
+                                }
+                            }
+                            &:nth-child(2) {
+                                a {
+                                    label {
+                                        &.checkbox {
+                                            padding-left: 10px !important;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .multiselect-selected-text {
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+
+/* Check box Star Style sCSS */
+.star {
+    &-rated {
+        &-section {
+            &-details {
+                display: flex;
+                width: 100%;
+                vertical-align: middle;
+                align-items: center;
+                padding-left: 0;
+                margin: 0;
+                /*  width: 400px;  */
+                li {
+                    display: block;
+                    float: left;
+                }
+            }
+        }
+        &-checkbox {
+            input {
+                border: 0;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
+                position: absolute;
+                opacity: 0;
+            }
+            label {
+                float: right;
+                /* color: $color_primary_gray; */
+                font-size: 14px;
+                margin-bottom: 0;
+                cursor: pointer;
+            }
+            label:before {
+                margin: 5px;
+                margin-right: 10px;
+                content: '\f005';
+                font-family: FontAwesome;
+                display: inline-block;
+                vertical-align: middle;
+                font-size: 1.5em;
+                color: #ccc;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                user-select: none;
+            }
+            input:checked ~ label:before {
+                color: $color-tt-primary;
+            }
+            label:hover ~ label:before {
+                color: $color-tt-primary;
+            }
+            label:hover:before {
+                color: $color-tt-primary;
+            }
+        }
+    }
+}
+
+.table-cont {
+    &.table-responsive {
+        overflow: hidden;
+    }
+}
+
+.action-btn {
+    .tt-btn {
+        @media screen and (max-width: 1366px) and (min-width: 1024px) {
+            min-width: 80px !important;
+            padding: 5px 25px;
+        }
+    }
+}

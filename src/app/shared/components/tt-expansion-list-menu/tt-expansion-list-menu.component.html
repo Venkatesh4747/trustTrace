@@ -1,0 +1,15 @@
+<div #expansionElement>
+    <div id="expansion-icon" (click)="expansion = !expansion" title="{{ 'Incomplete Fields' | translate }}">
+        <span class="circle fa fa-info"></span>
+    </div>
+    <div class="expansion-container" *ngIf="expansion">
+        <mat-expansion-panel [(expanded)]="expansion">
+            <div class="expansion-title">
+                {{ 'Please fill out the following sections to complete your profile' | translate }}
+            </div>
+            <div class="expansion-body" *ngFor="let item of menuList">
+                {{ item }}
+            </div>
+        </mat-expansion-panel>
+    </div>
+</div>

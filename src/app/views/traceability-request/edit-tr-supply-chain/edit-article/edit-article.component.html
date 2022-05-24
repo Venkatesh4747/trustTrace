@@ -1,0 +1,127 @@
+<tr provide-parent-form>
+    <td>
+        <div
+            class="article-type-block"
+            [ngClass]="{ 'cursor-pointer': isScrollingApplicable() }"
+            (click)="scrollToElement(article.supplyChainArticle.internalArticleName)"
+        >
+            <mat-checkbox
+                class="article-type cursor-pointer"
+                (change)="handleSelectArticleType($event)"
+                [disabled]="isSupplyChainArticleMandatory"
+            >
+                <div class="article-details">
+                    <p>
+                        {{ getArticleName }}
+                    </p>
+                </div>
+            </mat-checkbox>
+        </div>
+    </td>
+    <td>
+        <div class="article-name-no">
+            <mat-form-field [floatLabel]="'never'" [tooltip]="article.supplyChainArticle.internalArticleName">
+                <input
+                    (input)="onInputEvent()"
+                    matInput
+                    placeholder="{{ getArticleName | translate }} {{ 'Name & No' | translate }}"
+                    [(ngModel)]="article.supplyChainArticle.internalArticleName"
+                    name="article-name-{{ unique_id }}"
+                    required
+                    [readonly]="isReadonly"
+                />
+            </mat-form-field>
+        </div>
+    </td>
+    <td>
+        <div class="article-name-no">
+            <mat-form-field [floatLabel]="'never'">
+                <input
+                    (input)="onInputEvent()"
+                    matInput
+                    placeholder="{{ 'Supplier Article Name' | industry | translate }}"
+                    [(ngModel)]="article.supplyChainArticle.productOtherInfo.tradeName"
+                    name="supplier-article-name-{{ unique_id }}"
+                />
+            </mat-form-field>
+        </div>
+    </td>
+    <td>
+        <div class="article-supplier">
+            <app-tt-supplier-search
+                origin="T-trace"
+                placeholder="{{ getArticleName | translate }} {{ 'Supplier' | translate }}"
+                [existingValue]="getExistingDataForSupplierSearch(article.supplyChainArticle)"
+                (searchTextChange)="clearSupplierData()"
+                (selectionChange)="onSelectingSupplier($event)"
+                [required]="true"
+                [unInvitedTooltip]="
+                    'Uninvited Supplier - T-Trace will not be launched since this supplier was not invited to the platform'
+                        | translate
+                "
+                [unAcceptedTooltip]="
+                    'Unaccepted Supplier - Requests can be sent but will only be viewed by the Supplier after he accepts your invitation'
+                        | translate
+                "
+            >
+            </app-tt-supplier-search>
+        </div>
+    </td>
+    <td *ngIf="showFacilityColumn">
+        <div class="article-facility" *ngIf="!isFetchingFacility">
+            <app-tt-dropdown-search
+                [searchOptions]="facilities"
+                [(ngModel)]="selectedFacility"
+                placeholder="{{ getArticleName | translate }} {{ 'Facility' | translate }}"
+                name="facility-name-{{ unique_id }}"
+                [optionalParams]="optional"
+                [floatLabel]="'never'"
+                [isRequired]="false"
+                (selectionChange)="onSelectingFacility($event)"
+                (onClearInput)="handleFacilityClearInput($event)"
+            >
+            </app-tt-dropdown-search>
+        </div>
+        <i class="fa fa-spinner fa-spin ec-loader" *ngIf="isFetchingFacility"></i>
+    </td>
+    <td class="pr-2">
+        <div class="ponumber">
+            <mat-form-field [floatLabel]="'never'">
+                <input
+                    matInput
+                    (input)="onInputEvent()"
+                    (keydown.space)="$event.preventDefault()"
+                    class="text-uppercase"
+                    name="ponumber-{{ unique_id }}"
+                    [(ngModel)]="article['poNumber']"
+                    placeholder="{{ 'PO No. for' | translate }} {{ getArticleName | translate }}"
+                />
+            </mat-form-field>
+        </div>
+    </td>
+    <td>
+        <div class="article-data-collection" *ngIf="article.supplyChainArticle.traceable === 'yes'">
+            <mat-checkbox
+                [disabled]="makeToggleDisable()"
+                [labelPosition]="'after'"
+                [(ngModel)]="toggleValue"
+                name="toggle-{{ unique_id }}"
+                (change)="handleToggleChange($event)"
+            >
+                <div class="article-data-details">
+                    <span class="article-checkbox-label">
+                        {{ "Provide this supplier's data by yourself" | translate }}
+                    </span>
+                    <span
+                        [tooltip]="
+                            'If you know the supplier details of this supplier, please select to provide the data. Else you can launch request to that supplier to get the details'
+                                | translate
+                        "
+                    >
+                        <mat-icon class="article-error">error</mat-icon>
+                    </span>
+                </div>
+            </mat-checkbox>
+        </div>
+    </td>
+</tr>

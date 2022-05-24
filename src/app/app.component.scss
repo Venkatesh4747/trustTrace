@@ -1,0 +1,30 @@
+.chat-support-content {
+    position: absolute;
+    z-index: 9999;
+    bottom: 77px;
+    left: 90px;
+    color: #838383;
+    font-size: 13px;
+    font-family: 'Source Sans Pro-Regular';
+    width: 80px;
+    word-break: break-all;
+}
+
+.faq-help {
+    position: absolute;
+    z-index: 1000;
+    bottom: 10px;
+    left: 20px;
+    font-family: 'Source Sans Pro-Regular';
+
+    img {
+        width: 5em;
+    }
+    span {
+        z-index: 1001;
+        position: absolute;
+        left: 0.64em;
+        top: 1.1em;
+        font-size: 1.5em;
+    }
+}

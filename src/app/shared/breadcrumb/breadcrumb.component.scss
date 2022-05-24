@@ -1,0 +1,36 @@
+@import '~styles/variables';
+
+.bread-crumb {
+    position: fixed;
+    top: 56px;
+    left: 69px;
+    right: 0;
+    z-index: 100;
+}
+
+.bread-crumb.collapsed {
+    left: $side-nav-bar-width;
+}
+
+.bread-crumb-inner {
+    background: #f1f1f1;
+    font-size: 13px;
+    padding: 5px 9px;
+}
+
+.bread-crumb ul {
+    margin: 0;
+}
+
+.bread-crumb ul li a {
+    color: #666;
+}
+
+.bread-crumb ul li {
+    padding: 0;
+    margin: 0 4px;
+}
+
+.fa.fa-home {
+    font-size: 17px;
+}

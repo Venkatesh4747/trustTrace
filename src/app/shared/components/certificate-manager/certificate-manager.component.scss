@@ -1,0 +1,69 @@
+@import '../../../../styles/variables';
+
+.certificate-list-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.certificate-list-item {
+    width: 100%;
+}
+
+.tt-file-upload-ui-container {
+    border: 2px dashed $border-color-default;
+    padding: 20px 30px;
+    margin: 15px 15px 15px 0;
+    max-width: 300px;
+    cursor: pointer;
+    @media screen and (max-width: 1400px) {
+        padding: 10px 10px;
+        margin: 15px 0px 15px 0;
+    }
+}
+@media screen and (max-width: 1200px) and (min-width: 991px) {
+    .tt-file-upload-ui-container {
+        .tt-file-upload-ui-content {
+            .spinner-wrapper {
+                img {
+                    &.mr-2 {
+                        margin-right: 0 !important;
+                    }
+                }
+                h5 {
+                    &.description {
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.tt-file-upload-ui-content {
+    text-align: center;
+    .description {
+        color: #cccccc !important;
+        font-family: $font-family-Semibold;
+        font-size: 16px;
+        margin-left: 15px;
+    }
+}
+
+.tt-uploaded-file-list-container {
+    .tt-uploaded-file {
+        padding: 10px 10px 10px 0;
+        .fileName {
+            font-family: $font-family-Semibold;
+            font-size: 14px;
+            color: $text-color-primary;
+        }
+    }
+
+    .tt-remove-uploaded-file {
+        margin-left: 10px;
+        cursor: pointer;
+    }
+}
+.single-select-container {
+    width: 75%;
+}

@@ -1,0 +1,43 @@
+<div class="parent-container {{ addClass }}">
+    <!-- TITLE BAR -->
+    <div id="title-container">
+        <p class="title">{{ title | translate }}</p>
+        <a (click)="closeDialog()" *ngIf="showClose">
+            <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+        </a>
+    </div>
+    <!-- END OF TITLE BAR -->
+
+    <!-- MAIN CONTAINER -->
+    <div id="main-dialog-container">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div
+                [ngClass]="{ 'margin-lr-reset': data?.removeMargins }"
+                class="del-message"
+                [innerHTML]="msg | translate"
+            ></div>
+        </div>
+        <div *ngIf="isProvisionToAddInput" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 talign-center">
+            <mat-form-field [floatLabel]="'auto'" class="input">
+                <input matInput placeholder="{{ placeholder | translate }}" [(ngModel)]="inputText" />
+            </mat-form-field>
+        </div>
+    </div>
+    <!-- END OF MAIN CONTAINER -->
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center mt-3">
+        <div class="centreButtons">
+            <button
+                [disabled]="toBeDisabled && !inputText"
+                [style.margin-right]="secondaryButton ? '20px' : '0px'"
+                class="primary-btn"
+                (click)="actionDone(primaryButton)"
+            >
+                {{ primaryButton | translate }}
+            </button>
+            <button class="secondary-btn" *ngIf="secondaryButton" (click)="actionDone(secondaryButton, inputText)">
+                {{ secondaryButton | translate }}
+            </button>
+        </div>
+    </div>
+</div>

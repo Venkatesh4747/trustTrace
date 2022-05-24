@@ -1,0 +1,16 @@
+<div class="view-container">
+    <section class="text-center not-found pt-4" style="margin-top: 70px;">
+        <i class="fa fa-exclamation-triangle text-blue mb-2"></i>
+
+        <p class="mb-3 msg">{{ 'Looks like you have stumbled upon a broken link or missing page' | translate }}</p>
+
+        <button style="font-size: 14px;" [routerLink]="getDefaultLandingLink()" class="btn btn-blue mb-4">
+            <img src="{{ env.IMG_URL }}images/back.png" alt="back" /> {{ 'Back to Products' | translate }}
+        </button>
+
+        <p style="font-weight: 400; font-size: 16px;">
+            {{ 'if you think is an error, contact our support team at' | translate }}
+            <a href="mailto:support@trustrace.com" data-toggle="modal" data-target="#notfound">support@trustrace.com</a>
+        </p>
+    </section>
+</div>

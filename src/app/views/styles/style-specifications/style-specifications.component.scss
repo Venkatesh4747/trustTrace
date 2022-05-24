@@ -1,0 +1,49 @@
+@import '~styles/variables';
+.style-specifications {
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    color: $text-color-primary;
+    fieldset {
+        width: 48%;
+        margin-bottom: 30px;
+        &.chip-card-input {
+            width: 100%;
+        }
+        label {
+            width: 100%;
+            .style-uid-info {
+                float: right;
+            }
+        }
+        input {
+            width: 100%;
+            border: none;
+            box-shadow: none;
+            border-bottom: 2px solid #ccc;
+            margin-top: 10px;
+        }
+        .mat-form-field {
+            width: 100%;
+        }
+        .mat-form-field-label {
+            display: none;
+        }
+        .mat-form-field-underline {
+            border-bottom: 2px solid #ccc;
+        }
+        div.product-group-items {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            div {
+                width: 48%;
+                margin-top: 20px;
+                label.pdt-group-name {
+                    text-transform: capitalize;
+                }
+            }
+        }
+    }
+}

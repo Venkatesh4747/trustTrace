@@ -1,0 +1,30 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<mat-accordion class="mat-form-block-type-one" *ngIf="!pageLoading">
+    <mat-expansion-panel *ngFor="let division of divisions" (opened)="getAdditionalInfo(division)">
+        <mat-expansion-panel-header>
+            <mat-panel-title> {{ division }} </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="mat-panel-body">
+            <div class="row mt-1 mb-2">
+                <!-- <app-filter-criteria
+                    [filterCriteriaItems]="divisionItems[division]"
+                    [companyId]="companyId"
+                    [division]="division"
+                >
+                </app-filter-criteria> -->
+                <div *ngIf="!isFetchingAdditionalInfo">
+                    <app-additional-information
+                        [entityId]="companyId"
+                        [entity]="entity"
+                        [entityData]="additionalInfo"
+                        [fieldResponse]="fieldResponse"
+                        [showTitle]="false"
+                        (saveAdditionalInfo)="onSaveAdditionalInfo($event)"
+                    >
+                    </app-additional-information>
+                </div>
+                <i class="fa fa-spinner fa-spin ec-loader" *ngIf="isFetchingAdditionalInfo"></i>
+            </div>
+        </div>
+    </mat-expansion-panel>
+</mat-accordion>

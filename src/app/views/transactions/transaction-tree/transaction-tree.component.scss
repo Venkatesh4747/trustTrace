@@ -1,0 +1,14 @@
+.transaction-tree {
+    overflow: auto;
+    position: absolute;
+    bottom: 0;
+    top: 150px;
+    left: 15px;
+    right: 0;
+    overflow: auto;
+    width: 100%;
+    max-height: calc(100vh - 10em);
+}
+.edit-styled-btn {
+    margin: 20px;
+}

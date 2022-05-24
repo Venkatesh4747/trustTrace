@@ -1,0 +1,12 @@
+@import '~styles/variables';
+.tr-to-be-launched {
+    padding-left: 22px;
+}
+.cancel-btn,
+.save-btn {
+    border-radius: 5px;
+    width: 100%;
+}
+.select-tr-option {
+    color: $text-color;
+}

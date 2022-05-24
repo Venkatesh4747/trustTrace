@@ -1,0 +1,5 @@
+<div class="modal-input-group-container">
+    <div class="display-flex" *ngFor="let val of data.inputs; let isLast = last">
+        {{ val.firstName }}{{ val.lastName }}{{ isLast ? '' : ',' }}
+    </div>
+</div>

@@ -1,0 +1,299 @@
+<ul
+    class="list-unstyled list-inline"
+    [ngClass]="{
+        'root-node': rootNode,
+        'root-node-immediate-child': rootNodeImmediateChild,
+        'more-than-one-child-node': moreThanOneChildNode
+    }"
+>
+    <li class="node-container" *ngFor="let lotDatum of lotData">
+        <div class="node-container-outer">
+            <div class="node-container-inner" [ngClass]="{ 'root-node-has-children': lotDatum.inputEpcs?.length > 0 }">
+                <div class="tt-font text-center node-container-content">
+                    <div class="content">
+                        <div class="lot-details">
+                            <div class="po-number" *ngIf="lotDatum.poView && lotDatum.poView.division">
+                                {{ 'Division' | translate }}:
+                                <span class="font-bold">{{ lotDatum.poView.division || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.poView && lotDatum.poView.poNumber">
+                                {{ 'PO Number' | translate }}:
+                                <span class="font-bold">{{ lotDatum.poView.poNumber || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.poView && lotDatum.poView.productRefId">
+                                {{ 'Article Number' | translate }}:
+                                <span class="font-bold">{{ lotDatum.poView.productRefId || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.articleType">
+                                {{ 'Product Type' | translate }}:
+                                <span class="font-bold">{{ lotDatum.articleType || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.factoryName">
+                                {{ lotDatum.tierId ? tiers[lotDatum.tierId] : '' }}&nbsp;{{
+                                    'Facility Name & Code' | translate
+                                }}:
+                                <span class="font-bold">{{ lotDatum.factoryName || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.factoryCountry">
+                                {{ lotDatum.tierId ? tiers[lotDatum.tierId] : '' }}&nbsp;{{
+                                    'Facility Country' | translate
+                                }}:
+                                <span class="font-bold">{{ lotDatum.factoryCountry || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.invoiceDate">
+                                {{ lotDatum.tierId ? tiers[lotDatum.tierId] : '' }}&nbsp;
+                                {{ 'Invoice Date' | translate }}:
+                                <span class="font-bold">{{ (lotDatum.invoiceDate | date: 'dd-MM-yyyy') || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.productNo">
+                                {{ 'Product Number' | translate }}:
+                                <span class="font-bold">{{ lotDatum.productNo || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.productName">
+                                {{ 'Product Name' | translate }}:
+                                <span class="font-bold">{{ lotDatum.productName || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.articleNo">
+                                {{ 'Product UID' | translate }}:
+                                <span class="font-bold">{{ lotDatum.articleNo || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.mlmId">
+                                {{ 'Material UID' | translate }}:
+                                <span class="font-bold">{{ lotDatum.mlmId || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.mlmName">
+                                {{ 'Material Name' | translate }}:
+                                <span class="font-bold">{{ lotDatum.mlmName || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.totalQuantityUOM">
+                                {{ 'Total Quantity(UOM)' | translate }}:
+                                <span class="font-bold">{{ lotDatum.totalQuantityUOM || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.usedQuantityUOM">
+                                {{ 'Used Quantity(UOM)' | translate }}:
+                                <span class="font-bold">{{ lotDatum.usedQuantityUOM || 'NA' }}</span>
+                            </div>
+                            <div
+                                class="po-number"
+                                *ngIf="lotDatum.materialCompositions && lotDatum.materialCompositions.length > 0"
+                            >
+                                {{ 'Material Composition' | translate }}:
+                                <span
+                                    class="font-bold"
+                                    *ngFor="let comp of lotDatum.materialCompositions; let isLast = last"
+                                >
+                                    {{ comp.value }}% {{ comp.id }} {{ isLast ? '' : ',' }}
+                                </span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.tcReferenceId">
+                                {{ 'TC Reference ID' | translate }}:
+                                <span
+                                    class="font-bold popover-link"
+                                    (click)="openTransactionCertificateDetailView(lotDatum)"
+                                    >{{ lotDatum.tcReferenceId || 'NA' }}</span
+                                >
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.lotNo">
+                                {{ 'Lot No' | translate }}:
+                                <span class="font-bold">{{ lotDatum.lotNo || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.prodNo">
+                                {{ lotDatum.tierId ? tiers[lotDatum.tierId] : '' }}&nbsp; {{ 'Lot No' | translate }}:
+                                <span class="font-bold">{{ lotDatum.prodNo || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.invoiceNo">
+                                {{ lotDatum.tierId ? tiers[lotDatum.tierId] : '' }}&nbsp;
+                                {{ 'Invoice Number' | translate }}:
+                                <span class="font-bold">{{ lotDatum.invoiceNo || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.tradeName">
+                                {{ 'Trade Name' | translate }}:
+                                <span class="font-bold">{{ lotDatum.tradeName || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.totalQuantity">
+                                {{ 'Total Quantity (kg)' | translate }}:
+                                <span class="font-bold">{{ lotDatum.totalQuantity || 'NA' }}</span>
+                            </div>
+                            <div class="po-number" *ngIf="lotDatum.usedQuantity">
+                                {{ 'Used Quantity (kg)' | translate }}:
+                                <span class="font-bold">{{ lotDatum.usedQuantity || 'NA' }}</span>
+                            </div>
+                        </div>
+                        <div class="lot-certificates mt-1">
+                            <div *ngFor="let certificate of lotDatum.certificates">
+                                <div class="fileRow">
+                                    <span class="filename font-bold">{{
+                                        localization.getDisplayText(certificate.typeId)
+                                    }}</span>
+                                    <span
+                                        class="download-icon cursor-pointer"
+                                        tooltip="Download"
+                                        (click)="downloadCertificate(certificate)"
+                                    >
+                                        <img
+                                            src="{{ env.IMG_URL }}images/icon-download-black.png"
+                                            alt="Download Certificate"
+                                        />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div *ngFor="let qualityReport of lotDatum.qualityReports">
+                                <div class="fileRow" *ngIf="qualityReport.fileName.length > 0">
+                                    <span class="filename font-bold">Quality Report</span>
+                                    <span
+                                        class="download-icon cursor-pointer"
+                                        tooltip="Download"
+                                        (click)="downloadEvidenceFile(qualityReport)"
+                                    >
+                                        <img
+                                            src="{{ env.IMG_URL }}images/icon-download-black.png"
+                                            alt="Download Certificate"
+                                        />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div *ngFor="let otherDoc of lotDatum.otherDocs">
+                                <div class="fileRow" *ngIf="otherDoc.fileName.length > 0">
+                                    <span class="filename font-bold">Other Documents</span>
+                                    <span
+                                        class="download-icon cursor-pointer"
+                                        tooltip="Download"
+                                        (click)="downloadEvidenceFile(otherDoc)"
+                                    >
+                                        <img
+                                            src="{{ env.IMG_URL }}images/icon-download-black.png"
+                                            alt="Download Certificate"
+                                        />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BOM validation -->
+                        <ng-template #bomValidation>
+                            <div class="bom-validation-article-number">
+                                {{ 'Article Number:' | translate }} {{ lotDatum.articleNo }}
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table custom-table table-striped" *ngIf="lotDatum.bomValidation">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">{{ 'BOM from PLM/PDM' | translate }}</th>
+                                            <th scope="col">{{ 'T2 code in BOM' | translate }}</th>
+                                            <th scope="col">{{ 'Real T2 code in BOM' | translate }}</th>
+                                            <th scope="col">{{ 'Supplier input BOM' | translate }}</th>
+                                            <th scope="col">{{ 'Facility code' | translate }}</th>
+                                            <th scope="col">{{ 'Umbrella code' | translate }}</th>
+                                            <th scope="col">{{ 'Variance' | translate }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let row of lotDatum.bomValidation.bomTableData">
+                                            <td *ngIf="row.bomMaterialCode; else notAvailable">
+                                                {{ row.bomMaterialCode }}
+                                            </td>
+                                            <td *ngIf="row.bomFacilityCode; else notAvailable">
+                                                {{ row.bomFacilityCode }}
+                                            </td>
+                                            <td *ngIf="row.realT2Code; else notApplicable">
+                                                {{ row.realT2Code }}
+                                            </td>
+                                            <td *ngIf="row.supplierMaterialCode; else notAvailable">
+                                                {{ row.supplierMaterialCode }}
+                                            </td>
+                                            <td *ngIf="row.supplierFacilityCode; else notAvailable">
+                                                {{ row.supplierFacilityCode }}
+                                            </td>
+                                            <td *ngIf="row.umbrellaCode; else notApplicable">
+                                                {{ row.umbrellaCode }}
+                                            </td>
+                                            <td
+                                                *ngIf="
+                                                    row.variance !== null && row.variance !== undefined;
+                                                    else notAvailable
+                                                "
+                                            >
+                                                {{ row.variance }}%
+                                            </td>
+                                            <ng-template #notAvailable>
+                                                <td class="content-grey">
+                                                    {{ 'Not Available' | translate }}
+                                                </td>
+                                            </ng-template>
+                                            <ng-template #notApplicable>
+                                                <td class="content-grey">
+                                                    {{ 'Not Applicable' | translate }}
+                                                </td>
+                                            </ng-template>
+                                        </tr>
+                                        <ng-container *ngIf="lotDatum.bomValidation.additionalData">
+                                            <tr>
+                                                <td class="additional-bom-title" colspan="3">
+                                                    {{ 'Additional BOM from supplier input' | translate }}
+                                                </td>
+                                            </tr>
+                                            <tr *ngFor="let additionalData of lotDatum.bomValidation.additionalData">
+                                                <td colspan="3" class="text-center">
+                                                    {{
+                                                        additionalData.supplierMaterialCode ||
+                                                            ('Not Available' | translate)
+                                                    }}
+                                                    -
+                                                    {{
+                                                        additionalData.supplierFacilityCode ||
+                                                            ('Not Available' | translate)
+                                                    }}
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </ng-template>
+                        <div class="batch-id" *ngIf="lotDatum.bomValidation">
+                            <span
+                                class="font-bold popover-link"
+                                (click)="openBOMValidationPopup(lotDatum.bomValidation)"
+                                [popover]="bomValidation"
+                                placement="right bottom"
+                                container="body"
+                                [outsideClick]="true"
+                            >
+                                {{ 'BOM Validation' | translate }}
+                            </span>
+                            <div class="bom-validation-match-percentage">
+                                {{ 'Match Percentage: ' | translate }}
+                                <span class="match-percentage-value"
+                                    >{{ lotDatum.bomValidation.matchPercentage }}%</span
+                                >
+                            </div>
+                        </div>
+                        <!-- BOM validation End -->
+
+                        <div class="product-type-image">
+                            <img
+                                default="{{ env.IMG_URL }}images/products/simple/pdt_default.png"
+                                src="{{ env.IMG_URL }}images/products/simple/pdt_{{
+                                    lotDatum.articleType.toLowerCase().replace(' ', '_')
+                                }}.png"
+                                [tooltip]="lotDatum.articleType"
+                                alt="{{ lotDatum.articleType }}"
+                                *ngIf="lotDatum.articleType"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="dash-double-pointer-horizontal" *ngIf="rootNode && lotDatum.inputEpcs?.length > 0"></div>
+            </div>
+        </div>
+        <ng-template [ngIf]="lotDatum.inputEpcs?.length > 0">
+            <app-transaction-tree-node
+                [lotData]="lotDatum.inputEpcs"
+                [rootNodeImmediateChild]="rootNode"
+                [moreThanOneChildNode]="lotDatum.inputEpcs?.length > 1"
+            ></app-transaction-tree-node>
+        </ng-template>
+    </li>
+</ul>

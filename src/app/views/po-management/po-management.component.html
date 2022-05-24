@@ -1,0 +1,276 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="po-management-container" class="po-management-container">
+            <div id="po-management-header" class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Purchase order management' | translate }}</div>
+                        <div class="page-description">
+                            {{ 'View and Manage Purchase Order (PO)' | translate }}
+                        </div>
+                    </div>
+                    <div class="header-search" *ngIf="isPOAvailable && posFilters">
+                        <div class="title-right-search">
+                            <input
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Type and press enter to search' | translate }}"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchPOs($event)"
+                                data-cy="po-management-search"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <button
+                            type="button"
+                            class="btn btn-lg btn-bordered pull-right btn-gradient cs-btn mr-15"
+                            (click)="openImportExcelModal()"
+                        >
+                            <img src="{{ IMG_URL }}images/upload-blue-icon.png" alt="Import" />
+                            <span>{{ 'Import using Excel' | translate }}</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row -->
+
+            <div id="filter-bar-wrapper" class="row filter-bar-wrapper" *ngIf="isPOAvailable && posFilters">
+                <div class="col-md-12">
+                    <ul class="filter-bar-container">
+                        <li *ngFor="let filter of posFilters | keys; let filterInd = index">
+                            <app-tt-multi-select-search
+                                (selectionChange)="handleFilterSelection()"
+                                (refreshFilter)="refreshFilter()"
+                                [label]="filter.key"
+                                [options]="filter.value"
+                                [filter_session]="filter_session"
+                                [optionsParam]="optionsParam"
+                                *ngIf="!isAGroup(filter.value)"
+                                [data_cy]="removeSpace(filter.key)"
+                            >
+                            </app-tt-multi-select-search>
+                        </li>
+                        <li>
+                            <app-tt-date-filter
+                                (selectionChange)="handleDateFilterSelection($event)"
+                                (refreshFilter)="refreshFilter()"
+                                [filter_session]="filter_session"
+                                [label]="'Delivery Date' | translate"
+                                className="date-filter-bar"
+                                arrowIcon="arrow_drop_down"
+                            >
+                            </app-tt-date-filter>
+                        </li>
+                        <li class="reset-filters">
+                            <button
+                                class="button-badge mat-button btn btn-gray"
+                                (click)="resetAllFilters()"
+                                data-cy="po-management-reset-all-filters"
+                            >
+                                {{ 'Reset all filters' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-12 col-xs-12 col-s-12 col-lg-12 sort-by">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 total-count">
+                            <div class="float-l" *ngIf="pos.length > 0 || totalCountFlag">
+                                <app-card-pagination
+                                    [paginationStart]="pagination.from + 1"
+                                    [fetchSize]="pagination.size"
+                                    [totalItemsCount]="totalCount"
+                                    moduleName="PO Management"
+                                    (previous)="onScroll('back')"
+                                    (next)="onScroll('next')"
+                                >
+                                </app-card-pagination>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <div dropdown class="dropdown sort-dropdown">
+                                <a dropdownToggle data-toggle="dropdown" class="dropdown-toggle">
+                                    <span class="sort-name"
+                                        >{{ 'Sort By' | translate }}
+                                        <i class="fa fa-angle-down"></i>
+                                    </span>
+                                </a>
+                                <ul *dropdownMenu class="dropdown-menu">
+                                    <li>
+                                        <mat-radio-group
+                                            [(ngModel)]="sortByFilter.sortBy"
+                                            (change)="handleSortBy($event)"
+                                        >
+                                            <mat-radio-button
+                                                *ngFor="let sortByValue of sortByValues; let ind = index"
+                                                [value]="sortByValues[ind].key"
+                                            >
+                                                {{ sortByValue.value | translate }}
+                                            </mat-radio-button>
+                                        </mat-radio-group>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Sort Dropdown -->
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+
+            <div class="row po-management-table">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table custom-table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="checkbox-width">
+                                            <mat-checkbox
+                                                [checked]="hasUserSelectedAllPos()"
+                                                (change)="handleSelectAllPOs($event)"
+                                            >
+                                            </mat-checkbox>
+                                        </th>
+                                        <th class="action-space pl-1">
+                                            {{ 'PO Number' | translate }}
+                                        </th>
+                                        <th>
+                                            {{ 'Style Number' | translate }}
+                                        </th>
+                                        <th>{{ 'T1 Facility code' | translate }}</th>
+                                        <th>{{ 'Supplier Name' | translate }}</th>
+                                        <th>{{ 'PO Quantity (in Kg)' | translate }}</th>
+                                        <!-- <th>PO status</th> -->
+                                        <th>{{ 'Delivery Date' | translate }}</th>
+                                        <!-- <th>Parent PO Number</th> -->
+                                        <th>{{ 'Division' | translate }}</th>
+                                        <th>{{ 'PO Mapping Status' | translate }}</th>
+                                        <th *ngFor="let field of customFieldDisplayList">{{ field.name }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody [ngClass]="{ 'tbody-max-height': userSelectedPos.length > 0 }">
+                                    <tr *ngIf="!fetchingPOData && pos.length === 0">
+                                        <p class="content-center">
+                                            {{ 'No POs available!' | translate }}
+                                        </p>
+                                    </tr>
+                                    <tr *ngIf="fetchingPOData">
+                                        <p class="content-center">
+                                            <app-spinner [small]="true"></app-spinner>
+                                        </p>
+                                    </tr>
+                                    <ng-container *ngFor="let po of pos">
+                                        <tr
+                                            *ngFor="let poItem of po.purchase_order_line_items"
+                                            (click)="
+                                                navigateToDetailPage(
+                                                    po.id,
+                                                    poItem.transactional_trade_item_gtin.id,
+                                                    $event
+                                                )
+                                            "
+                                        >
+                                            <td class="checkbox-width">
+                                                <mat-checkbox
+                                                    [checked]="hasUserSelectedPo(po.transaction_id)"
+                                                    (change)="handlePOSelect($event, po)"
+                                                >
+                                                </mat-checkbox>
+                                            </td>
+
+                                            <td *ngIf="po.transaction_id; else notAvailable">
+                                                {{ po.transaction_id }}
+                                            </td>
+                                            <td *ngIf="poItem.transactional_trade_item_gtin; else notAvailable">
+                                                {{ poItem.transactional_trade_item_gtin.code }}
+                                            </td>
+                                            <td *ngIf="po.facility_ref_id; else notAvailable">
+                                                {{ po.facility_ref_id }}
+                                            </td>
+                                            <td *ngIf="po.seller_gln; else notAvailable">
+                                                {{ po.seller_gln.name }}
+                                            </td>
+                                            <td *ngIf="poItem.requested_quantity; else notAvailable">
+                                                {{ poItem.requested_quantity }}
+                                            </td>
+                                            <!-- <td *ngIf="po.status; else notAvailable">
+                                                {{ po.status }}
+                                            </td> -->
+                                            <td *ngIf="po.delivery_date; else notAvailable">
+                                                {{ po.delivery_date | date }}
+                                            </td>
+                                            <!-- <td *ngIf="po.parentPONumber; else notAvailable">
+                                                {{ po.parentPONumber }}
+                                            </td> -->
+                                            <td *ngIf="po.division; else notAvailable">
+                                                {{ po.division }}
+                                            </td>
+                                            <td
+                                                *ngIf="
+                                                    po.purchase_order_line_items[0] &&
+                                                        po.purchase_order_line_items[0]['mapping_status'];
+                                                    else notAvailable
+                                                "
+                                            >
+                                                {{ po.purchase_order_line_items[0]['mapping_status'] }}
+                                            </td>
+                                            <td *ngFor="let customField of customFieldDisplayList">
+                                                {{
+                                                    po['custom_fields']
+                                                        ? po['custom_fields'][customField.id]
+                                                        : ('Not Available' | translate)
+                                                }}
+                                            </td>
+                                            <ng-template #notAvailable>
+                                                <td class="content-grey">
+                                                    {{ 'Not Available' | translate }}
+                                                </td>
+                                            </ng-template>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                                <tfoot *ngIf="userSelectedPos.length > 0">
+                                    <tr>
+                                        <td>
+                                            <div class="table-footer-block">
+                                                <ul class="table-footer-block-inner">
+                                                    <li class="table-footer-block-inner-left"></li>
+                                                    <li class="table-footer-block-inner-right">
+                                                        <div class="po-management-button-block">
+                                                            <button
+                                                                class="btn cancel-btn"
+                                                                type="button"
+                                                                (click)="handleCancelClick()"
+                                                            >
+                                                                {{ 'Cancel' | translate }}
+                                                            </button>
+                                                            <button
+                                                                class="btn submit-btn"
+                                                                type="button"
+                                                                (click)="deletePOs()"
+                                                            >
+                                                                {{ 'Delete' | translate }}
+                                                            </button>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<router-outlet></router-outlet>

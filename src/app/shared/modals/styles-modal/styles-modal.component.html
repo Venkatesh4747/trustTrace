@@ -1,0 +1,65 @@
+<div bsModal #stylesModal="bs-modal" id="product-one" class="modal fade" tabindex="-1" role="dialog"
+     aria-labelledby="stylesModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" *ngIf="styleInfo">
+      <div class="modal-header blue-head">
+        <h4 class="modal-title pull-left">{{styleInfo.styleName}} <br>
+          <p><span *ngFor="let material of styleInfo.materialInfo; let isLast = last">
+                {{material.material && material.materialRatio ? convertToPercentage(material.materialRatio) + '% ' + material.material: ''}}{{isLast ? '' : ', '}}
+              </span>
+          </p>
+        </h4>
+        
+        <button type="button" class="close pull-right" (click)="hide()" aria-label="Close">
+          <img class="sni" src="{{env.IMG_URL}}images/close.png">
+        </button>
+      </div>
+      <div class="modal-body container-fluid">
+        <div class="row">
+          <div class="col-md-3"></div>
+          <div class="col-md-6" style="padding-top: 0">
+            <div class="row">
+              <div class="bhoechie-tab-container">
+                <div class="tab-left bhoechie-tab-menu">
+                  <div class="list-group">
+
+                    <a (click)="false" class="list-group-item">
+                      <div class="question-icon">
+                        <img src="{{env.IMG_URL}}images/step-1.png">
+                      </div>
+                      <div class="pro-name">
+                        <div class="f-left">
+                          <p class="tab-name" style="padding-top: 15px">{{'Processed' | translate}} {{styleInfo.styleName}}</p>
+                        </div>
+                      </div>
+                    </a>
+
+                    <a class="list-group-item" *ngFor="let supplier of styleInfo.supplierInfo">
+                      <div class="question-icon">
+                        <img [src]="vpIcons[supplier.vps]">
+                      </div>
+                      <div class="pro-name">
+                        <div class="f-left">
+                          <p class="tab-name">{{supplier.name}}</p>
+                          <p>
+                            <span class="flag-icon flag-icon-{{supplier.countryCode | lowercase}}"></span>
+                            <span style="margin-left: 10px;">{{supplier.country}}</span>
+                          </p>
+                        </div>
+                        <div class="f-right text-right">
+                          <p class="text-blue"><b>{{supplier.vps}} <i class="fa fa-caret-right"></i></b></p>
+                          <p><i class="fa fa-map-marker"></i> {{supplier.city}}</p>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3"></div>
+        </div>
+      </div><!-- modal-body -->
+    </div> <!-- modal-content-->
+  </div> <!-- modal-dialog -->
+</div> <!-- bs-modal-->

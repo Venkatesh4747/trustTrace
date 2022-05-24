@@ -1,0 +1,34 @@
+<div class="qr-code-container text-center">
+    <div class="preloader-scan mb-2">
+        <ul>
+            <li>
+                <img src="https://static.thenounproject.com/png/59262-200.png" alt="" />
+            </li>
+
+            <div class="diode" *ngIf="scanning && !fetchingData">
+                <div class="laser"></div>
+            </div>
+        </ul>
+    </div>
+    <div class="mb-2">
+        <input
+            autofocus
+            type="text"
+            (focus)="onFocus()"
+            (blur)="onBlur()"
+            (keyup)="fetchQRCodeDetails()"
+            #QRCodeInput
+            [(ngModel)]="qrCode"
+            placeholder="{{ 'External ID' | translate }}"
+        />
+    </div>
+    <button class="btn tt-btn tt-btn-primary" *ngIf="!fetchingData && !scanning" (click)="scanQRCode()">
+        <span style="color: white;">{{ 'Press to Scan QR' | translate }}</span>
+    </button>
+    <button class="btn tt-btn tt-btn-secondary" *ngIf="scanning && !fetchingData">
+        <span style="color: white;">{{ 'Cancel Scanning' | translate }}</span>
+    </button>
+    <button class="btn tt-btn tt-btn-secondary" *ngIf="!scanning && fetchingData" disabled>
+        <span style="color: white;">{{ 'Fetching Data' | translate }}</span>
+    </button>
+</div>

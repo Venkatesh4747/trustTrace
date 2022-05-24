@@ -1,0 +1,117 @@
+@import '~styles/variables';
+
+.chart-container {
+    margin-top: 20px;
+    height: 250px;
+    max-height: 250px;
+    padding: 0;
+    background-color: #fff;
+    font: 0/0 a;
+    .highcharts-exporting-group {
+        position: absolute;
+        top: 0;
+    }
+}
+
+.footer-container-title {
+    font-size: 16px;
+    border-top: 1px solid #ededed;
+    width: 100%;
+    color: $text-color-primary;
+    padding: 10px 0;
+    line-height: 1;
+    display: inline-block;
+}
+
+.footer-container {
+    img {
+        max-width: 30px;
+    }
+}
+
+.no-data-chart {
+    height: auto;
+    max-width: 100%;
+    min-height: 270px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    p {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #aaa;
+        font-size: calc(0.75em + 1vmin);
+    }
+}
+
+.table-img-block {
+    width: 100%;
+    display: inline-block;
+    padding: 15px 35px 0 15px;
+    height: 100%;
+    min-height: 270px;
+}
+
+.table-line-block {
+    padding: 15px;
+    display: table;
+    margin: 10px;
+    border-collapse: collapse;
+    border-radius: 4px;
+    border-style: hidden; /* hide standard table (collapsed) border */
+    box-shadow: 0 0 0 2px #325992; /* this draws the table border  */
+    thead > tr {
+        border: 2px solid#325992;
+    }
+    tbody > tr {
+        border: 2px solid#325992;
+    }
+    th,
+    td {
+        padding: 15px 25px;
+        border: 2px solid #325992;
+    }
+    tr > th {
+        background: #325992;
+    }
+}
+
+td {
+    border: 1px solid #ccc;
+}
+
+.line-white {
+    border: 2px solid #ffffff;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.line-blue {
+    border: 2px solid #325992;
+    border-radius: 4px;
+    background: #325992;
+}
+
+.line-dark-blue {
+    border: 2px solid #3f4f66;
+    border-radius: 4px;
+    background: #3f4f66;
+}
+
+.line-yellow {
+    border: 2px solid #ffd939;
+    border-radius: 4px;
+    background: #ffd939;
+}
+
+.line-green {
+    border: 2px solid #3aec7e;
+    border-radius: 4px;
+    background: #3aec7e;
+}

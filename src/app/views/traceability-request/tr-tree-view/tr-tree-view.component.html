@@ -1,0 +1,74 @@
+<div class="view-container" #treeView>
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div class="row header no-border">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pb-2 align-items-flex-start">
+                <div class="page-title">
+                    <div>{{ 'Tree View' | translate }}</div>
+                    <div class="page-description font-color-primary">
+                        {{ 'Get to know the complete tree view structure of your supply chain' | translate }}
+                    </div>
+                    <button
+                        data-html2canvas-ignore
+                        class="edit-styled-btn lock-unlock-button"
+                        [disabled]="userData.subscriptionType !== 'BRAND'"
+                        (click)="lockOrUnlockEditRequest(trId, !supplyChainData?.preserve)"
+                    >
+                        <span [className]="'pr-1 fa ' + (supplyChainData?.preserve ? 'fa-lock' : 'fa-unlock')"></span>
+                        {{ (supplyChainData?.preserve ? 'Unlock T-Trace' : 'Lock T-Trace') | translate }}
+                    </button>
+                    <button
+                        data-html2canvas-ignore
+                        class="edit-styled-btn lock-unlock-button"
+                        (click)="triggerScreenShot()"
+                        [disabled]="isDownloading"
+                    >
+                        <span class="pr-1 fa fa-download"></span>
+                        {{ 'Download' | translate }}
+                    </button>
+                </div>
+                <div class="pr-0">
+                    <div class="header-search flex-direction-column">
+                        <button
+                            data-html2canvas-ignore
+                            class="go-back-button"
+                            (click)="commonService.goBack(['/', 't-trace']); analyticsBackButtonClicked()"
+                        >
+                            {{ 'Back' | translate }}
+                        </button>
+                        <div
+                            [matTooltip]="
+                                supplyChainData?.preserve
+                                    ? ('Editing option is disabled by the person who launched the request' | translate)
+                                    : null
+                            "
+                        >
+                            <button
+                                data-html2canvas-ignore
+                                [disabled]="supplyChainData?.preserve"
+                                class="go-back-button edit-styled-btn width-100-px"
+                                (click)="navigateToEdit(); analyticsEditButtonClicked()"
+                            >
+                                <span class="fa fa-pencil pr-1"></span>{{ 'Edit' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row tree-view-container" *ngIf="supplyChainData">
+            <div
+                appScreenshot
+                [screenShotEvent]="screenshotEventEmitter"
+                [fileName]="supplyChainData.supplyChainArticle.internalArticleName"
+            >
+                <app-tree-view [items]="supplyChainData" [showDetails]="true"></app-tree-view>
+            </div>
+        </div>
+        <div data-html2canvas-ignore class="row add-data-to-tree-container" *ngIf="!supplyChainData?.preserve">
+            <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 add-data-to-tree" (click)="navigateToEdit()">
+                {{ 'Click on the Edit button to add data to the tree' | translate }}
+            </div>
+        </div>
+    </div>
+</div>

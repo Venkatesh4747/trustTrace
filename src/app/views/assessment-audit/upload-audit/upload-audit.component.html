@@ -1,0 +1,108 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="row header no-border">
+            <div id="upload-audit-header" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-3 pl-0">
+                <div class="header-search">
+                    <div class="page-title">
+                        <div>{{ 'Upload Audit Document' | translate }}</div>
+                        <div class="page-description font-color-primary">
+                            {{ 'Record Audit through uploading your audit document' | translate }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5 pl-2">
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <form class="upload-audit-form" [formGroup]="uploadAuditForm">
+                    <div>
+                        <div class="form-group">
+                            <mat-form-field [floatLabel]="'auto'">
+                                <mat-label class="tt-input-label">{{ 'Audit standard' | translate }}</mat-label>
+                                <mat-select formControlName="auditStandard">
+                                    <mat-option *ngFor="let standard of auditStandards | keys" [value]="standard.key">
+                                        {{ standard.value }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="form-group">
+                            <mat-form-field [floatLabel]="'auto'">
+                                <mat-label class="tt-input-label">{{ 'Audit Name' | translate }}</mat-label>
+                                <input
+                                    matInput
+                                    formControlName="auditName"
+                                    placeholder="E.g. BSCI Audit for GreenTex"
+                                />
+                            </mat-form-field>
+                        </div>
+                        <!-- <div class="form-group">
+                            <mat-form-field>
+                                <mat-label class="tt-input-label">Audit Body</mat-label>
+                                <input matInput formControlName="auditBody" placeholder="E.g. BSCI Audit for GreenTex" />
+                            </mat-form-field>
+                        </div> -->
+                        <div class="form-group">
+                            <mat-label class="tt-input-label">{{ 'Upload Document' | translate }}</mat-label>
+                            <div class="tt-file-upload-ui-container" (click)="InvokeFileUpload()">
+                                <div class="tt-file-upload-ui-content">
+                                    <div class="spinner-wrapper justify-content-center">
+                                        <img
+                                            src="{{ env.IMG_URL }}images/icon-upload-grey.png"
+                                            alt="Upload file"
+                                            class="mr-2"
+                                        />
+                                        <h5 class="description tt-font tt-font-regular text-muted">
+                                            Upload PDF File
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="display-inline-block" *ngIf="uploadedFile">
+                                {{ uploadedFile.fileName }}
+                                <!-- <button
+                                    class="btn btn-small btn-blue ml-1"
+                                    tooltip="Download File"
+                                    (click)="downloadFile(uploadedFile.id, uploadedFile.fileName)"
+                                >
+                                    <i class="fa fa-download"></i>
+                                </button> -->
+                                <button
+                                    class="btn btn-small ml-1 del-btn"
+                                    tooltip="Delete File"
+                                    (click)="deleteFile(uploadedFile.id, uploadedFile.fileName)"
+                                >
+                                    <img src="{{ env.IMG_URL }}images/questionaire-del.png" />
+                                </button>
+                            </div>
+                            <input
+                                type="file"
+                                class="hidden"
+                                id="file_upload"
+                                name="file_upload"
+                                (change)="uploadFile($event.target.files)"
+                                [hidden]="true"
+                            />
+                        </div>
+                    </div>
+                    <div class="btn-container actions-btn-container display-flex-justify-flex-end">
+                        <button mat-button class="cancel-btn" (click)="onCancelUploadAudit()">
+                            {{ 'Cancel' | translate }}
+                        </button>
+                        <button
+                            mat-button
+                            class="save-btn"
+                            (click)="onExtractAuditDocument()"
+                            [disabled]="!uploadAuditForm.valid || formProcessing"
+                        >
+                            {{ 'Extract' | translate }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

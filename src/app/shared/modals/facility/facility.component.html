@@ -1,0 +1,414 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+<!-- ********************* -->
+<!-- CREATE FACILITY MODAL -->
+<!-- ********************* -->
+
+<div class="facility-dialog" *ngIf="data.mode === facilityMode.ADD || data.mode === facilityMode.EDIT">
+    <!-- TITLE BAR -->
+    <div class="col-md-6" *ngIf="data.mode === facilityMode.ADD">
+        <p class="modal-title">{{ 'Create Facility' | translate }}</p>
+    </div>
+
+    <div class="col-md-6" *ngIf="data.mode === facilityMode.EDIT">
+        <p class="modal-title">{{ 'Update Facility' | translate }}</p>
+    </div>
+
+    <div class="col-md-6">
+        <span class="pull-right">
+            <a (click)="dialogRef.close()">
+                <img class="close-icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+            </a>
+        </span>
+    </div>
+    <!-- END OF TITLE BAR -->
+
+    <!-- FORM -->
+    <div class="form-container" *ngIf="facility">
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 leftside-fields">
+            <!-- LEFT SIDE FIELDS -->
+            <!-- Name -->
+            <mat-form-field class="input">
+                <input
+                    class="input-element"
+                    matInput
+                    placeholder="{{ 'Name of the facility' | translate }}"
+                    name="name"
+                    [(ngModel)]="facility.name"
+                    required
+                />
+            </mat-form-field>
+
+            <!-- Value Process Selection -->
+            <p class="label">{{ 'Value Process' | translate }}:</p>
+            <div class="vp-selection-list">
+                <mat-selection-list #valueProcess [(ngModel)]="facility.valueProcess">
+                    <mat-list-option
+                        class="selection-list-item"
+                        *ngFor="let vp of master_valueProcess | sortByFilter: 'value'"
+                        [value]="vp.id"
+                        name="valueProcess"
+                    >
+                        {{ vp.value }}
+                    </mat-list-option>
+                </mat-selection-list>
+            </div>
+
+            <!-- Materials Selection -->
+            <p class="label">{{ 'Materials Used' | industry | translate }}:</p>
+            <div class="vp-selection-list">
+                <mat-selection-list #materials [(ngModel)]="facility.materials">
+                    <mat-list-option
+                        class="selection-list-item"
+                        *ngFor="let mat of master_materials | sortByFilter: 'value'"
+                        [value]="mat.id"
+                        name="materials"
+                    >
+                        {{ mat.value }}
+                    </mat-list-option>
+                </mat-selection-list>
+            </div>
+
+            <!-- Certification Selection -->
+            <p class="label">{{ 'Certifications' | translate }}:</p>
+            <div class="vp-selection-list">
+                <mat-selection-list #standards [(ngModel)]="facility.standards">
+                    <mat-list-option
+                        class="selection-list-item"
+                        *ngFor="let cert of master_standards | sortByFilter: 'value'"
+                        [value]="cert.id"
+                        name="standards"
+                    >
+                        {{ cert.value }}
+                    </mat-list-option>
+                </mat-selection-list>
+            </div>
+        </div>
+        <!-- END OF LEFT SIDE FIELDS -->
+
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 rightside-fields">
+            <!-- RIGHT SIDE FIELDS -->
+
+            <!-- Male Employees -->
+            <mat-form-field class="input">
+                <input
+                    class="input-element"
+                    type="number"
+                    matInput
+                    placeholder="{{ 'No. of Male employees' | translate }}"
+                    name="male"
+                    [(ngModel)]="facility.employeeCount.men"
+                    min="0"
+                    step="1"
+                    oninput="validity.valid||(value='');"
+                />
+            </mat-form-field>
+
+            <!-- Female Employees -->
+            <mat-form-field class="input">
+                <input
+                    class="input-element"
+                    type="number"
+                    matInput
+                    placeholder="{{ 'No. of Female employees' | translate }}"
+                    name="female"
+                    [(ngModel)]="facility.employeeCount.women"
+                    min="0"
+                    step="1"
+                    oninput="validity.valid||(value='');"
+                />
+            </mat-form-field>
+
+            <!-- Other Employees -->
+            <mat-form-field class="input">
+                <input
+                    class="input-element"
+                    type="number"
+                    matInput
+                    placeholder="{{ 'No. of Other employees' | translate }}"
+                    name="other"
+                    [(ngModel)]="facility.employeeCount.others"
+                    min="0"
+                    step="1"
+                    oninput="validity.valid||(value='');"
+                />
+            </mat-form-field>
+            <!-- Production capacity -->
+
+            <mat-form-field class="input">
+                <input
+                    class="input-element"
+                    matInput
+                    placeholder="{{ 'Production capacity' | translate }}"
+                    name="productioncapacity"
+                    [(ngModel)]="facility.productionCapacity"
+                />
+            </mat-form-field>
+
+            <!-- Address Line1 -->
+            <mat-form-field class="location-input">
+                <input
+                    class="input-element"
+                    matInput
+                    placeholder="{{ 'Address Line' | translate }} 1"
+                    name="addressLine1"
+                    [(ngModel)]="facility.address.addressLine1"
+                    required
+                />
+            </mat-form-field>
+
+            <!-- Address Line2 -->
+            <mat-form-field class="input">
+                <input
+                    class="input-element"
+                    matInput
+                    placeholder="{{ 'Address Line' | translate }} 2"
+                    name="addressLine2"
+                    [(ngModel)]="facility.address.addressLine2"
+                />
+            </mat-form-field>
+
+            <!-- Country -->
+            <mat-form-field>
+                <mat-select
+                    class="location-input"
+                    placeholder="{{ 'Country' | translate }}"
+                    name="country"
+                    (selectionChange)="
+                        getStates($event.value); unsetStateOnCountrySelection(); unsetCityOnStateSelection()
+                    "
+                    [(ngModel)]="facility.address.country"
+                    required
+                >
+                    <mat-option [value]="country.name" *ngFor="let country of countries">{{ country.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- State -->
+            <mat-form-field>
+                <mat-select
+                    class="location-input"
+                    placeholder="{{ 'State' | translate }}"
+                    name="state"
+                    (selectionChange)="getCities($event.value); unsetCityOnStateSelection()"
+                    [(ngModel)]="facility.address.state"
+                    required
+                >
+                    <mat-option [value]="state.name" *ngFor="let state of states">{{ state.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- City -->
+            <mat-form-field>
+                <mat-select
+                    class="location-input"
+                    placeholder="{{ 'City' | translate }}"
+                    name="city"
+                    [(ngModel)]="facility.address.city"
+                    required
+                >
+                    <mat-option [value]="city.name" *ngFor="let city of cities">{{ city.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Zipcode -->
+            <mat-form-field class="location-input">
+                <input
+                    class="input-element"
+                    matInput
+                    placeholder="{{ 'Zipcode' | translate }}"
+                    name="zip"
+                    type="number"
+                    [(ngModel)]="facility.address.zip"
+                    required
+                />
+            </mat-form-field>
+
+            <!-- Save / Cancel Buttons -->
+            <div class="btn-container display-flex-justify-flex-end">
+                <div id="CANCEL_BTN" class="width-100-px mr-1">
+                    <button mat-button class="cancel-btn" (click)="dialogRef.close()">
+                        {{ 'Cancel' | translate }}
+                    </button>
+                </div>
+                <div id="SAVE_BTN" *ngIf="data.mode === facilityMode.ADD" class="width-100-px">
+                    <button mat-button class="save-btn" (click)="saveFacility()">{{ 'Save' | translate }}</button>
+                </div>
+                <div class="btn-container" *ngIf="data.mode === facilityMode.EDIT" class="width-100-px">
+                    <button mat-button class="save-btn" (click)="updateFacility()">{{ 'Update' | translate }}</button>
+                </div>
+            </div>
+        </div>
+        <!-- END OF RIGHT SIDE FIELDS -->
+    </div>
+    <!-- END OF FORM -->
+</div>
+<!--END OF facility container-->
+
+<!-- VIEW DIALOG -->
+<div class="main-container facility-view-dialog" *ngIf="data.mode === facilityMode.READ && facility">
+    <!-- Main Container -->
+
+    <!-- TITLE BAR -->
+    <div class="col-md-6 modal-title">
+        <p class="modal-title">{{ 'Facility' | translate }}</p>
+    </div>
+    <div class="col-md-6">
+        <span class="pull-right">
+            <a (click)="dialogRef.close()">
+                <img class="close-icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+            </a>
+        </span>
+    </div>
+    <!-- END OF TITLE BAR -->
+    <div class="company-name-container">
+        <!-- NAME OF THE FACILITY -->
+        <p class="company-heading">{{ facility.name }},</p>
+    </div>
+    <div class="company-data-container" *ngIf="facility.address">
+        <span *ngIf="facility.address.addressLine1">{{ facility.address.addressLine1 }},</span>
+        <span *ngIf="facility.address.addressLine2">{{ facility.address.addressLine2 }},</span>
+        <span *ngIf="facility.address.city">{{ facility.address.city }} - </span>
+        <span *ngIf="facility.address.st">{{ facility.address.st }},</span>
+        <span *ngIf="facility.address.state">{{ facility.address.state }},</span>
+        <span *ngIf="facility.address.country">{{ facility.address.country }}.</span>
+        <span *ngIf="facility.address.zip">{{ facility.address.zip }}.</span>
+    </div>
+
+    <div class="horizontal-div-wrapper">
+        <div class="vp-mt-cert-main-container">
+            <!-- VP-MT-CERT MAIN Container -->
+
+            <!-- Facility Employee Count -->
+            <div class="flex-container">
+                <div class="flex-box">
+                    <p class="male-numbers">{{ facility.employeeCount?.men || 0 }}</p>
+                    <p class="male-title">{{ 'Male Employees' | translate }}</p>
+                </div>
+                <div class="flex-box">
+                    <p class="female-numbers">{{ facility.employeeCount?.women || 0 }}</p>
+                    <p class="female-title">{{ 'Female Employees' | translate }}</p>
+                </div>
+                <div class="flex-box">
+                    <p class="others-numbers">{{ facility.employeeCount?.others || 0 }}</p>
+                    <p class="others-title">{{ 'Others Employees' | translate }}</p>
+                </div>
+                <div class="flex-box">
+                    <p class="op-numbers">{{ facility.noOfAssessments || 0 }}</p>
+                    <p class="op-title">{{ 'Number of Assessments' | translate }}</p>
+                </div>
+            </div>
+            <!--PRODUCTION CAPACITY-->
+            <div class="vp-mt-cert-sub-containers">
+                <div class="hr">
+                    <span class="hr-title">{{ 'PRODUCTION CAPACITY' | translate }}</span>
+                </div>
+                <!-- VP CHIPS -->
+                <p class="noMaterials pt-1" *ngIf="!facility?.productionCapacity">
+                    {{ 'No production capacity available for this facility' | translate }}
+                </p>
+                <div class="production-capacity  pt-1 pb-1 ml-2">
+                    {{ facility.productionCapacity }}
+                </div>
+            </div>
+            <!-- VALUE PROCESS -->
+            <div class="vp-mt-cert-sub-containers">
+                <div class="hr">
+                    <span class="hr-title">{{ 'VALUE PROCESS' | translate }}</span>
+                </div>
+                <!-- VP CHIPS -->
+                <p class="noMaterials pt-1" *ngIf="facility.valueProcess?.length <= 0">
+                    {{ 'No value process available for this facility' | translate }}
+                </p>
+                <div id="profile-chip-list">
+                    <mat-chip-list>
+                        <mat-chip class="vp-chip-style" *ngFor="let vp of facility.valueProcess | sortByFilter">{{
+                            localeService.getDisplayText(vp)
+                        }}</mat-chip>
+                    </mat-chip-list>
+                </div>
+            </div>
+            <!-- VP CHIPS -->
+
+            <!-- MATERIALS USED -->
+            <div class="vp-mt-cert-sub-containers">
+                <div class="hr">
+                    <span class="hr-title">{{ 'MATERIALS USED' | industry | translate }}</span>
+                </div>
+                <!-- MATERIAL CHIPS -->
+
+                <p class="noMaterials pt-1" *ngIf="facility.materials?.length <= 0">
+                    {{ 'No materials available for this facility' | industry | translate }}
+                </p>
+                <div id="profile-chip-list">
+                    <mat-chip-list>
+                        <mat-chip class="mat-chip-style" *ngFor="let material of facility.materials">{{
+                            localeService.getDisplayText(material)
+                        }}</mat-chip>
+                    </mat-chip-list>
+                </div>
+            </div>
+            <!-- END OF MATERIAL CHIPS -->
+
+            <!-- CERTIFICATIONS -->
+            <div class="vp-mt-cert-sub-containers">
+                <div class="hr">
+                    <span class="hr-title">{{ 'CERTIFICATIONS' | translate }}</span>
+                </div>
+            </div>
+            <p class="noMaterials pt-1" *ngIf="facility.certificateList?.length <= 0">
+                {{ 'No Standards' | translate }} &amp;
+                {{ 'Certifications' | translate }}
+            </p>
+            <div class="row" *ngIf="facility.certificateList?.length > 0">
+                <div
+                    class="col-md-2 standardsImageContainer"
+                    *ngFor="let standard of facility.certificateList; let i = index"
+                >
+                    <div
+                        class="certificate-item"
+                        [tooltip]="certificateTooltipContent"
+                        data-placement="top"
+                        (click)="certificateManagerService.downloadFile(standard.id, standard.uploadedFiles[0])"
+                        container="body"
+                        containerClass="certificateTooltip"
+                    >
+                        <img
+                            src="{{ utilService.getStandardImageUrl(standard.typeId) }}"
+                            (error)="utilService.getDefaultCertificateImage($event.target)"
+                            alt="Certificate Image"
+                        />
+                        <div class="overlay-download-icon">
+                            <img src="{{ env.IMG_URL }}images/icon-download-white.png" alt="Download Certificate" />
+                        </div>
+                        <div class="download-icon placement-bottom-right">
+                            <img src="{{ env.IMG_URL }}images/icon-download-grey.png" alt="Download Certificate" />
+                        </div>
+                    </div>
+                    <ng-template #certificateTooltipContent>
+                        <div class="text-left" style="background-color: #fff; border: 1px solid #f5f5f5;">
+                            <h5 class="tt-font">{{ getCertificateNameById(standard.typeId) }}</h5>
+                            <h5 class="tt-font tt-font-regular">
+                                {{ 'Validity' | translate }}:
+                                <span style="font-weight: bold !important;">{{ standard.expiryDate | date }}</span>
+                            </h5>
+                            <h5 class="tt-font tt-font-regular">
+                                {{ 'Certification Body' | translate }}:
+                                <span style="font-weight: bold !important;">{{ standard.body }}</span>
+                            </h5>
+                            <h5 class="tt-font tt-font-regular">
+                                {{ 'Facility Name' | translate }}:
+                                <span style="font-weight: bold !important;">{{ standard.facilityName }}</span>
+                            </h5>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+        <!-- End of VP-MT-CERT- MAIN Container -->
+    </div>
+</div>
+<!-- End of Main Container -->
+<!-- ******************** -->
+<!-- VIEW FACILITY MODAL -->
+<!-- ******************** -->

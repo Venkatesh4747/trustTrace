@@ -1,0 +1,15 @@
+.mat-chip {
+    background: rgb(156, 253, 205);
+    color: rgb(3, 63, 141);
+}
+.glyphicon-plus {
+    position: absolute;
+    right: 0;
+    color: #474747;
+    margin-left: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+input.mat-chip-input {
+    margin: 8px !important;
+}

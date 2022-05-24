@@ -1,0 +1,19 @@
+<div class="supply-chain-information" provide-parent-form>
+    <div class="form-group">
+        <label class="bmd-label-static"
+            >{{ localeService.getDisplayText(style.productType) }} {{ 'Manufacturer' | translate }}:<span
+                class="color-red"
+                >*</span
+            ></label
+        >
+
+        <app-supplier-list-element
+            origin="Styles"
+            (valueChanges)="suppliersChanged(style.productType, 0, $event)"
+            [options]="supplierListOptions"
+            unInvitedTooltip="Uninvited Supplier - Future Requests like T-Trace and T-EMS cannot not be launched for this style to this supplier"
+            [data_cy]="'create-style-supply-chain-manufacturer-info'"
+        >
+        </app-supplier-list-element>
+    </div>
+</div>

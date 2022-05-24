@@ -1,0 +1,39 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="view-container">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header-section fix-header-block">
+                    <div class="page-header-section-inner">
+                        <div class="page-title">
+                            <h4 class="title">{{ 'User Management' | translate }}</h4>
+                            <h5 class="sub-title">{{ 'Add, Remove and set privileges for the users' | translate }}.</h5>
+                        </div>
+                        <!-- Page Title -->
+                    </div>
+                    <!-- Page Header Section Inner -->
+                    <div class="page-header-section-inner alignment-right"></div>
+                    <!-- Page Header Section Inner Alignment Right -->
+                </div>
+                <!-- Page Header Section -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+        <div class="page-body-section body-section-top-space">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="info-details">
+                        <app-users> </app-users>
+                    </div>
+                    <!-- Info Details -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+        <!-- Page Body Section -->
+    </div>
+    <!-- Container Fluid -->
+</div>
+<!-- View Container -->

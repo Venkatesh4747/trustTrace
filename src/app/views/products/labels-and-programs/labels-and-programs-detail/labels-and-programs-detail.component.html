@@ -1,0 +1,511 @@
+<app-full-page-loader *ngIf="pageLoading || submitOnProgress"></app-full-page-loader>
+
+<div class="row" *ngIf="!pageLoading">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pl-0 pr-0">
+        <form
+            [formGroup]="labelsAndProgramFormGroup"
+            *ngIf="labelsAndProgramFormGroup"
+            [ngClass]="{
+                'full-height-tbody': !canSave
+            }"
+            class="labels-program-form-block"
+        >
+            <div class="material-input-style-box-type">
+                <div class="material-input-style-box-type-inner">
+                    <div class="row pl-15">
+                        <div class="col-xs-6 col-sm-6 col-md-4 col-lg-4">
+                            <div class="mat-form-group" [ngClass]="{ 'disabled-form-control': isUpdatePage }">
+                                <label class="label-header pt-15"
+                                    >{{ 'Choose Label Type' | translate }}<span class="color-red"> * </span>:</label
+                                >
+                                <mat-form-field floatLabel="never">
+                                    <mat-select
+                                        class="select-label-type"
+                                        formControlName="labelType"
+                                        [placeholder]="'E.g. General / Supplier specific' | translate"
+                                        (selectionChange)="
+                                            readOnlyController('labelType', 'Supplier specific', 'suppliers')
+                                        "
+                                    >
+                                        <mat-option
+                                            *ngFor="let type of labelsAndProgramConfig.labelType"
+                                            [value]="type.id"
+                                        >
+                                            <span class="list">{{ type.value | translate }}</span>
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <!-- Mat Form Group -->
+
+                            <div
+                                class="mat-form-group mat-filter-with-search"
+                                [ngClass]="{
+                                    'disabled-form-control': labelsAndProgramFormGroup.get('suppliers').disabled
+                                }"
+                            >
+                                <label class="label-header"
+                                    >{{ 'Choose the Supplier' | translate
+                                    }}<span
+                                        class="color-red"
+                                        *ngIf="!labelsAndProgramFormGroup.get('suppliers').disabled"
+                                        >* </span
+                                    >:</label
+                                >
+                                <app-filter-with-search
+                                    [formControl]="labelsAndProgramFormGroup.get('suppliers')"
+                                    label="{{ 'Select supplier' | translate }}"
+                                    [options]="labelsAndProgramConfig.suppliers"
+                                    [isDisabled]="labelsAndProgramFormGroup.get('suppliers').disabled"
+                                    [readOnly]="isUpdatePage && !isActiveLabel"
+                                    [hasError]="
+                                        labelsAndProgramFormGroup.get('suppliers').invalid &&
+                                        labelsAndProgramFormGroup.get('suppliers').touched
+                                    "
+                                    [matTooltip]="
+                                        labelsAndProgramFormGroup.get('suppliers').disabled && !isUpdatePage
+                                            ? ('Since its general label supplier selection is not allowed' | translate)
+                                            : ''
+                                    "
+                                ></app-filter-with-search>
+                            </div>
+                            <!-- Mat Form Group -->
+
+                            <div class="mat-form-group" [ngClass]="{ 'disabled-form-control': isUpdatePage }">
+                                <label class="label-header pb-15"
+                                    >{{ 'Enter a name for the Label' | translate
+                                    }}<span class="color-red">* </span>:</label
+                                >
+                                <mat-form-field floatLabel="never">
+                                    <input
+                                        matInput
+                                        name="labelName"
+                                        formControlName="labelName"
+                                        placeholder="{{ 'E.g. Organic Label' | translate }}"
+                                        (change)="onLabelNameChange('labelName')"
+                                    />
+                                </mat-form-field>
+                            </div>
+                            <!-- Mat Form Group -->
+
+                            <div
+                                class="mat-form-group mat-select-group"
+                                [ngClass]="{ 'disabled-form-control': isUpdatePage }"
+                            >
+                                <label class="label-header"
+                                    >{{ 'Choose Label Level' | translate }}<span class="color-red">* </span>:</label
+                                >
+                                <mat-form-field floatLabel="never">
+                                    <mat-select
+                                        formControlName="labelLevel"
+                                        (selectionChange)="getAvailableLabels()"
+                                        [placeholder]="'E.g. Product / Ingredient' | translate"
+                                    >
+                                        <mat-option
+                                            *ngFor="let level of labelsAndProgramConfig.labelLevel"
+                                            [value]="level.id"
+                                        >
+                                            <span class="list">{{ level.value | translate }}</span>
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <!-- Mat Form Group -->
+
+                            <div class="mat-form-group">
+                                <label class="label-header">{{ 'Comments' | translate }}:</label>
+                                <textarea
+                                    rows="5"
+                                    cols="50"
+                                    maxlength="1500"
+                                    class="form-control  comments-place-holder"
+                                    formControlName="comments"
+                                    [placeholder]="'Add Comments' | translate"
+                                ></textarea>
+                            </div>
+
+                            <div
+                                class="mat-form-group mat-filter-with-search pt-15"
+                                [ngClass]="{ 'disabled-form-control': isUpdatePage }"
+                            >
+                                <label class="label-header"
+                                    >{{ 'How do you wish to create the Label?' | translate
+                                    }}<span class="color-red">* </span>:</label
+                                >
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mat-radio-block">
+                                            <mat-radio-group
+                                                aria-label="Select an option"
+                                                formControlName="clone"
+                                                (change)="
+                                                    disableClonedLabelField();
+                                                    readOnlyController(
+                                                        'clone',
+                                                        false,
+                                                        'calculationBuilderValues',
+                                                        resetCalculationBuilder.bind(this)
+                                                    );"
+                                            >
+                                                <div class="mat-radio-flex">
+                                                    <mat-radio-button [value]="true">
+                                                        {{ 'Clone an existing label' | translate }}
+
+                                                        <app-filter-with-search
+                                                            [ngClass]="{
+                                                                'disabled-form-control': labelsAndProgramFormGroup.get(
+                                                                    'clonedLabel'
+                                                                ).disabled
+                                                            }"
+                                                            [formControl]="labelsAndProgramFormGroup.get('clonedLabel')"
+                                                            label="{{ 'E.g KRAV etc.' | translate }}"
+                                                            [options]="masterLabelList"
+                                                            [control]="control"
+                                                            [hasError]="
+                                                                labelsAndProgramFormGroup.get('clonedLabel').invalid &&
+                                                                labelsAndProgramFormGroup.get('clonedLabel').touched &&
+                                                                !labelsAndProgramFormGroup.get('clonedLabel').value
+                                                            "
+                                                            [isDisabled]="
+                                                                labelsAndProgramFormGroup.get('clonedLabel').disabled
+                                                            "
+                                                            [multiSelect]="false"
+                                                            (onValueChanges)="getLabelConfigs($event)"
+                                                            [matTooltip]="getValidTooltipForClonedLabel()"
+                                                        ></app-filter-with-search>
+                                                        <span
+                                                            class="spinner"
+                                                            matTooltip="Fetching Labels"
+                                                            *ngIf="fetchState.labels"
+                                                        >
+                                                            <mat-spinner [diameter]="14"></mat-spinner>
+                                                        </span>
+                                                    </mat-radio-button>
+                                                </div>
+                                                <!-- Mat Radio Flex -->
+
+                                                <mat-radio-button [value]="false">
+                                                    {{ 'Create from scratch (using calculation builder)' | translate }}
+                                                </mat-radio-button>
+                                            </mat-radio-group>
+                                        </div>
+                                        <!-- Mat Radio Block -->
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                            </div>
+                            <!-- Mat Form Group -->
+                        </div>
+                        <!-- Column -->
+                        <div class="col-md-8">
+                            <div class="action-buttton-right">
+                                <button
+                                    class="action-button mat-button"
+                                    [disabled]="!isActiveLabel"
+                                    (click)="deactivateLabel()"
+                                    [ngClass]="{
+                                        inactive: !isActiveLabel
+                                    }"
+                                    *ngIf="isUpdatePage && hasLabelDeactivateAccess"
+                                >
+                                    {{ (isActiveLabel ? 'Deactivate Label' : 'Inactive Label') | translate }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Row -->
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-12 pt-2 pl-0 pr-0">
+                            <label class="label-header pl-3">{{ 'Calculation Builder' | translate }}:</label>
+                            <div class="row">
+                                <div class="col-md-12 pl-0 pr-0">
+                                    <div class="table-responsive pl-0">
+                                        <table class="table table-striped">
+                                            <thead
+                                                [ngClass]="{
+                                                    'disabled-form-control': labelsAndProgramFormGroup.get(
+                                                        'calculationBuilderValues'
+                                                    ).disabled
+                                                }"
+                                            >
+                                                <tr>
+                                                    <th scope="col">{{ 'Parameter' | translate }}</th>
+                                                    <th scope="col">{{ 'Operator' | translate }}</th>
+                                                    <th scope="col">{{ 'Score' | translate }}</th>
+                                                    <th scope="col">{{ '' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody
+                                                formArrayName="calculationBuilderValues"
+                                                [ngClass]="{
+                                                    'disabled-form-control': labelsAndProgramFormGroup.get(
+                                                        'calculationBuilderValues'
+                                                    ).disabled
+                                                }"
+                                            >
+                                                <span
+                                                    class="config-spinner"
+                                                    matTooltip="Fetching calculation configuration"
+                                                    *ngIf="fetchState.labelConfig"
+                                                >
+                                                    <mat-spinner [diameter]="14"></mat-spinner>
+                                                </span>
+                                                <ng-container
+                                                    class="label-score-list"
+                                                    *ngFor="
+                                                        let parameterGroup of getArrayConfig(
+                                                            labelsAndProgramFormGroup,
+                                                            'calculationBuilderValues'
+                                                        ).controls;
+                                                        let parentIndex = index
+                                                    "
+                                                    [formGroupName]="parentIndex"
+                                                >
+                                                    <tr
+                                                        *ngIf="
+                                                            !parameterGroup?.get('subParametersValue');
+                                                            else subParamConfig
+                                                        "
+                                                        class="label-score"
+                                                    >
+                                                        <td>
+                                                            <span class="parameter-name-size">{{
+                                                                parameterGroup.get('displayName').value | translate
+                                                            }}</span>
+                                                        </td>
+                                                        <td class="table-body-filter">
+                                                            <mat-form-field floatLabel="never">
+                                                                <mat-select
+                                                                    formControlName="operator"
+                                                                    (selectionChange)="
+                                                                        updateValiditionForOperatorAndScore(
+                                                                            parameterGroup,
+                                                                            'operator',
+                                                                            'score'
+                                                                        )
+                                                                    "
+                                                                    [placeholder]="'E.g -/=' | translate"
+                                                                >
+                                                                    <mat-select-trigger class="color-change">
+                                                                        {{
+                                                                            parameterGroup.get('operator').value
+                                                                        }}</mat-select-trigger
+                                                                    >
+                                                                    <mat-option
+                                                                        *ngFor="
+                                                                            let operatorOption of labelsAndProgramConfig
+                                                                                ?.calculationBuilderConfig
+                                                                                ?.operatorsConfig
+                                                                        "
+                                                                        [value]="operatorOption.operator"
+                                                                    >
+                                                                        <span class="list">{{
+                                                                            operatorOption.displayName | translate
+                                                                        }}</span>
+                                                                    </mat-option>
+                                                                </mat-select>
+                                                            </mat-form-field>
+                                                        </td>
+                                                        <td>
+                                                            <mat-form-field floatLabel="never">
+                                                                <input
+                                                                    matInput
+                                                                    (change)="
+                                                                        updateValiditionForOperatorAndScore(
+                                                                            parameterGroup,
+                                                                            'score',
+                                                                            'operator'
+                                                                        )
+                                                                    "
+                                                                    class="parameter-score-input"
+                                                                    type="number"
+                                                                    formControlName="score"
+                                                                    [min]="
+                                                                        labelsAndProgramConfig.calculationBuilderConfig
+                                                                            .scoreValueRange.minValue
+                                                                    "
+                                                                    [max]="
+                                                                        labelsAndProgramConfig.calculationBuilderConfig
+                                                                            .scoreValueRange.maxValue
+                                                                    "
+                                                                    [step]="
+                                                                        labelsAndProgramConfig.calculationBuilderConfig
+                                                                            .scoreValueRange.incrementValue
+                                                                    "
+                                                                    [placeholder]="'E.g 1' | translate"
+                                                                />
+                                                            </mat-form-field>
+                                                        </td>
+                                                        <td>
+                                                            <span
+                                                                class="reset-parameter-values"
+                                                                *ngIf="
+                                                                    labelsAndProgramFormGroup.get(
+                                                                        'calculationBuilderValues'
+                                                                    ).enabled
+                                                                "
+                                                                (click)="reset(parameterGroup, ['operator', 'score'])"
+                                                            >
+                                                                {{ 'Reset' | translate }}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                    <ng-template #subParamConfig>
+                                                        <ng-container formArrayName="subParametersValue">
+                                                            <tr
+                                                                *ngFor="
+                                                                    let subParam of getArrayConfig(
+                                                                        parameterGroup,
+                                                                        'subParametersValue'
+                                                                    ).controls;
+                                                                    let subParamIndex = index
+                                                                "
+                                                                [formGroupName]="subParamIndex"
+                                                            >
+                                                                <td>
+                                                                    <span class="parameter-name-size">{{
+                                                                        subParam.get('displayName').value | translate
+                                                                    }}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <mat-form-field floatLabel="never">
+                                                                        <mat-select
+                                                                            formControlName="operator"
+                                                                            (selectionChange)="
+                                                                                updateValiditionForOperatorAndScore(
+                                                                                    subParam,
+                                                                                    'operator',
+                                                                                    'score'
+                                                                                )
+                                                                            "
+                                                                            [placeholder]="'E.g -/=' | translate"
+                                                                        >
+                                                                            <mat-select-trigger class="color-change">
+                                                                                {{
+                                                                                    subParam.get('operator').value
+                                                                                }}</mat-select-trigger
+                                                                            >
+                                                                            <mat-option
+                                                                                *ngFor="
+                                                                                    let operatorOption of labelsAndProgramConfig
+                                                                                        ?.calculationBuilderConfig
+                                                                                        ?.operatorsConfig
+                                                                                "
+                                                                                [value]="operatorOption.operator"
+                                                                            >
+                                                                                <span class="list">{{
+                                                                                    operatorOption.displayName
+                                                                                        | translate
+                                                                                }}</span>
+                                                                            </mat-option>
+                                                                        </mat-select>
+                                                                    </mat-form-field>
+                                                                </td>
+                                                                <td>
+                                                                    <mat-form-field floatLabel="never">
+                                                                        <input
+                                                                            matInput
+                                                                            (change)="
+                                                                                updateValiditionForOperatorAndScore(
+                                                                                    subParam,
+                                                                                    'score',
+                                                                                    'operator'
+                                                                                )
+                                                                            "
+                                                                            class="parameter-score-input"
+                                                                            type="number"
+                                                                            [min]="
+                                                                                labelsAndProgramConfig
+                                                                                    .calculationBuilderConfig
+                                                                                    .scoreValueRange.minValue
+                                                                            "
+                                                                            [max]="
+                                                                                labelsAndProgramConfig
+                                                                                    .calculationBuilderConfig
+                                                                                    .scoreValueRange.maxValue
+                                                                            "
+                                                                            [step]="
+                                                                                labelsAndProgramConfig
+                                                                                    .calculationBuilderConfig
+                                                                                    .scoreValueRange.incrementValue
+                                                                            "
+                                                                            formControlName="score"
+                                                                            [placeholder]="'E.g 1' | translate"
+                                                                        />
+                                                                    </mat-form-field>
+                                                                </td>
+                                                                <td>
+                                                                    <span
+                                                                        class="reset-parameter-values"
+                                                                        *ngIf="
+                                                                            labelsAndProgramFormGroup.get(
+                                                                                'calculationBuilderValues'
+                                                                            ).enabled
+                                                                        "
+                                                                        (click)="reset(subParam, ['operator', 'score'])"
+                                                                    >
+                                                                        {{ 'Reset' | translate }}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </ng-template>
+                                                </ng-container>
+                                            </tbody>
+                                            <tfoot *ngIf="canSave">
+                                                <tr>
+                                                    <td>
+                                                        <div class="table-footer-block">
+                                                            <ul class="table-footer-block-inner">
+                                                                <li class="table-footer-block-inner-left"></li>
+                                                                <li class="table-footer-block-inner-right">
+                                                                    <button
+                                                                        class="btn btn-secondary"
+                                                                        mat-button
+                                                                        color="primary"
+                                                                        type="button"
+                                                                        (click)="cancel()"
+                                                                    >
+                                                                        {{ 'Cancel' | translate }}
+                                                                    </button>
+                                                                    <button
+                                                                        class="submit-all-btn"
+                                                                        mat-button
+                                                                        type="submit"
+                                                                        [disabled]="!labelsAndProgramFormGroup.touched"
+                                                                        (click)="onSubmit()"
+                                                                    >
+                                                                        {{
+                                                                            (isUpdatePage
+                                                                                ? 'Save Changes'
+                                                                                : 'Create Label'
+                                                                            ) | translate
+                                                                        }}
+                                                                    </button>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Column -->
+                            </div>
+                            <!-- Row -->
+                        </div>
+                        <!-- Column -->
+                    </div>
+                    <!-- Row -->
+                </div>
+                <!-- Material Input Style Box Inner -->
+            </div>
+            <!-- Material Input Style Box -->
+        </form>
+    </div>
+    <!-- Column -->
+</div>
+<!-- Row -->

@@ -1,0 +1,28 @@
+@import '~styles/variables';
+
+.facility-list-div {
+    width: 50%;
+    padding-right: 15px;
+    @media #{$responsive-max-1023} {
+        width: 100%;
+    }
+}
+.facilities-div {
+    margin-top: 15px;
+    height: 440px;
+    width: 100%;
+    overflow: auto;
+    padding: 20px;
+}
+.table-card {
+    padding: 17px;
+}
+.flag-icon-in {
+    margin-top: 6px;
+}
+.facility-name {
+    font-family: $font-family-Bold;
+    font-size: 18px;
+    color: $tt-back-button-text-color;
+    word-break: break-word;
+}

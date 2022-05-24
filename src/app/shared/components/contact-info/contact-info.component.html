@@ -1,0 +1,86 @@
+<!-- CONTACT DETAILS SECTION -->
+<div class="hr">
+    <span class="hr-title">{{ 'CONTACT' | translate }}</span>
+</div>
+
+<!-- OPEN CONTAINER: TO SHOW THE CONTACT DETAILS -->
+<div class="show-location-details" *ngIf="!editContactInfo">
+    <div class="edit-btn-container" *ngIf="showEditIcon">
+        <a (click)="showSaveContactForm()">
+            <img class="edit-img" src="{{ cdnImage('edit-model.png') }}" alt="edit-model" />
+        </a>
+    </div>
+    <div>
+        <p *ngIf="contact?.name">{{ contact?.name }}</p>
+        <p *ngIf="contact?.email">{{ contact?.email }}</p>
+        <p *ngIf="contact?.phoneNumber">{{ contact?.phoneNumber }}</p>
+    </div>
+    <p *ngIf="!contact?.name && !contact?.email && !contact?.phoneNumber && showEditIcon">
+        {{ 'No contact details available. Click the edit button to add.' | translate }}
+    </p>
+    <p *ngIf="!contact?.name && !contact?.email && !contact?.phoneNumber && !showEditIcon">
+        {{ 'No contact details available.' | translate }}
+    </p>
+</div>
+
+<!-- OPEN CONTAINER: TO ENTER THE LOCATION DETAILS -->
+
+<div class="add-contact-container" *ngIf="editContactInfo">
+    <form class="location-form" [formGroup]="contactInfoForm" (keydown.enter)="saveContactForm()">
+        <!-- Name -->
+        <mat-form-field class="location-input">
+            <input
+                matInput
+                formControlName="name"
+                placeholder="{{ 'Name' | translate }}"
+                [(ngModel)]="contactData.contactPersonName"
+                name="contactData.contactPersonName"
+                required
+            />
+        </mat-form-field>
+
+        <!-- email -->
+        <mat-form-field class="location-input">
+            <input
+                matInput
+                type="email"
+                formControlName="email"
+                placeholder="{{ 'Email' | translate }}"
+                name="contactData.contactEmail"
+                [(ngModel)]="contactData.contactEmail"
+                required
+            />
+            <mat-error
+                *ngIf="
+                    !contactInfoForm.get('email').hasError('required') &&
+                    contactInfoForm.get('email').hasError('pattern')
+                "
+            >
+                {{ 'Please enter a valid email' | translate }}
+            </mat-error>
+        </mat-form-field>
+
+        <!-- number -->
+        <mat-form-field class="location-input">
+            <input
+                matInput
+                [errorStateMatcher]="matcher"
+                formControlName="phoneNumber"
+                placeholder="{{ 'Mobile Number' | translate }}"
+                name="contactData.contactMobile"
+                [(ngModel)]="contactData.contactMobile"
+            />
+            <mat-error *ngIf="contactInfoForm.get('phoneNumber').hasError('pattern')">
+                {{ 'Please enter a valid mobile number' | translate }}
+            </mat-error>
+        </mat-form-field>
+
+        <div class="btn-container display-flex-justify-flex-end">
+            <button mat-button class="cancel-btn" (click)="showContactInfoBlock()">{{ 'Cancel' | translate }}</button>
+            <button mat-button class="save-btn" (click)="saveContactForm()" [disabled]="!contactInfoForm.valid">
+                {{ 'Save' | translate }}
+            </button>
+        </div>
+    </form>
+</div>
+<!-- CONTACT DETAILS ENDS -->

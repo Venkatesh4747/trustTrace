@@ -1,0 +1,28 @@
+<div class="chip-card-wrapper">
+    <div *ngFor="let data of cardData; let cardIndex = index">
+        <div *ngIf="isCardDataStatusExists; else normalChipCard">
+            <div class="chip-card-container" *ngIf="data.status === 'ACTIVE'">
+                {{ data.value }}
+                <div class="chip-card-actions">
+                    <span *ngIf="handleShowEditDeleteButton(data)"
+                        ><i class="fa fa-pencil" (click)="onEdit(cardIndex)"></i
+                    ></span>
+                    <span *ngIf="handleShowEditDeleteButton(data)"
+                        ><i class="fa fa-trash" (click)="onDelete(cardIndex)"></i
+                    ></span>
+                </div>
+            </div>
+        </div>
+        <ng-template class="chip-card-container" #normalChipCard>
+            {{ data.value }}
+            <div class="chip-card-actions">
+                <span *ngIf="handleShowEditDeleteButton(data)"
+                    ><i class="fa fa-pencil" (click)="onEdit(cardIndex)"></i
+                ></span>
+                <span *ngIf="handleShowEditDeleteButton(data)"
+                    ><i class="fa fa-trash" (click)="onDelete(cardIndex)"></i
+                ></span>
+            </div>
+        </ng-template>
+    </div>
+</div>

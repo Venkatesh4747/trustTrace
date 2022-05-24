@@ -1,0 +1,344 @@
+<div class="cm-container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="mid-line tt-heading-title">
+                <span class="tt-font">{{ 'Certificate Upload' | translate }}</span>
+            </div>
+            <!-- tt-heading-title -->
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-md-5">
+            <p>
+                Upload your Scope Certificates/Documents under the <strong>“Scope Certificates”</strong> menu. Refer to
+                <strong>“How to manage scope certificate“</strong> video under the Training Videos section in the
+                TrusTrace Chat Support
+            </p>
+            <form
+                [formGroup]="certificateDetailsForm"
+                *ngIf="false"
+                #certificateDetailsFGD="ngForm"
+                (ngSubmit)="addCertificate()"
+            >
+                <!-- set the certificate id in the form field so it can be read from the formGroup itself -->
+                <input type="hidden" formControlName="certificateId" hidden />
+                <input type="hidden" formControlName="Entity_Type" hidden />
+
+                <ng-template ngFor let-field [ngForOf]="fieldsList" let-fieldIndex="index">
+                    <div [hidden]="field?.hidden">
+                        <div [ngSwitch]="field.type" class="form-group">
+                            <div *ngSwitchCase="'singleSelect'" class="single-select-container">
+                                <h5 class="tt-font">
+                                    {{ field.label | translate }}:
+                                    <span class="tt-required-asterisk" *ngIf="field.required">*</span>
+                                </h5>
+                                <app-tt-dropdown-search
+                                    [searchOptions]="field.options"
+                                    [placeholder]="field.placeholder"
+                                    [(ngModel)]="dropdownValues[field.formControlName]"
+                                    (selectionChange)="selectionChange(field.formControlName, $event)"
+                                    [ngModelOptions]="{ standalone: true }"
+                                    floatLabel="never"
+                                    [optionalParams]="parameters[field.formControlName]"
+                                    [isRequired]="isRequired"
+                                    [dontCheckString]="true"
+                                    [data_cy]="removeSpace(field.label)"
+                                ></app-tt-dropdown-search>
+                            </div>
+                            <!-- switch:singleSelect -->
+
+                            <div *ngSwitchCase="'text'">
+                                <h5 class="tt-font">
+                                    {{ field.label | translate }}:
+                                    <span class="tt-required-asterisk" *ngIf="field.required">*</span>
+                                </h5>
+                                <mat-form-field [floatLabel]="'never'" [hideRequiredMarker]="'true'">
+                                    <input
+                                        matInput
+                                        type="text"
+                                        [formControlName]="field.formControlName"
+                                        [placeholder]="field.placeholder"
+                                        [required]="field.required"
+                                        [attr.data-cy]="removeSpace(field.label)"
+                                    />
+                                    <mat-error *ngIf="certificateDetailsFormHasError(field.formControlName, 'required')"
+                                        >{{ 'Please select the' | translate }} {{ field.label | translate }}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                            <!-- text -->
+
+                            <div *ngSwitchCase="'date'">
+                                <h5 class="tt-font">
+                                    {{ field.label | translate }}:
+                                    <span class="tt-required-asterisk" *ngIf="field.required">*</span>
+                                </h5>
+                                <mat-form-field [floatLabel]="'never'" [hideRequiredMarker]="'true'">
+                                    <input
+                                        matInput
+                                        [formControlName]="field.formControlName"
+                                        [matDatepicker]="certificateExpiryDate"
+                                        (focus)="certificateExpiryDate.open()"
+                                        (click)="certificateExpiryDate.open()"
+                                        [placeholder]="field.placeholder"
+                                        [required]="field.required"
+                                        readonly
+                                        [attr.data-cy]="removeSpace(field.label)"
+                                    />
+                                    <mat-datepicker #certificateExpiryDate></mat-datepicker>
+                                    <mat-datepicker-toggle
+                                        matSuffix
+                                        [for]="certificateExpiryDate"
+                                    ></mat-datepicker-toggle>
+                                    <mat-error *ngIf="certificateDetailsFormHasError(field.formControlName, 'required')"
+                                        >{{ 'Please select the' | translate }} {{ field.label | translate }}</mat-error
+                                    >
+                                </mat-form-field>
+                            </div>
+                            <!-- switch:date -->
+
+                            <div *ngSwitchCase="'radio'">
+                                <h5 class="tt-font">
+                                    {{ field.label | translate }}:
+                                    <span class="tt-required-asterisk" *ngIf="field.required">*</span>
+                                </h5>
+                                <mat-radio-group [formControlName]="field.formControlName" [required]="field.required">
+                                    <mat-radio-button
+                                        *ngFor="let option of field.options"
+                                        [value]="option.value"
+                                        [checked]="option.default"
+                                        (change)="radioButtonChange(field.formControlName, $event)"
+                                    >
+                                        {{ option.label }}
+                                    </mat-radio-button>
+                                </mat-radio-group>
+                                <h6
+                                    class="error-message text-left tt-font tt-font-regular"
+                                    *ngIf="certificateDetailsFormHasError(field.formControlName, 'required')"
+                                >
+                                    {{ 'Please select the' | translate }} {{ field.label | translate }}
+                                </h6>
+                            </div>
+                        </div>
+                        <!-- form-group -->
+                    </div>
+                    <!-- hidden -->
+                </ng-template>
+                <div class="mt-2">
+                    <h5 class="tt-font">{{ 'Filename' | translate }}:</h5>
+                    <div *ngIf="uploadedFiles.length === 0; else listFiles">
+                        <h6 class="text-muted tt-font-regular">{{ 'Click below to upload file' | translate }}:</h6>
+                    </div>
+                    <ng-template #listFiles>
+                        <ul class="list-unstyled tt-uploaded-file-list-container">
+                            <li *ngFor="let fileName of uploadedFiles; let uploadedFileIndex = index">
+                                <span class="tt-uploaded-file">
+                                    <span class="fileName">{{ fileName.label }}</span>
+                                </span>
+                                <ng-template
+                                    [ngIf]="!isRemovingFile[uploadedFileIndex]"
+                                    [ngIfElse]="removingFileSpinner"
+                                >
+                                    <span
+                                        class="tt-remove-uploaded-file image-icon"
+                                        (click)="
+                                            removeFile(
+                                                certificateDetailsForm.value.certificateId,
+                                                fileName.value,
+                                                uploadedFileIndex
+                                            )
+                                        "
+                                    >
+                                        <img src="{{ env.IMG_URL }}images/questionaire-del.png" alt="Delete" />
+                                    </span>
+                                </ng-template>
+                                <ng-template #removingFileSpinner>
+                                    <div style="display: inline-block;">
+                                        <mat-spinner diameter="14"></mat-spinner>
+                                    </div>
+                                </ng-template>
+                            </li>
+                        </ul>
+                    </ng-template>
+                </div>
+                <!-- uploaded files list -->
+
+                <div class="mt-1 form-row">
+                    <div class="col-md-7 pl-0">
+                        <div
+                            class="tt-file-upload-ui-container"
+                            (click)="isUploading ? $event.stopPropagation() : fileInput.click()"
+                        >
+                            <div class="tt-file-upload-ui-content">
+                                <ng-template [ngIf]="!isUploading" [ngIfElse]="uploadFileSpinner">
+                                    <div class="spinner-wrapper">
+                                        <img
+                                            src="{{ env.IMG_URL }}images/icon-upload-grey.png"
+                                            alt="Upload file"
+                                            class="mr-2"
+                                        />
+                                        <h5 class="description tt-font tt-font-regular text-muted">
+                                            {{ 'Click here to upload file' | translate }}
+                                        </h5>
+                                    </div>
+                                </ng-template>
+                                <ng-template #uploadFileSpinner>
+                                    <div class="spinner-wrapper">
+                                        <h5 class="tt-font tt-font-regular tt-font-muted">
+                                            {{ 'Uploading File' | translate }} . . .
+                                        </h5>
+                                        <mat-spinner [diameter]="14"></mat-spinner>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </div>
+                        <input
+                            type="file"
+                            class="hidden"
+                            #fileInput
+                            (change)="uploadFile($event.target.files)"
+                            [hidden]="true"
+                            [disabled]="isUploading"
+                        />
+                        <h6
+                            class="error-message text-left tt-font tt-font-regular"
+                            *ngIf="certificateDetailsFormHasError('certificateId', 'required')"
+                        >
+                            {{ 'Required to upload documents' | translate }}
+                        </h6>
+                    </div>
+                    <!-- col-md-7 -->
+
+                    <div class="col-md-5 pt-2">
+                        <div class="add-button">
+                            <button
+                                type="submit"
+                                class="btn tt-btn tt-btn-super-slim tt-btn-outline-secondary tt-font"
+                                *ngIf="!isEditingCertificate"
+                            >
+                                {{ 'Add' | translate }}
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="btn tt-btn tt-btn-super-slim tt-btn-outline-secondary tt-font"
+                                *ngIf="isEditingCertificate"
+                            >
+                                {{ 'Save' | translate }}
+                            </button>
+                        </div>
+                        <div class="clear-button mt-1">
+                            <button
+                                type="button"
+                                class="btn tt-btn tt-btn-super-slim tt-btn-outline-secondary tt-font tt-font-muted"
+                                (click)="clearCertificatesForm()"
+                            >
+                                {{ 'Clear' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                    <!-- col-md-5 -->
+                </div>
+                <!-- file upload -->
+            </form>
+        </div>
+        <!-- col-md-6 -->
+        <div class="col-md-5" id="upload-certificate">
+            <h5 class="tt-font tt-heading">{{ 'Uploaded Certificates' | translate }}:</h5>
+            <div class="no-certificates-added text-center pt-3" *ngIf="certificates.length <= 0">
+                <img
+                    src="{{ env.IMG_URL }}images/no-certificate.png"
+                    style="height: 75px;"
+                    alt="No certificate image"
+                />
+                <h5 class="tt-font tt-font-muted">
+                    {{ 'Certificates' | translate }}
+                </h5>
+                <h5 class="tt-font tt-font-regular tt-font-muted">{{ 'have not been uploaded yet' | translate }}!</h5>
+            </div>
+            <ul class="list-unstyled certificate-list-container" *ngIf="certificates?.length > 0">
+                <li
+                    class="certificate-list-item tt-box-shadow"
+                    *ngFor="let certificate of certificates; let certIndex = index"
+                >
+                    <div class="details pull-left">
+                        <h6 class="tt-font">
+                            {{ getCertificateNameById(certificate.Certificate_Type) }}: &nbsp;<span
+                                class="tt-font tt-font-regular"
+                            >
+                                <span *ngIf="certificate?.uploadedFiles?.length === 1">{{
+                                    (certificate?.uploadedFiles)[0]?.label
+                                }}</span>
+                                <span *ngIf="certificate?.uploadedFiles?.length > 1"
+                                    >{{ (certificate?.uploadedFiles)[0]?.label }} &
+                                    {{ certificate?.uploadedFiles.length - 1 }}
+                                    {{ 'other files saved' | translate }}</span
+                                >
+                                <span *ngIf="!(certificate?.uploadedFiles)[0]?.label" class="tt-font tt-font-muted">{{
+                                    'Certificate not uploaded' | translate
+                                }}</span>
+                            </span>
+                        </h6>
+                        <h6 class="tt-font">
+                            {{ 'Certification Body' | translate }}: &nbsp;
+                            <span class="tt-font tt-font-regular" data-cy="create-manager-certification-body">{{
+                                certificate.Certification_Body
+                            }}</span>
+                        </h6>
+                        <h6 class="tt-font">
+                            {{ 'Expiry Date' | translate }}: &nbsp;
+                            <span class="tt-font tt-font-regular" data-cy="create-manager-expiry-date">{{
+                                certificate.Certificate_Expiry_Date | date
+                            }}</span>
+                        </h6>
+                    </div>
+                    <div class="pull-right">
+                        <span
+                            class="action-icons opacity-5 edit-icon vcenter"
+                            tooltip="{{ 'Edit is not available' | translate }}"
+                            container="body"
+                        >
+                            <!-- <ng-template
+                                [ngIf]="
+                                    !isProcessing[
+                                        'edit_' +
+                                            certIndex
+                                    ]
+                                "
+                                [ngIfElse]="actionLoading"
+                            > -->
+                            <img src="{{ env.IMG_URL }}images/edit.png" alt="Edit" />
+                            <!-- </ng-template> -->
+                        </span>
+                        <span
+                            class="action-icon delete-icon vcenter"
+                            tooltip="Delete"
+                            container="body"
+                            (click)="deleteCertificate(certificate.certificateId, certIndex)"
+                        >
+                            <!-- <ng-template
+                                [ngIf]="
+                                    !isProcessing[
+                                        'delete_' +
+                                        certIndex
+                                    ]
+                                "
+                                [ngIfElse]="actionLoading"
+                            > -->
+                            <img src="{{ env.IMG_URL }}images/questionaire-del.png" alt="Delete" />
+                            <!-- </ng-template> -->
+                        </span>
+                        <ng-template #actionLoading>
+                            <mat-spinner [diameter]="14"></mat-spinner>
+                        </ng-template>
+                    </div>
+                    <div class="clearfix"></div>
+                </li>
+            </ul>
+        </div>
+        <!-- col-md-6 -->
+    </div>
+    <!-- row -->
+</div>
+<!-- cm-container -->

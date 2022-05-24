@@ -1,0 +1,1233 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="upload-container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="upload-transaction-header">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="page-title">
+                            <div>{{ 'Upload Transaction Certificate' | translate }}</div>
+                            <div class="page-description">
+                                {{ 'Upload and fill Transaction Certificate information' | industry | translate }}
+                            </div>
+                        </div>
+                        <!-- Page Title -->
+                        <div class="close-icon-block text-right">
+                            <a
+                                (click)="
+                                    uploadedFile !== undefined
+                                        ? closeUploadEvidence(uploadedFile.id, uploadedFile.fullName)
+                                        : closeUploadEvidence(null, null)
+                                "
+                                *ngIf="showClose"
+                            >
+                                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Close Icon Block -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+        <!-- Upload Transaction Header -->
+    </div>
+    <!-- Column -->
+</div>
+<!-- Row -->
+<div class="upload-container-block">
+    <div class="row">
+        <div class="col-md-5">
+            <!--  Row -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="upload-transaction-certificate-block">
+                        <div class="upload-extraction-title">
+                            <h4 class="title">
+                                {{ extractionStatus | translate }}
+                            </h4>
+                        </div>
+                        <!-- Upload Extraction Title -->
+                        <div class="upload-certificate-section">
+                            <div class="uploaded-source-file-loader" *ngIf="uploadedFile && isExtracting">
+                                <app-spinner [small]="true"></app-spinner>
+                            </div>
+                            <ngx-extended-pdf-viewer
+                                [src]="fileToUpload"
+                                [height]="'80vh'"
+                                [useBrowserLocale]="true"
+                                [showBookmarkButton]="false"
+                                [showDownloadButton]="false"
+                                [showOpenFileButton]="false"
+                                [showPrintButton]="false"
+                                [showPropertiesButton]="false"
+                                *ngIf="uploadedFile && !isExtracting"
+                            >
+                                <!-- [showSecondaryToolbarButton]='false' -->
+                            </ngx-extended-pdf-viewer>
+                            <div class="drag-file-upload-container" *ngIf="!uploadedFile">
+                                <div class="drag-file-upload" (click)="fileInput.click()">
+                                    <span *ngIf="!isUploading" class="drag-file-upload-icon">
+                                        <mat-icon>arrow_upward</mat-icon>
+                                    </span>
+                                    <span *ngIf="!isUploading" class="pl-1">{{
+                                        'Click to upload certificate (Please upload only PDF files)' | translate
+                                    }}</span>
+                                    <span *ngIf="isUploading" class="margin-0-auto">
+                                        <app-spinner [small]="true"></app-spinner>
+                                    </span>
+                                    <input
+                                        type="file"
+                                        class="hidden"
+                                        #fileInput
+                                        name="{{ fileInput }}"
+                                        (change)="uploadFile($event.target.files, 'supplier')"
+                                        [hidden]="true"
+                                        [disabled]="isUploading"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Upload Certificate Section -->
+                        <div
+                            class="upload-certificate-document"
+                            *ngIf="uploadedFile && !isExtracting"
+                            [ngClass]="{ 'disabled-opacity-5': isExtracting }"
+                        >
+                            <div class="upload-file-name-block">
+                                <p>
+                                    <span>{{ 'File Name ' | translate }}:</span>{{ uploadedFile.name | translate }}
+                                </p>
+                                <a
+                                    [ngClass]="{ 'disabled-opacity-5': isExtracting }"
+                                    (click)="downloadEvidence(uploadedFile.id, uploadedFile.name)"
+                                >
+                                    <img
+                                        tooltip="Download"
+                                        container="body"
+                                        src="{{ env.IMG_URL }}images/file-download.png"
+                                        alt="Download"
+                                    />
+                                </a>
+                                <a
+                                    (click)="deleteEvidence(uploadedFile.id, uploadedFile.fullName, 'supplier')"
+                                    [ngClass]="{ 'disabled-opacity-5': isExtracting }"
+                                >
+                                    <img src="{{ env.IMG_URL }}images/delete-icon.png" alt="Delete" />
+                                </a>
+                            </div>
+                            <!-- Upload Certificate Document -->
+                        </div>
+                        <!-- Upload File Document -->
+                    </div>
+                    <!-- Upload Transaction Certificate Block -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!--  Row -->
+        </div>
+        <!-- Column -->
+        <div class="col-md-7">
+            <div class="upload-transaction-field">
+                <div class="mandatory-title">
+                    <h4 class="title">{{ 'All fields are mandatory' | translate }} <span class="madatory">*</span></h4>
+                    <div class="back-button">
+                        <button
+                            class="go-back-button"
+                            (click)="handleEditClick(!isEditMode)"
+                            [disabled]="
+                                (extractionStatus !== extractionStatusText.COMPLETED && !isExtractedDataAvailable) ||
+                                isExtracting ||
+                                (!uploadedFile && (!evidenceForm.valid ? false : !isBuyerConsigneExists()))
+                            "
+                        >
+                            {{ editBtnText | translate }}
+                        </button>
+                    </div>
+                </div>
+                <!-- Mandatory Title -->
+                <div class="material-input-style-box-type">
+                    <form #evidenceForm="ngForm" class="evidence-form-controls">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="table custom-table normal-style-table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ 'TC Reference ID' | translate }}</th>
+                                                    <th>{{ 'Certification Type' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <input
+                                                                type="text"
+                                                                matInput
+                                                                placeholder="{{ 'Enter TC Reference ID' | translate }}"
+                                                                required
+                                                                [(ngModel)]="
+                                                                    evidenceData.tcExtractedData.referenceNumber
+                                                                "
+                                                                name="evidence-tc-referenceNumber"
+                                                                [ngClass]="{
+                                                                    'red-border':
+                                                                        isExtractedDataAvailable &&
+                                                                        !extractedData.tcExtractedData.referenceNumber
+                                                                }"
+                                                                [disabled]="
+                                                                    !isEditMode ||
+                                                                    (extractionStatus ===
+                                                                        extractionStatusText.COMPLETED &&
+                                                                        extractedData.tcExtractedData
+                                                                            ?.referenceNumber &&
+                                                                        isExtractedDataAvailable)
+                                                                "
+                                                            />
+                                                        </mat-form-field>
+                                                        <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                            {{ 'Extracted value ' | translate }}:
+                                                            <span>{{
+                                                                extractedData.tcExtractedData.referenceNumber || 'NILL'
+                                                                    | translate
+                                                            }}</span>
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <mat-form-field
+                                                            *ngIf="extractionStatus !== 'Extraction failed'"
+                                                            [floatLabel]="'never'"
+                                                            class="mandatory"
+                                                        >
+                                                            <input
+                                                                type="text"
+                                                                required
+                                                                matInput
+                                                                placeholder="{{
+                                                                    'Enter Certification Type' | translate
+                                                                }}"
+                                                                [(ngModel)]="certStd"
+                                                                name="evidence-tc-certificateType"
+                                                                [disabled]="
+                                                                    !isEditMode ||
+                                                                    extractedData.tcExtractedData.certTypeId !== null ||
+                                                                    (extractionStatus ===
+                                                                        extractionStatusText.COMPLETED &&
+                                                                        extractedData.tcExtractedData?.certTypeId &&
+                                                                        isExtractedDataAvailable)
+                                                                "
+                                                                [ngClass]="{
+                                                                    'red-border':
+                                                                        isExtractedDataAvailable &&
+                                                                        !extractedData.tcExtractedData.certTypeId
+                                                                }"
+                                                            />
+                                                        </mat-form-field>
+                                                        <app-tt-dropdown-search
+                                                            *ngIf="extractionStatus === 'Extraction failed'"
+                                                            [searchOptions]="this.config.certs | sortByFilter"
+                                                            [(ngModel)]="certStd"
+                                                            [optionalParams]="certParams"
+                                                            placeholder="{{
+                                                                'Enter Certification Standard' | translate
+                                                            }}"
+                                                            required
+                                                            class="mandatory"
+                                                            floatLabel="never"
+                                                            [data_cy]="'scope-certificate-fac-name'"
+                                                            name="scope-certificate-certificate-type"
+                                                        >
+                                                        </app-tt-dropdown-search>
+                                                        <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                            {{ 'Extracted value ' | translate }}:
+                                                            <span>{{
+                                                                localeService.getDisplayText(
+                                                                    extractedData.tcExtractedData.certTypeId
+                                                                ) || ('NILL' | translate)
+                                                            }}</span>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="table custom-table normal-style-table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ 'Seller' | translate }}</th>
+                                                    <th>{{ 'Country of Dispatch' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <textarea
+                                                                type="text"
+                                                                required
+                                                                matInput
+                                                                placeholder="{{ 'Enter Seller' | translate }}"
+                                                                rows="7"
+                                                                [(ngModel)]="
+                                                                    evidenceData.tcExtractedData.sellerOfProduct[
+                                                                        'value'
+                                                                    ]
+                                                                "
+                                                                name="evidence-seller-of-product"
+                                                                [disabled]="
+                                                                    !isEditMode ||
+                                                                    (extractionStatus ===
+                                                                        extractionStatusText.COMPLETED &&
+                                                                        extractedData.tcExtractedData?.sellerOfProduct
+                                                                            ?.value &&
+                                                                        isExtractedDataAvailable) ||
+                                                                    (extractedData.tcExtractedData.sellerOfProduct &&
+                                                                        extractedData.tcExtractedData.sellerOfProduct[
+                                                                            'value'
+                                                                        ] !== null)
+                                                                "
+                                                                [ngClass]="{
+                                                                    'red-border':
+                                                                        isExtractedDataAvailable &&
+                                                                        (!extractedData.tcExtractedData
+                                                                            .sellerOfProduct ||
+                                                                            !extractedData.tcExtractedData
+                                                                                .sellerOfProduct['value'])
+                                                                }"
+                                                            >
+                                                            </textarea>
+                                                        </mat-form-field>
+                                                        <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                            {{ 'Extracted value ' | translate }}:
+                                                            <span>
+                                                                {{
+                                                                    extractedData.tcExtractedData.sellerOfProduct
+                                                                        ? extractedData.tcExtractedData.sellerOfProduct[
+                                                                              'value'
+                                                                          ]
+                                                                        : ('NILL' | translate)
+                                                                }}
+                                                            </span>
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <div class="tt-dropdown-arrow-style">
+                                                            <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    matInput
+                                                                    placeholder="{{
+                                                                        'Enter Country of Dispatch' | translate
+                                                                    }}"
+                                                                    [(ngModel)]="
+                                                                        evidenceData.tcExtractedData.countryOfDispatch
+                                                                    "
+                                                                    name="evidence-country-of-dispatch"
+                                                                    [disabled]="
+                                                                        !isEditMode ||
+                                                                        (extractionStatus ===
+                                                                            extractionStatusText.COMPLETED &&
+                                                                            extractedData.tcExtractedData
+                                                                                ?.countryOfDispatch &&
+                                                                            isExtractedDataAvailable) ||
+                                                                        extractedData.tcExtractedData
+                                                                            .countryOfDispatch !== null
+                                                                    "
+                                                                    [ngClass]="{
+                                                                        'red-border':
+                                                                            isExtractedDataAvailable &&
+                                                                            !extractedData.tcExtractedData
+                                                                                .countryOfDispatch
+                                                                    }"
+                                                                />
+                                                            </mat-form-field>
+                                                            <!-- <app-tt-dropdown-search
+                                                                    *ngIf="
+                                                                        evidenceData.tcExtractedData.countryOfDispatch ===
+                                                                        null
+                                                                    "
+                                                                    [searchOptions]="config.countries"
+                                                                    [placeholder]="'{{'Enter Country of Dispatch' | translate}}'"
+                                                                    [(ngModel)]="selectedCountry"
+                                                                    (selectionChange)="onSelectingCountry($event)"
+                                                                    name="country-of-dispatch"
+                                                                    floatLabel="never"
+                                                                    [optionalParams]="countryParams"
+                                                                    [isRequired]="true"
+                                                                    class="mandatory"
+                                                                    [showToastr]="false"
+                                                                    [dontCheckString]="true"
+                                                                    required
+                                                                >
+                                                                </app-tt-dropdown-search> -->
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{ 'Extracted value ' | translate }}:
+                                                                <span>
+                                                                    {{
+                                                                        extractedData.tcExtractedData.countryOfDispatch
+                                                                            ? extractedData.tcExtractedData
+                                                                                  .countryOfDispatch
+                                                                            : ('NILL' | translate)
+                                                                    }}
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                        <!-- TT Drop Down Arrow Style-->
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                            <!-- <div class="col-md-4"> -->
+                            <!-- <div class="upload-trader-certificate-section">
+                                    <div class="checkbox-block">
+                                        <mat-checkbox [disabled]="isExtracting || !uploadedFile"
+                                            [ngModelOptions]="{ standalone: true }" [checked]="traderChecked"
+                                            [(ngModel)]="traderChecked">
+                                            {{
+                                            'Check this box if this is a trader TC or have cotton content in the TC'
+                                            | translate
+                                            }}
+                                        </mat-checkbox>
+                                    </div>
+                                </div> -->
+                            <!-- <div class="file-upload-block"> -->
+                            <!-- <div *ngIf="traderChecked"> -->
+                            <!-- <div class="drag-file-upload-container" *ngIf="!traderUploadedFile">
+                                            <div class="drag-file-upload" (click)="traderFileInput.click()">
+                                                <span *ngIf="!isTraderUploading" class="drag-file-upload-icon">
+                                                    <mat-icon>arrow_upward</mat-icon>
+                                                </span>
+                                                <span *ngIf="!isTraderUploading" class="pl-1">Click to upload
+                                                    certificate (Please upload only PDF files)</span>
+                                                <span *ngIf="isTraderUploading" class="margin-0-auto">
+                                                    <app-spinner [small]="true"></app-spinner>
+                                                </span>
+                                                <input type="file" class="hidden" #traderFileInput
+                                                    name="{{ traderFileInput }}"
+                                                    (change)="uploadTraderFile($event.target.files, 'trader')"
+                                                    [hidden]="true" [disabled]="isTraderUploading" />
+                                            </div>
+                                        </div> -->
+                            <!-- <div class="upload-certificate-document"
+                                            *ngIf="traderUploadedFile && !isExtracting"
+                                            [ngClass]="{ 'disabled-opacity-5': isExtracting }"> -->
+                            <!-- <div class="upload-file-name-block">
+                                                <p>{{ traderUploadedFile.name }}</p>
+                                                <a [ngClass]="{ 'disabled-opacity-5': isExtracting }" (click)="
+                                                        downloadEvidence(traderUploadedFile.id, traderUploadedFile.name)
+                                                    ">
+                                                    <img tooltip="Download" container="body"
+                                                        src="{{ env.IMG_URL }}images/file-download.png"
+                                                        alt="Download" />
+                                                </a>
+                                                <a (click)="
+                                                        deleteEvidence(
+                                                            traderUploadedFile.id,
+                                                            traderUploadedFile.fullName,
+                                                            'trader'
+                                                        )
+                                                    " [ngClass]="{ 'disabled-opacity-5': isExtracting }">
+                                                    <img src="{{ env.IMG_URL }}images/delete-icon.png" alt="Delete" />
+                                                </a>
+                                            </div> -->
+                            <!-- Upload Certificate Document -->
+                            <!-- </div> -->
+                            <!-- </div> -->
+                            <!-- </div> -->
+                            <!-- </div> -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="table custom-table normal-style-table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        {{ 'Buyer' | translate }}
+                                                        <span
+                                                            matTooltip="Buyer not found"
+                                                            matTooltipPosition="above"
+                                                            *ngIf="
+                                                                !extractedData.tcExtractedData.buyerOfProduct[
+                                                                    'isExist'
+                                                                ] && !isEditMode
+                                                            "
+                                                            class="header-icon validation-icon"
+                                                        >
+                                                            <mat-icon>error</mat-icon>
+                                                        </span>
+                                                    </th>
+                                                    <th>
+                                                        {{ 'Consignee' | translate }}
+                                                        <span
+                                                            matTooltip="Consignee not found"
+                                                            matTooltipPosition="above"
+                                                            *ngIf="
+                                                                !extractedData.tcExtractedData.consigneeOfProduct[
+                                                                    'isExist'
+                                                                ] && !isEditMode
+                                                            "
+                                                            class="header-icon validation-icon"
+                                                        >
+                                                            <mat-icon>error</mat-icon>
+                                                        </span>
+                                                    </th>
+                                                    <th>{{ 'Net weight' | translate }}</th>
+                                                    <th>{{ 'Recording Facility' | translate }}</th>
+                                                    <th>
+                                                        {{ 'Supplier facility UID' | translate }}
+                                                        <span
+                                                            [matTooltip]="
+                                                                evidenceData.systemMessages.includes(
+                                                                    'The selected T2 Facility does not have a valid Scope Certificate'
+                                                                )
+                                                                    ? 'Supplier facility UID does not have a valid Scope Certificate'
+                                                                    : 'Seller does not match with selected supplier facility UID'
+                                                            "
+                                                            matTooltipPosition="above"
+                                                            *ngIf="!facilityValidSC"
+                                                            class="header-icon validation-icon"
+                                                        >
+                                                            <mat-icon>error</mat-icon>
+                                                        </span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td [ngClass]="{ 'disabled-opacity-5': disableFields }">
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <textarea
+                                                                type="text"
+                                                                required
+                                                                matInput
+                                                                rows="7"
+                                                                placeholder="{{ 'Enter Buyer' | translate }}"
+                                                                [(ngModel)]="
+                                                                    evidenceData.tcExtractedData.buyerOfProduct.value
+                                                                "
+                                                                name="evidence-buyer-of-product"
+                                                                [ngClass]="{
+                                                                    'red-border':
+                                                                        isExtractedDataAvailable &&
+                                                                        (!extractedData.tcExtractedData
+                                                                            .buyerOfProduct ||
+                                                                            !extractedData.tcExtractedData
+                                                                                .buyerOfProduct['value'])
+                                                                }"
+                                                                [disabled]="
+                                                                    !isEditMode ||
+                                                                    (extractionStatus ===
+                                                                        extractionStatusText.COMPLETED &&
+                                                                        extractedData.tcExtractedData?.buyerOfProduct
+                                                                            ?.value &&
+                                                                        isExtractedDataAvailable)
+                                                                "
+                                                            >
+                                                            </textarea>
+                                                        </mat-form-field>
+                                                        <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                            {{ 'Extracted value ' | translate }}:
+                                                            <span>
+                                                                {{
+                                                                    extractedData.tcExtractedData.buyerOfProduct
+                                                                        ? extractedData.tcExtractedData.buyerOfProduct[
+                                                                              'value'
+                                                                          ]
+                                                                        : ('NILL' | translate)
+                                                                }}
+                                                            </span>
+                                                        </p>
+                                                    </td>
+                                                    <td [ngClass]="{ 'disabled-opacity-5': disableFields }">
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <textarea
+                                                                type="text"
+                                                                rows="7"
+                                                                required
+                                                                matInput
+                                                                placeholder="{{ 'Enter Consignee' | translate }}"
+                                                                [(ngModel)]="
+                                                                    evidenceData.tcExtractedData.consigneeOfProduct[
+                                                                        'value'
+                                                                    ]
+                                                                "
+                                                                name="evidence-consignee-of-product"
+                                                                [ngClass]="{
+                                                                    'red-border':
+                                                                        isExtractedDataAvailable &&
+                                                                        (!extractedData.tcExtractedData
+                                                                            .consigneeOfProduct ||
+                                                                            !extractedData.tcExtractedData
+                                                                                .consigneeOfProduct['value'])
+                                                                }"
+                                                                [disabled]="
+                                                                    !isEditMode ||
+                                                                    (extractionStatus ===
+                                                                        extractionStatusText.COMPLETED &&
+                                                                        extractedData.tcExtractedData
+                                                                            ?.consigneeOfProduct?.value &&
+                                                                        isExtractedDataAvailable)
+                                                                "
+                                                            >
+                                                            </textarea>
+                                                        </mat-form-field>
+                                                        <p
+                                                            class="value-gray"
+                                                            *ngIf="
+                                                                extractionStatus === extractionStatusText.COMPLETED &&
+                                                                isExtractedDataAvailable
+                                                            "
+                                                        >
+                                                            {{ 'Extracted value ' | translate }}:
+                                                            <span>
+                                                                {{
+                                                                    extractedData.tcExtractedData.consigneeOfProduct
+                                                                        ? extractedData.tcExtractedData
+                                                                              .consigneeOfProduct['value']
+                                                                        : ('NILL' | translate)
+                                                                }}
+                                                            </span>
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <input
+                                                                type="text"
+                                                                required
+                                                                matInput
+                                                                placeholder="{{ 'Net weight' | translate }}"
+                                                                [(ngModel)]="evidenceData.tcExtractedData.netWeight"
+                                                                name="evidence-total-net-weight"
+                                                                [disabled]="
+                                                                    !isEditMode ||
+                                                                    (extractionStatus ===
+                                                                        extractionStatusText.COMPLETED &&
+                                                                        extractedData.tcExtractedData?.netWeight &&
+                                                                        isExtractedDataAvailable)
+                                                                "
+                                                            />
+                                                        </mat-form-field>
+                                                        <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                            {{ 'Extracted value ' | translate }}:
+                                                            <span>
+                                                                {{
+                                                                    extractedData.tcExtractedData.netWeight
+                                                                        ? extractedData.tcExtractedData.netWeight
+                                                                        : ('NILL' | translate)
+                                                                }}
+                                                            </span>
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <mat-form-field
+                                                            [floatLabel]="'never'"
+                                                            *ngIf="!isExtractedDataAvailable"
+                                                        >
+                                                            <input
+                                                                type="text"
+                                                                matInput
+                                                                placeholder="{{
+                                                                    'Select Recording Facility' | translate
+                                                                }}"
+                                                                [(ngModel)]="evidenceData.recordingFacilityId"
+                                                                name="evidence-recording-fac-name"
+                                                                disabled
+                                                            />
+                                                        </mat-form-field>
+
+                                                        <app-tt-dropdown-search
+                                                            [floatLabel]="'never'"
+                                                            *ngIf="isExtractedDataAvailable"
+                                                            [searchOptions]="facilityList"
+                                                            [(ngModel)]="evidenceData.recordingFacilityId"
+                                                            [optionalParams]="recordingFacilityParams"
+                                                            placeholder="{{ 'Select Recording Facility' | translate }}"
+                                                            required
+                                                            class="mandatory input"
+                                                            floatLabel="never"
+                                                            [data_cy]="'scope-certificate-fac-name'"
+                                                            [showTooltip]="false"
+                                                            [canTextBeWrapped]="true"
+                                                            name="evidence-recording-fac-name"
+                                                        >
+                                                        </app-tt-dropdown-search>
+                                                    </td>
+                                                    <td>
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <input
+                                                                class="input"
+                                                                type="text"
+                                                                name="evidence-tc-facility"
+                                                                placeholder="{{
+                                                                    'Enter Supplier facility UID' | translate
+                                                                }}"
+                                                                [(ngModel)]="searchTermFacility"
+                                                                (blur)="validateSelectedFacility()"
+                                                                matInput
+                                                                [matAutocomplete]="facilitySearch"
+                                                                (keyup)="searchFacility($event)"
+                                                                [disabled]="isExtracting || !uploadedFile"
+                                                                data-cy="outbound-transaction-customer-name"
+                                                                required
+                                                            />
+                                                            <mat-hint [ngStyle]="{ color: hintColorFacility }">{{
+                                                                facilitySearchHintText | translate
+                                                            }}</mat-hint>
+                                                            <mat-autocomplete
+                                                                #facilitySearch="matAutocomplete"
+                                                                [displayWith]="getFacilityName"
+                                                                (optionSelected)="
+                                                                    onFacilitySelection(
+                                                                        $event.option.value,
+                                                                        evidenceData
+                                                                    )
+                                                                "
+                                                            >
+                                                                <mat-option
+                                                                    *ngFor="let item of facilities"
+                                                                    [value]="item"
+                                                                >
+                                                                    {{ item.reference_id }}-{{ item.name }}
+                                                                </mat-option>
+                                                            </mat-autocomplete>
+                                                        </mat-form-field>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table
+                                            [ngClass]="{ 'product-table': traderChecked }"
+                                            class="table custom-table evidence-upload-table table-striped"
+                                        >
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ 'Product Name & Number' | translate }}</th>
+                                                    <!-- <th>Material Composition</th> -->
+                                                    <th>{{ 'Trade name' | translate }}</th>
+                                                    <th>{{ 'LOT Nos' | translate }}</th>
+                                                    <th>{{ 'Quantity (kgs)' | translate }}</th>
+                                                    <th>
+                                                        {{ 'Raw material UID' | translate }}
+                                                    </th>
+                                                    <th *ngIf="traderChecked">
+                                                        {{ 'Real Yarn Supplier' | translate }}
+                                                    </th>
+                                                    <th *ngIf="traderChecked">{{ 'Real Yarn CoO' | translate }}</th>
+                                                    <th *ngIf="traderChecked">{{ 'Cotton Lint CoO' | translate }}</th>
+                                                    <th>{{ 'Action' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr
+                                                    *ngFor="
+                                                        let product of evidenceData.tcExtractedData.productInfo;
+                                                        let ind = index
+                                                    "
+                                                >
+                                                    <td>
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <input
+                                                                type="text"
+                                                                matInput
+                                                                placeholder="{{
+                                                                    'Enter Product Name & Number' | translate
+                                                                }}"
+                                                                [(ngModel)]="product.productName"
+                                                                name="evidence-tc-productName{{ ind }}-{{ ind }}"
+                                                                required
+                                                                [ngClass]="{
+                                                                    'red-border':
+                                                                        isExtractedDataAvailable &&
+                                                                        (!extractedData.tcExtractedData.productInfo ||
+                                                                            !extractedData.tcExtractedData.productInfo[
+                                                                                ind
+                                                                            ] ||
+                                                                            !extractedData.tcExtractedData.productInfo[
+                                                                                ind
+                                                                            ].productName)
+                                                                }"
+                                                                [disabled]="
+                                                                    !isEditMode ||
+                                                                    (extractionStatus ===
+                                                                        extractionStatusText.COMPLETED &&
+                                                                        extractedData.tcExtractedData?.productInfo &&
+                                                                        extractedData.tcExtractedData.productInfo[ind]
+                                                                            ?.productName &&
+                                                                        isExtractedDataAvailable)
+                                                                "
+                                                            />
+                                                        </mat-form-field>
+                                                        <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                            {{ 'Extracted value ' | translate }}:
+                                                            <span>{{
+                                                                extractedData.tcExtractedData &&
+                                                                extractedData.tcExtractedData.productInfo &&
+                                                                extractedData.tcExtractedData.productInfo[ind]
+                                                                    ? extractedData.tcExtractedData.productInfo[ind]
+                                                                          .productName
+                                                                    : ('NILL' | translate)
+                                                            }}</span>
+                                                        </p>
+                                                    </td>
+                                                    <!-- <td>
+                                                            <mat-form-field [floatLabel]="'never'">
+                                                                <input type="text" matInput
+                                                                    placeholder="Enter Material Composition" />
+                                                            </mat-form-field>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{'Extracted value ' | translate}}
+                                                                <span>100% Post-consumer recycled</span>
+                                                            </p>
+                                                        </td> -->
+                                                    <td>
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <input
+                                                                type="text"
+                                                                matInput
+                                                                placeholder="{{ 'Enter Trade name' | translate }}"
+                                                                [(ngModel)]="product.tradeName"
+                                                                name="evidence-tc-tradeName{{ ind }}-{{ ind }}"
+                                                                [ngModelOptions]="{ standalone: true }"
+                                                                [disabled]="!isEditMode"
+                                                                [ngClass]="{
+                                                                    'red-border':
+                                                                        isExtractedDataAvailable &&
+                                                                        (!extractedData.tcExtractedData.productInfo ||
+                                                                            !extractedData.tcExtractedData.productInfo[
+                                                                                ind
+                                                                            ] ||
+                                                                            !extractedData.tcExtractedData.productInfo[
+                                                                                ind
+                                                                            ].tradeName)
+                                                                }"
+                                                            />
+                                                        </mat-form-field>
+                                                        <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                            {{ 'Extracted value ' | translate }}:
+                                                            <span
+                                                                >{{
+                                                                    extractedData.tcExtractedData &&
+                                                                    extractedData.tcExtractedData.productInfo &&
+                                                                    extractedData.tcExtractedData.productInfo[ind]
+                                                                        ? extractedData.tcExtractedData.productInfo[ind]
+                                                                              .tradeName
+                                                                        : ('NILL' | translate)
+                                                                }}
+                                                            </span>
+                                                        </p>
+                                                    </td>
+                                                    <td [ngClass]="{ 'disabled-opacity-5': !isEditMode }">
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <input
+                                                                type="text"
+                                                                matInput
+                                                                placeholder="{{ 'Enter Lots No' | translate }}"
+                                                                [(ngModel)]="product.lotNumbers"
+                                                                name="evidence-tc-lotNumbers{{ ind }}-{{ ind }}"
+                                                                required
+                                                                [ngClass]="{
+                                                                    'red-border':
+                                                                        isExtractedDataAvailable &&
+                                                                        (!extractedData.tcExtractedData.productInfo ||
+                                                                            !extractedData.tcExtractedData.productInfo[
+                                                                                ind
+                                                                            ] ||
+                                                                            !extractedData.tcExtractedData.productInfo[
+                                                                                ind
+                                                                            ].lotNumbers)
+                                                                }"
+                                                                [disabled]="isExtracting || !uploadedFile"
+                                                            />
+                                                        </mat-form-field>
+                                                        <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                            {{ 'Extracted value ' | translate }}:
+                                                            <span>{{
+                                                                extractedData.tcExtractedData &&
+                                                                extractedData.tcExtractedData.productInfo &&
+                                                                extractedData.tcExtractedData.productInfo[ind]
+                                                                    ? extractedData.tcExtractedData.productInfo[ind]
+                                                                          .lotNumbers
+                                                                    : ('NILL' | translate)
+                                                            }}</span>
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <input
+                                                                type="number"
+                                                                matInput
+                                                                [disabled]="!isEditMode"
+                                                                placeholder="{{ 'Enter Quantity' | translate }}"
+                                                                [(ngModel)]="product.netWeight"
+                                                                name="evidence-tc-netWeight{{ ind }}-{{ ind }}"
+                                                                required
+                                                            />
+                                                        </mat-form-field>
+                                                        <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                            {{ 'Extracted value ' | translate }}:
+                                                            <span>{{
+                                                                extractedData.tcExtractedData &&
+                                                                extractedData.tcExtractedData.productInfo &&
+                                                                extractedData.tcExtractedData.productInfo[ind]
+                                                                    ? extractedData.tcExtractedData.productInfo[ind]
+                                                                          .netWeight
+                                                                    : ('NILL' | translate)
+                                                            }}</span>
+                                                        </p>
+                                                    </td>
+                                                    <td>
+                                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                            <input
+                                                                class="input"
+                                                                type="text"
+                                                                [(ngModel)]="product.productItem"
+                                                                name="evidence-tc-mlm-id{{ ind }}-{{ ind }}"
+                                                                placeholder="{{ 'Enter Material UID' | translate }}"
+                                                                (blur)="validateSelectedProduct(product)"
+                                                                matInput
+                                                                [matAutocomplete]="soaSearch"
+                                                                (keyup)="searchStyleOrArticle($event, product)"
+                                                                [disabled]="isExtracting || !uploadedFile"
+                                                                required
+                                                            />
+                                                            <mat-hint [ngStyle]="{ color: hintColor }">{{
+                                                                soaSearchHintText | translate
+                                                            }}</mat-hint>
+                                                            <mat-autocomplete
+                                                                #soaSearch="matAutocomplete"
+                                                                [displayWith]="getProductName.bind(this)"
+                                                            >
+                                                                <mat-option
+                                                                    *ngFor="let item of searchData"
+                                                                    [value]="item"
+                                                                >
+                                                                    {{ getProductName(item) }}
+                                                                </mat-option>
+                                                            </mat-autocomplete>
+                                                        </mat-form-field>
+                                                        <p class="value-gray" *ngIf="soaSearchHintText === ''">
+                                                            {{ 'Material Composition' | translate }}:
+                                                            <span>{{
+                                                                displayMaterialComposition(product.productItem)
+                                                            }}</span>
+                                                        </p>
+                                                    </td>
+                                                    <td *ngIf="traderChecked">
+                                                        <mat-form-field [floatLabel]="'never'">
+                                                            <input
+                                                                type="text"
+                                                                matInput
+                                                                placeholder="{{
+                                                                    'Enter Real Yarn Supplier' | translate
+                                                                }}"
+                                                                [ngModelOptions]="{ standalone: true }"
+                                                                [(ngModel)]="product.supplierForTraderTC"
+                                                            />
+                                                        </mat-form-field>
+                                                    </td>
+                                                    <td *ngIf="traderChecked">
+                                                        <app-tt-dropdown-search
+                                                            [searchOptions]="config.yarnCoo | sortByFilter"
+                                                            [optionalParams]="countryParams"
+                                                            placeholder="{{ 'Enter Real Yarn CoO' | translate }}"
+                                                            [floatLabel]="'never'"
+                                                            [data_cy]="'evidence-tc-yarn-coo'"
+                                                            (selectionChange)="selectYarnCOO($event, product)"
+                                                            class="yarn-coo"
+                                                        >
+                                                        </app-tt-dropdown-search>
+                                                        <!-- <app-tt-multi-select-auto-complete
+                                                            [options]="config.yarnCoo"
+                                                            placeholder="{{ 'Enter Yarn COO' | translate }}"
+                                                            (selectionChange)="selectCountry($event, 'yarn', product)"
+                                                            name="{{ 'evidence-tc-yarn-coo' + ind + '-' + ind }}"
+                                                            data_cy="{{ 'evidence-tc-yarn-coo' + ind + '-' + ind }}"
+                                                            [optionalParams]="countryParams"
+                                                            [selectedOptions]="product.yarnCOO?.country"
+                                                            [floatLabel]="'never'"
+                                                        >
+                                                        </app-tt-multi-select-auto-complete> -->
+                                                    </td>
+                                                    <td *ngIf="traderChecked">
+                                                        <!-- <app-tt-dropdown-search
+                                                            [searchOptions]="config.countries | sortByFilter"
+                                                            [(ngModel)]="product.cottonCOO"
+                                                            [optionalParams]="countryParams"
+                                                            placeholder="Enter Cotton COO"
+                                                            floatLabel="never"
+                                                            [data_cy]="'evidence-tc-cotton-coo'"
+                                                            [ngModelOptions]="{ standalone: true }"
+                                                        >
+                                                        </app-tt-dropdown-search> -->
+                                                        <app-tt-multi-select-auto-complete
+                                                            [options]="config.cottonCoo"
+                                                            placeholder="{{ 'Enter Cotton CoO' | translate }}"
+                                                            (selectionChange)="selectCountry($event, 'cotton', product)"
+                                                            name="{{ 'evidence-tc-cotton-coo' + ind + '-' + ind }}"
+                                                            data_cy="{{ 'evidence-tc-cotton-coo' + ind + '-' + ind }}"
+                                                            [optionalParams]="countryParams"
+                                                            [selectedOptions]="product.cottonLintCOO?.country"
+                                                            [floatLabel]="'never'"
+                                                        >
+                                                        </app-tt-multi-select-auto-complete>
+                                                    </td>
+                                                    <td>
+                                                        <div
+                                                            class="action-icon-flex delete-icon"
+                                                            (click)="deleteProductInfo(ind)"
+                                                            [ngClass]="{ 'disabled-opacity-5': editBtnText === 'Edit' }"
+                                                        >
+                                                            <img
+                                                                src="{{ env.IMG_URL }}images/delete-icon.png"
+                                                                alt="delete"
+                                                            />
+                                                        </div>
+                                                        <!-- Action-->
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Table Responsive -->
+                                </div>
+                                <!-- Table Container -->
+                                <div class="add-item-button text-right">
+                                    <button
+                                        [disabled]="editBtnText === 'Edit'"
+                                        type="button"
+                                        class="btn btn-add"
+                                        (click)="addProductInfo()"
+                                    >
+                                        <i class="action-icons fa fa-plus"></i>{{ 'Add more' | translate }}
+                                    </button>
+                                </div>
+                                <!-- Add Item Button -->
+                                <div class="horizontal-separater"></div>
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!--  Row -->
+
+                        <!-- <div class="row">
+                                <div class="col-md-8">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table class="table custom-table normal-style-table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Invoice No</th>
+                                                        <th>Invoice Date</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let invoice of invoiceInfo; let ind = index">
+                                                        <td>
+                                                            <mat-form-field [floatLabel]="'never'">
+                                                                <input type="text" matInput
+                                                                    placeholder="Enter TC Reference ID" [(ngModel)]="invoice.invoiceNo" />
+                                                            </mat-form-field>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                {{'Extracted value' | translate}}:  <span>GOTS</span>
+                                                            </p>
+                                                        </td>
+                                                        <td>
+                                                            <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                                                <mat-label>{{ 'Audit Date' | translate }}:</mat-label>
+                                                                <input matInput [matDatepicker]="invoiceDate"
+                                                                    (focus)="invoiceDate.open()"
+                                                                    (click)="invoiceDate.open()" readonly required
+                                                                    data-cy="audit-test-audit-date" [(ngModel)]="invoice.invoiceDate" />
+                                                                <mat-datepicker #invoiceDate></mat-datepicker>
+                                                                <mat-datepicker-toggle matSuffix [for]="invoiceDate">
+                                                                </mat-datepicker-toggle>
+                                                                <mat-error>{{
+                                                                    'Please select the audit date' | translate
+                                                                    }}</mat-error>
+                                                            </mat-form-field>
+                                                            <p class="value-gray" *ngIf="isExtractedDataAvailable">
+                                                                Extracted value  <span>GOTS</span>
+                                                            </p>
+                                                        </td>
+                                                        <td>
+                                                            <div class="action-icon-flex delete-icon"
+                                                                (click)="deleteInvoiceInfo(ind)">
+                                                                <img src="{{ env.IMG_URL }}images/delete-icon.png"
+                                                                    alt="delete" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="add-item-button text-right">
+                                        <button type="button" class="btn btn-add" (click)="addInvoiceInfo()">
+                                            <i class="action-icons fa fa-plus"></i>{{ 'Add more' | translate }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="horizontal-separater"></div>
+                                </div>
+                            </div> -->
+                        <!--  Row -->
+
+                        <div class="approval-status-block">
+                            <div class="row" *ngIf="isEditMode && evidenceData.workflowStatus">
+                                <div class="col-md-12">
+                                    <p class="approval-status-reasons-title">
+                                        {{ "Looks like you've edited something - provide the details" | translate
+                                        }}<span>*</span>
+                                    </p>
+                                    <div
+                                        class="approval-status-reasons"
+                                        *ngFor="let reason of reasons; let reasonInd = index"
+                                    >
+                                        <mat-checkbox
+                                            [checked]="reason.checked"
+                                            [(ngModel)]="reason.checked"
+                                            name="reason-{{ reasonInd }}"
+                                            [ngClass]="{
+                                                'pointer-none':
+                                                    extractionStatus === extractionStatusText.FAILED &&
+                                                    reason.checked &&
+                                                    reasonInd === 0
+                                            }"
+                                        >
+                                            {{ reason.name }}</mat-checkbox
+                                        >
+                                    </div>
+
+                                    <div
+                                        class="approval-status-reasons other-reason-status"
+                                        [ngClass]="{
+                                            'pb-0': otherChecked
+                                        }"
+                                    >
+                                        <mat-checkbox
+                                            [checked]="otherChecked"
+                                            [(ngModel)]="otherChecked"
+                                            name="approval-other-tt"
+                                        >
+                                            Other
+                                        </mat-checkbox>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12" *ngIf="otherChecked">
+                                    <div class="other-reason upload-other-reason-material">
+                                        <mat-form-field [floatLabel]="'never'" class="mandatory">
+                                            <input
+                                                type="text"
+                                                matInput
+                                                placeholder=""
+                                                [(ngModel)]="evidenceData.comments.otherComments"
+                                                name="evidence-tc-other-reason"
+                                                required
+                                            />
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+
+                                <div class="approval-status-reasons pl-40">
+                                    <mat-checkbox
+                                        [checked]="evidenceData.notifyTT"
+                                        [(ngModel)]="evidenceData.notifyTT"
+                                        name="approval-notify-tt"
+                                        [ngClass]="{
+                                            'pointer-none':
+                                                extractionStatus === extractionStatusText.FAILED &&
+                                                evidenceData.notifyTT
+                                        }"
+                                    >
+                                        {{
+                                            'Submit Transaction Certificate to TrusTrace support team for configuration'
+                                                | translate
+                                        }}
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="upload-footer-block">
+                                    <div class="footer-button-block text-right">
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary"
+                                            (click)="
+                                                uploadedFile !== undefined
+                                                    ? closeUploadEvidence(uploadedFile.id, uploadedFile.fullName)
+                                                    : closeUploadEvidence(null, null)
+                                            "
+                                        >
+                                            {{ 'Cancel' | translate }}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            [disabled]="!evidenceForm.valid"
+                                            (click)="submitEvidence()"
+                                        >
+                                            {{ 'Submit' | translate }}
+                                        </button>
+                                    </div>
+                                    <!-- Footer Button Block -->
+                                </div>
+                                <!-- Upload Footer Block -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!-- Row -->
+                    </form>
+                </div>
+                <!-- Material Input Style Box Type-->
+            </div>
+            <!-- Upload Transaction Field-->
+        </div>
+        <!-- Column -->
+    </div>
+    <!--  Row -->
+</div>
+<!-- Upload Container Block -->

@@ -1,0 +1,46 @@
+.mat-icon {
+    display: block;
+    margin: 0 auto;
+    width: 22.5px;
+    height: 22.5px;
+    border-radius: 50%;
+    &.mat-done {
+        background-color: #b4ffd1;
+        mat-icon {
+            color: #62bc33;
+            font-size: 16px;
+            padding: 2px 3px;
+            line-height: 1.2;
+        }
+    }
+    &.mat-edit {
+        background-color: #f2c405;
+        mat-icon {
+            color: #fff;
+            font-size: 13px;
+            padding: 4px 5px;
+            line-height: 1.2;
+        }
+    }
+    &.initiated {
+        background-color: #f2c405;
+        mat-icon {
+            color: #fff;
+            font-size: 20px;
+            padding: 0px 2px;
+            line-height: 1.2;
+        }
+    }
+    &.mat-error-icon {
+        color: #f88181;
+        mat-icon {
+            font-size: 25px;
+            line-height: 1;
+        }
+    }
+}
+
+.spinner {
+    position: relative;
+    top: 10px;
+}

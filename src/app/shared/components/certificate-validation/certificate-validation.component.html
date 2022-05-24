@@ -1,0 +1,48 @@
+<div class="validation-info-container">
+    <div *ngFor="let entry of data['validationData']">
+        <div class="validation-section">
+            <div class="section-heading">
+                {{ entry.key }}
+                <span *ngIf="entry.valid === true">
+                    <mat-icon>verified_user</mat-icon>
+                </span>
+                <span *ngIf="entry.valid === false">
+                    <mat-icon>error</mat-icon>
+                </span>
+            </div>
+
+            <div class="validation-data">
+                <div *ngIf="!entry.negate">{{ 'Given Data' | translate }} :</div>
+                <div *ngIf="entry.negate">{{ 'Not Expected' | translate }} :</div>
+                <div class="expected-section">
+                    {{ entry.data }}
+                </div>
+            </div>
+            <!-- Commented as  Deeper Validation pipeline is implemented  -->
+            <!-- <div  *ngIf="!!entry.negate != entry.valid"> -->
+            <div>
+                <div class="validation-data">
+                    <div>{{ 'Extracted Data' | translate }} :</div>
+                    <div class="expected-section">
+                        {{ entry.extractedData }}
+                    </div>
+                </div>
+
+                <div class="validation-data">
+                    <div>{{ 'Score' | translate }} :</div>
+                    <div class="expected-section">
+                        {{ entry.score | number: '1.1-2' }}
+                    </div>
+                </div>
+            </div>
+            <!-- Commented as  Deeper Validation pipeline is implemented  -->
+            <!-- <div *ngIf="!!entry.negate == entry.valid">
+                <div
+                    [ngClass]="{ 'validation-passed-message': entry.valid, 'validation-failed-message': !entry.valid }"
+                >
+                    No Match Found
+                </div>
+            </div> -->
+        </div>
+    </div>
+</div>

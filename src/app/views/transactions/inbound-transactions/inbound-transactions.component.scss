@@ -1,0 +1,203 @@
+@import '~styles/variables';
+.parent-container {
+    position: relative;
+    height: 100%;
+}
+
+.title {
+    font-family: $font-family-Bold;
+    color: #325992;
+    font-size: 20px;
+    padding-left: 15px;
+    float: left;
+}
+
+.content {
+    position: absolute;
+    top: 40px;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+}
+
+.certificate-container {
+    margin-top: 20px;
+    .title {
+        font-family: $font-family-Semibold;
+        padding: 0;
+        font-size: 14px;
+    }
+}
+
+.content .certificate-container:not(:last-child) {
+    border-bottom: 2px solid #efefef;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+    margin-left: 30px;
+    float: right;
+}
+
+.del-message {
+    margin-top: 22px;
+    font-family: 'Source Sans Pro-Regular';
+    font-size: 19px;
+    color: #325992;
+    text-align: center;
+    margin-left: 60px;
+    margin-right: 60px;
+}
+
+.centreButtons {
+    margin-top: 20px;
+    margin-left: 112px;
+}
+
+.delete-btn {
+    background: #7effbe;
+    color: #474747;
+    border-radius: 5px;
+    font-family: 'Source Sans Pro-Semibold';
+    margin-right: 2px;
+    height: 36px;
+    min-width: 80px;
+    outline: none;
+    border: none;
+    padding: 0 10px;
+}
+
+.discard-btn {
+    background: #71eeff;
+    color: #474747;
+    border-radius: 5px;
+    font-family: 'Source Sans Pro-Semibold';
+    margin-right: 2px;
+    height: 36px;
+    min-width: 80px;
+    outline: none;
+    border: none;
+}
+.input {
+    color: $text-color-primary;
+}
+
+.tt-file-upload-ui-container {
+    position: relative;
+    border: 2px dashed $border-color-default;
+    padding: 20px 15px;
+    margin: 15px 15px 15px 0;
+    width: 300px;
+    cursor: pointer;
+}
+
+.tt-file-upload-ui-content {
+    text-align: center;
+    .description {
+        color: #cccccc !important;
+        font-family: $font-family-Semibold;
+        font-size: 16px;
+        margin-left: 15px;
+    }
+}
+
+.tt-uploaded-file-list-container {
+    .tt-uploaded-file {
+        padding: 10px 10px 10px 0;
+        .fileName {
+            font-family: $font-family-Semibold;
+            font-size: 14px;
+            color: $text-color-primary;
+        }
+    }
+
+    .tt-remove-uploaded-file {
+        margin-left: 10px;
+        cursor: pointer;
+    }
+}
+
+.file-list-container {
+    display: block;
+    text-align: left;
+    margin-top: 15px;
+
+    .filename {
+        display: inline-block;
+        font-size: 13px;
+        padding: 3px 10px 3px 0;
+        width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+    }
+
+    .delete-icon {
+        cursor: pointer;
+        img {
+            height: 14px;
+        }
+    }
+}
+
+.form-align {
+    padding-right: 75px;
+}
+
+.save-btn {
+    background: #78ff9b;
+    font-family: $font-family-Semibold;
+    color: #212121;
+    border-radius: 5px;
+}
+
+.label {
+    font-size: 19px;
+    color: $text-color-primary;
+}
+
+.input {
+    font-size: 14px;
+    color: $text-color-primary !important;
+}
+
+.btn-align {
+    margin-top: -20px;
+}
+
+.error-msg {
+    font-size: 10px;
+}
+
+.create-inbound-form-block {
+    position: relative;
+    left: -25px;
+}
+
+.flex-container-block {
+    display: block;
+}
+.flex-container {
+    .flex-container-inner {
+        width: 46%;
+        margin: 20px 12px;
+        margin-right: 0;
+        display: block;
+        float: left;
+    }
+}
+.flex-container-inner {
+    display: inline-flex;
+    width: 46%;
+    margin: 20px 12px;
+    margin-right: 0;
+    app-tt-dropdown-search,
+    app-supplier-list-element {
+        width: 100%;
+    }
+}

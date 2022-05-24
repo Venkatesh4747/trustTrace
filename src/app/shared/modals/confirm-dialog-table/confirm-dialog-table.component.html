@@ -1,0 +1,44 @@
+<div class="import-data-status import-data-status-errors">
+    <div class="import-data-status-title">{{ tableData.title | translate }}</div>
+    <div class="import-data-status-body">
+        <div>
+            {{ tableData.description | translate }}
+        </div>
+        <div class="import-data-status-error-details">
+            <div class="common-striped-table">
+                <div class="table">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th *ngFor="let header of tableData.tableHeader" scope="col">
+                                    {{ header | translate }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let eachRowData of tableData.tableValue">
+                                <td *ngFor="let key of tableData.tableHeader">{{ eachRowData[key] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="upload-data-buttons-tier">
+        <button
+            *ngIf="tableData.secondaryButtonText"
+            class="cancel-btn-tier"
+            (click)="closeDialog(tableData.secondaryButtonText)"
+        >
+            {{ tableData.secondaryButtonText | translate }}
+        </button>
+        <button
+            *ngIf="tableData.primaryButtonText"
+            class="upload-btn-tier"
+            (click)="closeDialog(tableData.primaryButtonText)"
+        >
+            {{ tableData.primaryButtonText | translate }}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,18 @@
+.mat-dialog-container {
+    &.ng-trigger-dialogContainer {
+        overflow: auto !important;
+    }
+}
+
+.fix-body-height {
+    height: 600px;
+    overflow: auto;
+
+    .page-header-section {
+    }
+
+    .page-body-section {
+        position: relative;
+        top: 50px;
+    }
+}

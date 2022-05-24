@@ -1,0 +1,235 @@
+<div class="container-fluid">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div class="page-create-section">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header-section">
+                    <div class="page-header-section-inner">
+                        <button
+                            tourAnchor="createUser"
+                            class="btn btn-lg btn-gradient"
+                            (click)="navigateToCreateUser()"
+                        >
+                            <img src="{{ env.IMG_URL }}images/plus-btn.png" alt="Add" />
+                            {{ 'Create New User' | translate }}
+                        </button>
+                    </div>
+                    <!-- Header Section Inner -->
+                    <div class="page-header-section-inner alignment-right">
+                        <div class="title-right-search">
+                            <input
+                                tourAnchor="search"
+                                type="text"
+                                class="search"
+                                placeholder="{{ 'Search Users' | translate }}"
+                                [(ngModel)]="searchText"
+                                (keyup)="searchUsers($event)"
+                            />
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <!-- Title Right Search -->
+                    </div>
+                    <!-- Header Section Inner Alignment Right -->
+                </div>
+                <!-- Header Section -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+
+        <div class="page-body-section">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="inner-page-loader" *ngIf="pageLoading || isDataLoading">
+                        <app-spinner [small]="true"></app-spinner>
+                    </div>
+                    <div class="table-cont table-responsive ml-0" id="table-cont">
+                        <table class="table custom-table" *ngIf="!pageLoading" [ngClass]="{ notBrandView: !isBrand }">
+                            <thead>
+                                <tr class="nth-count-four">
+                                    <th>{{ 'Name of the User' | translate }}</th>
+                                    <th *ngIf="isBrandAssociated">
+                                        {{ 'Primary Contact' | translate }}
+                                    </th>
+                                    <th *ngIf="!isBrandAssociated">
+                                        <div class="table-header-filter">
+                                            <app-tt-multi-select-search
+                                                (selectionChange)="handleFilterSelection('Division')"
+                                                [(ngModel)]="filterOptions['Division']"
+                                                name="filter-groups"
+                                                [label]="division"
+                                                [options]="usersFilters['Division']"
+                                                [filter_session]="filter_session"
+                                                [optionsParam]="optionsParam"
+                                            >
+                                            </app-tt-multi-select-search>
+                                        </div>
+                                    </th>
+                                    <th *ngIf="!isBrandAssociated">{{ 'Tier' | translate }}</th>
+                                    <th>
+                                        <div class="table-header-filter">
+                                            <app-tt-multi-select-search
+                                                (selectionChange)="handleFilterSelection('Associated groups')"
+                                                [(ngModel)]="filterOptions['Associated groups']"
+                                                name="filter-groups"
+                                                [label]="associated_groups"
+                                                [options]="usersFilters['Associated groups']"
+                                                [filter_session]="filter_session"
+                                                [optionsParam]="optionsParam"
+                                            >
+                                            </app-tt-multi-select-search>
+                                        </div>
+                                        <!-- Table Header Filter -->
+                                    </th>
+                                    <!-- Adidas changes -->
+                                    <th *ngIf="false">
+                                        <div class="table-header-filter">
+                                            <app-tt-multi-select-search
+                                                (selectionChange)="handleFilterSelection('Associated facilities')"
+                                                [(ngModel)]="filterOptions['Associated facilities']"
+                                                name="filter-facilities"
+                                                [label]="associated_facilities"
+                                                [options]="usersFilters['Associated facilities']"
+                                                [filter_session]="filter_session"
+                                                [optionsParam]="optionsParam"
+                                            >
+                                            </app-tt-multi-select-search>
+                                        </div>
+                                        <!-- Table Header Filter -->
+                                    </th>
+                                    <th *ngIf="authUser.hasAdminGroup">{{ 'Action' | translate }}</th>
+                                </tr>
+                            </thead>
+                            <tbody
+                                *ngIf="users && users.length >= 0"
+                                infiniteScroll
+                                [infiniteScrollDistance]="0.5"
+                                (scrolled)="onScroll()"
+                                [scrollWindow]="false"
+                                [infiniteScrollDisabled]="disableInfiniteScroll"
+                            >
+                                <tr *ngFor="let user of users | usersSorting; let i = index">
+                                    <td>
+                                        <div class="user-details">
+                                            <span class="user-value">{{ user.firstName }} {{ user.lastName }} </span>
+                                            <span class="user-label">{{ user.email }}</span>
+                                        </div>
+                                        <!-- User Details -->
+                                    </td>
+                                    <td *ngIf="isBrandAssociated">
+                                        <div class="pd-l-r-16">
+                                            {{ user.primaryContact ? 'Yes' : ('No' | translate) }}
+                                        </div>
+                                    </td>
+                                    <td *ngIf="!isBrandAssociated">
+                                        <div *ngIf="user.division; else notAvailable">
+                                            {{
+                                                displayDivision(user.division)
+                                                    ? displayDivision(user.division)
+                                                    : ('Not Available' | translate)
+                                            }}
+                                        </div>
+                                    </td>
+                                    <td *ngIf="!isBrandAssociated">
+                                        <div *ngIf="user.tier; else notAvailable">
+                                            {{ user.tier | translate }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="pd-l-r-16">
+                                            <b *ngFor="let group of user.groups; let isLast = last">
+                                                {{ group.name }}{{ isLast ? '' : ',' }}
+                                            </b>
+                                        </div>
+                                    </td>
+                                    <!-- Adidas changes -->
+                                    <td *ngIf="false">
+                                        <div class="pd-l-r-16">
+                                            <b *ngFor="let facility of user.facilities_associated; let isLast = last">
+                                                {{ facility.name }}{{ isLast ? '' : ',' }}
+                                            </b>
+                                        </div>
+                                    </td>
+                                    <td *ngIf="authUser.hasAdminGroup">
+                                        <div class="action-modules">
+                                            <span
+                                                class="tooltip-user"
+                                                [tooltip]="getToolTipContent(user, 'Manage') | translate"
+                                            >
+                                                <button
+                                                    tourAnchor="updateUser_{{ i }}"
+                                                    class="btn-link"
+                                                    [disabled]="!isActiveUser(user) || isSameUser(user)"
+                                                    (click)="navigateToManageUser(user.id, user.email)"
+                                                >
+                                                    <img src="{{ env.IMG_URL }}images/edit.png" alt="Edit" />
+                                                    {{ 'Manage User' | translate }}
+                                                </button>
+                                            </span>
+                                            <span
+                                                class="tooltip-user"
+                                                [tooltip]="getToolTipContent(user, 'Status') | translate"
+                                            >
+                                                <button
+                                                    tourAnchor="userStatus_{{ i }}"
+                                                    *ngIf="isActiveUser(user); else NotActiveUser"
+                                                    class="text-red btn-link"
+                                                    (click)="
+                                                        openDeactivateConfirmationPopup(user.id, getFullName(user))
+                                                    "
+                                                    [disabled]="user.email === authUser.email"
+                                                >
+                                                    <img
+                                                        class="set-padding-10"
+                                                        src="{{ env.IMG_URL }}images/deactivated.png"
+                                                        alt="Deactivate"
+                                                    />
+                                                    {{ 'Deactivate User' | translate }}
+                                                </button>
+                                                <ng-template #NotActiveUser>
+                                                    <button
+                                                        class="text-green btn-link"
+                                                        (click)="
+                                                            openActivateConfirmationPopup(user.id, getFullName(user))
+                                                        "
+                                                        [disabled]="user.email === authUser.email"
+                                                    >
+                                                        <img
+                                                            class="set-padding-10"
+                                                            src="{{ env.IMG_URL }}images/activated.png"
+                                                            alt="activate"
+                                                        />
+                                                        {{ 'Activate User' | translate }}
+                                                    </button>
+                                                </ng-template>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <ng-template #notAvailable>
+                                        <td>
+                                            {{ 'Not Available' | translate }}
+                                        </td>
+                                    </ng-template>
+                                </tr>
+                                <tr
+                                    class="no-users"
+                                    *ngIf="!users || (users.length === 0 && !(pageLoading || isDataLoading))"
+                                >
+                                    {{
+                                        'No users found' | translate
+                                    }}!
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table Count -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+        <!-- Page Body Section -->
+    </div>
+    <!-- Page Create Section -->
+</div>
+<!-- Container Fluid -->

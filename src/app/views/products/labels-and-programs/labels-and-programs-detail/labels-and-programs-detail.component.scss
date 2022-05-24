@@ -1,0 +1,206 @@
+@import '~styles/variables';
+@import '~styles/mixins';
+
+.view-container {
+    max-height: calc(100vh - 9.5em);
+}
+
+.labels-program-form-block {
+    color: $text-color-primary;
+    font-family: $font-family-Regular;
+    padding-left: 15px;
+    padding-top: 15px;
+    max-height: calc(100vh - 14.2em);
+    overflow-x: hidden;
+    margin-top: 20px;
+}
+.full-height-tbody {
+    max-height: calc(100vh - 10.6em);
+}
+
+.pt-15 {
+    padding-top: 15px;
+}
+
+.label-header {
+    display: block;
+    margin-bottom: 10px;
+    font-family: $font-family-Semibold;
+    font-size: 14px;
+}
+
+.mat-radio-flex {
+    display: flex;
+    vertical-align: middle;
+    align-items: center;
+}
+
+.table {
+    margin-bottom: 0px;
+    thead {
+        @include shadow(0 -1px 4px 0 rgba(0, 0, 0, 0.16));
+        background-color: #fff;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+    th {
+        font-weight: bold;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        font-family: $font-family-Bold;
+        font-size: 16px;
+    }
+    td,
+    th {
+        width: auto;
+        border-bottom: 0 !important;
+        vertical-align: middle;
+        &:first-child {
+            padding-left: 45px;
+        }
+        @media screen and (max-width: 1200px) {
+            width: 200px;
+        }
+        &:last-child {
+            width: auto;
+        }
+        @media screen and (max-width: 1200px) {
+            width: 200px;
+        }
+    }
+    tfoot {
+        position: relative;
+        .table-footer-block {
+            &-inner {
+                @include shadow(0 -1px 4px 0 rgba(0, 0, 0, 0.16));
+                position: fixed;
+                left: 251px;
+                bottom: 0;
+                background: #fff;
+                width: calc(100% - 15.5em);
+                display: flex;
+                padding: 20px 30px;
+                padding-left: 23px;
+                color: $text-color-primary;
+                margin-bottom: 0;
+                z-index: 2;
+                &-left {
+                    display: flex;
+                    float: left;
+                    width: 50%;
+                    align-items: center;
+                    .mat-icon {
+                        &.mat-save {
+                            color: #6f6f6f;
+                            margin-right: 10px;
+                        }
+                    }
+                    p {
+                        margin-bottom: 0;
+                    }
+                }
+                &-right {
+                    display: block;
+                    float: right;
+                    text-align: right;
+                    width: 50%;
+                }
+            }
+        }
+    }
+}
+
+.btn {
+    color: $text-color-drag-file;
+    &:hover,
+    &:active,
+    &:focus {
+        color: $text-color-drag-file;
+    }
+}
+
+.btn-secondary {
+    border-radius: 4px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.04);
+    border: 1px solid #8e8e8e;
+    margin-right: 15px;
+    background: #fff;
+    font-family: $font-family-Semibold;
+}
+.submit-all-btn {
+    border-radius: 4px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.04);
+    background-color: #7affad;
+    margin-right: 20px;
+    color: $text-color-drag-file;
+    font-family: $font-family-Semibold;
+}
+
+table.table-striped > tbody > tr:nth-of-type(odd) {
+    background: #e6fbff;
+}
+
+.spinner {
+    .mat-progress-spinner {
+        display: inline-block;
+    }
+}
+
+// todo remove this class and add it global
+
+.disabled-form-control {
+    opacity: 0.8;
+}
+thead {
+    position: relative;
+}
+.config-spinner {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.reset-parameter-values {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #325992;
+    font-size: 14px;
+    font-family: $font-family-Bold;
+    padding-right: 100px;
+}
+
+.parameter-name-size {
+    font-size: 14px !important;
+}
+
+.action-button {
+    height: 40px;
+    min-width: 150px;
+    border-radius: 4px;
+    padding: 0 15px;
+    font-family: $font-family-Semibold;
+    font-size: 16px;
+    margin-right: 2px;
+    outline: none;
+    border: none;
+    float: right;
+    color: #ffffff;
+    background-color: #ff5f5f;
+    cursor: pointer;
+    &.inactive {
+        background-color: #a8a8a8;
+        color: $text-color-primary;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+.action-buttton-right {
+    padding-right: 25px;
+    padding-top: 40px;
+}
+
+.comments-place-holder::placeholder {
+    color: rgba(0, 0, 0, 0.6) !important;
+}

@@ -1,0 +1,63 @@
+<div class="reusable-entity-row" *ngFor="let material of items | keyvalue">
+    <div class="row entity-article-row odd-row">
+        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 pl-4 talign-left">
+            <mat-checkbox
+                class="font-semi-bold"
+                (change)="materialSelectionChanged(material.key)"
+                [(ngModel)]="materialSelected[material.key]"
+            >
+            </mat-checkbox>
+        </div>
+        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 pl-15px talign-left">
+            {{ material.value[0].entity_type.value }}
+        </div>
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+            {{ material.value[0].entity_details.name }}
+        </div>
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 pl-2 talign-left">
+            --
+        </div>
+        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 pl-2 pr-1 talign-left last-traced">
+            <span>--</span>
+            <span (click)="toggleItemExpansion(material['key'])">
+                <i class="fa fa-angle-up action-icons-small" *ngIf="itemExpanded[material['key']]"></i>
+                <i class="fa fa-angle-down action-icons-small" *ngIf="!itemExpanded[material['key']]"></i>
+            </span>
+        </div>
+    </div>
+    <div *ngIf="itemExpanded[material['key']]">
+        <div class="row entity-articles entity-article-row even-row collapse-section-bg">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <h3 class="entity-articles-title">{{ 'History of the traced material' | translate }}:</h3>
+            </div>
+            <mat-radio-group
+                class="col-xs-12 col-sm-12 col-md-12 col-lg-12 p-0"
+                [(ngModel)]="selectedSupplyChains[material['key']]"
+                (change)="supplyChainSelectedEvent(material['key'])"
+            >
+                <div class="row entity-traced-article-row" *ngFor="let supplyChain of material.value">
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 pl-4 talign-left">
+                        <mat-radio-button class="text-blue font-regular" [value]="supplyChain.id"> </mat-radio-button>
+                    </div>
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 pl-15px talign-left">
+                        {{ supplyChain.entity_type.value }}
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                        {{ supplyChain.entity_details.name }}
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 pl-15px talign-left">
+                        {{ supplyChain.supplier.name }}
+                    </div>
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 pl-2 talign-left last-traced">
+                        <span>{{ utilService.getDatebyFormat1(supplyChain.create_ts) }}</span>
+                        <img
+                            class="materials-icon icon-at-start cursor-pointer supply-chain-tree"
+                            src="{{ env.IMG_URL }}images/tree-icon.png"
+                            (click)="viewSupplyChainFlow(supplyChain.id)"
+                        />
+                    </div>
+                </div>
+            </mat-radio-group>
+        </div>
+    </div>
+</div>

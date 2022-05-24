@@ -1,0 +1,40 @@
+@import '~styles/variables';
+
+/* Table */
+.evidences-table {
+    position: absolute;
+    top: 250px;
+    left: 20px;
+    right: 38px;
+    bottom: 100px;
+    overflow-y: auto;
+    width: 100%;
+}
+.entity-table {
+    background-color: $border-color-secondary;
+    display: flex;
+    align-items: center;
+    min-height: 59px;
+    padding: 0 10px;
+    font-size: 15px;
+    .tr-title {
+        color: #fff !important;
+    }
+    .certificate-category {
+        color: $text-color-certificate-category;
+    }
+}
+
+div.hr {
+    border-bottom: 1px solid $border-color-primary !important;
+}
+.hr-title {
+    font-family: $font-family-Semibold;
+    font-size: 17px;
+}
+.header-search {
+    align-items: inherit;
+}
+.go-back-button {
+    display: block;
+}

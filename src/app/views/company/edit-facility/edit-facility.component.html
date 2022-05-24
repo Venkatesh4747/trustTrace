@@ -1,0 +1,8 @@
+<ng-template [ngIf]="isDataReady" [ngIfElse]="loading">
+    <app-create-facility isEditFacility="true" [facility]="facility"></app-create-facility>
+</ng-template>
+<ng-template #loading>
+    <div class="view-container">
+        <app-full-page-loader></app-full-page-loader>
+    </div>
+</ng-template>

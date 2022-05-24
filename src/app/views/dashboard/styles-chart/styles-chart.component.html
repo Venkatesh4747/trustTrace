@@ -1,0 +1,43 @@
+<app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+<div class="pt-3 row" *ngIf="!showChartDetail">
+    <div
+        class="chart-thumbnail-wrapper col-xs-4 col-sm-3 col-md-3 col-lg-3"
+        *ngFor="let chart of chartItems; let chartInd = index"
+    >
+        <app-chart-thumbnail
+            [index]="chartInd"
+            [title]="chart.displayName"
+            [type]="chart.chartType"
+            [id]="chart.itemId"
+            [fieldId]="chart.customFieldId"
+            [routerLink]="['chart-detail']"
+            [queryParams]="{ type: chart.chartType, id: chart.itemId }"
+        ></app-chart-thumbnail>
+    </div>
+</div>
+<div class="pt-3 row" *ngIf="showChartDetail">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="pt-2 row">
+            <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-md-offset-2 col-lg-offset-2">
+                <div class="chart-title" *ngIf="chartConfig">{{ chartConfig.nameX | translate }}</div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div id="filter-bar-wrapper" class="row filter-bar-wrapper">
+                    <div *ngIf="showFilterBar" class="col-md-12">
+                        <app-filter-bar
+                            [filters]="chartFilters"
+                            [filter_session]="filter_session"
+                            (handleFilterSelection)="getChartData()"
+                        >
+                        </app-filter-bar>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pt-2 row" *ngIf="!isFetchingChartData">
+            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-md-offset-2 col-lg-offset-2">
+                <app-chart-detail [itemId]="itemId" [chartConfig]="chartConfig"></app-chart-detail>
+            </div>
+        </div>
+    </div>
+</div>

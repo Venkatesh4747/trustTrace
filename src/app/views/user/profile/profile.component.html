@@ -1,0 +1,428 @@
+<div class="view-container text-center">
+    <div class="view-container-content">
+        <div class="container-fluid dashboard-outer dashboard-chart-outer">
+            <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+            <div class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="page-title pt-3 pl-2">{{ 'User Profile' | translate }}</div>
+                    <div class="page-description pl-2">
+                        <div [ngSwitch]="settingsType">
+                            <span *ngSwitchCase="tabSectionName.USER_PROFILE_TAB">
+                                {{ 'Set the preferences for User' | translate }}
+                            </span>
+
+                            <!-- Todo: Add translation -->
+                            <span *ngSwitchCase="tabSectionName.PASSWORD_UPDATE_TAB">
+                                {{ 'Set the preferences for Password' | translate }}
+                            </span>
+
+                            <span *ngSwitchCase="tabSectionName.EMAIL_NOTIFICATIONS_TAB">
+                                {{ 'Set the preferences for email notifications' | translate }}
+                            </span>
+                        </div>
+                    </div>
+                    <!-- col -->
+                </div>
+            </div>
+            <div class="row pt-2">
+                <form class="toby user-profile">
+                    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-2">
+                        <div
+                            class="form-group bottom"
+                            style="cursor: auto !important"
+                            [ngClass]="{ selected: settingsType === tabSectionName.USER_PROFILE_TAB }"
+                        >
+                            <label (click)="pageLoad(tabSectionName.USER_PROFILE_TAB)" class="ml-2">{{
+                                'General Settings' | translate
+                            }}</label>
+                            <div [ngClass]="{ selected: settingsType === tabSectionName.USER_PROFILE_TAB }"></div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-2">
+                        <div
+                            class="form-group bottom"
+                            style="cursor: auto !important"
+                            [ngClass]="{ selected: settingsType === tabSectionName.PASSWORD_UPDATE_TAB }"
+                        >
+                            <label (click)="pageLoad(tabSectionName.PASSWORD_UPDATE_TAB)">{{
+                                'Password Settings' | translate
+                            }}</label>
+                            <div [ngClass]="{ selected: settingsType === tabSectionName.PASSWORD_UPDATE_TAB }"></div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-3 col-lg-2" *ngIf="userSubscription === 'SUPPLIER'">
+                        <div
+                            class="form-group bottom"
+                            style="cursor: auto !important"
+                            [ngClass]="{ selected: settingsType === tabSectionName.EMAIL_NOTIFICATIONS_TAB }"
+                        >
+                            <label (click)="pageLoad(tabSectionName.EMAIL_NOTIFICATIONS_TAB)">{{
+                                'Email Settings' | translate
+                            }}</label>
+                            <div
+                                [ngClass]="{ selected: settingsType === tabSectionName.EMAIL_NOTIFICATIONS_TAB }"
+                            ></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row pt-2">
+                <ng-container [ngSwitch]="settingsType">
+                    <div
+                        class="col-xs-12 col-sm-12 col-md-12 col-lg-12 settings"
+                        *ngSwitchCase="tabSectionName.USER_PROFILE_TAB"
+                    >
+                        <mat-accordion class="mat-form-block-type-one">
+                            <mat-expansion-panel [expanded]="true">
+                                <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+                                    <div class="row mt-3 text-left">
+                                        <div class="col-md-4">
+                                            <div>
+                                                <h5 class="tt-font text-left">
+                                                    {{ 'First Name' | translate }}
+                                                    <span class="tt-required-asterisk">*</span>
+                                                </h5>
+                                            </div>
+                                            <mat-form-field floatLabel="never">
+                                                <input
+                                                    matInput
+                                                    type="text"
+                                                    class="text-color"
+                                                    formControlName="firstName"
+                                                    placeholder="Eg., John"
+                                                />
+                                                <mat-error *ngIf="userFormHasError('firstName', 'required')">{{
+                                                    'Please enter the first name
+                                                of the user'
+                                                        | translate
+                                                }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="row text-left ">
+                                        <div class="col-md-4">
+                                            <div>
+                                                <h5 class="tt-font text-left">
+                                                    {{ 'Last Name' | translate }}
+                                                    <span class="tt-required-asterisk">*</span>
+                                                </h5>
+                                            </div>
+                                            <mat-form-field floatLabel="never">
+                                                <input
+                                                    matInput
+                                                    type="text"
+                                                    class="text-color"
+                                                    formControlName="lastName"
+                                                    placeholder="Eg., Doe"
+                                                />
+                                                <mat-error *ngIf="userFormHasError('lastName', 'required')">{{
+                                                    'Please enter the last name
+                                                of the user'
+                                                        | translate
+                                                }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="row text-left">
+                                        <div class="col-md-4">
+                                            <div
+                                                class="input-field-line-color notEditable tooltip-bottom"
+                                                tooltip="{{ 'Cannot be modified' | translate }}"
+                                            >
+                                                <h5 class="tt-font text-left">
+                                                    {{ 'Email ID' | translate }}
+                                                    <label class="ml-1 edit">
+                                                        ({{ 'Cannot be modified' | translate }})
+                                                    </label>
+                                                </h5>
+                                                <mat-form-field floatLabel="never">
+                                                    <input
+                                                        matInput
+                                                        type="email"
+                                                        formControlName="emailId"
+                                                        placeholder="{{ 'Eg., john@gmail.com' | translate }}"
+                                                        class="notEditable"
+                                                        disabled
+                                                    />
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row text-left">
+                                        <div class="col-md-4">
+                                            <h5 class="tt-font text-left">
+                                                {{ 'Select Your Preferred Language' | translate }}
+                                            </h5>
+                                            <mat-form-field floatLabel="never">
+                                                <mat-select
+                                                    name="lang_name"
+                                                    id="lang_name"
+                                                    formControlName="language"
+                                                    [value]="preferredLanguage"
+                                                    (input)="preferredLanguage = $event.target.value"
+                                                >
+                                                    <mat-option
+                                                        class="cursorp text-color"
+                                                        [value]="language.code"
+                                                        *ngFor="let language of languages"
+                                                        >{{ language.languageName }}
+                                                    </mat-option>
+                                                </mat-select>
+                                                <mat-error *ngIf="userFormHasError('language', 'required')">{{
+                                                    'Please select the language' | translate
+                                                }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2 text-left">
+                                        <div class="col-md-7 mt-3 mb-3 ">
+                                            <button
+                                                type="button"
+                                                (click)="discard()"
+                                                mat-button
+                                                class="btn tt-btn tt-btn-secondary"
+                                            >
+                                                {{ 'Clear' | translate }}
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                [disabled]="userForm.invalid"
+                                                mat-button
+                                                style="margin-left: 20px;"
+                                                class="btn tt-btn tt-btn-primary"
+                                            >
+                                                {{ 'Save' | translate }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
+
+                    <div
+                        class="col-xs-12 col-sm-12 col-md-12 col-lg-12 settings "
+                        *ngSwitchCase="tabSectionName.PASSWORD_UPDATE_TAB"
+                    >
+                        <mat-accordion class="mat-form-block-type-one">
+                            <mat-expansion-panel [expanded]="true">
+                                <form (ngSubmit)="onSave()">
+                                    <ng-container [formGroup]="passwordUpdateForm">
+                                        <div class="text-left mt-3">
+                                            <mat-panel-title>{{ 'Change Password' | translate }}</mat-panel-title>
+                                        </div>
+
+                                        <div class="mt-2 change-password">
+                                            <div class="row text-left">
+                                                <div class="col-md-4">
+                                                    <div>
+                                                        <h5 class="tt-font text-left">
+                                                            {{ 'Current Password' | translate }}
+                                                            <span
+                                                                *ngIf="
+                                                                    passwordUpdateFormHasError('currentPW', 'required')
+                                                                "
+                                                                class="tt-required-asterisk"
+                                                                >*</span
+                                                            >
+                                                        </h5>
+                                                        <mat-form-field floatLabel="never">
+                                                            <input
+                                                                matInput
+                                                                type="password"
+                                                                (click)="focused()"
+                                                                formControlName="currentPW"
+                                                            />
+                                                            <mat-error
+                                                                *ngIf="
+                                                                    passwordUpdateFormHasError('currentPW', 'required')
+                                                                "
+                                                                >{{ 'Please enter the Current Password' | translate }}
+                                                            </mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row text-left">
+                                                <div class="col-md-4">
+                                                    <div>
+                                                        <h5 class="tt-font text-left">
+                                                            {{ 'New Password' | translate }}
+                                                            <span
+                                                                *ngIf="passwordUpdateFormHasError('newPW', 'required')"
+                                                                class="tt-required-asterisk"
+                                                                >*</span
+                                                            >
+                                                        </h5>
+                                                        <mat-form-field floatLabel="never">
+                                                            <input
+                                                                matInput
+                                                                type="password"
+                                                                formControlName="newPW"
+                                                                [tooltip]="passwordRules"
+                                                                placement="right"
+                                                            />
+                                                            <mat-error
+                                                                *ngIf="passwordUpdateFormHasError('newPW', 'required')"
+                                                            >
+                                                                {{ 'Please enter the New Password' | translate }}
+                                                            </mat-error>
+                                                            <mat-error
+                                                                *ngIf="passwordUpdateForm.hasError('pattern', 'newPW')"
+                                                            >
+                                                                {{ 'Password criteria not met' | translate }}
+                                                            </mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row text-left">
+                                                <div class="col-md-4">
+                                                    <div>
+                                                        <h5 class="tt-font text-left">
+                                                            {{ 'Confirm  Password' | translate }}
+                                                            <span
+                                                                *ngIf="
+                                                                    passwordUpdateFormHasError('confirmPW', 'required')
+                                                                "
+                                                                class="tt-required-asterisk"
+                                                                >*</span
+                                                            >
+                                                        </h5>
+                                                        <mat-form-field floatLabel="never">
+                                                            <input
+                                                                matInput
+                                                                type="password"
+                                                                formControlName="confirmPW"
+                                                                [tooltip]="confirmPasswordRule"
+                                                                placement="right"
+                                                            />
+                                                            <mat-error
+                                                                *ngIf="
+                                                                    passwordUpdateFormHasError('confirmPW', 'required')
+                                                                "
+                                                            >
+                                                                {{ 'Please enter the confirm Password' | translate }}
+                                                            </mat-error>
+                                                            <mat-error
+                                                                *ngIf="
+                                                                    passwordUpdateForm.hasError('pattern', 'confirmPW')
+                                                                "
+                                                            >
+                                                                {{ 'Password criteria not met' | translate }}
+                                                            </mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-2 text-left">
+                                            <div class="col-md-7 mt-3 mb-3 ">
+                                                <button
+                                                    type="button"
+                                                    (click)="discardPasswordForm()"
+                                                    mat-button
+                                                    class="btn tt-btn tt-btn-secondary"
+                                                >
+                                                    {{ 'Clear' | translate }}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    [disabled]="
+                                                        passwordUpdateForm.invalid || passwordUpdateForm.untouched
+                                                    "
+                                                    (click)="onValidateCurrentPassword()"
+                                                    mat-button
+                                                    style="margin-left: 20px;"
+                                                    class="btn tt-btn tt-btn-primary"
+                                                >
+                                                    {{ 'Save' | translate }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </form>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
+
+                    <div
+                        class="col-xs-12 col-sm-12 col-md-12 col-lg-12 settings"
+                        *ngSwitchCase="tabSectionName.EMAIL_NOTIFICATIONS_TAB"
+                    >
+                        <div class="email-notification-tab">
+                            <mat-accordion class="mat-form-block-type-one">
+                                <mat-expansion-panel [expanded]="true" class="email-tab">
+                                    <div class="text-left mt-4 mb-1">
+                                        <mat-panel-title>{{
+                                            'Set your preference for email notifications' | translate
+                                        }}</mat-panel-title>
+                                    </div>
+
+                                    <div class="row text-left">
+                                        <div class="col-md-4">
+                                            <mat-radio-group
+                                                [(ngModel)]="emailPreferences"
+                                                (change)="updateEmailPreferences($event)"
+                                            >
+                                                <div class="mt-2 text-left tt-font">
+                                                    <mat-radio-button [value]="2">{{
+                                                        'Receive weekly consolidated email notification for the requests launched by your customers'
+                                                            | translate
+                                                    }}</mat-radio-button>
+                                                </div>
+                                                <div class="mt-2 text-left tt-font">
+                                                    <mat-radio-button [value]="1"
+                                                        >{{
+                                                            'Receive email notification as and when a customer launches a request'
+                                                                | translate
+                                                        }}
+                                                    </mat-radio-button>
+                                                </div>
+                                            </mat-radio-group>
+                                        </div>
+                                    </div>
+                                </mat-expansion-panel>
+                            </mat-accordion>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #passwordRules>
+    <div
+        class="password-rules"
+        appPasswordValidator
+        [password]="passwordUpdateForm.value.newPW"
+        (isValid)="validatePassword($event)"
+    ></div>
+</ng-template>
+<ng-template #confirmPasswordRule>
+    <div class="password-rules">
+        <div>
+            <h4 class="password-rules--title">
+                <img [src]="env.IMG_URL + 'images/info.png'" alt="info" />{{ 'Password Rule' | translate }}
+            </h4>
+            <div class="password-rules--content" style="margin-top: 26px;">
+                <ul class="list-unstyled" style="padding-left: 6px;">
+                    <li>
+                        <span>
+                            <i
+                                class="fa {{
+                                    passwordUpdateForm.value.newPW === passwordUpdateForm.value.confirmPW
+                                        ? 'green fa-check'
+                                        : 'red fa-times'
+                                }}"
+                            ></i
+                        ></span>
+                        {{ 'Confirm password should match password' | translate }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</ng-template>

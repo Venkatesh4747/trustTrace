@@ -1,0 +1,109 @@
+<div class="row" id="{{ entity.supplyChainArticle.internalArticleName }}" provide-parent-form>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pl-3">
+        <div class="row" *ngIf="addMoreInputs">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                <div class="label-block">
+                    <mat-label class="tt-input-label">
+                        {{ localizationService.getDisplayText(entity.supplyChainArticle.articleTypeId) }}:
+                        <span class="font-regular">{{ getProductName() }}</span>
+                    </mat-label>
+                    <mat-label class="tt-input-label">
+                        {{ 'PO No.:' | translate }}
+                        <span class="font-regular">{{
+                            entity.poNumber ? entity.poNumber : ('Not Available' | translate)
+                        }}</span>
+                    </mat-label>
+                    <div class="add-more-input mt-2" *ngIf="addMoreInputs.length > 0">
+                        <button
+                            type="button"
+                            class="btn btn-static mr-2"
+                            mat-button
+                            [matMenuTriggerFor]="addMoreInputsMenu"
+                        >
+                            <img src="{{ getImageURL }}images/plus-btn.png" alt="Add" />
+                            {{ 'Add Material' | translate }} <i class="fa fa-caret-down pl-1" aria-hidden="true"></i>
+                        </button>
+                        <button
+                            type="button"
+                            mat-button
+                            [disabled]="!hasArticleIndexList"
+                            class="btn btn-static"
+                            (click)="deleteSelectedArticleType()"
+                            placement="top"
+                        >
+                            <span
+                                [matTooltip]="
+                                    !hasArticleIndexList
+                                        ? ('Please select at least one material to delete. Note: Mandatory materials cannot be deleted.'
+                                          | translate)
+                                        : ''
+                                "
+                            >
+                                <img alt="delete" src="{{ getImageURL }}images/delete-icon.png" />
+                                {{ 'Delete Material' | translate }}</span
+                            >
+                        </button>
+                        <mat-menu #addMoreInputsMenu="matMenu">
+                            <button
+                                mat-menu-item
+                                *ngFor="let item of addMoreInputs"
+                                (click)="addToProductSupplyChainList(item)"
+                            >
+                                {{ localizationService.getDisplayText(item.value) }}
+                            </button>
+                        </mat-menu>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                <div class="bg-secondary">
+                    <div
+                        class="bg-secondary-inner"
+                        *ngFor="let productSupplyChainList of entity.productSupplyChainList; let ind = index"
+                    >
+                        <div class="font-regular non-traceable" *ngIf="nonTraceableStartingIndex === ind">
+                            <strong>{{ 'Non Traceable Articles' | translate }}</strong>
+                            ({{
+                                'Trace request will not be launched to the suppliers of these articles' | translate
+                            }}.):
+                        </div>
+                        <app-edit-article
+                            [article]="productSupplyChainList"
+                            [listIndex]="ind"
+                            (scrollToElementWithId)="scrollToElementWithId($event)"
+                            [isReadonly]="productSupplyChainList.supplyChainArticle.creationType === 'USER'"
+                            [disableDelete]="entity.productSupplyChainList.length === 1"
+                            [addMoreInputs]="addMoreInputs"
+                            [scrollTo]="scrollTo"
+                            (handleRecreate)="recreateProductSupplyChainList($event)"
+                            (handleCheckboxArticleType)="deleteArticleByIndex($event)"
+                            [showFacilityColumn]="toShowFacilityColumn"
+                        >
+                        </app-edit-article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" *ngIf="addMoreInputs">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="row" *ngFor="let productSupplyChain of entity.productSupplyChainList">
+            <div
+                class="col-xs-12 col-sm-12 col-md-12 col-lg-12 position-relative"
+                *ngIf="checkEntityRequired(productSupplyChain)"
+            >
+                <div class="loading construct-supply-chain-data" *ngIf="isConstructingPayload">
+                    {{ 'Loading' | translate }}&#8230;
+                </div>
+                <app-edit-entity
+                    [entity]="productSupplyChain"
+                    *ngIf="!isConstructingPayload"
+                    [scrollTo]="scrollTo"
+                    [trId]="trId"
+                    [toShowFacilityColumn]="toShowFacilityColumn"
+                ></app-edit-entity>
+            </div>
+        </div>
+    </div>
+</div>

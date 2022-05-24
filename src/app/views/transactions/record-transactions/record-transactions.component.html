@@ -1,0 +1,708 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div id="record-transactions-container" class="record-transactions-container" *ngIf="!pageLoading">
+            <div class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3">
+                    <div class="page-title">
+                        <div>{{ 'Record integrated transaction' | translate }}</div>
+                        <div class="page-description">
+                            {{ 'Record manual transaction' | translate }}
+                        </div>
+                    </div>
+                    <div>
+                        <a [routerLink]="['/', 'transactions']">
+                            <button class="go-back-button">{{ 'Back' | translate }}</button>
+                        </a>
+                    </div>
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row -->
+
+            <!-- Outbound -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="body-section">
+                        <div class="body-header-section">
+                            <h3 class="title">{{ 'Outbound' | translate }}:</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table custom-table table-striped outbound-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{{ 'Action' | translate }}</th>
+                                        <th scope="col">
+                                            {{ 'Style Name & No' | translate }} <span class="color-red">*</span>
+                                        </th>
+                                        <th scope="col">
+                                            {{ 'Production Lot ID' | translate }} <span class="color-red">*</span>
+                                        </th>
+                                        <th scope="col">
+                                            {{ 'Shipped Quantity' | translate }} <span class="color-red">*</span>
+                                        </th>
+                                        <th scope="col">
+                                            {{ 'Customer' | translate }} <span class="color-red">*</span>
+                                        </th>
+                                        <th scope="col">{{ 'PO No' | translate }} <span class="color-red">*</span></th>
+                                        <th scope="col">{{ 'Shipment reference' | translate }}</th>
+                                        <th scope="col">
+                                            {{ 'Date of production' | translate }} <span class="color-red">*</span>
+                                        </th>
+                                        <th scope="col">
+                                            {{ 'Production Facility' | translate }} <span class="color-red">*</span>
+                                        </th>
+                                        <th scope="col">
+                                            {{ 'Date of shipment' | translate }} <span class="color-red">*</span>
+                                        </th>
+                                        <th scope="col">
+                                            {{ 'Shipment Facility' | translate }} <span class="color-red">*</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="action-icon">
+                                                <div class="action-icon-flex">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/document-upload.png"
+                                                            alt="document-upload"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <p class="document-details">{{ '3 documents uploaded' | translate }}</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input
+                                                    class="input"
+                                                    type="text"
+                                                    name="Style Name & No"
+                                                    [(ngModel)]="soaUniqueName"
+                                                    (blur)="validateSelectedStyle()"
+                                                    matInput
+                                                    [matAutocomplete]="soaSearch"
+                                                    (keyup)="searchStyleOrArticle($event)"
+                                                    required
+                                                    data-cy="inbound-transaction-article-style-name-number"
+                                                />
+                                                <mat-hint #soaSearchHint [ngStyle]="{ color: hintColor }">{{
+                                                    soaSearchHintText | translate
+                                                }}</mat-hint>
+                                                <mat-autocomplete
+                                                    #soaSearch="matAutocomplete"
+                                                    [displayWith]="getSOAName"
+                                                    (optionSelected)="onSOASelection($event.option.value)"
+                                                >
+                                                    <mat-option *ngFor="let item of searchData" [value]="item">
+                                                        {{ item.unique_search }}
+                                                    </mat-option>
+                                                </mat-autocomplete>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Production Lot ID" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Shipped Quantity" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <!-- <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Customer" />
+                                            </mat-form-field> -->
+                                            <app-tt-dropdown-search
+                                                [searchOptions]="config.customers | sortByFilter"
+                                                [(ngModel)]="payload.lot.outboundData.customerId"
+                                                [placeholder]="'Customer Name:'"
+                                                name="customer"
+                                                required
+                                                [isRequired]="isRequired"
+                                                [data_cy]="'outbound-transaction-customer-name'"
+                                            >
+                                            </app-tt-dropdown-search>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="PO No" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Shipment reference" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input
+                                                    class="input"
+                                                    matInput
+                                                    [matDatepicker]="picker6"
+                                                    name="date"
+                                                    [(ngModel)]="payload.lot.date"
+                                                    readonly
+                                                    (click)="picker.open()"
+                                                    data-cy="inbound-transaction-date"
+                                                />
+                                                <mat-datepicker-toggle matSuffix [for]="picker6">
+                                                </mat-datepicker-toggle>
+                                                <mat-datepicker #picker6></mat-datepicker>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <!-- <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Production  Facility" />
+                                            </mat-form-field> -->
+                                            <mat-form-field>
+                                                <input
+                                                    class="input"
+                                                    type="text"
+                                                    name="Production  Facility"
+                                                    [(ngModel)]="soaUniqueName"
+                                                    (blur)="validateSelectedStyle()"
+                                                    matInput
+                                                    [matAutocomplete]="soaSearch"
+                                                    (keyup)="searchStyleOrArticle($event)"
+                                                    required
+                                                    data-cy="inbound-transaction-article-style-name-number"
+                                                />
+                                                <mat-hint #soaSearchHint [ngStyle]="{ color: hintColor }">{{
+                                                    'Type at least 3 characters to search' | translate
+                                                }}</mat-hint>
+                                                <mat-autocomplete
+                                                    #soaSearch="matAutocomplete"
+                                                    [displayWith]="getSOAName"
+                                                    (optionSelected)="onSOASelection($event.option.value)"
+                                                >
+                                                    <mat-option *ngFor="let item of searchData" [value]="item">
+                                                        {{ item.unique_search }}
+                                                    </mat-option>
+                                                </mat-autocomplete>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input
+                                                    class="input"
+                                                    matInput
+                                                    [matDatepicker]="picker5"
+                                                    name="date"
+                                                    [(ngModel)]="payload.lot.date"
+                                                    readonly
+                                                    (click)="picker.open()"
+                                                    data-cy="inbound-transaction-date"
+                                                />
+                                                <mat-datepicker-toggle matSuffix [for]="picker5">
+                                                </mat-datepicker-toggle>
+                                                <mat-datepicker #picker5></mat-datepicker>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input
+                                                    class="input"
+                                                    type="text"
+                                                    name="Shipment  Facility"
+                                                    [(ngModel)]="soaUniqueName"
+                                                    (blur)="validateSelectedStyle()"
+                                                    matInput
+                                                    [matAutocomplete]="soaSearch"
+                                                    (keyup)="searchStyleOrArticle($event)"
+                                                    required
+                                                    data-cy="inbound-transaction-article-style-name-number"
+                                                />
+                                                <mat-hint #soaSearchHint [ngStyle]="{ color: hintColor }">{{
+                                                    'Type at least 3 characters to search' | translate
+                                                }}</mat-hint>
+                                                <mat-autocomplete
+                                                    #soaSearch="matAutocomplete"
+                                                    [displayWith]="getSOAName"
+                                                    (optionSelected)="onSOASelection($event.option.value)"
+                                                >
+                                                    <mat-option *ngFor="let item of searchData" [value]="item">
+                                                        {{ item.unique_search }}
+                                                    </mat-option>
+                                                </mat-autocomplete>
+                                            </mat-form-field>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <!--  <tfoot>
+                                    <tr>
+                                        <td colspan="9">
+                                            <div class="table-footer-block">
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot> -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Lots -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="body-section">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="body-section-left">
+                                    <h3 class="title">{{ 'Input lots' | translate }}:</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="body-section-right">
+                                    <button class="btn btn-lg btn-secondary-blue pull-right cs-btn">
+                                        <img src="{{ env.IMG_URL }}images/add-icon.svg" alt="add-more" />
+                                        {{ 'Add More' | translate }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pd-0">
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table custom-table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{{ 'Action' | translate }}</th>
+                                        <th scope="col">
+                                            {{ 'Style Name & No' | translate }}<span class="color-red">*</span>
+                                        </th>
+                                        <th scope="col">{{ 'Lot ID' | translate }}<span class="color-red">*</span></th>
+                                        <th scope="col">
+                                            {{ 'Quantity used (kgs)' | translate }}<span class="color-red">*</span>
+                                        </th>
+                                        <th scope="col">
+                                            {{ 'Supplier' | translate }}<span class="color-red">*</span>
+                                        </th>
+                                        <th scope="col">{{ 'PO No' | translate }}<span class="color-red">*</span></th>
+                                        <th scope="col">{{ 'Shipment reference' | translate }}</th>
+                                        <th scope="col">{{ 'Date' | translate }}<span class="color-red">*</span></th>
+                                        <th scope="col">{{ 'Facility' | translate }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="action-icon">
+                                                <div class="action-icon-flex">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/document-upload.png"
+                                                            alt="document-upload"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <div class="action-icon-flex delete-icon">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/delete-icon.png"
+                                                            alt="delete"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <p class="document-details">{{ '3 documents uploaded' | translate }}</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input
+                                                    class="input"
+                                                    type="text"
+                                                    name="Article/Style"
+                                                    [(ngModel)]="soaUniqueName"
+                                                    (blur)="validateSelectedStyle()"
+                                                    matInput
+                                                    [matAutocomplete]="soaSearch"
+                                                    (keyup)="searchStyleOrArticle($event)"
+                                                    required
+                                                    data-cy="inbound-transaction-article-style-name-number"
+                                                />
+                                                <mat-hint #soaSearchHint [ngStyle]="{ color: hintColor }">{{
+                                                    'Type at least 3 characters to search' | translate
+                                                }}</mat-hint>
+                                                <mat-autocomplete
+                                                    #soaSearch="matAutocomplete"
+                                                    [displayWith]="getSOAName"
+                                                    (optionSelected)="onSOASelection($event.option.value)"
+                                                >
+                                                    <mat-option *ngFor="let item of searchData" [value]="item">
+                                                        {{ item.unique_search }}
+                                                    </mat-option>
+                                                </mat-autocomplete>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Lot ID" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Quantity used (kgs)" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <!--  <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field> -->
+                                            <app-supplier-list-element
+                                                [listData]="suppliers"
+                                                [(ngModel)]="payload.lot.inboundData.supplier"
+                                                (valueChanges)="updateSupplier($event)"
+                                                [options]="supplierListOptions"
+                                                required
+                                                unInvitedTooltip="Uninvited Supplier - Inbound Transaction can be created but no further transactions can be traced for this Supplier "
+                                                [data_cy]="'record-transaction-suppliers'"
+                                            >
+                                            </app-supplier-list-element>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="PO No" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Shipment reference" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input
+                                                    class="input"
+                                                    matInput
+                                                    [matDatepicker]="picker"
+                                                    name="date"
+                                                    [(ngModel)]="payload.lot.date"
+                                                    readonly
+                                                    (click)="picker.open()"
+                                                    data-cy="inbound-transaction-date"
+                                                />
+                                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                                <mat-datepicker #picker></mat-datepicker>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Facility" />
+                                            </mat-form-field>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="action-icon">
+                                                <div class="action-icon-flex">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/document-upload.png"
+                                                            alt="document-upload"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <div class="action-icon-flex delete-icon">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/delete-icon.png"
+                                                            alt="delete"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <p class="document-details">{{ '3 documents uploaded' | translate }}</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input autocomplete="false" matInput [matDatepicker]="picker1" />
+                                                <mat-datepicker-toggle matSuffix [for]="picker1">
+                                                </mat-datepicker-toggle>
+                                                <mat-datepicker #picker1></mat-datepicker>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="action-icon">
+                                                <div class="action-icon-flex">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/document-upload.png"
+                                                            alt="document-upload"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <div class="action-icon-flex delete-icon">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/delete-icon.png"
+                                                            alt="delete"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <p class="document-details">{{ '3 documents uploaded' | translate }}</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input autocomplete="false" matInput [matDatepicker]="picker2" />
+                                                <mat-datepicker-toggle matSuffix [for]="picker2">
+                                                </mat-datepicker-toggle>
+                                                <mat-datepicker #picker2></mat-datepicker>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="action-icon">
+                                                <div class="action-icon-flex">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/document-upload.png"
+                                                            alt="document-upload"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <div class="action-icon-flex delete-icon">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/delete-icon.png"
+                                                            alt="delete"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <p class="document-details">{{ '3 documents uploaded' | translate }}</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input autocomplete="false" matInput [matDatepicker]="picker3" />
+                                                <mat-datepicker-toggle matSuffix [for]="picker3">
+                                                </mat-datepicker-toggle>
+                                                <mat-datepicker #picker3></mat-datepicker>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="action-icon">
+                                                <div class="action-icon-flex">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/document-upload.png"
+                                                            alt="document-upload"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <div class="action-icon-flex delete-icon">
+                                                    <a href="">
+                                                        <img
+                                                            src="{{ env.IMG_URL }}images/delete-icon.png"
+                                                            alt="delete"
+                                                        />
+                                                    </a>
+                                                </div>
+                                                <p class="document-details">{{ '3 documents uploaded' | translate }}</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field>
+                                                <input autocomplete="false" matInput [matDatepicker]="picker4" />
+                                                <mat-datepicker-toggle matSuffix [for]="picker4">
+                                                </mat-datepicker-toggle>
+                                                <mat-datepicker #picker4></mat-datepicker>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <mat-form-field appearance="outline">
+                                                <input matInput placeholder="Placeholder" />
+                                            </mat-form-field>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>
+                                            <div class="table-footer-block">
+                                                <ul class="table-footer-block-inner">
+                                                    <li class="table-footer-block-inner-left">
+                                                        <!--  <div class="mat-icon mat-save">
+                                                            <mat-icon matTooltip="Save">save</mat-icon>
+                                                        </div>
+                                                        <p>
+                                                            {{ 'Auto saved on' | translate }}
+                                                        </p> -->
+                                                    </li>
+                                                    <li class="table-footer-block-inner-right">
+                                                        <div class="transaction-button-block">
+                                                            <button class="btn cancel-btn" type="button">
+                                                                {{ 'Cancel' | translate }}
+                                                            </button>
+                                                            <button class="btn submit-btn" type="button">
+                                                                {{ 'Submit' | translate }}
+                                                            </button>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

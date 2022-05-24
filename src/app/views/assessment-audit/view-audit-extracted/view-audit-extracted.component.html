@@ -1,0 +1,386 @@
+<div class="parent-container">
+    <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+    <div class="row title-container">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="title">
+                <div class="page-title">
+                    <div>{{ 'Manual Verification' | translate }}</div>
+                    <div class="page-description font-color-primary">
+                        {{ 'Verify the extracted data manually' | translate }}
+                    </div>
+                </div>
+            </div>
+            <a (click)="closeDialog()">
+                <img class="icon" src="{{ utilService.getcdnImage('close-model.png') }}" />
+            </a>
+        </div>
+    </div>
+
+    <div class="row mt-7">
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+            <div class="section-title">{{ 'Document uploaded by you' | translate }}:</div>
+            <div class="section-container">
+                <ngx-extended-pdf-viewer
+                    [src]="pdfSrc"
+                    [height]="'90vh'"
+                    [useBrowserLocale]="true"
+                    [showBookmarkButton]="false"
+                    [showDownloadButton]="false"
+                    [showOpenFileButton]="false"
+                    [showPrintButton]="false"
+                    [showPropertiesButton]="false"
+                >
+                    <!-- [showSecondaryToolbarButton]='false' -->
+                </ngx-extended-pdf-viewer>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+            <div class="section-title">{{ 'Data extracted from the Document' | translate }}:</div>
+            <div class="section-container form-container mt-5" style="padding-top: 0px;">
+                <div class="hr">
+                    <span class="hr-title">{{ 'Audit Summary' | translate }}:</span>
+                </div>
+                <div class="form-section">
+                    <form class="extracted-audit-form" [formGroup]="extractedAuditForm">
+                        <div class="form-group mb-3">
+                            <mat-form-field>
+                                <mat-label class="tt-input-label">
+                                    {{ 'Audit Name' | translate }}:
+                                    <span>&#42;</span>
+                                </mat-label>
+                                <input
+                                    matInput
+                                    formControlName="auditName"
+                                    placeholder="E.g. BSCI Audit for GreenTex"
+                                />
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <mat-form-field>
+                                <mat-label class="tt-input-label">
+                                    {{ 'Audit Standard' | translate }}:
+                                    <span>&#42;</span>
+                                </mat-label>
+                                <mat-select formControlName="auditStandard">
+                                    <mat-option *ngIf="auditTemplate?.id" [value]="auditTemplate?.id">
+                                        {{ auditTemplate?.name }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <mat-form-field>
+                                <mat-label class="tt-input-label">{{ 'Audit Body' | translate }}:</mat-label>
+                                <input
+                                    matInput
+                                    formControlName="auditBody"
+                                    placeholder="E.g. BSCI Audit for GreenTex"
+                                />
+                                <mat-hint *ngIf="this.draft?.extractedData?.audit_body" class="hint" align="end">
+                                    <div>
+                                        {{ 'Extracted value' | translate }}:
+                                        {{ this.draft?.extractedData?.audit_body | truncate: 25 }}
+                                        <span *ngIf="this.draft?.extractedData?.audit_body?.length > 25">
+                                            <i
+                                                class="fa {{ collapse.auditBody ? 'fa-plus' : 'fa-minus' }}"
+                                                (click)="toggleCollapse('auditBody')"
+                                            ></i>
+                                        </span>
+                                    </div>
+                                </mat-hint>
+                            </mat-form-field>
+                            <div class="exp-hint" [hidden]="collapse.auditBody">
+                                {{ this.draft?.extractedData?.audit_body }}
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <mat-form-field>
+                                <mat-label class="tt-input-label">
+                                    {{ 'Supplier Name' | translate }}: <span>&#42;</span></mat-label
+                                >
+                                <mat-select
+                                    formControlName="supplierName"
+                                    (selectionChange)="fetchFacilityBySupplier()"
+                                >
+                                    <mat-option *ngFor="let supplier of suppliers | keys" [value]="supplier.key">
+                                        {{ supplier.value }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-hint *ngIf="this.draft?.extractedData?.auditee" class="hint" align="end">
+                                    <div>
+                                        {{ 'Extracted value' | translate }}:
+                                        {{ this.draft?.extractedData?.auditee | truncate: 25 }}
+                                        <span *ngIf="this.draft?.extractedData?.auditee?.length > 25">
+                                            <i
+                                                class="fa {{ collapse.supplierName ? 'fa-plus' : 'fa-minus' }}"
+                                                (click)="toggleCollapse('supplierName')"
+                                            ></i>
+                                        </span>
+                                    </div>
+                                </mat-hint>
+                            </mat-form-field>
+                            <div class="exp-hint" [hidden]="collapse.supplierName">
+                                {{ this.draft?.extractedData?.auditee }}
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <mat-form-field>
+                                <mat-label class="tt-input-label">
+                                    {{ 'Name of the Facility' | translate }}:
+                                    <span>&#42;</span>
+                                </mat-label>
+                                <mat-select formControlName="facility">
+                                    <mat-option *ngFor="let facility of facilities" [value]="facility.id">
+                                        {{ facility.name }}
+                                    </mat-option> </mat-select
+                                ><mat-spinner *ngIf="facilitiesIsLoading" diameter="14"></mat-spinner>
+                                <mat-hint *ngIf="this.draft?.extractedData?.facility_id" class="hint" align="end">
+                                    <div>
+                                        {{ 'Extracted value' | translate }}:
+                                        {{ this.draft?.extractedData?.facility_id | truncate: 25 }}
+                                        <span *ngIf="this.draft?.extractedData?.facility_id?.length > 25">
+                                            <i
+                                                class="fa {{ collapse.facility ? 'fa-plus' : 'fa-minus' }}"
+                                                (click)="toggleCollapse('facility')"
+                                            ></i>
+                                        </span>
+                                    </div>
+                                </mat-hint>
+                            </mat-form-field>
+                            <div class="exp-hint" [hidden]="collapse.facility">
+                                {{ this.draft?.extractedData?.facility_id }}
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <mat-form-field>
+                                <mat-label class="tt-input-label">{{ 'Auditor' | translate }}:</mat-label>
+                                <input matInput formControlName="auditor" placeholder="E.g. BSCI Audit for GreenTex" />
+                                <mat-hint *ngIf="this.draft?.extractedData?.auditor" class="hint" align="end">
+                                    <div>
+                                        {{ 'Extracted value' | translate }}:
+                                        {{ this.draft?.extractedData?.auditor | truncate: 25 }}
+                                        <span *ngIf="this.draft?.extractedData?.auditor?.length > 25">
+                                            <i
+                                                class="fa {{ collapse.auditor ? 'fa-plus' : 'fa-minus' }}"
+                                                (click)="toggleCollapse('auditor')"
+                                            ></i>
+                                        </span>
+                                    </div>
+                                </mat-hint>
+                            </mat-form-field>
+                            <div class="exp-hint" [hidden]="collapse.auditor">
+                                {{ this.draft?.extractedData?.auditor }}
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <mat-form-field [floatLabel]="'always'" class="req-symbol-remove">
+                                <mat-label class="tt-input-label">
+                                    {{ 'Audit Date' | translate }}:
+                                    <span>&#42;</span>
+                                </mat-label>
+                                <input
+                                    matInput
+                                    [matDatepicker]="auditValidFrom"
+                                    (dateChange)="auditValidFromLocalUpdate($event)"
+                                    [matDatepickerFilter]="auditValidFromFilter"
+                                    (focus)="auditValidFrom.open()"
+                                    (click)="auditValidFrom.open()"
+                                    formControlName="auditValidFromDate"
+                                    readonly
+                                    required
+                                />
+                                <mat-datepicker #auditValidFrom></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix [for]="auditValidFrom"></mat-datepicker-toggle>
+                                <mat-hint *ngIf="this.draft?.extractedData?.date_of_audit" class="hint" align="end">
+                                    <div>
+                                        {{ 'Extracted Date' | translate }}:
+                                        {{ this.draft?.extractedData?.date_of_audit | truncate: 25 }}
+                                        <span *ngIf="this.draft?.extractedData?.date_of_audit?.length > 25">
+                                            <i
+                                                class="fa {{ collapse.auditDate ? 'fa-plus' : 'fa-minus' }}"
+                                                (click)="toggleCollapse('auditDate')"
+                                            ></i>
+                                        </span>
+                                    </div>
+                                </mat-hint>
+                                <mat-error>Please select the audit date</mat-error>
+                            </mat-form-field>
+                            <div class="exp-hint" [hidden]="collapse.auditDate">
+                                {{ this.draft?.extractedData?.date_of_audit }}
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <mat-form-field [floatLabel]="'always'" class="req-symbol-remove">
+                                <mat-label class="tt-input-label">
+                                    {{ 'Expiry Date' | translate }}:
+                                    <span>&#42;</span>
+                                </mat-label>
+                                <input
+                                    matInput
+                                    [matDatepicker]="auditValidTill"
+                                    [min]="auditValidFromLocal"
+                                    (focus)="auditValidTill.open()"
+                                    (click)="auditValidTill.open()"
+                                    formControlName="auditValidToDate"
+                                    readonly
+                                    required
+                                />
+                                <mat-datepicker #auditValidTill></mat-datepicker>
+                                <mat-datepicker-toggle matSuffix [for]="auditValidTill"></mat-datepicker-toggle>
+                                <mat-error>Please select the audit valid through date</mat-error>
+                                <mat-hint *ngIf="this.draft?.extractedData?.valid_till" class="hint" align="end">
+                                    <div>
+                                        {{ 'Extracted Date' | translate }}:
+                                        {{ this.draft?.extractedData?.valid_till | truncate: 25 }}
+                                        <span *ngIf="this.draft?.extractedData?.valid_till?.length > 25">
+                                            <i
+                                                class="fa {{ collapse.expiryDate ? 'fa-plus' : 'fa-minus' }}"
+                                                (click)="toggleCollapse('expiryDate')"
+                                            ></i>
+                                        </span>
+                                    </div>
+                                </mat-hint>
+                            </mat-form-field>
+                            <div class="exp-hint" [hidden]="collapse.expiryDate">
+                                {{ this.draft?.extractedData?.valid_till }}
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <mat-form-field>
+                                <mat-label class="tt-input-label">
+                                    {{ 'Overall Rating' | translate }}:
+                                    <span>&#42;</span>
+                                </mat-label>
+                                <mat-select formControlName="overallRating">
+                                    <mat-option
+                                        *ngFor="let option of _.keys(overallRatings?.options) | sortByFilter"
+                                        [value]="overallRatings.options[option]"
+                                    >
+                                        {{ overallRatings.options[option] }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-hint *ngIf="this.draft?.extractedData?.overall_rating" class="hint" align="end">
+                                    {{ 'Extracted Field' | translate }}:
+                                    {{ this.draft?.extractedData?.overall_rating | truncate: 25 }}</mat-hint
+                                >
+                            </mat-form-field>
+                        </div>
+                        <div class="form-group mb-3">
+                            <mat-form-field>
+                                <mat-label class="tt-input-label">{{ 'Normalised Rating' | translate }}:</mat-label>
+                                <mat-select formControlName="normalisedRating">
+                                    <mat-option
+                                        *ngFor="let normalisedRate of normalisedRatings | sortByFilter"
+                                        [value]="normalisedRate"
+                                    >
+                                        {{ normalisedRate }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </form>
+                </div>
+
+                <form [formGroup]="auditInformationForm" *ngIf="auditInformationFormReady" class="extracted-audit-form">
+                    <ng-container *ngFor="let section of auditTemplate.sections; let first = first">
+                        <div *ngIf="section?.metadata?.text_extraction_supported" [formGroupName]="section.fromControl">
+                            <div class="hr">
+                                <div class="mt-5">
+                                    <span class="hr-title"> {{ section?.header }}:</span>
+                                </div>
+                            </div>
+                            <div class="form-section" style="padding-top: 0px;">
+                                <div class="mt-5" *ngIf="first">
+                                    <span class="audit-standard ">
+                                        {{ 'Audit Standard: BSCI' }}
+                                    </span>
+                                </div>
+                                <div class="mt-5">
+                                    <ng-container *ngFor="let field of section?.fields">
+                                        <div [ngSwitch]="field.type" class="mt-1">
+                                            <div *ngSwitchCase="'SELECT'">
+                                                <div class="form-group mb-3">
+                                                    <mat-form-field>
+                                                        <mat-label class="tt-input-label"> {{ field.name }}:</mat-label>
+                                                        <mat-select [formControlName]="field.fromControl">
+                                                            <mat-option
+                                                                *ngFor="
+                                                                    let option of _.keys(field.options) | sortByFilter
+                                                                "
+                                                                [value]="field.options[option]"
+                                                            >
+                                                                {{ field.options[option] }}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                        <mat-hint
+                                                            *ngIf="getExtractedValue(section?.header, field?.name)"
+                                                            class="hint"
+                                                            align="end"
+                                                        >
+                                                            {{ 'Extracted Field' | translate }}:
+                                                            {{
+                                                                getExtractedValue(section?.header, field?.name)
+                                                                    | truncate: 25
+                                                            }}
+                                                        </mat-hint>
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                            <div *ngSwitchDefault>{{ 'Unknown field type' | translate }}</div>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </form>
+
+                <div class="form-section" style="padding-top: 0px;">
+                    <div class="non-conformity-section-container mt-2">
+                        <app-non-conformities-create
+                            [showDivider]="true"
+                            (nonConformitiesUpdated)="onUpdateNonconformities($event)"
+                            [ncEditEvent]="ncEdit"
+                            [initialState]="nonConformities"
+                        >
+                        </app-non-conformities-create>
+                        <div class="col-md-12 pd-0">
+                            <app-non-conformities-list
+                                [nonConformities]="nonConformities"
+                                ncMode="record"
+                                (updateNcEvent)="onUpdateNC($event)"
+                            >
+                            </app-non-conformities-list>
+                        </div>
+                    </div>
+                </div>
+                <div class="btnGroups mt-3">
+                    <button
+                        [disabled]="btnStatus.saveDraft"
+                        type="button"
+                        (click)="onSaveDraft()"
+                        class="go-back-button tt-save-btn"
+                    >
+                        {{ btnStatus.saveDraft ? ('Saving draft' | translate) : ('Save as draft' | translate) }}
+                    </button>
+                    <button (click)="closeDialog()" class="btn tt-btn tt-btn-secondary" mat-button>
+                        {{ 'Cancel' | translate }}
+                    </button>
+                    <button
+                        (click)="onCreateAudit()"
+                        [disabled]="btnStatus.createAudit || !validateForms()"
+                        type="button"
+                        class="btn tt-btn tt-btn-primary mr-0"
+                        mat-button
+                    >
+                        {{ btnStatus.createAudit ? 'Creating Audit' : 'Create Audit' }}
+                    </button>
+                    <p style="visibility: hidden;"></p>
+                    <!-- btn cut issue fix -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+<div class="pl-2 pr-3">
+    <div class="row text-color-primary" *ngIf="!fetchingMasterData">
+        <div
+            class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pl-3"
+            *ngFor="let info of entityData | keys; let ind = index"
+        >
+            <div>
+                <div class="row" *ngIf="showTitle">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="hr">
+                            <span class="hr-title">{{ info.key | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-1 pb-1">
+                        <app-customization-info
+                            [customizationInfo]="info.value"
+                            (customizationValueChange)="onValueChange($event)"
+                            [formMode]="editCustomizationInfo"
+                            [indexId]="ind"
+                            [fieldResponse]="fieldResponse"
+                            [canShowEditIcon]="canShowEditIcon"
+                        >
+                        </app-customization-info>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="fetchingMasterData">
+        <div class="col-md-12">
+            <div class="material-loader">
+                <mat-spinner diameter="14" class="ec-loader"></mat-spinner>
+            </div>
+        </div>
+    </div>
+</div>

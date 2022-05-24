@@ -1,0 +1,592 @@
+<div class="view-container text-center">
+    <div class="view-container-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header-section fix-header-block">
+                        <div class="page-header-section-inner">
+                            <div class="page-title">
+                                <h4 class="title">{{ 'Admin' | translate }}</h4>
+                            </div>
+                            <!-- Page Title -->
+                        </div>
+                        <!-- Page Header Section Inner -->
+                        <div class="page-header-section-inner alignment-right"></div>
+                        <!-- Page Header Section Inner Alignment Right -->
+                    </div>
+                    <!-- Page Header Section -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+
+            <div class="page-body-section body-section-top-space">
+                <div class="row pt-2">
+                    <form class="toby admin-profile">
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-2">
+                            <div
+                                class="form-group bottom cursor-pointer"
+                                [ngClass]="{ selected: settingsType === selectedTabs[0] }"
+                            >
+                                <label (click)="settingsType = selectedTabs[0]" class="ml-2">{{
+                                    'General Settings' | translate
+                                }}</label>
+                                <div [ngClass]="{ selected: settingsType === selectedTabs[0] }"></div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-3 col-lg-2">
+                            <div
+                                class="form-group bottom"
+                                style="cursor: auto !important"
+                                [ngClass]="{ selected: settingsType === selectedTabs[1] }"
+                            >
+                                <label (click)="settingsType = selectedTabs[1]">{{ 'Geo API' | translate }}</label>
+                                <div [ngClass]="{ selected: settingsType === selectedTabs[1] }"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <ng-container [ngSwitch]="settingsType">
+                        <div class="col-md-12" *ngSwitchCase="selectedTabs[0]">
+                            <div class="import-data-container">
+                                <div class="mat-collapse-section">
+                                    <mat-accordion>
+                                        <mat-expansion-panel [expanded]="true" class="mb-20">
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-title>
+                                                    Import data
+                                                </mat-panel-title>
+                                            </mat-expansion-panel-header>
+
+                                            <!-- row -->
+                                            <div class="admin-outer mt-0">
+                                                <div class="row import-file">
+                                                    <div class="col-md-2"></div>
+                                                    <div class="col-md-5 validate-data">
+                                                        <label for="import-file">Choose File to validate</label>
+                                                        <input
+                                                            type="file"
+                                                            id="import-file"
+                                                            class="import-file-input"
+                                                            (change)="handleFileInput($event.target.files)"
+                                                        />
+                                                    </div>
+                                                    <div class="col-md-2 validate-btn">
+                                                        <button
+                                                            class="btn"
+                                                            value="Validate Data"
+                                                            (click)="validateDataFile()"
+                                                        >
+                                                            Validate Data
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-2"></div>
+                                                </div>
+                                                <!-- row -->
+
+                                                <div class="row import-button">
+                                                    <button
+                                                        [disabled]="!validated"
+                                                        class="btn"
+                                                        value="Import Data"
+                                                        (click)="importData()"
+                                                    >
+                                                        Import Data
+                                                    </button>
+                                                </div>
+                                                <div class="error-text-box">
+                                                    <textarea
+                                                        rows="5"
+                                                        cols="50"
+                                                        [(ngModel)]="validationResponse"
+                                                    ></textarea>
+                                                </div>
+                                            </div>
+                                            <div>Pending Conflicts</div>
+                                            <div *ngIf="conflictTypesList">
+                                                <app-full-page-loader *ngIf="exportingConflictData">
+                                                </app-full-page-loader>
+                                                <div *ngFor="let conflictType of conflictTypesList">
+                                                    <button class="btn" (click)="exportConflictData(conflictType.type)">
+                                                        {{ conflictType.type }} - {{ conflictType.count }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </mat-expansion-panel>
+
+                                        <mat-expansion-panel class="mb-20">
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-title>
+                                                    Generate Reset Password Link
+                                                </mat-panel-title>
+                                            </mat-expansion-panel-header>
+
+                                            <!-- User Create Group Component Section -->
+                                            <div class="reset-form-block">
+                                                <form
+                                                    [formGroup]="emailLinkGenerateForm"
+                                                    (ngSubmit)="sendEmailRequest()"
+                                                >
+                                                    <mat-form-field class="example-full-width">
+                                                        <input formControlName="emailId" matInput placeholder="Email" />
+                                                    </mat-form-field>
+                                                    <mat-card-actions>
+                                                        <button
+                                                            (click)="clearEmailField()"
+                                                            type="button"
+                                                            class="btn btn-blue btn-md cancel-btn mr-15"
+                                                        >
+                                                            Clear
+                                                        </button>
+                                                        <button class="btn btn-gray btn-md">
+                                                            Generate Link
+                                                        </button>
+
+                                                        <div *ngIf="emailLinkGenerated" class="email-link-setup">
+                                                            <ul class="email-link-setup-list">
+                                                                <li>
+                                                                    <input
+                                                                        type="text"
+                                                                        value="{{ emailLinkGenerated }}"
+                                                                        #urlHolder
+                                                                        name=""
+                                                                        readonly
+                                                                    />
+                                                                    <p>{{ emailLinkGenerated }}</p>
+                                                                </li>
+                                                                <li>
+                                                                    <button
+                                                                        class="btn btn-sm btn-gradient"
+                                                                        type="button"
+                                                                        (click)="copyUrl(urlHolder)"
+                                                                        value="click to copy"
+                                                                    >
+                                                                        Copy
+                                                                    </button>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </mat-card-actions>
+                                                </form>
+                                            </div>
+                                        </mat-expansion-panel>
+
+                                        <mat-expansion-panel class="mb-20">
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-title>
+                                                    Reset Password
+                                                </mat-panel-title>
+                                            </mat-expansion-panel-header>
+
+                                            <div class="reset-password" style="display:-webkit-inline-box;">
+                                                <mat-card class="example-card">
+                                                    <mat-card-header>
+                                                        <mat-card-title>Reset Password</mat-card-title>
+                                                    </mat-card-header>
+                                                    <mat-card-content>
+                                                        <form class="example-form" #resetPasswordForm="ngForm">
+                                                            <table class="example-full-width" cellspacing="0">
+                                                                <tr>
+                                                                    <td>
+                                                                        <mat-form-field
+                                                                            class="example-full-width"
+                                                                            style="width:500px"
+                                                                        >
+                                                                            <input
+                                                                                matInput
+                                                                                placeholder="Username"
+                                                                                [(ngModel)]="user.emailId"
+                                                                                name="username"
+                                                                                required
+                                                                            />
+                                                                        </mat-form-field>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <mat-form-field
+                                                                            class="example-full-width"
+                                                                            style="width:500px"
+                                                                        >
+                                                                            <input
+                                                                                matInput
+                                                                                placeholder="Password"
+                                                                                [(ngModel)]="user.password"
+                                                                                type="password"
+                                                                                name="password"
+                                                                                required
+                                                                            />
+                                                                        </mat-form-field>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </form>
+                                                    </mat-card-content>
+                                                    <mat-card-actions>
+                                                        <button
+                                                            (click)="clearData()"
+                                                            class="btn btn-blue btn-md cancel-btn mr-15"
+                                                        >
+                                                            Clear
+                                                        </button>
+                                                        <button
+                                                            (click)="resetPassword()"
+                                                            [disabled]="!resetPasswordForm.valid"
+                                                            class="btn btn-gray btn-md"
+                                                        >
+                                                            Reset
+                                                        </button>
+                                                    </mat-card-actions>
+                                                </mat-card>
+                                            </div>
+                                        </mat-expansion-panel>
+                                        <mat-expansion-panel class="mb-20">
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-title>
+                                                    T-BOT: Add Blueprint
+                                                </mat-panel-title>
+                                            </mat-expansion-panel-header>
+
+                                            <!-- row -->
+                                            <div class="admin-outer mt-0">
+                                                <div class="row">
+                                                    <div class="col-md-6 col-md-offset-3">
+                                                        <div class="mb-2">
+                                                            <mat-form-field>
+                                                                <input
+                                                                    id="companyIDTransactionType"
+                                                                    name="companyIDTransactionType"
+                                                                    matInput
+                                                                    [(ngModel)]="bucketKey"
+                                                                    placeholder="Please enter the company ID / Transaction Type (Refer to the instructions in the sample sheet)"
+                                                                />
+                                                            </mat-form-field>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row import-file">
+                                                    <div class="col-md-2"></div>
+                                                    <div class="col-md-5 validate-data">
+                                                        <label for="import-blueprint-file"
+                                                            >Choose File to validate</label
+                                                        >
+                                                        <input
+                                                            type="file"
+                                                            id="import-blueprint-file"
+                                                            class="import-file-input"
+                                                            (change)="storeBlueprintFile($event.target.files)"
+                                                        />
+                                                        <div>{{ bluePrintS3Url }}</div>
+                                                    </div>
+                                                    <div class="col-md-2 validate-btn">
+                                                        <button
+                                                            class="btn"
+                                                            value="Validate Data"
+                                                            (click)="uploadBlueprint()"
+                                                            [disabled]="uploadingBluePrint"
+                                                        >
+                                                            <ng-template [ngIf]="!uploadingBluePrint"
+                                                                >Upload Blueprint
+                                                            </ng-template>
+                                                            <ng-template [ngIf]="uploadingBluePrint"
+                                                                >Uploading . . .
+                                                            </ng-template>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-2"></div>
+                                                </div>
+                                            </div>
+                                        </mat-expansion-panel>
+
+                                        <mat-expansion-panel class="mb-20">
+                                            <mat-expansion-panel-header class="notification-panel">
+                                                <mat-panel-title>
+                                                    Notifications
+                                                </mat-panel-title>
+                                            </mat-expansion-panel-header>
+                                            <div class="row">
+                                                <div class="col-xs-6">
+                                                    <mat-card>
+                                                        <mat-card-header>
+                                                            <mat-card-title>
+                                                                {{ 'Release update ' | titlecase }}
+                                                            </mat-card-title>
+                                                        </mat-card-header>
+                                                        <form
+                                                            [formGroup]="releaseUpdateForm"
+                                                            class="mt-2"
+                                                            (submit)="onUpdateRelease()"
+                                                        >
+                                                            <mat-card-content class="mt-2">
+                                                                <div class="form-group">
+                                                                    <mat-form-field>
+                                                                        <mat-label>Key</mat-label>
+                                                                        <input
+                                                                            formControlName="key"
+                                                                            type="password"
+                                                                            autocomplete="false"
+                                                                            matInput
+                                                                        />
+                                                                    </mat-form-field>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <mat-form-field>
+                                                                        <mat-label>End date</mat-label>
+                                                                        <input
+                                                                            autocomplete="false"
+                                                                            matInput
+                                                                            formControlName="date"
+                                                                            [min]="minDate"
+                                                                            [matDatepicker]="picker"
+                                                                        />
+                                                                        <mat-datepicker-toggle matSuffix [for]="picker">
+                                                                        </mat-datepicker-toggle>
+                                                                        <mat-datepicker #picker></mat-datepicker>
+                                                                    </mat-form-field>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <mat-form-field>
+                                                                        <mat-label>End Time (hh:mm)</mat-label>
+                                                                        <input
+                                                                            autocomplete="false"
+                                                                            readonly
+                                                                            matInput
+                                                                            formControlName="time"
+                                                                            [format]="24"
+                                                                            [ngxTimepicker]="time"
+                                                                        />
+                                                                        <ngx-material-timepicker #time>
+                                                                        </ngx-material-timepicker>
+                                                                    </mat-form-field>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <mat-form-field>
+                                                                        <mat-label>Leave a comment</mat-label>
+                                                                        <textarea
+                                                                            formControlName="message"
+                                                                            matInput
+                                                                            rows="3"
+                                                                        ></textarea>
+                                                                    </mat-form-field>
+                                                                </div>
+                                                            </mat-card-content>
+                                                            <mat-card-actions>
+                                                                <button
+                                                                    type="button"
+                                                                    (click)="releaseUpdateForm.reset()"
+                                                                    class="btn btn-blue btn-md cancel-btn mr-15"
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                                <button
+                                                                    type="submit"
+                                                                    class="btn btn-gray btn-md"
+                                                                    [disabled]="
+                                                                        !releaseUpdateForm.valid ||
+                                                                        releaseUpdateInProgress
+                                                                    "
+                                                                >
+                                                                    <app-spinner
+                                                                        *ngIf="releaseUpdateInProgress"
+                                                                        [small]="true"
+                                                                    ></app-spinner>
+
+                                                                    <ng-template #submit>
+                                                                        Submit
+                                                                    </ng-template>
+
+                                                                    Submit
+                                                                </button>
+                                                            </mat-card-actions>
+                                                        </form>
+                                                    </mat-card>
+                                                </div>
+                                                <div class="col-xs-6 release-list">
+                                                    <h3>Releases</h3>
+                                                    <ul class="mt-2">
+                                                        <li *ngFor="let release of releaseUpdates; let i = index">
+                                                            <span [matTooltip]="release.message">{{
+                                                                moment.utc(release.expiryTs).local()
+                                                            }}</span>
+                                                            <span class="action">
+                                                                <button
+                                                                    mat-button
+                                                                    type="button"
+                                                                    (click)="deleteReleaseData(i)"
+                                                                >
+                                                                    <mat-icon aria-hidden="false">delete</mat-icon>
+                                                                </button>
+                                                            </span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </mat-expansion-panel>
+
+                                        <mat-expansion-panel class="mb-20">
+                                            <mat-expansion-panel-header class="notification-panel">
+                                                <mat-panel-title>
+                                                    Style Compliance
+                                                </mat-panel-title>
+                                            </mat-expansion-panel-header>
+                                            <div class="row">
+                                                <div class="col-md-2 validate-btn">
+                                                    <button
+                                                        class="btn"
+                                                        value="Trigger Style Compliance"
+                                                        (click)="triggerCompliance()"
+                                                    >
+                                                        Trigger Style Compliance
+                                                    </button>
+                                                    <app-spinner *ngIf="isStyleComplianceTriggered" [small]="true">
+                                                    </app-spinner>
+                                                </div>
+                                            </div>
+                                        </mat-expansion-panel>
+
+                                        <mat-expansion-panel class="mb-20">
+                                            <mat-expansion-panel-header class="notification-panel">
+                                                <mat-panel-title> S3 File Upload </mat-panel-title>
+                                            </mat-expansion-panel-header>
+                                            <div class="row">
+                                                <div class="col-xs-12 col-md-6 col-lg-6">
+                                                    <form (submit)="onSubmitCalculationDataSet()">
+                                                        <ng-container [formGroup]="calculationForm">
+                                                            <mat-card>
+                                                                <div class="form-group">
+                                                                    <mat-form-field>
+                                                                        <mat-label>Select bucket:</mat-label>
+                                                                        <mat-select formControlName="bucketName">
+                                                                            <ng-container
+                                                                                *ngIf="buckets$ | async as buckets"
+                                                                            >
+                                                                                <mat-option
+                                                                                    *ngFor="let bucket of buckets"
+                                                                                    [value]="bucket"
+                                                                                >
+                                                                                    {{ bucket }}
+                                                                                </mat-option>
+                                                                            </ng-container>
+                                                                        </mat-select>
+                                                                    </mat-form-field>
+                                                                </div>
+                                                                <div class="from-group">
+                                                                    <mat-form-field>
+                                                                        <mat-label>Bucket Key:</mat-label>
+                                                                        <input
+                                                                            formControlName="bucketKey"
+                                                                            matInput
+                                                                            type="text"
+                                                                        />
+                                                                    </mat-form-field>
+                                                                </div>
+
+                                                                <div
+                                                                    class="form-group
+                                                        upload-group"
+                                                                >
+                                                                    <label for="input-file-id">Choose File</label>
+                                                                    <input
+                                                                        id="input-file-id"
+                                                                        type="file"
+                                                                        formControlName="file"
+                                                                        (change)="
+                                                                            this.calculationDataFile = $event.target.files.item(
+                                                                                0
+                                                                            )
+                                                                        "
+                                                                    />
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    (click)="calculationForm.reset()"
+                                                                    class="btn btn-blue cancel-btn mr-15"
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                                <button
+                                                                    [disabled]="
+                                                                        calculationForm.invalid ||
+                                                                        calculationSubmitInProgress
+                                                                    "
+                                                                    class="btn btn-gray"
+                                                                    type="submit"
+                                                                    mat-button
+                                                                >
+                                                                    Submit
+                                                                </button>
+                                                            </mat-card>
+                                                        </ng-container>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </mat-expansion-panel>
+
+                                        <mat-expansion-panel class="mb-20" *ngIf="isFoodIndustry">
+                                            <mat-expansion-panel-header class="notification-panel">
+                                                <mat-panel-title> Calculation batch trigger </mat-panel-title>
+                                            </mat-expansion-panel-header>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <button
+                                                        type="button"
+                                                        (click)="bulkCalculationTrigger()"
+                                                        class="btn btn-gray btn-md"
+                                                        [disabled]="triggerBtnState"
+                                                    >
+                                                        <app-spinner
+                                                            *ngIf="batchTrigger.triggerInprogress"
+                                                            [small]="true"
+                                                        ></app-spinner>
+
+                                                        Trigger score
+                                                    </button>
+                                                    <p class="pt-1">
+                                                        {{ batchTrigger.count }}
+                                                        were updated as of last trigger at
+                                                        {{ batchTrigger.timeStamp | date: 'full' }}
+                                                        <span
+                                                            class="reload"
+                                                            [ngClass]="{ loading: batchTrigger.fetchingData }"
+                                                        >
+                                                            <mat-icon (click)="getLatestCalculationTriggerData()">
+                                                                refresh</mat-icon
+                                                            >
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </mat-expansion-panel>
+                                    </mat-accordion>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12" *ngSwitchCase="selectedTabs[1]">
+                            <mat-accordion class="mat-form-block-type-one">
+                                <mat-expansion-panel [expanded]="true" class="mb-20">
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            GeoAPI
+                                        </mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <app-geo-api></app-geo-api>
+                                </mat-expansion-panel>
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            Sync
+                                        </mat-panel-title>
+                                    </mat-expansion-panel-header>
+                                    <app-geo-api-update></app-geo-api-update>
+                                </mat-expansion-panel>
+                            </mat-accordion>
+                        </div>
+                    </ng-container>
+                </div>
+                <!-- Row -->
+            </div>
+            <!-- Page Body Section -->
+        </div>
+    </div>
+</div>

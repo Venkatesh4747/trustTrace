@@ -1,0 +1,160 @@
+<div class="parent-container">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header-section">
+                    <div class="page-header-section-inner">
+                        <div class="page-title">
+                            <h4 class="title">{{ 'Create New User' | translate }}</h4>
+                            <h5 class="sub-title">{{ 'Create a user to add into a group' | translate }}</h5>
+                        </div>
+                        <!-- Page Title -->
+                    </div>
+                    <!-- Page Header Section Inner -->
+                    <div class="page-header-section-inner alignment-right">
+                        <!-- <button class="go-back-button">Back</button> -->
+                        <!-- Title Right Search -->
+                    </div>
+                    <!-- Page Header Section Inner Alignment Right -->
+                </div>
+                <!-- Page Header Section -->
+            </div>
+            <!-- Column -->
+        </div>
+        <!-- Row -->
+
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+
+        <div class="page-body-section" *ngIf="!pageLoading">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-page-section fix-body-height">
+                        <div class="form-page-inner">
+                            <form [formGroup]="createUserForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <mat-form-field [floatLabel]="'never'">
+                                            <input
+                                                maxlength="75"
+                                                matInput
+                                                placeholder="{{ 'First Name' | translate }}"
+                                                name="fn-ln firstName"
+                                                formControlName="firstName"
+                                                required
+                                            />
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <mat-form-field [floatLabel]="'never'">
+                                            <input
+                                                maxlength="75"
+                                                matInput
+                                                placeholder="{{ 'Last Name' | translate }}"
+                                                name="fn-ln lastName"
+                                                formControlName="lastName"
+                                                required
+                                            />
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <mat-form-field [floatLabel]="'never'">
+                                            <input
+                                                maxlength="75"
+                                                matInput
+                                                placeholder="{{ 'Email ID' | translate }}"
+                                                name="fn-ln emailId"
+                                                formControlName="emailId"
+                                                required
+                                            />
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <ul class="select-mandatory">
+                                            <li>
+                                                <mat-checkbox formControlName=""
+                                                    >{{ 'Enabled for Email Notifications' | translate }}
+                                                </mat-checkbox>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-20">
+                                        <div class="form-page-inner-select">
+                                            <h5 class="mat-title">
+                                                {{ 'Associated Facility' | translate }}:
+                                                <span class="color-red">*</span>
+                                            </h5>
+
+                                            <app-tt-table-with-checkbox></app-tt-table-with-checkbox>
+                                        </div>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-20">
+                                        <div class="form-page-inner-select">
+                                            <h5 class="mat-title">
+                                                {{ 'Select Groups to add' | translate }}:
+                                                <span class="color-red">*</span>
+                                            </h5>
+                                            <app-tt-table-with-checkbox></app-tt-table-with-checkbox>
+                                        </div>
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="button-block">
+                                            <div class="pull-right">
+                                                <button
+                                                    class="btn btn-blue btn-md cancel-btn"
+                                                    type="button"
+                                                    (click)="onCancel()"
+                                                >
+                                                    {{ 'Cancel' | translate }}
+                                                </button>
+                                                <button
+                                                    class="btn btn-gray btn-md"
+                                                    [disabled]="formProcessing"
+                                                    type="button"
+                                                >
+                                                    {{ 'Create User' | translate }}
+                                                </button>
+                                            </div>
+                                            <!-- Pull Left -->
+                                        </div>
+                                        <!-- Butto Block -->
+                                    </div>
+                                    <!-- Column -->
+                                </div>
+                                <!-- Row -->
+                            </form>
+                        </div>
+                        <!-- Column -->
+                        <!-- Form Page Inner -->
+                    </div>
+                    <!-- Form Page Section -->
+                </div>
+                <!-- Column -->
+            </div>
+            <!-- Row -->
+        </div>
+        <!-- Page Body Section -->
+    </div>
+    <!--  Container Fluid -->
+</div>
+<!--  View Container -->

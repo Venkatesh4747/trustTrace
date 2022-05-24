@@ -1,0 +1,85 @@
+@import '../../../../../styles/variables';
+.template-label {
+    font-family: $font-family-Regular;
+    color: $text-font-color;
+    margin: 0;
+    align-self: center;
+    font-weight: normal;
+    font-size: 14px;
+    font-weight: 600;
+}
+.template-label {
+    span {
+        color: red;
+    }
+}
+
+.nc-title {
+    margin-bottom: 10px;
+}
+
+.non-conformities-form {
+    padding-left: 15px;
+    mat-form-field {
+        width: 100%;
+    }
+}
+
+.margin-set {
+    margin-top: 34px;
+}
+
+.pd-0 {
+    padding: 0px !important;
+    padding-right: 15px !important;
+}
+.pr-0 {
+    padding-right: 0 !important;
+}
+.sm-pd-0 {
+    padding: 0px;
+}
+.new-nc {
+    width: 100% !important;
+}
+
+@media (max-width: 991px) {
+    .new-nc {
+        width: 100% !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .sm-pd-0 {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+    .edit-m-addBtn {
+        position: relative;
+        right: 15px;
+    }
+}
+
+.hr {
+    border-bottom: 2px solid #ececec;
+    font-family: $font-family-Semibold;
+    color: #ccc;
+    margin-top: 25px !important;
+    margin-bottom: 30px !important;
+}
+.hr-title {
+    font-family: $font-family-Bold;
+    font-size: 14px;
+    margin-left: -20px; //fix
+}
+
+.tt-btn {
+    @media screen and (max-width: 1100px) {
+        min-width: 100px !important;
+    }
+}
+mat-form-field {
+    input {
+        color: #325992;
+    }
+}

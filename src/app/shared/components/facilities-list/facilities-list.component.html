@@ -1,0 +1,32 @@
+<div class="facility-list-div pull-left">
+    <div class="sub-supplier-hr hr">
+        <span class="hr-title" data-cy="profile-facilities-count"
+            >{{ title | translate | uppercase }}({{ facilityCount }})</span
+        >
+    </div>
+
+    <div class="facilities-div">
+        <div class="table-card" *ngFor="let facility of facilities">
+            <div class="table-card-left cursor-p" [routerLink]="['/', 'facilities', facility.id, companyId]">
+                <p class="facility-name">
+                    {{ facility.name }}
+                </p>
+                <p class="desc">
+                    {{ 'Production Capacity' | translate }}:
+                    {{ facility.productionCapacity || ('Not Available' | translate) }}
+                </p>
+                <div *ngIf="facility.address">
+                    <p class="desc">{{ facility.address?.country }}</p>
+                </div>
+            </div>
+            <div class="table-card-right flex-column" *ngIf="facility.address">
+                <div
+                    *ngIf="facility.address.country"
+                    class="flag-icon flag-icon-{{
+                        getCountryCode(facility.address?.country)
+                    }} action-item align-self-flex-end ml-10 float-r"
+                ></div>
+            </div>
+        </div>
+    </div>
+</div>

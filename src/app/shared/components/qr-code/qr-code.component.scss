@@ -1,0 +1,57 @@
+.qr-code-container {
+    position: relative;
+}
+.preloader-scan {
+    position: relative;
+    display: table;
+    height: 100px;
+    text-align: center;
+    margin: 0 auto 20px;
+
+    ul {
+        height: 100%;
+        display: table-cell;
+        vertical-align: middle;
+        list-style-type: none;
+        text-align: center;
+        padding-left: 0;
+    }
+
+    li {
+        width: 125px;
+        height: 125px;
+        opacity: 0.75;
+        img {
+            width: 125px;
+            height: 125px;
+        }
+    }
+
+    .laser {
+        width: 125%;
+        margin-left: -15px;
+        background-color: tomato;
+        height: 1px;
+        position: absolute;
+        top: 40px;
+        z-index: 2;
+        box-shadow: 0 0 4px red;
+        animation: scanning 2s infinite;
+    }
+
+    .diode {
+        animation: beam 0.01s infinite;
+    }
+}
+
+@keyframes beam {
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes scanning {
+    50% {
+        transform: translateY(50px);
+    }
+}

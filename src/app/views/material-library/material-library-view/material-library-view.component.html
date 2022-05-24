@@ -1,0 +1,923 @@
+<div class="view-container">
+    <div class="container-fluid">
+        <app-full-page-loader *ngIf="pageLoading"></app-full-page-loader>
+        <div class="mb-3">
+            <div class="row header no-border">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 header-search pt-3 pb-2">
+                    <div class="page-title">
+                        <div>{{ 'Raw Materials' | translate }}</div>
+                        <div class="page-description font-color-primary">
+                            {{
+                                'Detailed view of the material, style associated
+                            and its supply chain'
+                                    | industry
+                                    | translate
+                            }}
+                        </div>
+                    </div>
+
+                    <div class="pr-0">
+                        <button class="go-back-button" (click)="goBack()">
+                            {{ 'Back' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pl-1 tab-group-wrapper  mat-tab-view-page">
+                <mat-tab-group mat-stretch-tabs class="toby">
+                    <mat-tab class="col-xs-3 col-sm-3 col-md-3 col-lg-2" *ngFor="let tab of tabs">
+                        <ng-template mat-tab-label>
+                            <div
+                                class="form-group bottom cursor-default"
+                                [ngClass]="{ selected: materialDetailType === tab }"
+                                (click)="changeMaterialDetailType(tab)"
+                            >
+                                <label class="cursor-pointer">{{ tab | translate }}</label>
+                                <div [ngClass]="{ selected: materialDetailType === tab }"></div>
+                            </div>
+                        </ng-template>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+
+            <div *ngIf="!pageLoading" class="pt-2">
+                <div class="row pl-2" *ngIf="materialDetail">
+                    <!-- Column to start HTML -->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-sm-9 col-md-10 col-lg-10 col-xs-9">
+                                <ul class="material-list-items">
+                                    <li class="material-list-items-view">
+                                        <div class="material-setup">
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">
+                                                    {{ 'Article Type' | industry | translate }}
+                                                </li>
+                                                <li class="material-setup-list">:</li>
+                                                <li class="material-setup-list">
+                                                    {{ localeService.getDisplayText(materialDetail.articleTypeId) }}
+                                                </li>
+                                            </ul>
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">
+                                                    {{ 'Article UID' | translate }}
+                                                </li>
+                                                <li class="material-setup-list">:</li>
+                                                <li class="material-setup-list break-word">
+                                                    {{
+                                                        materialDetail?.materialUniqueCode ||
+                                                            ('Not Available' | translate)
+                                                            | truncateText: acceptedStringLength
+                                                    }}
+                                                </li>
+                                            </ul>
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">
+                                                    {{ 'Internal Article Name' | industry | translate }}
+                                                </li>
+                                                <li class="material-setup-list">:</li>
+                                                <li
+                                                    class="material-setup-list break-word"
+                                                    [matTooltip]="materialDetail?.internalArticleName"
+                                                >
+                                                    {{
+                                                        materialDetail?.internalArticleName ||
+                                                            ('Not Available' | translate)
+                                                            | truncateText: acceptedStringLength
+                                                    }}
+                                                </li>
+                                            </ul>
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">
+                                                    {{ 'Internal Article Number' | industry | translate }}
+                                                </li>
+                                                <li class="material-setup-list">:</li>
+                                                <li
+                                                    class="material-setup-list break-word "
+                                                    [matTooltip]="materialDetail?.internalArticleNumber"
+                                                >
+                                                    {{
+                                                        materialDetail?.internalArticleNumber ||
+                                                            ('Not Available' | translate)
+                                                            | truncateText: acceptedStringLength
+                                                    }}
+                                                </li>
+                                            </ul>
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">
+                                                    {{ 'Supplier Article Name' | industry | translate }}
+                                                </li>
+                                                <li class="material-setup-list">:</li>
+                                                <li
+                                                    class="material-setup-list break-word"
+                                                    [matTooltip]="materialDetail?.supplierArticleName"
+                                                >
+                                                    {{
+                                                        materialDetail?.supplierArticleName ||
+                                                            ('Not Available' | translate)
+                                                            | truncateText: acceptedStringLength
+                                                    }}
+                                                </li>
+                                            </ul>
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">
+                                                    {{ 'Supplier Article Number' | industry | translate }}
+                                                </li>
+                                                <li class="material-setup-list">:</li>
+                                                <li
+                                                    class="material-setup-list break-word"
+                                                    [matTooltip]="materialDetail?.supplierArticleNumber"
+                                                >
+                                                    {{
+                                                        materialDetail?.supplierArticleNumber ||
+                                                            ('Not Available' | translate)
+                                                            | truncateText: acceptedStringLength
+                                                    }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <!-- Material Set UP -->
+                                    </li>
+                                    <!-- Material List Items View -->
+                                    <li class="material-list-items-view">
+                                        <div class="material-setup">
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">{{ 'Supplier Name' | translate }}</li>
+                                                <li class="material-setup-list">:</li>
+                                                <li
+                                                    class="material-setup-list"
+                                                    [matTooltip]="materialDetail?.supplier?.value"
+                                                >
+                                                    {{
+                                                        materialDetail?.supplier?.value ||
+                                                            ('Not Available' | translate)
+                                                            | truncateText: acceptedStringLength
+                                                    }}
+                                                </li>
+                                            </ul>
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">{{ 'Year' | translate }}</li>
+                                                <li class="material-setup-list">:</li>
+                                                <li class="material-setup-list">
+                                                    {{ materialDetail?.year || ('Not Available' | translate) }}
+                                                </li>
+                                            </ul>
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">{{ 'Season' | translate }}</li>
+                                                <li class="material-setup-list">:</li>
+                                                <li class="material-setup-list">
+                                                    {{
+                                                        materialDetail?.seasons?.value || ('Not Available' | translate)
+                                                    }}
+                                                </li>
+                                            </ul>
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">{{ 'Width' | translate }}</li>
+                                                <li class="material-setup-list">:</li>
+                                                <li class="material-setup-list" *ngIf="materialDetail.width">
+                                                    {{ materialDetail?.width?.value }}
+                                                    {{ localeService?.getDisplayText(materialDetail?.width?.unit) }}
+                                                </li>
+                                                <li class="material-setup-list" *ngIf="!materialDetail?.width">
+                                                    {{ 'Not Available' | translate }}
+                                                </li>
+                                            </ul>
+                                            <ul class="material-setup-block">
+                                                <li class="material-setup-list">{{ 'Density' | translate }}</li>
+                                                <li class="material-setup-list">:</li>
+                                                <li class="material-setup-list">
+                                                    <span class="primary-blue-title" *ngIf="materialDetail?.density">
+                                                        {{ materialDetail?.density?.value }}
+                                                        <label
+                                                            class="mb-0"
+                                                            [innerHTML]="
+                                                                commonServices.getConvertedUnit(
+                                                                    localeService.getDisplayText(
+                                                                        materialDetail.density.unit
+                                                                    )
+                                                                )
+                                                            "
+                                                        >
+                                                        </label>
+                                                    </span>
+                                                    <span class="primary-blue-title" *ngIf="!materialDetail?.density">
+                                                        {{ 'Not Available' | translate }}
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <!-- Material Set UP -->
+                                    </li>
+                                    <!-- Material List Items View -->
+                                    <li class="material-list-items-view">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="material-setup material-setup-separate">
+                                                    <ul class="material-setup-block">
+                                                        <li class="material-setup-list">
+                                                            {{ 'Material Composition' | industry | translate }}:
+                                                        </li>
+                                                        <li class="material-setup-list">
+                                                            <ul class="table-card-material-compositions cursor-default">
+                                                                <li
+                                                                    class="table-card-material-comp"
+                                                                    *ngFor="
+                                                                        let comp of materialDetail.materialsComposition
+                                                                    "
+                                                                >
+                                                                    <div class="comp primary-blue-title">
+                                                                        {{ comp?.value }}%
+                                                                    </div>
+                                                                    <div
+                                                                        class="material-value break-word"
+                                                                        [matTooltip]="
+                                                                            localeService?.getDisplayText(comp.id)
+                                                                        "
+                                                                    >
+                                                                        {{
+                                                                            localeService.getDisplayText(comp.id)
+                                                                                | truncateText: acceptedStringLength
+                                                                        }}
+                                                                    </div>
+                                                                </li>
+                                                                <li
+                                                                    class="primary-blue-title"
+                                                                    *ngIf="
+                                                                        !materialDetail?.materialsComposition ||
+                                                                        materialDetail?.materialsComposition?.length ===
+                                                                            0
+                                                                    "
+                                                                >
+                                                                    {{ 'Not Available' | translate }}
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!-- Material Set UP -->
+                                            </div>
+                                            <!-- Column -->
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="material-setup material-setup-separate">
+                                                    <ul class="material-setup-block">
+                                                        <li class="material-setup-list">
+                                                            {{ 'Required Certificates' | translate }}:
+                                                        </li>
+                                                        <li class="material-setup-list">
+                                                            <div class="comp primary-blue-title mt-1">
+                                                                <span
+                                                                    *ngFor="
+                                                                        let cert of materialDetail?.certifications
+                                                                            | slice: 0:3;
+                                                                        let i = index;
+                                                                        let isLast = last
+                                                                    "
+                                                                >
+                                                                    {{ localeService.getDisplayText(cert.id)
+                                                                    }}{{
+                                                                        isLast
+                                                                            ? materialDetail?.certifications?.length > 3
+                                                                                ? ','
+                                                                                : ''
+                                                                            : ', '
+                                                                    }}
+                                                                </span>
+                                                                <span
+                                                                    *ngIf="
+                                                                        materialDetail?.certifications &&
+                                                                        materialDetail?.certifications?.length > 3
+                                                                    "
+                                                                >
+                                                                    <app-tt-expansion-panel
+                                                                        [valueList]="materialDetail.certifications"
+                                                                    >
+                                                                    </app-tt-expansion-panel>
+                                                                </span>
+                                                            </div>
+                                                            <div
+                                                                class="primary-blue-title pt-1"
+                                                                *ngIf="
+                                                                    !(
+                                                                        materialDetail?.certifications &&
+                                                                        materialDetail?.certifications?.length > 0
+                                                                    )
+                                                                "
+                                                            >
+                                                                {{ 'Not Available' | translate }}
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!-- Material Set UP -->
+                                            </div>
+                                            <!-- Column -->
+                                        </div>
+                                        <!-- Row -->
+                                    </li>
+                                    <!-- Material List Items View -->
+                                    <li class="material-list-items-view">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="material-setup material-setup-separate">
+                                                    <ul class="material-setup-block second-child-pt-1">
+                                                        <li class="material-setup-list">{{ 'Colors' | translate }}:</li>
+                                                        <li
+                                                            class="material-setup-list"
+                                                            *ngFor="
+                                                                let color of materialDetail?.materialColors
+                                                                    | slice: 0:3;
+                                                                let i = index;
+                                                                let isLast = last
+                                                            "
+                                                        >
+                                                            {{ color.value
+                                                            }}{{
+                                                                isLast
+                                                                    ? materialDetail?.materialColors?.length > 3
+                                                                        ? ','
+                                                                        : ''
+                                                                    : ', '
+                                                            }}
+                                                        </li>
+                                                        <li
+                                                            class="material-setup-list"
+                                                            *ngIf="
+                                                                materialDetail?.materialColors &&
+                                                                materialDetail?.materialColors?.length > 3
+                                                            "
+                                                        >
+                                                            <app-tt-expansion-panel
+                                                                [valueList]="materialDetail.materialColors"
+                                                            >
+                                                            </app-tt-expansion-panel>
+                                                        </li>
+                                                        <li
+                                                            class="material-setup-list pt-1"
+                                                            *ngIf="!materialDetail?.materialColors"
+                                                        >
+                                                            {{ 'Not Available' | translate }}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!-- Material Set UP -->
+                                            </div>
+                                            <!-- Column -->
+                                            <div class="col-md-6 col-sm-6">
+                                                <div class="material-setup material-setup-separate">
+                                                    <ul class="material-setup-block">
+                                                        <li class="material-setup-list">
+                                                            {{ 'Traceable' | translate }}:
+                                                        </li>
+                                                        <li
+                                                            class="material-setup-list"
+                                                            *ngIf="materialDetail?.traceable === 'yes'"
+                                                        >
+                                                            <img
+                                                                class="table-card-icons"
+                                                                src="{{ env.IMG_URL }}images/traced.png"
+                                                                alt="Traced"
+                                                            />
+                                                        </li>
+                                                        <li
+                                                            class="material-setup-list"
+                                                            *ngIf="materialDetail?.traceable === 'no'"
+                                                        >
+                                                            <img
+                                                                class="table-card-icons"
+                                                                src="{{ env.IMG_URL }}images/not-traced.png"
+                                                                alt="NotTraced"
+                                                            />
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <!-- Material Set UP -->
+                                            </div>
+                                            <!-- Column -->
+                                        </div>
+                                        <!-- Row -->
+                                    </li>
+                                    <!-- Material List Items View -->
+                                </ul>
+                            </div>
+                            <!-- Column -->
+                            <div class="col-sm-3 col-md-2 col-lg-2 col-xs-3">
+                                <div class="material-setup">
+                                    <ul class="material-button-section">
+                                        <li class="material-button-section-list">
+                                            <div class="material-button-block">
+                                                <a>
+                                                    <button
+                                                        class="edit-styled-btn width-100-px"
+                                                        (click)="showEditDialog(materialDetail.id)"
+                                                    >
+                                                        <i class="fa fa-pencil"></i>{{ 'Edit' | translate }}
+                                                    </button>
+                                                </a>
+                                                <a routerLink="clone">
+                                                    <button class="edit-styled-btn width-100-px">
+                                                        <i class="fa fa-clone"></i>{{ 'Clone' | translate }}
+                                                    </button>
+                                                </a>
+                                            </div>
+                                            <!-- Material Button Block -->
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- Material Set UP -->
+                            </div>
+                            <!-- Column -->
+                        </div>
+                        <!-- Row -->
+                    </div>
+                    <!-- Column -->
+                </div>
+                <!-- Row -->
+                <div *ngIf="materialDetailType === tabs[0]" class="pt-2">
+                    <div class="row pl-2">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <!-- Styles Association -->
+                            <div class="row m-0">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div class="hr">
+                                            <span class="hr-title font-17 font-bold"
+                                                >{{ 'Styles Associated' | industry | translate }}:
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div
+                                            class="row"
+                                            *ngIf="
+                                                materialDetail &&
+                                                materialStyleAssociation &&
+                                                materialStyleAssociation?.length > 0
+                                            "
+                                        >
+                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pb-1">
+                                                <span class="total-size"
+                                                    >{{ 'Total No. of Styles' | industry | translate }}:
+                                                </span>
+                                                <span class="total-size-value">{{ totalSize }}</span>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                <div
+                                                    class="row style-association-table m-0"
+                                                    infiniteScroll
+                                                    [infiniteScrollDistance]="0"
+                                                    (scrolled)="onScroll()"
+                                                    [scrollWindow]="false"
+                                                    [infiniteScrollDisabled]="disableInfiniteScroll"
+                                                >
+                                                    <div
+                                                        class="table-responsive"
+                                                        *ngIf="materialStyleAssociation?.length > 0"
+                                                    >
+                                                        <div
+                                                            class="table-card"
+                                                            *ngFor="let style of materialStyleAssociation"
+                                                            (click)="
+                                                                commonServices.navigateToUrlWithLocationBack([
+                                                                    '/',
+                                                                    'styles',
+                                                                    style.id
+                                                                ])
+                                                            "
+                                                        >
+                                                            <div class="table-card-left flex-column">
+                                                                <div class="title blue-title">
+                                                                    {{ style.name }}
+                                                                </div>
+                                                                <div class="title blue-title font-regular">
+                                                                    {{ style.season }}&nbsp;{{ style.year }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="table-card-right flex-column">
+                                                                <div class="title blue-title">
+                                                                    {{ 'Material Composition' | industry | translate }}
+                                                                </div>
+                                                                <div
+                                                                    class="title blue-title font-regular talign-right"
+                                                                    *ngIf="
+                                                                        style?.materialComp &&
+                                                                        style.materialComp?.length > 0
+                                                                    "
+                                                                >
+                                                                    <span
+                                                                        *ngFor="
+                                                                            let comp of style?.materialComp;
+                                                                            let isLast = last
+                                                                        "
+                                                                    >
+                                                                        {{ comp.value }}%
+                                                                        {{ localeService.getDisplayText(comp.id)
+                                                                        }}{{ isLast ? '' : ', ' }}
+                                                                    </span>
+                                                                </div>
+                                                                <div
+                                                                    class="title blue-title font-regular talign-right"
+                                                                    *ngIf="
+                                                                        !style?.materialComp ||
+                                                                        style?.materialComp?.length === 0
+                                                                    "
+                                                                >
+                                                                    {{ 'Not Available' | translate }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="row"
+                                            *ngIf="
+                                                !materialStyleAssociation ||
+                                                (materialStyleAssociation && materialStyleAssociation?.length === 0)
+                                            "
+                                        >
+                                            <div class="no-style-association">
+                                                <img
+                                                    class="no-transaction-image"
+                                                    src="{{ env.IMG_URL }}images/no-style-association.png"
+                                                    alt="Add"
+                                                />
+                                                <div class="page-title talign-center pt-1">
+                                                    {{ 'No Associated Styles' | translate }}
+                                                </div>
+                                                <div class="page-description talign-center pt-1">
+                                                    {{ 'Style information not available' | industry | translate }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                            <div class="heading-title pb-2 font-bold">{{ 'QR Code' | translate }}:</div>
+                            <div class="mt-1">
+                                <button class="edit-styled-btn" [disabled]="uniqueCode" (click)="viewQRCode()">
+                                    <i class="fa fa-qrcode"></i>{{ 'View QR Code' | translate }}
+                                </button>
+                            </div>
+                            <div class="qr-code-view-wrapper" *ngIf="uniqueCode">
+                                <app-generate-qr-code [qrId]="uniqueCode" [qrCodeId]="'qrcode-id-1'">
+                                </app-generate-qr-code>
+                            </div>
+                        </div>
+                        <!-- 3P - API - Reference key -->
+                        <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 mt-2" *ngIf="false">
+                            <!--<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 mt-2" *ngIf="refId">-->
+                            <div class="heading-title pb-2 font-bold">{{ 'API Reference ID' | translate }}:</div>
+                            <div class="mt-1">
+                                <app-ref-id [apiReferenceId]="refId"></app-ref-id>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pl-2">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <!-- Tags -->
+                            <div class="row m-0">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pb-2">
+                                        <div class="hr">
+                                            <span class="hr-title font-17 font-bold">{{ 'Tags' | translate }}: </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" *ngIf="materialDetail">
+                                    <div
+                                        class="col-xs-12 col-sm-12 col-md-12 col-lg-12 material-tags"
+                                        *ngIf="materialDetail.tags && materialDetail.tags?.length > 0"
+                                    >
+                                        <span *ngFor="let tag of materialDetail.tags" class="material-tag">
+                                            {{ tag }}
+                                        </span>
+                                    </div>
+                                    <div
+                                        class="col-xs-12 col-sm-12 col-md-12 col-lg-12 material-tags"
+                                        *ngIf="!materialDetail.tags || materialDetail.tags?.length === 0"
+                                    >
+                                        <div class="no-tags">
+                                            <div class="page-title talign-center pt-1">
+                                                {{ 'No tags found' | translate }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="materialDetailType === tabs[1]" class="pt-2">
+                    <div class="row pl-2" *ngIf="!showDetailedSupplyChain">
+                        <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                            <div class="row m-0">
+                                <app-orders-association
+                                    [id]="id"
+                                    (handleSelection)="handleSupplyChainFlow($event)"
+                                    (handleItemClick)="getDetailedSupplyChain($event)"
+                                ></app-orders-association>
+                            </div>
+                        </div>
+                        <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                            <!-- Simplified Supply Chain -->
+                            <div class="row m-0">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div class="heading-title">{{ 'Simplified Supply Chain' | translate }}:</div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div class="row">
+                                            <div class="supply-chain">
+                                                <div class="load-supply-chain-tree" *ngIf="isLoadingSupplyChain">
+                                                    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+                                                </div>
+                                                <div class="supply-chain-container" *ngIf="supplyChainProduct">
+                                                    <div class="supply-chain-date-po pb-2" *ngIf="selectedSupplyChain">
+                                                        <div class="pb-1">
+                                                            {{ 'Date Modified' | translate }}:
+                                                            <span>{{
+                                                                selectedSupplyChain.date | date: 'MMM d y'
+                                                            }}</span>
+                                                        </div>
+                                                        <div>
+                                                            {{ 'Purchase Order No' | translate }}.:
+                                                            <span>{{
+                                                                selectedSupplyChain.po || ('Not Available' | translate)
+                                                            }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        class="supply-chain-flow-container"
+                                                        *ngFor="
+                                                            let item of supplyChainProduct | keys;
+                                                            let isLast = last;
+                                                            let isFirst = first
+                                                        "
+                                                    >
+                                                        <div class="row mt-3 max-width-400px min-height-100px">
+                                                            <div class="col-xs-4 col-sm-4 col-md-3 col-lg-3">
+                                                                <div class="product-type-image-container">
+                                                                    <div
+                                                                        class="vertical-line-top"
+                                                                        *ngIf="!isFirst"
+                                                                    ></div>
+                                                                    <!-- <img
+                                                                        class="product-type-image"
+                                                                        src="{{ env.IMG_URL }}images/products/{{
+                                                                            item.key
+                                                                        }}.png"
+                                                                    /> -->
+                                                                    <app-img
+                                                                        [src]="getSrc(item)"
+                                                                        [alt]="item.key"
+                                                                        [default]="defaultSrc"
+                                                                        class="simplified-chain-product-type-image"
+                                                                    >
+                                                                    </app-img>
+                                                                    <div
+                                                                        class="vertical-line-bottom"
+                                                                        *ngIf="!isLast"
+                                                                    ></div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-xs-8 col-sm-8 col-md-6 col-lg-6">
+                                                                <div class="product-type-heading">
+                                                                    {{ localeService.getDisplayText(item.key) }}
+                                                                </div>
+                                                                <div
+                                                                    class="supply-chain-detail-container"
+                                                                    *ngIf="item && item.value && item.value?.length > 0"
+                                                                >
+                                                                    <div
+                                                                        class="supply-chain-details cursor-default"
+                                                                        *ngFor="let supplier of item.value"
+                                                                    >
+                                                                        <div>
+                                                                            {{ supplier.name
+                                                                            }}<span *ngIf="supplier?.address?.country"
+                                                                                >,
+                                                                                {{ supplier?.address?.country }}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    class="no-supply-chain"
+                                                    *ngIf="!supplyChainProduct && !isLoadingSupplyChain"
+                                                >
+                                                    <img
+                                                        class="no-transaction-image"
+                                                        src="{{ env.IMG_URL }}images/no-tree-view-available.png"
+                                                        alt="Add"
+                                                    />
+                                                    <div class="page-title talign-center pt-1">
+                                                        {{ 'No Tree View Available' | translate }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pl-1" *ngIf="showDetailedSupplyChain">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 detailed-supply-chain-title">
+                            {{ 'Detailed Supply Chain' | translate }}:
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pt-4 display-flex-align-items-center">
+                            <span (click)="handleBackClick()" class="click-back">
+                                <img class="sni" src="{{ env.IMG_URL }}images/charts-back.png" />
+                            </span>
+                            <div class="supply-chain-date-po pb-2" *ngIf="selectedDetailedSupplyChain">
+                                <div class="pb-1">
+                                    {{ 'Date Modified' | translate }}:
+                                    <span>{{ selectedDetailedSupplyChain.date | date: 'MMM d y' }}</span>
+                                </div>
+                                <div>
+                                    {{ 'Purchase Order No' | translate }}.:
+                                    <span>{{ selectedDetailedSupplyChain.po || ('Not Available' | translate) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="col-xs-12 col-sm-12 col-md-12 col-lg-12 tree-view-container"
+                            *ngIf="supplyChainData"
+                        >
+                            <app-tree-view
+                                [items]="supplyChainData"
+                                [navigateWithParams]="true"
+                                [queryParams]="queryParams"
+                            ></app-tree-view>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="materialDetailType === tabs[2]" class="pt-2">
+                    <div class="row pt-2 pl-2">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <app-evidences-association
+                                [id]="id"
+                                [entity]="'Material Library'"
+                                (handleSelection)="handleSelectedEvidence($event)"
+                            ></app-evidences-association>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <div class="heading-title">{{ tabs[2] | translate }}:</div>
+                                </div>
+                            </div>
+                            <div class="evidence-container">
+                                <div class="load-evidence" *ngIf="isLoadingProductEvidence">
+                                    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+                                </div>
+                                <div class="row evidence_details mt-2 mb-2 ">
+                                    <div
+                                        class="col-xs-12 col-sm-12 col-md-12 col-lg-12"
+                                        *ngIf="selectedEvidence && !isLoadingProductEvidence"
+                                    >
+                                        <p>
+                                            {{ 'Date Modified' | translate }}:
+                                            <span class="font-bold">{{
+                                                selectedEvidence.last_modified | date: 'MMM d y'
+                                            }}</span>
+                                        </p>
+                                        <p>
+                                            Purchase Order No: <span class="font-bold">{{ selectedEvidence.po }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <p class="noMaterials pt-1" *ngIf="evidenceDetail?.length <= 0">
+                                    {{ 'No Standards' | translate }} &amp;
+                                    {{ 'Certifications' | translate }}
+                                </p>
+                                <div class="row" *ngFor="let evidence of evidenceDetail">
+                                    <div class="col-md-12">
+                                        <h5 class="tt-font">
+                                            {{ localeService.getDisplayText(evidence.productType) }}:
+                                        </h5>
+                                        <div class="standardsContainer" style="border:none;">
+                                            <div class="row" *ngIf="evidence?.evidencesView?.length > 0">
+                                                <div
+                                                    class="col-md-2 standardsImageContainer"
+                                                    *ngFor="let standard of evidence?.evidencesView; let i = index"
+                                                >
+                                                    <div
+                                                        class="certificate-item"
+                                                        [tooltip]="certificateTooltipContent"
+                                                        data-placement="top"
+                                                        (click)="
+                                                            downloadFiles(
+                                                                standard?.ttCertificate?.id,
+                                                                standard?.ttCertificate?.uploadedFiles
+                                                            )
+                                                        "
+                                                        containerClass="certificateTooltip"
+                                                        container="body"
+                                                    >
+                                                        <img
+                                                            [src]="
+                                                                utilService.getStandardImageUrl(
+                                                                    standard.ttCertificate.typeId
+                                                                )
+                                                            "
+                                                            (error)="
+                                                                utilService.getDefaultCertificateImage($event.target)
+                                                            "
+                                                            alt="Certificate Image"
+                                                        />
+                                                        <div class="overlay-download-icon">
+                                                            <img
+                                                                src="{{ env.IMG_URL }}images/icon-download-white.png"
+                                                                alt="Download Certificate"
+                                                            />
+                                                        </div>
+                                                        <div class="download-icon placement-bottom-right">
+                                                            <img
+                                                                src="{{ env.IMG_URL }}images/icon-download-grey.png"
+                                                                alt="Download Certificate"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <ng-template #certificateTooltipContent>
+                                                        <div
+                                                            class="text-left"
+                                                            style="background-color: #fff; border: 1px solid #f5f5f5;"
+                                                        >
+                                                            <h5 class="tt-font">
+                                                                {{ localeService.getDisplayText(standard.certId) }}:
+                                                            </h5>
+                                                            <h5 class="tt-font tt-font-regular">
+                                                                {{ 'Product Name' | translate }}:
+                                                                <span style="font-weight: bold !important;"
+                                                                    >{{
+                                                                        localeService.getDisplayText(
+                                                                            evidence.productType
+                                                                        )
+                                                                    }}
+                                                                </span>
+                                                            </h5>
+                                                            <h5 class="tt-font tt-font-regular">
+                                                                {{ 'Certification Type' | translate }}:
+                                                                <span style="font-weight: bold !important;">{{
+                                                                    standard.category | titlecase
+                                                                }}</span>
+                                                            </h5>
+                                                            <h5 class="tt-font tt-font-regular">
+                                                                {{ 'Provided By' | translate }}:
+                                                                <span style="font-weight: bold !important;">{{
+                                                                    standard.dataProviderName
+                                                                }}</span>
+                                                            </h5>
+                                                        </div>
+                                                    </ng-template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="row text-color-primary"
+                    *ngIf="
+                        materialDetailType !== tabs[0] &&
+                        materialDetailType !== tabs[1] &&
+                        materialDetailType !== tabs[2]
+                    "
+                >
+                    <div *ngIf="!isFetchingAdditionalInfo">
+                        <app-additional-information
+                            [entityId]="id"
+                            [entity]="entity"
+                            [entityData]="additionalInfo"
+                            [fieldResponse]="fieldResponse"
+                            [canShowEditIcon]="checkAccess('ML_UPDATE')"
+                            (saveAdditionalInfo)="onSaveAdditionalInfo($event)"
+                        >
+                        </app-additional-information>
+                    </div>
+                    <i class="fa fa-spinner fa-spin ec-loader" *ngIf="isFetchingAdditionalInfo"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>

@@ -1,0 +1,563 @@
+{
+    "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+    "version": 1,
+    "newProjectRoot": "projects",
+    "projects": {
+        "tt-app": {
+            "root": "",
+            "sourceRoot": "src",
+            "projectType": "application",
+            "architect": {
+                "build": {
+                    "builder": "@angular-devkit/build-angular:browser",
+                    "options": {
+                        "aot": true,
+                        "outputPath": "dist",
+                        "index": "src/index.html",
+                        "main": "src/main.ts",
+                        "tsConfig": "src/tsconfig.app.json",
+                        "polyfills": "src/polyfills.ts",
+                        "assets": [
+                            "src/assets",
+                            {
+                                "glob": "**/*",
+                                "input": "node_modules/leaflet/dist/images",
+                                "output": "/assets"
+                            }
+                        ],
+                        "styles": [
+                            "node_modules/saturn-datepicker/bundle.css",
+                            "node_modules/bootstrap/dist/css/bootstrap.min.css",
+                            "node_modules/font-awesome/css/font-awesome.min.css",
+                            "node_modules/ngx-toastr/toastr.css",
+                            "node_modules/spinkit/css/spinners/10-fading-circle.css",
+                            "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
+                            "node_modules/leaflet/dist/leaflet.css",
+                            "node_modules/leaflet.fullscreen/Control.FullScreen.css",
+                            "node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css",
+                            "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+                            "src/assets/stylesheets/flag-icon.scss",
+                            "src/styles/styles.scss",
+                            "src/styles/commons.scss",
+                            "src/styles/common-components.scss"
+                        ],
+                        "stylePreprocessorOptions": {
+                            "includePaths": ["src/environments/styles/staging"]
+                        },
+                        "scripts": [
+                            "node_modules/ngx-extended-pdf-viewer/assets/pdf.js",
+                            "node_modules/ngx-extended-pdf-viewer/assets/pdf.worker.js",
+                            "node_modules/ngx-extended-pdf-viewer/assets/viewer.js"
+                        ]
+                    },
+                    "configurations": {
+                        "food-qa-aot": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.food.qa.ts"
+                                }
+                            ],
+                            "index": {
+                                "input": "src/index.staging.html",
+                                "output": "index.html"
+                            },
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/staging"]
+                            }
+                        },
+                        "food-uat-aot": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.food.uat.ts"
+                                }
+                            ],
+                            "index": {
+                                "input": "src/index.staging.html",
+                                "output": "index.html"
+                            },
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/staging"]
+                            }
+                        },
+                        "fashion-qa-aot": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.fashion.qa.ts"
+                                }
+                            ],
+                            "index": {
+                                "input": "src/index.staging.html",
+                                "output": "index.html"
+                            },
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/staging"]
+                            }
+                        },
+                        "fashion-uat-aot": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.fashion.uat.ts"
+                                }
+                            ],
+                            "index": {
+                                "input": "src/index.staging.html",
+                                "output": "index.html"
+                            },
+                            "stylePreprocessorOptions": {}
+                        },
+                        "adidas-qa-aot": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/staging"]
+                            },
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.adidas.qa.ts"
+                                },
+                                {
+                                    "replace": "src/index.html",
+                                    "with": "src/index-adidas.qa.html"
+                                }
+                            ]
+                        },
+                        "food-qa": {
+                            "optimization": false,
+                            "outputHashing": "none",
+                            "sourceMap": true,
+                            "extractCss": false,
+                            "namedChunks": false,
+                            "aot": false,
+                            "extractLicenses": false,
+                            "vendorChunk": false,
+                            "buildOptimizer": false,
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/staging"]
+                            },
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.food.qa.ts"
+                                }
+                            ],
+                            "index": {
+                                "input": "src/index.staging.html",
+                                "output": "index.html"
+                            }
+                        },
+                        "food-uat": {
+                            "optimization": false,
+                            "outputHashing": "none",
+                            "sourceMap": true,
+                            "extractCss": false,
+                            "namedChunks": false,
+                            "aot": false,
+                            "extractLicenses": false,
+                            "vendorChunk": false,
+                            "buildOptimizer": false,
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/staging"]
+                            },
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.food.uat.ts"
+                                }
+                            ],
+                            "index": {
+                                "input": "src/index.staging.html",
+                                "output": "index.html"
+                            }
+                        },
+                        "fashion-local": {
+                            "optimization": false,
+                            "outputHashing": "none",
+                            "sourceMap": true,
+                            "extractCss": false,
+                            "namedChunks": false,
+                            "aot": false,
+                            "extractLicenses": false,
+                            "vendorChunk": false,
+                            "buildOptimizer": false,
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/staging"]
+                            },
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.fashion.local.ts"
+                                }
+                            ]
+                        },
+                        "uat-local": {
+                            "optimization": false,
+                            "outputHashing": "none",
+                            "sourceMap": true,
+                            "extractCss": false,
+                            "namedChunks": false,
+                            "aot": false,
+                            "extractLicenses": false,
+                            "vendorChunk": false,
+                            "buildOptimizer": false,
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/adidas-staging"]
+                            },
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.uat.local.ts"
+                                }
+                            ]
+                        },
+                        "fashion-qa": {
+                            "optimization": false,
+                            "outputHashing": "none",
+                            "sourceMap": true,
+                            "extractCss": false,
+                            "namedChunks": false,
+                            "aot": false,
+                            "extractLicenses": false,
+                            "vendorChunk": false,
+                            "buildOptimizer": false,
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/staging"]
+                            },
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.fashion.qa.ts"
+                                }
+                            ],
+                            "index": {
+                                "input": "src/index.staging.html",
+                                "output": "index.html"
+                            }
+                        },
+                        "uat-qa": {
+                            "optimization": false,
+                            "outputHashing": "none",
+                            "sourceMap": true,
+                            "extractCss": false,
+                            "namedChunks": false,
+                            "aot": false,
+                            "extractLicenses": false,
+                            "vendorChunk": false,
+                            "buildOptimizer": false,
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/adidas-staging"]
+                            },
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.uat.qa.ts"
+                                },
+                                {
+                                    "replace": "src/index.html",
+                                    "with": "src/index-adidas.qa.html"
+                                }
+                            ]
+                        },
+                        "adidas-qa": {
+                            "optimization": false,
+                            "outputHashing": "none",
+                            "sourceMap": true,
+                            "extractCss": false,
+                            "namedChunks": false,
+                            "aot": false,
+                            "extractLicenses": false,
+                            "vendorChunk": false,
+                            "buildOptimizer": false,
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/adidas-staging"]
+                            },
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.adidas.qa.ts"
+                                },
+                                {
+                                    "replace": "src/index.html",
+                                    "with": "src/index-adidas.qa.html"
+                                }
+                            ]
+                        },
+                        "fashion-production": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.fashion.prod.ts"
+                                }
+                            ],
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/prod"]
+                            }
+                        },
+                        "food-production": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.food.prod.ts"
+                                }
+                            ],
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/prod"]
+                            }
+                        },
+                        "adidas-production": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.adidas.prod.ts"
+                                },
+                                {
+                                    "replace": "src/index.html",
+                                    "with": "src/index-adidas.production.html"
+                                }
+                            ],
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/adidas-prod"]
+                            }
+                        },
+                        "adidas-integration": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.adidas.int.ts"
+                                },
+                                {
+                                    "replace": "src/index.html",
+                                    "with": "src/index-adidas.integration.html"
+                                }
+                            ],
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/prod"]
+                            }
+                        },
+                        "adidas-training": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.adidas.training.ts"
+                                },
+                                {
+                                    "replace": "src/index.html",
+                                    "with": "src/index-adidas.training.html"
+                                }
+                            ],
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/adidas-prod"]
+                            }
+                        },
+                        "staging": {
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": true,
+                            "extractCss": true,
+                            "namedChunks": false,
+                            "aot": false,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": false,
+                            "fileReplacements": [],
+                            "index": {
+                                "input": "src/index.staging.html",
+                                "output": "index.html"
+                            },
+                            "stylePreprocessorOptions": {
+                                "includePaths": ["src/environments/styles/staging"]
+                            }
+                        }
+                    }
+                },
+                "serve": {
+                    "builder": "@angular-devkit/build-angular:dev-server",
+                    "options": {
+                        "browserTarget": "tt-app:build",
+                        "open": true,
+                        "host": "app.trustrace.local",
+                        "port": 4200
+                    },
+                    "configurations": {
+                        "food-qa": {
+                            "browserTarget": "tt-app:build:food-qa"
+                        },
+                        "food-uat": {
+                            "browserTarget": "tt-app:build:food-uat"
+                        },
+                        "fashion-local": {
+                            "browserTarget": "tt-app:build:fashion-local"
+                        },
+                        "uat-local": {
+                            "browserTarget": "tt-app:build:uat-local"
+                        },
+                        "fashion-qa": {
+                            "browserTarget": "tt-app:build:fashion-qa"
+                        },
+                        "uat-qa": {
+                            "browserTarget": "tt-app:build:uat-qa"
+                        },
+                        "adidas-qa": {
+                            "browserTarget": "tt-app:build:adidas-qa"
+                        },
+                        "production": {
+                            "browserTarget": "tt-app:build:production",
+                            "aot": true,
+                            "optimization": true
+                        }
+                    }
+                },
+                "extract-i18n": {
+                    "builder": "@angular-devkit/build-angular:extract-i18n",
+                    "options": {
+                        "browserTarget": "tt-app:build"
+                    }
+                },
+                "test": {
+                    "builder": "@angular-devkit/build-angular:karma",
+                    "options": {
+                        "main": "src/test.ts",
+                        "karmaConfig": "./karma.conf.js",
+                        "polyfills": "src/polyfills.ts",
+                        "tsConfig": "src/tsconfig.spec.json",
+                        "scripts": [],
+                        "styles": [
+                            "node_modules/bootstrap/dist/css/bootstrap.min.css",
+                            "node_modules/font-awesome/css/font-awesome.min.css",
+                            "node_modules/ngx-toastr/toastr.css",
+                            "node_modules/spinkit/css/spinners/10-fading-circle.css",
+                            "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
+                            "node_modules/leaflet/dist/leaflet.css",
+                            "node_modules/leaflet.fullscreen/Control.FullScreen.css",
+                            "node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css",
+                            "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+                            "src/assets/stylesheets/flag-icon.scss",
+                            "src/styles/styles.scss",
+                            "src/styles/commons.scss",
+                            "src/styles/common-components.scss"
+                        ],
+                        "assets": [
+                            "src/assets",
+                            {
+                                "glob": "**/*",
+                                "input": "node_modules/leaflet/dist/images",
+                                "output": "/assets"
+                            }
+                        ]
+                    }
+                },
+                "lint": {
+                    "builder": "@angular-eslint/builder:lint",
+                    "options": {
+                        "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+                    }
+                }
+            }
+        }
+    },
+    "defaultProject": "tt-app",
+    "schematics": {
+        "@schematics/angular:component": {
+            "prefix": "app",
+            "style": "scss"
+        },
+        "@schematics/angular:directive": {
+            "prefix": "app"
+        }
+    },
+    "cli": {
+        "analytics": false
+    }
+}

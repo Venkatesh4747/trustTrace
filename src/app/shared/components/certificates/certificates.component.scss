@@ -1,0 +1,19 @@
+@import '~styles/variables';
+
+.standard-container {
+    height: 200px;
+    margin-left: 0px;
+}
+.standards-image-container {
+    display: inline-block;
+}
+.tool-tip-div {
+    background-color: #fff;
+    border: 1px solid $box-shadow-color-default;
+}
+.tool-tip-font {
+    font-weight: bold;
+}
+.border-none {
+    border: none;
+}

@@ -1,0 +1,13 @@
+@import '~styles/variables';
+
+#tr-container {
+    .table-card-left {
+        .desc.blue-desc {
+            span {
+                font-size: 14px;
+                color: $text-color-primary;
+                font-family: $font-family-Bold;
+            }
+        }
+    }
+}

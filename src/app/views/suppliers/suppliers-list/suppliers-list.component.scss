@@ -1,0 +1,131 @@
+@import '~styles/variables';
+
+.supplier-title {
+    a {
+        font-family: $font-family-Bold;
+        color: $text-color-primary;
+    }
+}
+
+.action-item {
+    user-select: none;
+    &.flex-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+}
+
+.unaccepted {
+    font-family: $font-family-Semibold;
+    font-size: 16px;
+    color: $color_red;
+    font-weight: 600;
+    text-align: center;
+}
+
+.accepted {
+    font-family: $font-family-Semibold;
+    font-size: 16px;
+    color: $text-color-primary;
+    font-weight: 600;
+    text-align: center;
+}
+
+.remainder-icon {
+    width: 21px;
+    height: auto;
+    margin-top: -5px;
+}
+
+.remainder-email-icon {
+    position: absolute;
+    width: 42px;
+    left: 5px;
+    top: 0px;
+}
+
+.action-btn {
+    min-width: 184px;
+    font-family: $font-family-Semibold;
+    color: $color-table-filter-5;
+    padding: 8px 10px;
+    background-color: transparent;
+    outline: none;
+    border-radius: 6px;
+    border: solid 2px $stroke-color-choose-btn;
+    position: relative;
+    span {
+        margin-left: 25px;
+    }
+    img {
+        margin-right: 8px;
+    }
+}
+
+.action-terminate-btn {
+    min-width: 100px;
+    font-family: $font-family-Semibold;
+    color: $color_red;
+    padding: 8px 10px;
+    background-color: $color_white;
+    outline: none;
+    border-radius: 6px;
+    border: solid 2px $color_red;
+    position: relative;
+    span {
+        margin-left: 25px;
+    }
+    img {
+        margin-right: 8px;
+    }
+    &:hover {
+        background-color: $color_red;
+        color: $color_white;
+    }
+}
+
+.desc {
+    span {
+        font-size: 14px;
+        color: $color-table-filter-5;
+        font-family: $font-family-Bold;
+    }
+}
+
+.overallScore {
+    color: $color-table-filter-5;
+}
+
+.unaccepted-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.edit-invite {
+    float: right;
+    cursor: pointer;
+    height: 2.5em;
+    align-self: flex-end;
+    img {
+        width: 23px;
+    }
+    .link-image {
+        img {
+            width: 15px;
+        }
+    }
+    .hide-invite-url {
+        opacity: 0;
+        height: 0;
+        position: absolute;
+        pointer-events: none;
+    }
+}
+.archive-button {
+    padding-right: 15px;
+}
+.table-card .table-card-left {
+    width: 75%;
+}

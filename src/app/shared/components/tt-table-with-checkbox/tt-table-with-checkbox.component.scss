@@ -1,0 +1,52 @@
+@import '~styles/variables';
+@import '~styles/mixins';
+
+/* .common-fix-header-table {
+    .table {
+        &-responsive {
+            padding: 0;
+        }
+        table-layout: fixed;
+        border-collapse: collapse;
+        > thead {
+            position: relative;
+            > tr {
+                display: block;
+                position: relative;
+                border-bottom: 1px solid $color_arrow_border-color;
+                > th {
+                    border-bottom: 0 !important;
+                    padding: 8px;
+                    &:first-child {
+                        padding-left: 5px;
+                    }
+                }
+            }
+        }
+        > tbody {
+            height: 95px;
+            overflow: auto;
+            display: block;
+            > tr {
+                display: block;
+                position: relative;
+                border-bottom: 1px solid $color_table-border-bottom;
+                > td {
+                    border-bottom: 0 !important;
+                    padding: 8px;
+                    &:first-child {
+                        padding-left: 5px;
+                        vertical-align: top;
+                    }
+                    .user {
+                        &-details {
+                            p {
+                                margin-bottom: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+} */

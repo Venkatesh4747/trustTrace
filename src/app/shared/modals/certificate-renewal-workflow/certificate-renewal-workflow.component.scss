@@ -1,0 +1,89 @@
+@import '~styles/variables';
+
+.certificate-renewal-container {
+    color: #325992;
+    font-family: $font-family-Regular;
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+}
+
+.certificate-renewal-left-container {
+    width: 45%;
+}
+
+.certificate-renewal-center-container {
+    width: 10%;
+    text-align: center;
+}
+
+.certificate-renewal-right-container {
+    width: 45%;
+}
+
+.certificate-renewal-title {
+    font-size: 16px;
+    font-family: $font-family-Bold;
+    margin-bottom: 15px;
+}
+.certificate-renewal-subtitle {
+    padding-bottom: 10px;
+}
+
+.upload-certificate {
+    display: block;
+    padding: 20px 0 10px;
+}
+
+.brand-comments h3 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.secondary-btn {
+    display: block;
+    border-radius: 4px;
+    margin: 0 auto;
+    border: 0;
+    background-color: #7affad;
+    padding: 10px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #4b4b4b;
+    text-align: center;
+    &:hover,
+    &:focus,
+    &:active {
+        outline: none;
+        background-color: #7affad;
+    }
+}
+
+.mat-input-label {
+    display: block;
+    padding-bottom: 5px;
+}
+
+mat-radio-label {
+    width: 100%;
+    white-space: inherit;
+}
+
+mat-radio-button {
+    width: 100%;
+    padding: 10px;
+    align-items: center;
+}
+
+mat-form-field-infix {
+    margin-top: 20px;
+}
+
+.resolution-date-picker {
+    margin-top: 20px;
+    .resolution-date-picker-label {
+        color: #325992;
+        font-size: 16px;
+        font-weight: bold;
+    }
+}

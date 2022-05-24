@@ -1,0 +1,55 @@
+<div class="certifications-container">
+    <div class="sub-supplier-hr hr">
+        <span class="hr-title">{{ 'Certifications' | translate | uppercase }}</span>
+    </div>
+    <div class="standardsContainer border-none">
+        <p class="noMaterials pt-1" *ngIf="!standards?.length; else certificates">
+            <span>{{ 'No Standards' | translate }} & {{ 'Certifications' | translate }}</span>
+        </p>
+        <ng-template #certificates>
+            <div class="standard-container pt-1 row">
+                <div class="standards-image-container" *ngFor="let standard of standards">
+                    <div
+                        class="certificate-item"
+                        [tooltip]="certificateTooltipContent"
+                        data-placement="top"
+                        (click)="downloadFile(standard.id, standard.uploadedFiles[0])"
+                        containerClass="certificateTooltip"
+                        container="body"
+                    >
+                        <img src="{{ getStandardImageUrl(standard.typeId) }}" alt="Certificate Image" />
+                        <div class="overlay-download-icon">
+                            <img
+                                class=" ml-1"
+                                src="{{ env.IMG_URL }}images/icon-download-white.png"
+                                alt="Download Certificate"
+                            />
+                        </div>
+                        <div class="download-icon placement-bottom-right">
+                            <img src="{{ env.IMG_URL }}images/icon-download-grey.png" alt="Download Certificate" />
+                        </div>
+                    </div>
+                    <ng-template #certificateTooltipContent>
+                        <div class="text-left tool-tip-div">
+                            <h5 class="tt-font">
+                                {{ getCertificateNameById(standard.typeId) }}
+                            </h5>
+                            <h5 class="tt-font tt-font-regular">
+                                {{ 'Validity' | translate }}:
+                                <span class="tool-tip-font">{{ standard.expiryDate | date }}</span>
+                            </h5>
+                            <h5 class="tt-font tt-font-regular">
+                                {{ 'Certification Body' | translate }}:
+                                <span class="tool-tip-font">{{ standard.body }}</span>
+                            </h5>
+                            <h5 class="tt-font tt-font-regular">
+                                {{ 'Facility Name' | translate }}:
+                                <span class="tool-tip-font">{{ standard.facilityName }}</span>
+                            </h5>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+</div>
